@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<link rel="stylesheet" href="/app/css/app.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Offline — RenterIQ</title>
+<style>
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl)}
+.offline-header{background:var(--blue);padding:20px;text-align:center}
+.offline-logo{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+.offline-logo svg{flex-shrink:0}
+.offline-logo span{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px}
+.offline-title{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#fff}
+.offline-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.offline-icon{font-size:64px;margin-bottom:24px}
+.offline-heading{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);margin-bottom:12px}
+.offline-body{font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted);line-height:1.65;max-width:320px;margin-bottom:32px}
+.offline-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px}
+.btn-home{background:var(--blue);color:#fff;border:none;border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;cursor:pointer;-webkit-tap-highlight-color:transparent;width:100%}
+.btn-retry{background:#fff;color:var(--blue);border:2px solid var(--blue);border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;cursor:pointer;-webkit-tap-highlight-color:transparent;width:100%}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="offline-header">
+    <div class="offline-logo">
+      <svg width="22" height="28" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 0L21.5 5V13C21.5 20.18 17.16 26.36 11 28C4.84 26.36 0.5 20.18 0.5 13V5L11 0Z" fill="rgba(255,255,255,.85)"/>
+        <path d="M11 4L7 9.5V15.5H9.5V12H12.5V15.5H15V9.5L11 4Z" fill="#1B50C8"/>
+      </svg>
+      <span>RENTERIQ</span>
+    </div>
+    <div class="offline-title">You're offline</div>
+  </div>
+  <div class="offline-content">
+    <div class="offline-icon">📶</div>
+    <div class="offline-heading">No internet connection</div>
+    <div class="offline-body">RenterIQ works offline for pages you've visited before. Connect to the internet to access new content.</div>
+    <div class="offline-btns">
+      <button class="btn-home" onclick="navigate('/app/index.html')">Go to Home</button>
+      <button class="btn-retry" onclick="location.reload()">Try Again</button>
+    </div>
+  </div>
+</div>
+<script>
+function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+document.addEventListener('DOMContentLoaded',function(){document.body.style.opacity='0';requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'})});
+</script>
+</body>
+</html>

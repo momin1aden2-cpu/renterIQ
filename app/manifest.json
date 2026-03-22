@@ -1,7 +1,7 @@
 {
   "name": "RenterIQ",
   "short_name": "RenterIQ",
-  "description": "Your complete renting guide — from search to vacate.",
+  "description": "The complete renting guide for Australian tenants — from search to vacate.",
   "start_url": "/app/index.html",
   "display": "standalone",
   "orientation": "portrait",
@@ -23,5 +23,28 @@
   ],
   "screenshots": [],
   "categories": ["lifestyle", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Search Rentals",
+      "short_name": "Search",
+      "description": "Find rental properties",
+      "url": "/app/pages/search.html",
+      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Inspections",
+      "short_name": "Inspect",
+      "description": "View upcoming inspections",
+      "url": "/app/pages/inspection.html",
+      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Vault",
+      "short_name": "Vault",
+      "description": "Access your documents",
+      "url": "/app/pages/vault.html",
+      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
   "lang": "en-AU"
 }

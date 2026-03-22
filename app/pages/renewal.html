@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/app/css/app.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Lease Renewal — RenterIQ</title>
+<style>
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl)}
+.rn-header{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.rn-row{display:flex;align-items:center;justify-content:space-between}
+.rn-back{background:none;border:none;color:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.rn-back-arrow{font-size:22px;font-weight:700;line-height:1}
+.rn-back-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;opacity:.7}
+.rn-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
+.rn-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.rn-help{background:rgba(255,255,255,.12);border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:#fff;font-family:'Sora',sans-serif;font-weight:700}
+.view{display:flex;flex-direction:column;min-height:100vh;transition:opacity .2s ease}
+.teal-lt{background:rgba(0,200,150,.1)}
+.amber-lt{background:rgba(245,166,35,.1)}
+.blue-lt-bg{background:var(--blue-xl)}
+.sp-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
+.sp-text{font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55}
+.bond-checkbox{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
+@keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.change-row{padding:11px 0;border-bottom:1px solid var(--border-lt);display:flex;align-items:flex-start;gap:12px}
+.change-row:last-child{border-bottom:none}
+.change-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.upload-zone{border:2px dashed var(--border);border-radius:18px;padding:32px 20px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .2s var(--ease-smooth)}
+.upload-zone:active{border-color:var(--blue);background:rgba(27,80,200,.02)}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.timeline-item{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-lt)}
+.timeline-item:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ═══════════════════════════════════
+     VIEW A — RENEWAL OVERVIEW
+     ═══════════════════════════════════ -->
+<div class="view" id="viewA">
+
+<header class="rn-header">
+  <div class="rn-row">
+    <button class="rn-back" onclick="navigate('/app/index.html')"><span class="rn-back-arrow">‹</span><span class="rn-back-label">RENTERIQ</span></button>
+    <button class="rn-help" onclick="showToast('Lease Renewal','Renewing or moving out? RenterIQ guides both','💡')">?</button>
+  </div>
+  <div class="rn-title">Lease Renewal</div>
+  <div class="rn-sub">18 Smith Street, Fitzroy VIC 3065</div>
+</header>
+
+<div style="flex:1;padding-bottom:100px">
+
+<!-- LEASE STATUS CARD -->
+<div style="margin:16px;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.08)">
+  <div style="display:flex;gap:14px;align-items:center">
+    <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📅</div>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Current Lease Ending</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:var(--blue);margin-top:3px">31 March 2026</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">358 days remaining</div>
+    </div>
+  </div>
+  <div style="height:1px;background:var(--border-lt);margin:12px 0"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Time elapsed</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">7 of 12 months</span></div>
+  <div style="height:8px;background:var(--blue-xl);border-radius:100px;overflow:hidden"><div id="renewalLeaseBar" style="height:100%;background:var(--teal);border-radius:100px;width:0;transition:width .8s cubic-bezier(.4,0,.2,1)"></div></div>
+  <div style="margin-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Reminders set:</span>
+    <span style="background:var(--blue-xl);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue)">90 days</span>
+    <span style="background:var(--blue-xl);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue)">60 days</span>
+    <span style="background:var(--blue-xl);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue)">30 days</span>
+  </div>
+</div>
+
+<!-- DECISION CARDS -->
+<div style="margin:0 16px 14px;padding-top:4px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:16px">What would you like to do?</div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+
+    <!-- RENEWING -->
+    <div style="background:#fff;border-radius:18px;padding:20px;border:2px solid var(--blue);box-shadow:0 4px 16px rgba(27,80,200,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s" onclick="switchView('B')" onpointerdown="this.style.transform='scale(.98)'" onpointerup="this.style.transform=''">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:26px">🔄</div>
+        <span style="background:var(--blue);color:#fff;border-radius:100px;padding:5px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Renewing</span>
+      </div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--text);margin-top:12px">I'm renewing my lease</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:8px;line-height:1.65">Upload your new lease and RenterIQ reviews every clause in plain English — so you know exactly what changed from your previous agreement.</div>
+      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-top:12px;display:block">Continue →</span>
+    </div>
+
+    <!-- NOT RENEWING -->
+    <div style="background:#fff;border-radius:18px;padding:20px;border:1.5px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s" onclick="switchView('D')" onpointerdown="this.style.transform='scale(.98)'" onpointerup="this.style.transform=''">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:26px">🚪</div>
+      </div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--text);margin-top:12px">I'm moving out</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:8px;line-height:1.65">RenterIQ will guide you through everything you need to do before handing back the keys — from your exit inspection to getting your bond back.</div>
+      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);margin-top:12px;display:block">Continue →</span>
+    </div>
+  </div>
+</div>
+
+<!-- NOT SURE YET -->
+<div style="margin:0 16px 16px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:16px;padding:16px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:6px">🤔 Not sure yet?</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">You don't need to decide right now. RenterIQ will send you reminders at 90, 60 and 30 days before your lease ends. Come back when you're ready.</div>
+  <button style="background:transparent;color:#7A5500;border:1px solid rgba(245,166,35,.4);border-radius:10px;padding:10px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;margin-top:10px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Reminder set','We\'ll remind you again at 60 days','🔔')">Remind Me Later</button>
+</div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/search.html')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+</nav>
+</div>
+
+<!-- ═══════════════════════════════════
+     VIEW B — UPLOAD NEW LEASE
+     ═══════════════════════════════════ -->
+<div class="view" id="viewB" style="display:none">
+
+<header class="rn-header">
+  <div class="rn-row">
+    <button class="rn-back" onclick="switchView('A')"><span class="rn-back-arrow">‹</span><span class="rn-back-label">Renewal</span></button>
+  </div>
+  <div class="rn-title">New Lease Upload</div>
+  <div class="rn-sub">Upload your renewed lease for review</div>
+  <div style="margin-top:14px;height:6px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden"><div style="height:100%;width:50%;background:#fff;border-radius:100px"></div></div>
+</header>
+
+<div style="flex:1;padding:16px;padding-bottom:120px">
+
+<!-- WHAT WE CHECK -->
+<div style="background:rgba(27,80,200,.04);border:1px solid rgba(27,80,200,.12);border-radius:14px;padding:15px 16px;margin-bottom:16px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:10px">📋 What RenterIQ will check in your new lease</div>
+  <div style="display:flex;flex-direction:column;gap:7px">
+    <div style="display:flex;gap:8px;align-items:flex-start"><div class="sp-dot"></div><div class="sp-text">Any changes to rent amount or increase schedule</div></div>
+    <div style="display:flex;gap:8px;align-items:flex-start"><div class="sp-dot"></div><div class="sp-text">Changes to lease duration or end date</div></div>
+    <div style="display:flex;gap:8px;align-items:flex-start"><div class="sp-dot"></div><div class="sp-text">Any new or modified clauses compared to your previous agreement</div></div>
+    <div style="display:flex;gap:8px;align-items:flex-start"><div class="sp-dot"></div><div class="sp-text">Bond amount — confirm it matches what was lodged</div></div>
+    <div style="display:flex;gap:8px;align-items:flex-start"><div class="sp-dot"></div><div class="sp-text">Any additional conditions added by the landlord</div></div>
+  </div>
+</div>
+
+<!-- UPLOAD CARD -->
+<div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px">Upload New Lease Agreement</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Replace the current saved lease with your renewed one.</div>
+
+  <div class="upload-zone" id="renewalDropZone" onclick="triggerRenewalUpload()">
+    <div style="font-size:44px;margin-bottom:10px">🔄</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Tap to upload your new lease</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px">PDF, JPG or PNG · Max 20MB</div>
+  </div>
+
+  <input type="file" id="renewalFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleRenewalUpload(this)">
+
+  <div id="renewalSelected" style="display:none;margin-top:14px;background:var(--blue-xl);border-radius:14px;padding:14px 16px;border:1px solid var(--border)">
+    <div style="display:flex;gap:12px;align-items:center">
+      <span style="font-size:28px">📄</span>
+      <div style="flex:1">
+        <div class="renewal-filename" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">—</div>
+        <div class="renewal-filesize" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">—</div>
+      </div>
+      <span style="font-size:20px;cursor:pointer" onclick="removeRenewalFile()">✕</span>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
+    <div style="flex:1;height:1px;background:var(--border-lt)"></div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted)">OR</span>
+    <div style="flex:1;height:1px;background:var(--border-lt)"></div>
+  </div>
+
+  <button style="width:100%;background:var(--blue-xl);color:var(--blue);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="loadDemoRenewal()">Use Demo Renewed Lease</button>
+</div>
+
+<!-- KEY CHANGES NOTE -->
+<div style="margin-top:14px;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:14px 16px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);margin-bottom:5px">✓ Your previous lease review is saved in the Vault</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#005040;line-height:1.65">After uploading your new lease, RenterIQ will flag any clauses that have changed since your previous review — so you only need to focus on what's new.</div>
+</div>
+
+</div>
+
+<!-- STICKY FOOTER -->
+<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
+  <button style="background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
+  <button id="analyseRenewalBtn" style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;opacity:.5;pointer-events:none;-webkit-tap-highlight-color:transparent" onclick="startRenewalAnalysis()">Analyse New Lease →</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     VIEW C — REVIEW COMPLETE
+     ═══════════════════════════════════ -->
+<div class="view" id="viewC" style="display:none">
+
+<!-- TOP SECTION -->
+<div style="background:var(--blue);padding:50px 24px 44px;text-align:center">
+  <div style="width:80px;height:80px;border-radius:50%;background:rgba(0,200,150,.2);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;animation:successPop .5s cubic-bezier(.4,0,.2,1)">✅</div>
+  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#fff;margin-bottom:10px">New Lease Reviewed</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:rgba(255,255,255,.72);line-height:1.7;max-width:300px;margin:0 auto">Your renewed lease has been compared to your previous agreement. Here's what changed.</div>
+</div>
+
+<div style="flex:1;padding:20px 16px;padding-bottom:100px">
+
+<!-- WHAT CHANGED -->
+<div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Changes from your previous lease</div>
+  <div style="display:flex;flex-direction:column;gap:0">
+    <div class="change-row">
+      <div class="change-icon amber-lt">⚠️</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Rent increased</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Previous: $620/wk · New: $645/wk<br>Increase of $25/wk from 1 April 2026. 60 days notice provided — compliant with VIC law.</div></div>
+    </div>
+    <div class="change-row">
+      <div class="change-icon teal-lt">✓</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease term unchanged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">12 months · 1 April 2026 – 31 March 2027. Same duration as your current agreement.</div></div>
+    </div>
+    <div class="change-row">
+      <div class="change-icon teal-lt">✓</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond unchanged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">$2,480 · No additional bond requested.</div></div>
+    </div>
+    <div class="change-row">
+      <div class="change-icon amber-lt">⚠️</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">New clause added — garden maintenance</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Clause 14 added specifying tenant responsibility for lawn mowing every 4 weeks. This is standard in new VIC lease templates but was not in your previous agreement.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- RENT INCREASE INFO -->
+<div style="background:rgba(27,80,200,.04);border:1px solid rgba(27,80,200,.12);border-radius:14px;padding:15px 16px;margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:8px">💡 About the rent increase</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Your new rent of $645/wk represents a 4% increase. The average Melbourne rental increase in early 2025 was 4.2% — this is within typical range. RenterIQ is not providing financial advice — this is for your reference only.</div>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;display:block;cursor:pointer" onclick="navigate('/app/pages/rights.html#VIC')">Check VIC rent increase rules →</span>
+</div>
+
+<!-- FULL REVIEW PROMPT -->
+<div style="background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px">Want to review all 12 clauses?</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:14px">RenterIQ can give you a full plain-English review of the new lease — not just the changes.</div>
+  <button style="width:100%;background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/lease.html')">Full Lease Review →</button>
+</div>
+
+<!-- SAVE PROMPT -->
+<div style="background:linear-gradient(135deg,var(--teal),var(--teal-dk));border-radius:16px;padding:18px;margin-bottom:14px">
+  <span style="font-size:28px;display:block;margin-bottom:10px">🗄️</span>
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:6px">Save new lease to Vault</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.6">Your renewed lease, the changes summary and the full review will all be saved together.</div>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,.9);margin-top:10px;display:block;cursor:pointer" onclick="saveRenewalToVault()">Save to Vault →</span>
+</div>
+
+<!-- ACTION BUTTONS -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <button style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:14px;padding:16px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="saveRenewalToVault()">Save New Lease to Vault</button>
+  <button style="width:100%;background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/index.html')">Back to Home</button>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     VIEW D — MOVING OUT GUIDE
+     ═══════════════════════════════════ -->
+<div class="view" id="viewD" style="display:none">
+
+<header class="rn-header">
+  <div class="rn-row">
+    <button class="rn-back" onclick="switchView('A')"><span class="rn-back-arrow">‹</span><span class="rn-back-label">Renewal</span></button>
+  </div>
+  <div class="rn-title">Moving Out</div>
+  <div class="rn-sub">Your checklist for a smooth exit</div>
+</header>
+
+<div style="flex:1;padding:16px;padding-bottom:100px">
+
+<!-- NOTICE REQUIRED -->
+<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:16px;padding:16px;margin-bottom:16px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#7A5500;margin-bottom:8px">⚠️ Give notice in writing first</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">Before anything else, you must give your agent written notice of your intention to vacate. In Victoria, you must give at least 28 days notice for a periodic tenancy or notice that aligns with the lease end date for a fixed-term tenancy.</div>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);display:block;margin-top:8px;cursor:pointer" onclick="navigate('/app/pages/rights.html')">Notice requirements by state →</span>
+</div>
+
+<!-- MOVING OUT TIMELINE -->
+<div style="background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:18px">Your Moving Out Timeline</div>
+  <div style="display:flex;flex-direction:column;gap:0">
+
+    <div class="timeline-item">
+      <div class="step-num">1</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Give written notice to your agent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55">Send a notice to vacate via email or letter — keep a copy in your Vault.</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;margin-top:4px;display:inline-block" onclick="navigate('/app/pages/vault.html')">Save to Vault</span></div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="step-num">2</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Book professional cleaning (if required)</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55">Check your lease for cleaning requirements. Most leases require professional carpet cleaning — keep the receipt.</div></div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="step-num">3</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Complete all repairs and touch-ups</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55">Address any damage you are responsible for. Use your move-in report to check what was pre-existing.</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;margin-top:4px;display:inline-block" onclick="navigate('/app/pages/vault.html#reports')">View move-in report</span></div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="step-num">4</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Complete your Exit Inspection</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55">Do a full room-by-room walkthrough with photos after the property is clean and empty.</div><button style="background:var(--blue);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;margin-top:8px;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/exit.html')">Start Exit Inspection →</button></div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="step-num">5</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Return all keys and access devices</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55">Return all keys, garage remotes, security fobs and any other access devices provided at move-in.</div></div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="step-num">6</div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Await bond return</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55">After exit, the agent has 14 days to lodge a bond claim. If no claim is made, your bond is returned automatically. If claimed, you can dispute it with your state tribunal.</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;margin-top:4px;display:inline-block" onclick="navigate('/app/pages/rights.html')">Bond rights →</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EXIT INSPECTION CTA -->
+<div style="background:linear-gradient(135deg,var(--blue),var(--blue-md));border-radius:16px;padding:20px;cursor:pointer;margin-bottom:14px;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/exit.html')">
+  <span style="font-size:36px;display:block;margin-bottom:14px">🚪</span>
+  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff;margin-bottom:8px">Start your Exit Inspection</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.75);line-height:1.6">Your most important step. Documents the property after cleaning — protects your full bond.</div>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--teal);margin-top:12px;display:block">Begin Exit Inspection →</span>
+</div>
+
+<!-- BOND CHECKLIST -->
+<div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Bond Return Checklist</div>
+  <div style="display:flex;flex-direction:column;gap:0">
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleBondCheck(0)"><div class="bond-checkbox" id="bondCheck-0"></div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.4" id="bondLabel-0">Exit inspection completed and saved to Vault</span></div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleBondCheck(1)"><div class="bond-checkbox" id="bondCheck-1"></div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.4" id="bondLabel-1">All repairs and touch-ups done</span></div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleBondCheck(2)"><div class="bond-checkbox" id="bondCheck-2"></div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.4" id="bondLabel-2">Professional cleaning receipt saved (if applicable)</span></div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleBondCheck(3)"><div class="bond-checkbox" id="bondCheck-3"></div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.4" id="bondLabel-3">All keys and access devices returned</span></div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleBondCheck(4)"><div class="bond-checkbox" id="bondCheck-4"></div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.4" id="bondLabel-4">Bond lodgement receipt saved in Vault</span></div>
+  </div>
+  <div id="bondCheckProgress" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);text-align:center;margin-top:10px">0 of 5 done</div>
+</div>
+
+<!-- RIGHTS REMINDER -->
+<div style="background:rgba(27,80,200,.04);border:1px solid rgba(27,80,200,.12);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/rights.html')">
+  <div style="width:40px;height:40px;border-radius:11px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚖️</div>
+  <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Know your bond rights in Victoria</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">Your full guide to the bond refund process</div></div>
+  <span style="font-size:20px;color:var(--muted)">›</span>
+</div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/search.html')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+</nav>
+</div>
+
+</div><!-- /app-shell -->
+
+<script>
+/* ═══════════════════════════════════════
+   RenterIQ — Lease Renewal JS
+   ═══════════════════════════════════════ */
+
+function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+
+function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
+
+// ── View Management ──
+var rnViews=['A','B','C','D'];
+var currentView='A';
+
+function switchView(id){
+  var cur=document.getElementById('view'+currentView);
+  var nxt=document.getElementById('view'+id);
+  if(!nxt||id===currentView)return;
+  cur.style.opacity='0';cur.style.pointerEvents='none';
+  setTimeout(function(){
+    cur.style.display='none';
+    nxt.style.display='flex';nxt.style.flexDirection='column';nxt.style.minHeight='100vh';
+    requestAnimationFrame(function(){
+      nxt.style.opacity='0';
+      requestAnimationFrame(function(){nxt.style.transition='opacity .2s ease';nxt.style.opacity='1';nxt.style.pointerEvents=''});
+    });
+    window.scrollTo(0,0);
+  },150);
+  currentView=id;
+}
+
+// ── Lease Upload ──
+var renewalFileLoaded=false;
+
+function triggerRenewalUpload(){document.getElementById('renewalFile').click()}
+
+function handleRenewalUpload(input){
+  if(!input.files||!input.files[0])return;
+  renewalFileLoaded=true;
+  var file=input.files[0];
+  var zone=document.getElementById('renewalDropZone');
+  var selected=document.getElementById('renewalSelected');
+  var btn=document.getElementById('analyseRenewalBtn');
+  if(zone)zone.style.display='none';
+  if(selected){
+    selected.style.display='block';
+    var nameEl=selected.querySelector('.renewal-filename');
+    var sizeEl=selected.querySelector('.renewal-filesize');
+    if(nameEl)nameEl.textContent=file.name;
+    if(sizeEl)sizeEl.textContent=(file.size/(1024*1024)).toFixed(1)+' MB · Ready to analyse';
+  }
+  if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto'}
+  showToast('New lease uploaded ✓','Tap Analyse to review changes','📄');
+}
+
+function loadDemoRenewal(){
+  renewalFileLoaded=true;
+  var zone=document.getElementById('renewalDropZone');
+  var selected=document.getElementById('renewalSelected');
+  var btn=document.getElementById('analyseRenewalBtn');
+  if(zone)zone.style.display='none';
+  if(selected){
+    selected.style.display='block';
+    var nameEl=selected.querySelector('.renewal-filename');
+    var sizeEl=selected.querySelector('.renewal-filesize');
+    if(nameEl)nameEl.textContent='lease_renewal_18_smith_st_2026.pdf';
+    if(sizeEl)sizeEl.textContent='2.1 MB · Demo loaded';
+  }
+  if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto'}
+  showToast('Demo renewal lease loaded','Tap Analyse','📄');
+}
+
+function removeRenewalFile(){
+  renewalFileLoaded=false;
+  var zone=document.getElementById('renewalDropZone');
+  var selected=document.getElementById('renewalSelected');
+  var btn=document.getElementById('analyseRenewalBtn');
+  if(zone)zone.style.display='';
+  if(selected)selected.style.display='none';
+  if(btn){btn.style.opacity='.5';btn.style.pointerEvents='none'}
+  document.getElementById('renewalFile').value='';
+}
+
+function startRenewalAnalysis(){
+  showToast('Analysing new lease…','Comparing to previous agreement','⚖️');
+  setTimeout(function(){switchView('C')},2000);
+}
+
+// ── Save to Vault ──
+function saveRenewalToVault(){
+  showToast('New lease saved to Vault ✓','Changes summary and review stored','🗄️');
+  setTimeout(function(){navigate('/app/pages/vault.html')},1200);
+}
+
+// ── Bond Checklist ──
+var bondChecked=new Set();
+
+function toggleBondCheck(n){
+  var box=document.getElementById('bondCheck-'+n);
+  var label=document.getElementById('bondLabel-'+n);
+  if(bondChecked.has(n)){
+    bondChecked.delete(n);
+    if(box){box.style.background='white';box.style.borderColor='var(--border)';box.textContent=''}
+    if(label){label.style.color='var(--text)';label.style.textDecoration='none'}
+  }else{
+    bondChecked.add(n);
+    if(box){box.style.background='var(--teal)';box.style.borderColor='var(--teal)';box.style.color='white';box.style.fontFamily='Sora,sans-serif';box.style.fontWeight='700';box.style.fontSize='13px';box.textContent='✓'}
+    if(label){label.style.color='var(--muted)';label.style.textDecoration='line-through'}
+  }
+  var el=document.getElementById('bondCheckProgress');
+  var done=bondChecked.size;
+  if(el){el.textContent=done===5?'✓ All done — you\'re ready to hand back the keys':done+' of 5 done';el.style.color=done===5?'var(--teal-dk)':'var(--muted)'}
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded',function(){
+  document.body.style.opacity='0';
+  requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
+  rnViews.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
+  setTimeout(function(){var bar=document.getElementById('renewalLeaseBar');if(bar)bar.style.width='41%'},400);
+});
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+</body>
+</html>
