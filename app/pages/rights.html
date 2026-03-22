@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/app/css/app.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Renter Rights — RenterIQ</title>
+<style>
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl)}
+.placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.placeholder .ph-emoji{font-size:56px;margin-bottom:16px}
+.placeholder .ph-title{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:var(--blue-dk);margin-bottom:6px}
+.placeholder .ph-sub{font-size:14px;color:var(--muted);max-width:280px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="screen-header">
+    <button class="back-btn" onclick="navigate('/app/index.html')">← Back</button>
+    <div class="hdr-title">Renter Rights</div>
+    <div class="hdr-sub">Free help in every state and territory</div>
+  </header>
+  <div class="placeholder pb-nav">
+    <div class="ph-emoji">⚖️</div>
+    <div class="ph-title">Renter Rights Coming Soon</div>
+    <p class="ph-sub">Direct links to every state tenancy authority, dispute resolution body, and free renter support service.</p>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/search.html')"><div class="tab-icon">�</div><span class="tab-label">Search</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">�</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">�️</div><span class="tab-label">Vault</span></button>
+  </nav>
+</div>
+<script>
+function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+document.addEventListener('DOMContentLoaded',function(){document.body.style.opacity='0';requestAnimationFrame(function(){document.body.style.transition='opacity .22s';document.body.style.opacity='1'})});
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+</body>
+</html>

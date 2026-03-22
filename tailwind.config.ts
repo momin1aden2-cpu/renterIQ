@@ -9,8 +9,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        blue: {
+          DEFAULT: "var(--blue)",
+          dk: "var(--blue-dk)",
+          md: "var(--blue-md)",
+          lt: "var(--blue-lt)",
+          xl: "var(--blue-xl)",
+        },
+        teal: {
+          DEFAULT: "var(--teal)",
+          dk: "var(--teal-dk)",
+        },
+        text: "var(--text)",
+        muted: "var(--muted)",
+        border: "var(--border)",
+        "border-lt": "var(--border-lt)",
+      },
+      fontFamily: {
+        sora: ["Sora", "sans-serif"],
+        nunito: ["Nunito", "sans-serif"],
+      },
+      borderRadius: {
+        sm: "12px",
+        card: "16px",
+        lg: "20px",
+        full: "100px",
       },
     },
   },
