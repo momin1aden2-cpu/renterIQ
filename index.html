@@ -906,23 +906,31 @@ window.addEventListener('beforeinstallprompt', (e) => {
 document.querySelectorAll('.install-btn').forEach(btn => {
   btn.addEventListener('click', async (e) => {
     e.preventDefault();
+    
+    if (isStandalone()) {
+      // Already installed - go to app
+      window.location.href = '/app/index.html';
+      return;
+    }
+    
     if (deferredPrompt) {
-      // Android/Chrome - native install prompt
+      // Android/Chrome - native install prompt available
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         showInstallSuccess();
       }
       deferredPrompt = null;
-    } else if (isIOS() && !isStandalone()) {
-      // iOS - show instructions
+    } else if (isIOS()) {
+      // iOS - show install instructions
       showIOSInstructions();
-    } else if (isStandalone()) {
-      // Already installed - go to app
-      window.location.href = '/app/index.html';
     } else {
-      // Desktop or other - just open the app
-      window.location.href = '/app/index.html';
+      // Desktop/localhost - open app directly
+      btn.textContent = '✓ Opening App...';
+      btn.style.background = '#00C896';
+      setTimeout(() => {
+        window.location.href = '/app/index.html';
+      }, 500);
     }
   });
 });
