@@ -1,7 +1,6 @@
 import ScreenHeader from "@/components/ScreenHeader";
 import Card from "@/components/Card";
-import StatusTag from "@/components/StatusTag";
-import { MessageSquare, Building2, ShieldCheck } from "lucide-react";
+import { Building2, ShieldCheck } from "lucide-react";
 
 const conversations = [
   {

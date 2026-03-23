@@ -2,7 +2,7 @@ import ScreenHeader from "@/components/ScreenHeader";
 import Card from "@/components/Card";
 import StatusTag from "@/components/StatusTag";
 import Button from "@/components/Button";
-import { Wrench, Droplets, Zap, ThermometerSun, Plus } from "lucide-react";
+import { Droplets, Zap, ThermometerSun, Plus } from "lucide-react";
 
 const repairs = [
   {
