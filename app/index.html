@@ -7,8 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RenterIQ">
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
 <link rel="manifest" href="/app/manifest.json">
-<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
 <link rel="stylesheet" href="/app/css/app.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -171,12 +173,12 @@
 
   <!-- Install Banner -->
   <div class="install-banner" id="installBanner" style="display:none">
-    <span class="ib-icon">📱</span>
+    <img src="/assets/logo.svg" alt="" width="28" height="28" style="flex-shrink:0">
     <div class="ib-body">
-      <div class="ib-title">Add RenterIQ to your home screen</div>
-      <div class="ib-sub">Works offline · Free · No app store</div>
+      <div class="ib-title">Add to Home Screen</div>
+      <div class="ib-sub">Works offline · Always free</div>
     </div>
-    <button class="ib-install" id="installBtn">Install</button>
+    <button class="ib-install" id="installBtn">Add</button>
     <button class="ib-close" id="installClose" aria-label="Dismiss">✕</button>
   </div>
 
@@ -184,10 +186,7 @@
   <header class="screen-header" style="padding:14px 20px 20px">
     <div class="hdr-top">
       <a href="/index.html" class="hdr-brand">
-        <svg width="22" height="28" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11 0L21.5 5V13C21.5 20.18 17.16 26.36 11 28C4.84 26.36 0.5 20.18 0.5 13V5L11 0Z" fill="rgba(255,255,255,.85)"/>
-          <path d="M11 4L7 9.5V15.5H9.5V12H12.5V15.5H15V9.5L11 4Z" fill="#1B50C8"/>
-        </svg>
+        <img src="/assets/logo.svg" alt="RenterIQ" width="28" height="28" style="filter:brightness(0) invert(1)">
         <span class="hdr-brand-text">RENTERIQ</span>
       </a>
       <div class="hdr-actions">
@@ -195,8 +194,8 @@
         <div class="hdr-avatar" onclick="navigate('/app/pages/profile.html')">A</div>
       </div>
     </div>
-    <div class="hdr-title" id="greeting" style="font-size:24px;font-weight:800;margin-top:10px">Good morning, Alex</div>
-    <div class="hdr-sub" id="currentDate" style="font-weight:600;margin-top:3px">Melbourne, VIC</div>
+    <div class="hdr-title" id="greeting" style="font-size:24px;font-weight:800;margin-top:10px">Good morning</div>
+    <div class="hdr-sub" id="currentDate" style="font-weight:600;margin-top:3px">Ready to rent smart</div>
   </header>
 
   <!-- Content -->
