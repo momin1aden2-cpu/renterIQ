@@ -1,8 +1,6 @@
-/* ═══════════════════════════════════════
-   RenterIQ PWA — Shared Styles
-   ═══════════════════════════════════════ */
+/* RenterIQ PWA — Shared Styles */
 
-/* ───── CSS VARIABLES ───── */
+/* Variables */
 :root {
   --blue: #1B50C8;
   --blue-dk: #0A2460;
@@ -35,7 +33,7 @@
   --ease-smooth: cubic-bezier(.4,0,.2,1);
 }
 
-/* ───── BASE RESET ───── */
+/* Reset */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -76,11 +74,11 @@ ul {
   list-style: none;
 }
 
-/* ───── SCROLLBAR HIDE ───── */
+/* Scrollbar */
 ::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; }
 
-/* ───── SCREEN HEADER ───── */
+/* Screen Header */
 .screen-header {
   background: linear-gradient(180deg, var(--blue) 0%, #1545B0 100%);
   padding: 16px 20px 22px;
@@ -119,7 +117,7 @@ ul {
   justify-content: space-between;
 }
 
-/* ───── BACK BUTTON ───── */
+/* Back Button */
 .back-btn {
   display: flex;
   align-items: center;
@@ -136,7 +134,7 @@ ul {
   margin-bottom: 8px;
 }
 
-/* ───── CARDS ───── */
+/* Cards */
 .card {
   background: #fff;
   border-radius: var(--r-md);
@@ -161,7 +159,7 @@ ul {
   transform: scale(.985);
 }
 
-/* ───── BUTTONS ───── */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -250,7 +248,7 @@ ul {
   font-size: 13px;
 }
 
-/* ───── TAGS ───── */
+/* Tags */
 .tag {
   display: inline-flex;
   align-items: center;
@@ -283,7 +281,7 @@ ul {
   color: var(--muted);
 }
 
-/* ───── SECTION LABEL ───── */
+/* Section Label */
 .sec-label {
   font-size: 11px;
   font-weight: 700;
@@ -293,14 +291,14 @@ ul {
   font-family: 'Sora', sans-serif;
 }
 
-/* ───── SECTION DIVIDER ───── */
+/* Section Divider */
 .section-divider {
   height: 1px;
   background: var(--border-lt);
   margin: 16px 0;
 }
 
-/* ───── TOAST NOTIFICATION ───── */
+/* Toast */
 .toast {
   position: fixed;
   top: 16px;
@@ -342,7 +340,7 @@ ul {
   margin-top: 1px;
 }
 
-/* ───── BOTTOM NAVIGATION ───── */
+/* Bottom Navigation */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -410,7 +408,7 @@ ul {
   color: var(--blue);
 }
 
-/* ───── UTILITY CLASSES ───── */
+/* Utilities */
 .pb-nav {
   padding-bottom: 90px;
 }
@@ -424,7 +422,7 @@ ul {
   margin-top: -16px;
 }
 
-/* ───── ANIMATIONS ───── */
+/* Animations */
 @keyframes pulse {
   0%,100% { opacity:1; transform:scale(1); }
   50% { opacity:.35; transform:scale(.8); }
@@ -477,13 +475,13 @@ ul {
   transition: all .3s;
 }
 
-/* ───── PHOTO PLACEHOLDERS ───── */
+/* Photo Placeholders */
 .ph-blue { background: linear-gradient(135deg, #1a3a8f, #2E63E0); }
 .ph-teal { background: linear-gradient(135deg, #006B50, #00C896); }
 .ph-slate { background: linear-gradient(135deg, #2a3f6f, #4a6fa5); }
 .ph-dk { background: linear-gradient(135deg, #0A2460, #1B50C8); }
 
-/* ───── CONDITION BUTTONS ───── */
+/* Condition Buttons */
 .cond-btn {
   flex: 1; border-radius: 14px; padding: 14px 8px;
   border: 2px solid var(--border); background: white;
@@ -498,7 +496,7 @@ ul {
 .cond-poor-active { border-color: var(--red) !important; background: var(--red-lt) !important; }
 .chip-active { background: var(--blue) !important; color: white !important; border-color: var(--blue) !important; }
 
-/* ───── GLASS SURFACE ───── */
+/* Glass Surface */
 .glass {
   background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(1.4);
@@ -506,7 +504,7 @@ ul {
   border: 1px solid var(--glass-border);
 }
 
-/* ───── FOCUS RING ───── */
+/* Focus Ring */
 input:focus, textarea:focus, select:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(27,80,200,.12);
@@ -514,7 +512,7 @@ input:focus, textarea:focus, select:focus {
   transition: box-shadow .2s var(--ease-smooth), border-color .2s;
 }
 
-/* ───── SHIMMER LOADING ───── */
+/* Shimmer Loading */
 .shimmer {
   background: linear-gradient(90deg, var(--border-lt) 25%, #fff 50%, var(--border-lt) 75%);
   background-size: 200% 100%;
@@ -522,14 +520,14 @@ input:focus, textarea:focus, select:focus {
   border-radius: var(--r-md);
 }
 
-/* ───── SMOOTH CARD ENTRY ───── */
+/* Card Entry Stagger */
 .stagger-1 { animation: fadeIn .35s var(--ease-smooth) .05s both; }
 .stagger-2 { animation: fadeIn .35s var(--ease-smooth) .1s both; }
 .stagger-3 { animation: fadeIn .35s var(--ease-smooth) .15s both; }
 .stagger-4 { animation: fadeIn .35s var(--ease-smooth) .2s both; }
 .stagger-5 { animation: fadeIn .35s var(--ease-smooth) .25s both; }
 
-/* ───── DISCLAIMER ───── */
+/* Disclaimer */
 .disclaimer {
   font-family: 'Nunito', sans-serif;
   font-weight: 600;
@@ -542,7 +540,7 @@ input:focus, textarea:focus, select:focus {
   padding: 12px 14px;
 }
 
-/* ───── EMPTY STATE ───── */
+/* Empty State */
 .empty-state {
   text-align: center;
   padding: 48px 24px;

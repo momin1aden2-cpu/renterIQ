@@ -46,9 +46,7 @@
 <body>
 <div class="app-shell">
 
-<!-- ═══════════════════════════════════
-     VIEW A — PROFILE HOME
-     ═══════════════════════════════════ -->
+<!-- VIEW A — PROFILE HOME -->
 <div class="view" id="viewA">
 
 <header class="pr-header">
@@ -160,9 +158,7 @@
 </nav>
 </div><!-- /viewA -->
 
-<!-- ═══════════════════════════════════
-     VIEW B — PERSONAL DETAILS
-     ═══════════════════════════════════ -->
+<!-- VIEW B — PERSONAL DETAILS -->
 <div class="view" id="viewB" style="display:none">
 
 <header class="pr-header-sm">
@@ -218,9 +214,7 @@
 </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     VIEW C — PROPERTY & TENANCY
-     ═══════════════════════════════════ -->
+<!-- VIEW C — PROPERTY & TENANCY -->
 <div class="view" id="viewC" style="display:none">
 
 <header class="pr-header-sm">
@@ -288,9 +282,7 @@
 </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     VIEW D — NOTIFICATION PREFERENCES
-     ═══════════════════════════════════ -->
+<!-- VIEW D — NOTIFICATION PREFERENCES -->
 <div class="view" id="viewD" style="display:none">
 
 <header class="pr-header-sm">
@@ -396,9 +388,7 @@
 </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     VIEW E — SUBSCRIPTION & BILLING
-     ═══════════════════════════════════ -->
+<!-- VIEW E — SUBSCRIPTION & BILLING -->
 <div class="view" id="viewE" style="display:none">
 
 <header class="pr-header-sm">
@@ -499,9 +489,7 @@
 </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     VIEW F — DATA & PRIVACY
-     ═══════════════════════════════════ -->
+<!-- VIEW F — DATA & PRIVACY -->
 <div class="view" id="viewF" style="display:none">
 
 <header class="pr-header-sm">
@@ -554,9 +542,7 @@
 </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     VIEW G — ABOUT RENTERIQ
-     ═══════════════════════════════════ -->
+<!-- VIEW G — ABOUT RENTERIQ -->
 <div class="view" id="viewG" style="display:none">
 
 <header class="pr-header-sm">
@@ -621,15 +607,13 @@
 </div><!-- /app-shell -->
 
 <script>
-/* ═══════════════════════════════════════
-   RenterIQ — Profile & Settings JS
-   ═══════════════════════════════════════ */
+/* RenterIQ — Profile & Settings JS */
 
 function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
 
 function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
 
-// ── View Management ──
+// View Management
 var views=['A','B','C','D','E','F','G'];
 var currentView='A';
 
@@ -650,7 +634,7 @@ function switchView(id){
   currentView=id;
 }
 
-// ── Push Notifications ──
+// Push Notifications
 var pushEnabled=false;
 
 function togglePushNotifs(){
@@ -688,7 +672,7 @@ function updatePushStatusCard(enabled){
   }
 }
 
-// ── Notification Preferences ──
+// Notification Preferences
 var prefToggles=[true,true,true,true,true,true,false,false];
 
 function togglePref(n){
@@ -703,7 +687,7 @@ function togglePref(n){
   showToast(on?'Enabled':'Disabled','',on?'🔔':'🔕');
 }
 
-// ── Quiet Hours ──
+// Quiet Hours
 var quietOn=false;
 
 function toggleQuiet(){
@@ -718,7 +702,7 @@ function toggleQuiet(){
   if(hours)hours.style.display=quietOn?'flex':'none';
 }
 
-// ── Subscription ──
+// Subscription
 function notifyMe(){
   var input=document.getElementById('notifyEmail');
   var email=input?input.value:'';
@@ -728,7 +712,7 @@ function notifyMe(){
   }else{showToast('Enter a valid email','','⚠️')}
 }
 
-// ── Danger Zone ──
+// Danger Zone
 function signOut(){
   showToast('Signing out…','Return to the home screen to sign back in','🚪');
   setTimeout(function(){navigate('/app/index.html')},1500);
@@ -742,7 +726,7 @@ function confirmDataDelete(){
   showToast('Data deletion','Contact support@renteriq.com.au to request full data deletion','❌');
 }
 
-// ── Init ──
+// Init
 document.addEventListener('DOMContentLoaded',function(){
   document.body.style.opacity='0';
   requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});

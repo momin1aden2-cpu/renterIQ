@@ -41,9 +41,7 @@
 <body>
 <div class="app-shell">
 
-<!-- ═══════════════════════════════════
-     VIEW A — RENEWAL OVERVIEW
-     ═══════════════════════════════════ -->
+<!-- VIEW A — RENEWAL OVERVIEW -->
 <div class="view" id="viewA">
 
 <header class="rn-header">
@@ -124,9 +122,7 @@
 </nav>
 </div>
 
-<!-- ═══════════════════════════════════
-     VIEW B — UPLOAD NEW LEASE
-     ═══════════════════════════════════ -->
+<!-- VIEW B — UPLOAD NEW LEASE -->
 <div class="view" id="viewB" style="display:none">
 
 <header class="rn-header">
@@ -200,9 +196,7 @@
 </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     VIEW C — REVIEW COMPLETE
-     ═══════════════════════════════════ -->
+<!-- VIEW C — REVIEW COMPLETE -->
 <div class="view" id="viewC" style="display:none">
 
 <!-- TOP SECTION -->
@@ -268,9 +262,7 @@
 </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     VIEW D — MOVING OUT GUIDE
-     ═══════════════════════════════════ -->
+<!-- VIEW D — MOVING OUT GUIDE -->
 <div class="view" id="viewD" style="display:none">
 
 <header class="rn-header">
@@ -370,15 +362,13 @@
 </div><!-- /app-shell -->
 
 <script>
-/* ═══════════════════════════════════════
-   RenterIQ — Lease Renewal JS
-   ═══════════════════════════════════════ */
+/* RenterIQ — Lease Renewal JS */
 
 function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
 
 function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
 
-// ── View Management ──
+// View Management
 var rnViews=['A','B','C','D'];
 var currentView='A';
 
@@ -399,7 +389,7 @@ function switchView(id){
   currentView=id;
 }
 
-// ── Lease Upload ──
+// Lease Upload
 var renewalFileLoaded=false;
 
 function triggerRenewalUpload(){document.getElementById('renewalFile').click()}
@@ -456,13 +446,13 @@ function startRenewalAnalysis(){
   setTimeout(function(){switchView('C')},2000);
 }
 
-// ── Save to Vault ──
+// Save to Vault
 function saveRenewalToVault(){
   showToast('New lease saved to Vault ✓','Changes summary and review stored','🗄️');
   setTimeout(function(){navigate('/app/pages/vault.html')},1200);
 }
 
-// ── Bond Checklist ──
+// Bond Checklist
 var bondChecked=new Set();
 
 function toggleBondCheck(n){
@@ -482,7 +472,7 @@ function toggleBondCheck(n){
   if(el){el.textContent=done===5?'✓ All done — you\'re ready to hand back the keys':done+' of 5 done';el.style.color=done===5?'var(--teal-dk)':'var(--muted)'}
 }
 
-// ── Init ──
+// Init
 document.addEventListener('DOMContentLoaded',function(){
   document.body.style.opacity='0';
   requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});

@@ -543,7 +543,7 @@
         <div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.65">Kitchen splashback stain appears larger than documented at move-in. Pre-existing stain was 2cm — exit photo shows approximately 5cm.</div>
       </div>
       <div style="padding:0 16px 14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">AI-Assisted Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>
         <div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:13px 14px">
           <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.75">Clean the splashback thoroughly with a degreaser or kitchen cleaner (e.g. Exit Mould or Ajax spray). If the stain has grown due to grease or cooking residue, a professional oven/kitchen clean may be required. Many cleaning companies offer kitchen deep cleans for $80–$150. If the stain is permanent, document this and note it was partially pre-existing — your move-in photos support this.</div>
         </div>
@@ -572,7 +572,7 @@
         <div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.65">Scuff mark on south bathroom wall approximately 8cm in length. Not present in move-in photos or agency report.</div>
       </div>
       <div style="padding:0 16px 14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">AI-Assisted Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>
         <div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:13px 14px">
           <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.75">Lightly sand the scuff mark with fine sandpaper (220 grit) then touch up with matching wall paint. Standard rental white is usually Dulux Vivid White or Taubmans Antique White — both available at Bunnings for under $20. Apply one thin coat, allow 2 hours to dry, apply a second coat if needed. Photograph the repaired area before key handover and save to your Vault as evidence of the repair.</div>
         </div>
@@ -668,15 +668,13 @@
 </div><!-- /app-shell -->
 
 <script>
-/* ═══════════════════════════════════════
-   RenterIQ — Exit Inspection JS
-   ═══════════════════════════════════════ */
+/* RenterIQ — Exit Inspection JS */
 
 function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
 
 function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
 
-// ── View Management ──
+// View Management
 var allViews=['A','B','C','D','E','F','G','H'],currentView='A';
 
 function switchView(id){
@@ -696,7 +694,7 @@ function switchView(id){
   currentView=id;
 }
 
-// ── Pre-Exit Checklist ──
+// Pre-Exit Checklist
 var exitChecked=new Set();
 
 function toggleExitCheck(n){
@@ -723,7 +721,7 @@ function updateExitCheckProgress(){
   if(btn){btn.style.opacity=done===total?'1':'.5';btn.style.pointerEvents=done===total?'auto':'none'}
 }
 
-// ── Room State ──
+// Room State
 var exitRoomData=[
   {name:'Entry & Hallway',emoji:'🚪',miContext:'Good condition · 3 photos'},
   {name:'Living Room',emoji:'🛋',miContext:'Good condition · 4 photos'},
@@ -819,7 +817,7 @@ function updateExitProgress(){
   if(hint){hint.textContent=allDone?'All areas done — generating comparison ✓':(exitRoomData.length-done)+' areas remaining';if(allDone)hint.style.color='var(--teal-dk)'}
 }
 
-// ── Tabs ──
+// Tabs
 function setExitTab(idx){
   [0,1,2].forEach(function(i){
     var tab=document.getElementById('exitTab'+i);
@@ -854,7 +852,7 @@ function addExitPhoto(){
   showToast('Photo added · '+time,'Timestamped · Saved to exit report','📷');
 }
 
-// ── Generation ──
+// Generation
 function runExitGeneration(){
   var delays=[600,1400,2200,3200,4400,5400];
   delays.forEach(function(delay,i){
@@ -868,7 +866,7 @@ function runExitGeneration(){
   setTimeout(function(){switchView('F')},6000);
 }
 
-// ── Tenant Decisions ──
+// Tenant Decisions
 var tenantDecisions={};
 
 function tenantConfirmed(n){
@@ -903,7 +901,7 @@ function checkReviewComplete(){
   }
 }
 
-// ── Fixed Items ──
+// Fixed Items
 var fixedItems=new Set();
 
 function markFixed(n){
@@ -922,7 +920,7 @@ function generateExitReport(){
   setTimeout(function(){switchView('H')},1200);
 }
 
-// ── Init ──
+// Init
 document.addEventListener('DOMContentLoaded',function(){
   document.body.style.opacity='0';
   requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});

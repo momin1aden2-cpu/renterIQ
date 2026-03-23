@@ -11,11 +11,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Routine Inspection — RenterIQ</title>
 <style>
-/* ── Shell ── */
+/* Shell */
 .app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
 .view{display:flex;flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
 
-/* ── Shared Header ── */
+/* Shared Header */
 .sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
 .sh-row{display:flex;align-items:center;justify-content:space-between}
 .sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
@@ -25,13 +25,13 @@
 .sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
 .sh-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
 
-/* ── Section Labels ── */
+/* Section Labels */
 .sec-label{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 10px}
 
-/* ── Content Scroll ── */
+/* Content Scroll */
 .content{flex:1;overflow-y:auto;padding-bottom:100px}
 
-/* ── Buttons ── */
+/* Buttons */
 .btn-blue-c{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(27,80,200,.2);transition:all .18s var(--ease-smooth)}
 .btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(27,80,200,.15)}
 .btn-teal-c{background:linear-gradient(135deg,var(--teal),#00DBA6);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,200,150,.25);transition:all .18s var(--ease-smooth)}
@@ -43,7 +43,7 @@
 .btn-full{width:100%}
 .flex-1{flex:1}
 
-/* ── Tags ── */
+/* Tags */
 .tag{display:inline-flex;align-items:center;padding:5px 12px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;white-space:nowrap}
 .tag-teal{background:rgba(0,200,150,.1);color:var(--teal-dk)}
 .tag-blue{background:rgba(27,80,200,.1);color:var(--blue)}
@@ -51,7 +51,7 @@
 .tag-red{background:rgba(232,64,64,.1);color:var(--red)}
 .tag-muted{background:var(--blue-xl);color:var(--muted)}
 
-/* ── Bottom Nav ── */
+/* Bottom Nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
 .nav-tab:active{transform:scale(.92)}
@@ -60,9 +60,7 @@
 .tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
 .nav-tab.active .tab-label{color:var(--blue)}
 
-/* ══════════════════════════════════════════
-   VIEW A — INSPECTION HISTORY
-   ══════════════════════════════════════════ */
+/* VIEW A — INSPECTION HISTORY */
 .countdown-card{background:#fff;border-radius:20px;padding:20px;border:1px solid var(--border-lt);box-shadow:var(--shadow-elevated);margin:16px}
 .cd-top{display:flex;align-items:center;gap:14px}
 .cd-icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 4px 12px rgba(27,80,200,.2)}
@@ -76,7 +74,7 @@
 .cd-actions{display:flex;gap:8px;margin-top:14px}
 .cd-actions .btn-blue-c,.cd-actions .btn-muted-c{font-size:13px;padding:10px;border-radius:12px}
 
-/* ── Past Inspection Card ── */
+/* Past Inspection Card */
 .ri-card{background:#fff;border-radius:18px;margin:0 16px 12px;padding:16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
 .ri-card:active{transform:scale(.98);box-shadow:none}
 .ri-top{display:flex;align-items:center;justify-content:space-between}
@@ -90,9 +88,7 @@
 .ri-progress-fill{height:100%;background:var(--teal);border-radius:100px;transition:width .5s}
 .ri-progress-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
 
-/* ══════════════════════════════════════════
-   VIEW B — RECORD REPORT
-   ══════════════════════════════════════════ */
+/* VIEW B — RECORD REPORT */
 .input-method{background:#fff;border-radius:20px;padding:20px;margin:16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth);display:flex;gap:16px;align-items:center}
 .input-method:active{transform:scale(.98);box-shadow:none}
 .input-method.selected{border:2px solid var(--blue);box-shadow:var(--shadow-glow-blue)}
@@ -101,7 +97,7 @@
 .im-desc{font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
 .im-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-left:auto}
 
-/* ── Photo Scan Area ── */
+/* Photo Scan Area */
 .scan-area{margin:0 16px 16px;background:#fff;border-radius:20px;padding:20px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card)}
 .scan-upload{border:2px dashed var(--border);border-radius:16px;padding:40px 20px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .2s var(--ease-smooth)}
 .scan-upload:active{border-color:var(--blue);background:rgba(27,80,200,.02)}
@@ -112,7 +108,7 @@
 .scan-preview img{width:100%;display:block;border-radius:14px}
 .scan-preview-remove{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer}
 
-/* ── Manual Entry ── */
+/* Manual Entry */
 .manual-area{margin:0 16px 16px;background:#fff;border-radius:20px;padding:20px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card)}
 .item-row{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-lt)}
 .item-row:last-child{border-bottom:none}
@@ -122,9 +118,7 @@
 .item-remove{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;-webkit-tap-highlight-color:transparent;flex-shrink:0;min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center}
 .add-item-btn{display:flex;align-items:center;gap:8px;padding:12px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)}
 
-/* ══════════════════════════════════════════
-   VIEW C — AI ANALYSIS
-   ══════════════════════════════════════════ */
+/* VIEW C — AI ANALYSIS */
 .ai-hero{text-align:center;padding:32px 24px}
 .ai-icon{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto;box-shadow:var(--shadow-glow-blue)}
 .ai-icon.analyzing{animation:aiPulse 2s ease-in-out infinite}
@@ -138,7 +132,7 @@
 @keyframes aiPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(27,80,200,.3)}50%{transform:scale(1.06);box-shadow:0 0 0 16px rgba(27,80,200,0)}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-/* ── Category Cards ── */
+/* Category Cards */
 .cat-section{margin:0 16px 16px}
 .cat-header{display:flex;align-items:center;gap:10px;padding:14px 0 10px}
 .cat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
@@ -152,9 +146,7 @@
 .ci-action{margin-top:10px;padding-top:10px;border-top:1px solid var(--border-lt);display:flex;align-items:center;gap:8px}
 .ci-action-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)}
 
-/* ══════════════════════════════════════════
-   VIEW D — ACTION PLAN
-   ══════════════════════════════════════════ */
+/* VIEW D — ACTION PLAN */
 .plan-card{background:#fff;border-radius:18px;margin:0 16px 12px;padding:16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);transition:all .18s var(--ease-smooth)}
 .plan-card:active{transform:scale(.98)}
 .plan-top{display:flex;align-items:center;gap:12px}
@@ -170,9 +162,7 @@
 .plan-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .2s;font-size:14px}
 .plan-check.done{background:var(--teal);border-color:var(--teal);color:#fff}
 
-/* ══════════════════════════════════════════
-   VIEW E — RESPONSE BUILDER
-   ══════════════════════════════════════════ */
+/* VIEW E — RESPONSE BUILDER */
 .deadline-banner{background:var(--amber-lt);border:1.5px solid rgba(245,166,35,.3);border-radius:16px;margin:16px;padding:16px;display:flex;gap:12px;align-items:center}
 .dl-icon{font-size:28px;flex-shrink:0}
 .dl-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#7A5500}
@@ -183,9 +173,7 @@
 .response-field::placeholder{color:var(--muted)}
 .response-actions{display:flex;gap:8px;margin-top:14px}
 
-/* ══════════════════════════════════════════
-   VIEW F — REMINDERS
-   ══════════════════════════════════════════ */
+/* VIEW F — REMINDERS */
 .reminder-row{background:#fff;border-radius:16px;margin:0 16px 10px;padding:14px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:13px;transition:all .18s var(--ease-smooth)}
 .rr-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .rr-body{flex:1;min-width:0}
@@ -194,9 +182,7 @@
 .rr-toggle{width:44px;height:24px;border-radius:100px;display:flex;align-items:center;padding:2px;cursor:pointer;flex-shrink:0;transition:background .2s;position:relative}
 .rr-toggle-dot{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 
-/* ══════════════════════════════════════════
-   VIEW G — SUMMARY
-   ══════════════════════════════════════════ */
+/* VIEW G — SUMMARY */
 .summary-hero{text-align:center;padding:32px 24px}
 .summary-icon{font-size:56px;display:block;margin-bottom:12px}
 .summary-title{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:var(--text)}
@@ -206,15 +192,15 @@
 .ss-num{font-family:'Sora',sans-serif;font-weight:800;font-size:22px}
 .ss-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
 
-/* ── Animations ── */
+/* Animations */
 @keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 
-/* ── Disclaimer ── */
+/* Disclaimer */
 .disclaimer-note{background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.18);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
 .disclaimer-note .dn-icon{font-size:15px;flex-shrink:0;margin-top:1px}
 .disclaimer-note p{font-size:12px;font-weight:600;color:#8A6500;line-height:1.65}
 
-/* ── Toast ── */
+/* Toast */
 .toast{position:fixed;top:16px;left:14px;right:14px;z-index:9999;background:rgba(10,36,96,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#fff;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;transform:translateY(-90px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--shadow-float);pointer-events:none;border:1px solid rgba(255,255,255,.08)}
 .toast.show{transform:translateY(0);opacity:1;pointer-events:auto}
 </style>
@@ -222,9 +208,7 @@
 <body>
 <div class="app-shell">
 
-<!-- ══════════════════════════════════════════
-     VIEW A — INSPECTION HISTORY
-     ══════════════════════════════════════════ -->
+<!-- VIEW A — INSPECTION HISTORY -->
 <div class="view" id="viewA">
   <header class="sh">
     <div class="sh-row">
@@ -305,7 +289,7 @@
     <div style="padding:0 16px;margin-top:8px">
       <div class="disclaimer-note">
         <span class="dn-icon">⚠️</span>
-        <p>AI-assisted analysis · Always verify items against the original report. RenterIQ does not provide legal advice.</p>
+        <p>Smart analysis · Always verify items against the original report. RenterIQ does not provide legal advice.</p>
       </div>
     </div>
   </div>
@@ -319,9 +303,7 @@
   </nav>
 </div>
 
-<!-- ══════════════════════════════════════════
-     VIEW B — RECORD REPORT
-     ══════════════════════════════════════════ -->
+<!-- VIEW B — RECORD REPORT -->
 <div class="view" id="viewB" style="display:none">
   <header class="sh">
     <div class="sh-row">
@@ -411,9 +393,7 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     VIEW C — AI ANALYSIS
-     ══════════════════════════════════════════ -->
+<!-- VIEW C — AI ANALYSIS -->
 <div class="view" id="viewC" style="display:none">
   <header class="sh">
     <div class="sh-row">
@@ -534,16 +514,14 @@
       <div style="padding:16px">
         <div class="disclaimer-note">
           <span class="dn-icon">⚠️</span>
-          <p>AI-assisted classification · Reviewed by tenant · This is guidance only, not legal advice.</p>
+          <p>Smart classification · Reviewed by tenant · This is guidance only, not legal advice.</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     VIEW D — ACTION PLAN
-     ══════════════════════════════════════════ -->
+<!-- VIEW D — ACTION PLAN -->
 <div class="view" id="viewD" style="display:none">
   <header class="sh">
     <div class="sh-row">
@@ -634,9 +612,7 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     VIEW E — RESPONSE BUILDER
-     ══════════════════════════════════════════ -->
+<!-- VIEW E — RESPONSE BUILDER -->
 <div class="view" id="viewE" style="display:none">
   <header class="sh">
     <div class="sh-row">
@@ -690,9 +666,7 @@ Alexandra Johnson</textarea>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     VIEW F — REMINDERS
-     ══════════════════════════════════════════ -->
+<!-- VIEW F — REMINDERS -->
 <div class="view" id="viewF" style="display:none">
   <header class="sh">
     <div class="sh-row">
@@ -758,9 +732,7 @@ Alexandra Johnson</textarea>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     VIEW G — COMPLETED SUMMARY
-     ══════════════════════════════════════════ -->
+<!-- VIEW G — COMPLETED SUMMARY -->
 <div class="view" id="viewG" style="display:none">
   <header class="sh">
     <div class="sh-row">
@@ -851,7 +823,7 @@ Alexandra Johnson</textarea>
     <div style="padding:16px">
       <div class="disclaimer-note">
         <span class="dn-icon">⚠️</span>
-        <p>AI-assisted · Reviewed by tenant · Saved to your Vault for future reference.</p>
+        <p>Smart · Reviewed by tenant · Saved to your Vault for future reference.</p>
       </div>
     </div>
 
@@ -871,20 +843,20 @@ Alexandra Johnson</textarea>
 </div><!-- /app-shell -->
 
 <script>
-/* ── Navigation ── */
+/* Navigation */
 function navigate(url){
   document.body.style.opacity='0';
   setTimeout(()=>{window.location.href=url},180);
 }
 
-/* ── View Switching ── */
+/* View Switching */
 function switchView(id){
   document.querySelectorAll('.view').forEach(v=>v.style.display='none');
   const view=document.getElementById('view'+id);
   if(view){view.style.display='flex';view.style.opacity='0';requestAnimationFrame(()=>{view.style.opacity='1'});window.scrollTo(0,0);}
 }
 
-/* ── Toast ── */
+/* Toast */
 function showToast(title,sub,icon){
   document.getElementById('toastTitle').textContent=title;
   document.getElementById('toastSub').textContent=sub;
@@ -894,7 +866,7 @@ function showToast(title,sub,icon){
   setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-/* ── Input Method Selection ── */
+/* Input Method Selection */
 let currentMethod='photo';
 function selectMethod(method){
   currentMethod=method;
@@ -912,7 +884,7 @@ function selectMethod(method){
   document.getElementById('manualSection').style.display=method==='manual'?'block':'none';
 }
 
-/* ── Scan Photo ── */
+/* Scan Photo */
 function simulateScanUpload(){
   document.getElementById('scanPreview').style.display='block';
   document.getElementById('scanUpload').style.display='none';
@@ -923,7 +895,7 @@ function removeScanPhoto(){
   document.getElementById('scanUpload').style.display='block';
 }
 
-/* ── Manual Entry ── */
+/* Manual Entry */
 let itemCount=3;
 function addItem(){
   itemCount++;
@@ -942,7 +914,7 @@ function renumberItems(){
   itemCount=document.querySelectorAll('.item-row').length;
 }
 
-/* ── AI Analysis Animation ── */
+/* AI Analysis Animation */
 function startAnalysis(){
   const btn=document.getElementById('analyzeBtn');
   btn.innerHTML='<span style="display:inline-block;animation:spin 1s linear infinite">⏳</span> Analysing…';
@@ -979,7 +951,7 @@ function runAnalysisAnimation(){
   },4200);
 }
 
-/* ── Plan Check Toggle ── */
+/* Plan Check Toggle */
 function togglePlanCheck(el){
   el.classList.toggle('done');
   if(el.classList.contains('done')){
@@ -992,7 +964,7 @@ function togglePlanCheck(el){
   }
 }
 
-/* ── Reminder Toggle ── */
+/* Reminder Toggle */
 function toggleReminder(el){
   const dot=el.querySelector('.rr-toggle-dot');
   const isOn=el.style.background==='var(--teal)';
@@ -1009,11 +981,11 @@ function toggleReminder(el){
   }
 }
 
-/* ── Fade In ── */
+/* Fade In */
 document.body.style.opacity='0';
 window.addEventListener('load',()=>{document.body.style.transition='opacity .25s ease';document.body.style.opacity='1';});
 
-/* ── Reset analyze button when returning to B ── */
+/* Reset analyze button when returning to B */
 const origSwitch=switchView;
 switchView=function(id){
   if(id==='B'){

@@ -11,10 +11,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Find a Rental — RenterIQ</title>
 <style>
-/* ── Shell ── */
+/* Shell */
 .app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
 
-/* ── Search Header ── */
+/* Search Header */
 .search-header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 0;box-shadow:0 2px 16px rgba(10,36,96,.18)}
 .sh-topbar{display:flex;align-items:center;justify-content:space-between}
 .sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
@@ -26,7 +26,7 @@
 .sh-location-text{font-weight:600;font-size:13px;color:rgba(255,255,255,.65)}
 .sh-location-change{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal);cursor:pointer;-webkit-tap-highlight-color:transparent}
 
-/* ── Search Bar ── */
+/* Search Bar */
 .search-bar{background:#fff;border-radius:16px;padding:13px 15px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.1);margin-top:12px;transition:box-shadow .2s}
 .search-bar:focus-within{box-shadow:0 2px 8px rgba(27,80,200,.1),0 8px 28px rgba(27,80,200,.15)}
 .search-bar .sb-icon{color:var(--muted);font-size:18px;flex-shrink:0}
@@ -34,21 +34,21 @@
 .search-bar input::placeholder{color:var(--muted)}
 .search-bar .sb-clear{color:var(--muted);font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:44px;min-width:32px;display:none;align-items:center;justify-content:center}
 
-/* ── Type Chips ── */
+/* Type Chips */
 .chips-row{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding:0 0 14px;-webkit-overflow-scrolling:touch}
 .chips-row::-webkit-scrollbar{display:none}
 .type-chip{border-radius:100px;padding:7px 16px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);transition:all .18s var(--ease-smooth);white-space:nowrap;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .type-chip.active{background:rgba(255,255,255,.22);color:#fff;border-color:rgba(255,255,255,.45);box-shadow:0 2px 8px rgba(0,0,0,.1)}
 .type-chip:active{transform:scale(.95)}
 
-/* ── Content Area ── */
+/* Content Area */
 .content{flex:1;overflow-y:auto;padding-bottom:100px}
 
-/* ── Section Label ── */
+/* Section Label */
 .sec-label{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 16px 10px;display:flex;justify-content:space-between;align-items:center}
 .sec-label-link{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer;text-transform:none;letter-spacing:0}
 
-/* ── Recent Searches ── */
+/* Recent Searches */
 .recent-card{background:#fff;border-radius:18px;margin:0 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden}
 .recent-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .12s}
 .recent-row:last-child{border-bottom:none}
@@ -59,7 +59,7 @@
 .rr-meta{font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
 .rr-chev{color:var(--muted);font-size:18px;flex-shrink:0}
 
-/* ── Suburb Cards ── */
+/* Suburb Cards */
 .suburb-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}
 .suburb-card{border-radius:18px;padding:18px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth);box-shadow:0 4px 16px rgba(0,0,0,.12)}
 .suburb-card:active{transform:scale(.96)}
@@ -67,7 +67,7 @@
 .suburb-name{font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:#fff}
 .suburb-count{font-weight:700;font-size:12px;color:rgba(255,255,255,.7);margin-top:3px}
 
-/* ── Open Inspections Row ── */
+/* Open Inspections Row */
 .oi-scroll{display:flex;gap:12px;overflow-x:auto;padding:0 16px 4px;-webkit-overflow-scrolling:touch}
 .oi-scroll::-webkit-scrollbar{display:none}
 .oi-card{width:180px;flex-shrink:0;background:#fff;border-radius:16px;padding:14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
@@ -77,13 +77,13 @@
 .oi-time{font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
 .oi-price{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-top:4px}
 
-/* ── Results ── */
+/* Results */
 .results-header{padding:14px 16px 8px;display:flex;justify-content:space-between;align-items:center}
 .results-count{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
 .results-sort{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;display:flex;align-items:center}
 .results-list{padding:0 16px;display:flex;flex-direction:column;gap:14px}
 
-/* ── Property Card ── */
+/* Property Card */
 .prop-card-result{background:#fff;border-radius:20px;overflow:hidden;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
 .prop-card-result:active{transform:scale(.98);box-shadow:none}
 .pcr-image{height:165px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
@@ -99,23 +99,23 @@
 .pcr-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .pcr-cta{width:100%;border-radius:10px;padding:11px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;cursor:pointer;-webkit-tap-highlight-color:transparent;border:none}
 
-/* ── Pulse Dot ── */
+/* Pulse Dot */
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
 .pulse-dot{width:7px;height:7px;background:var(--teal);border-radius:50%;animation:pulse 2s ease-in-out infinite;flex-shrink:0;display:inline-block}
 .amber-dot{width:6px;height:6px;background:var(--amber);border-radius:50%;flex-shrink:0;display:inline-block}
 
-/* ── Overlays ── */
+/* Overlays */
 .property-overlay,.filter-overlay{position:fixed;inset:0;z-index:200;background:rgba(10,36,96,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .28s ease}
 .property-sheet,.filter-sheet{position:relative;width:100%;max-width:430px;background:#fff;border-radius:26px 26px 0 0;max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .32s var(--ease-smooth);box-shadow:0 -8px 40px rgba(0,0,0,.15)}
 .sheet-handle{width:40px;height:4px;background:var(--border);border-radius:100px;margin:14px auto 0}
 
-/* ── Sheet Image ── */
+/* Sheet Image */
 .sheet-img{height:200px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .sheet-emoji{font-size:56px}
 .sheet-save{position:absolute;top:12px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:none;z-index:2}
 .sheet-insp-badge{position:absolute;bottom:12px;left:14px;background:rgba(0,0,0,.52);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:100px;padding:4px 10px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px}
 
-/* ── Sheet Body ── */
+/* Sheet Body */
 .sheet-body{padding:18px 18px 0}
 .sheet-price{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:var(--blue)}
 .sheet-price span{font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted)}
@@ -141,13 +141,13 @@
 .agency-link{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:2px}
 .sheet-no-insp{background:var(--amber-lt);border:1px solid rgba(245,166,35,.3);border-radius:12px;padding:14px;font-size:13px;font-weight:600;color:#8A5500;line-height:1.55}
 
-/* ── Sheet Sticky CTA ── */
+/* Sheet Sticky CTA */
 .sheet-cta{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 18px 24px;display:flex;gap:10px}
 .sheet-cta-save{width:48px;height:48px;flex-shrink:0;border-radius:12px;border:2px solid var(--border);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:#fff;-webkit-tap-highlight-color:transparent;transition:all .15s}
 .sheet-cta-book{flex:1;border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:48px;box-shadow:0 2px 8px rgba(27,80,200,.25);transition:all .18s var(--ease-smooth)}
 .sheet-cta-book:active{transform:scale(.97);box-shadow:0 1px 4px rgba(27,80,200,.2)}
 
-/* ── Filter Sheet ── */
+/* Filter Sheet */
 .filter-header{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 0}
 .filter-title{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)}
 .filter-reset{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:44px}
@@ -163,7 +163,7 @@
 .filter-apply{width:100%;margin:20px 18px 0;width:calc(100% - 36px);border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;cursor:pointer;min-height:48px;margin-bottom:32px;box-shadow:0 2px 8px rgba(27,80,200,.25);transition:all .18s var(--ease-smooth)}
 .filter-apply:active{transform:scale(.97)}
 
-/* ── Bottom Nav ── */
+/* Bottom Nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
 .nav-tab:active{transform:scale(.92)}
@@ -172,7 +172,7 @@
 .tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
 .nav-tab.active .tab-label{color:var(--blue)}
 
-/* ── Tags (extend app.css) ── */
+/* Tags (extend app.css) */
 .tag{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;white-space:nowrap}
 .tag-teal{background:var(--teal-lt);color:var(--teal-dk)}
 .tag-blue{background:var(--blue-lt);color:var(--blue)}
@@ -182,7 +182,7 @@
 <body>
 <div class="app-shell">
 
-  <!-- ═══ 1. STICKY SEARCH HEADER ═══ -->
+  <!-- 1. STICKY SEARCH HEADER -->
   <header class="search-header">
     <!-- Row 1 — top bar -->
     <div class="sh-topbar">
@@ -215,10 +215,10 @@
     </div>
   </header>
 
-  <!-- ═══ SCROLLABLE CONTENT ═══ -->
+  <!-- SCROLLABLE CONTENT -->
   <div class="content">
 
-    <!-- ═══ 2. SEARCH HOME STATE ═══ -->
+    <!-- 2. SEARCH HOME STATE -->
     <div id="searchHome">
 
       <!-- 2A. Recent Searches -->
@@ -302,7 +302,7 @@
       </div>
     </div>
 
-    <!-- ═══ 3. RESULTS STATE ═══ -->
+    <!-- 3. RESULTS STATE -->
     <div id="searchResults" style="display:none">
       <!-- 3A. Results Header -->
       <div class="results-header">
@@ -401,7 +401,7 @@
 
   </div><!-- /content -->
 
-  <!-- ═══ 4. PROPERTY DETAIL SHEET ═══ -->
+  <!-- 4. PROPERTY DETAIL SHEET -->
   <div class="property-overlay" id="propertyOverlay">
     <div class="property-sheet" id="propertySheet">
       <div class="sheet-handle"></div>
@@ -439,7 +439,7 @@
     </div>
   </div>
 
-  <!-- ═══ 5. FILTER BOTTOM SHEET ═══ -->
+  <!-- 5. FILTER BOTTOM SHEET -->
   <div class="filter-overlay" id="filterOverlay">
     <div class="filter-sheet" id="filterSheet">
       <div class="sheet-handle"></div>
@@ -502,7 +502,7 @@
     </div>
   </div>
 
-  <!-- ═══ BOTTOM NAVIGATION ═══ -->
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <button class="nav-tab" onclick="navigate('/app/index.html')">
       <div class="tab-icon">🏠</div>
@@ -525,11 +525,9 @@
 </div><!-- /app-shell -->
 
 <script>
-/* ═══════════════════════════════════════
-   RenterIQ — Search Screen JS
-   ═══════════════════════════════════════ */
+/* RenterIQ — Search Screen JS */
 
-// ── Utilities ──
+// Utilities
 function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
 
 function showToast(title,sub,icon){
@@ -542,11 +540,11 @@ function showToast(title,sub,icon){
   clearTimeout(t._timer);t._timer=setTimeout(function(){t.style.transform='translateY(-90px)';t.style.opacity='0'},3200);
 }
 
-// ── State ──
+// State
 var savedProperties=new Set(['p1']);
 var currentPropertyId=null;
 
-// ── Property Data ──
+// Property Data
 var properties={
   p1:{price:'$620',addr:'18 Smith Street, Fitzroy VIC 3065',beds:3,baths:1,cars:2,size:180,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-blue">Pet Friendly</span>',insp:true,inspTime:'Sat 10:00am',inspBadge:'<span class="pulse-dot"></span>Inspection Sat 10:00am',agency:'Nelson Alexander — Fitzroy',gradient:'linear-gradient(135deg,#1a3a8f,#2E63E0)',emoji:'🏠'},
   p2:{price:'$480',addr:'7/92 Bridge Road, Richmond VIC 3121',beds:2,baths:1,cars:1,size:85,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-amber">New Listing</span>',insp:true,inspTime:'Sun 11:30am',inspBadge:'<span class="pulse-dot"></span>Inspection Sun 11:30am',agency:'Jellis Craig — Richmond',gradient:'linear-gradient(135deg,#006B50,#00C896)',emoji:'🏢'},
@@ -554,7 +552,7 @@ var properties={
   p4:{price:'$710',addr:'3/21 Johnston Street, Collingwood VIC 3066',beds:3,baths:2,cars:1,size:145,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-blue">Garage</span>',insp:true,inspTime:'Sat 1:00pm',inspBadge:'<span class="pulse-dot"></span>Inspection Sat 1:00pm',agency:'hockingstuart — Collingwood',gradient:'linear-gradient(135deg,#1A4A6B,#2299CC)',emoji:'🏘'}
 };
 
-// ── Search Logic ──
+// Search Logic
 function handleSearch(value){
   var clear=document.getElementById('searchClear');
   clear.style.display=value.length>0?'flex':'none';
@@ -594,7 +592,7 @@ function selectSuburb(name,count){
 
 function clearRecents(){showToast('Cleared','Recent searches removed','✓')}
 
-// ── Property Detail Sheet ──
+// Property Detail Sheet
 function openProperty(id){
   currentPropertyId=id;
   var p=properties[id];
@@ -639,7 +637,7 @@ function closeProperty(){
   setTimeout(function(){overlay.style.display='none'},320);
 }
 
-// ── Save / Book / Notify ──
+// Save / Book / Notify
 function toggleSave(id){
   if(savedProperties.has(id)){savedProperties.delete(id);showToast('Removed from Saved','You can re-save any time','♡')}
   else{savedProperties.add(id);showToast('Property Saved ❤️','Find it in your Vault','❤️')}
@@ -670,7 +668,7 @@ function notifyMe(id){
   closeProperty();
 }
 
-// ── Filter Sheet ──
+// Filter Sheet
 function openFilterSheet(){
   var overlay=document.getElementById('filterOverlay');
   var sheet=document.getElementById('filterSheet');
@@ -688,7 +686,7 @@ function closeFilterSheet(){
 function applyFilters(){closeFilterSheet();showResults('42 properties found');showToast('Filters applied','Showing matching properties','✓')}
 function resetFilters(){showToast('Filters reset','Showing all properties','↺')}
 
-// ── Chip & Pill Toggles ──
+// Chip & Pill Toggles
 document.querySelectorAll('.type-chip').forEach(function(chip){
   chip.addEventListener('click',function(){
     document.querySelectorAll('.type-chip').forEach(function(c){c.classList.remove('active')});
@@ -706,21 +704,21 @@ document.querySelectorAll('.filter-group').forEach(function(group){
   });
 });
 
-// ── Overlay Dismiss ──
+// Overlay Dismiss
 document.getElementById('propertyOverlay').addEventListener('click',function(e){if(e.target===this)closeProperty()});
 document.getElementById('filterOverlay').addEventListener('click',function(e){if(e.target===this)closeFilterSheet()});
 
-// ── Init ──
+// Init
 showHome();
 savedProperties.forEach(function(id){updateSaveBtn(id)});
 
-// ── Page Fade In ──
+// Page Fade In
 document.addEventListener('DOMContentLoaded',function(){
   document.body.style.opacity='0';
   requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
 });
 
-// ── Service Worker ──
+// Service Worker
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>
 </body>
