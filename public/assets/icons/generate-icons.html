@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RenterIQ — Generate PWA Icons</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #F4F7FF;
+    color: #0F1C3F;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 32px;
+  }
+  h1 { font-size: 24px; font-weight: 800; }
+  p { color: #5A6B8A; font-size: 14px; max-width: 480px; text-align: center; line-height: 1.6; }
+  .icon-row {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .icon-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .icon-box canvas {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(27,80,200,.15);
+  }
+  .icon-box span {
+    font-size: 13px;
+    font-weight: 700;
+    color: #5A6B8A;
+  }
+  button {
+    background: #1B50C8;
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  button:hover { background: #0A2460; }
+  .note {
+    background: rgba(245,166,35,.08);
+    border: 1px solid rgba(245,166,35,.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #8A6500;
+    max-width: 480px;
+    text-align: center;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<h1>RenterIQ PWA Icon Generator</h1>
+<p>Right-click an icon and choose "Save image as…" or use the download buttons below.</p>
+
+<div class="icon-row">
+  <div class="icon-box">
+    <canvas id="icon192" width="192" height="192"></canvas>
+    <span>icon-192.png (192×192)</span>
+    <button onclick="download('icon192', 'icon-192.png')">Download 192</button>
+  </div>
+  <div class="icon-box">
+    <canvas id="icon512" width="512" height="512"></canvas>
+    <span>icon-512.png (512×512)</span>
+    <button onclick="download('icon512', 'icon-512.png')">Download 512</button>
+  </div>
+</div>
+
+<div class="note">
+  ⚠️ Save both files to <strong>/assets/icons/</strong> in your project,
+  replacing the empty placeholders.
+</div>
+
+<script>
+function drawIcon(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+
+  // ── Background: blue rounded square ──
+  const cornerR = s * 0.18;
+  ctx.beginPath();
+  ctx.moveTo(cornerR, 0);
+  ctx.lineTo(s - cornerR, 0);
+  ctx.quadraticCurveTo(s, 0, s, cornerR);
+  ctx.lineTo(s, s - cornerR);
+  ctx.quadraticCurveTo(s, s, s - cornerR, s);
+  ctx.lineTo(cornerR, s);
+  ctx.quadraticCurveTo(0, s, 0, s - cornerR);
+  ctx.lineTo(0, cornerR);
+  ctx.quadraticCurveTo(0, 0, cornerR, 0);
+  ctx.closePath();
+  ctx.fillStyle = '#1B50C8';
+  ctx.fill();
+
+  // ── Shield path (centred) ──
+  const cx = s / 2;
+  const shieldW = s * 0.44;
+  const shieldH = s * 0.52;
+  const shieldTop = s * 0.18;
+  const shieldLeft = cx - shieldW / 2;
+  const shieldRight = cx + shieldW / 2;
+  const shieldBottom = shieldTop + shieldH;
+  const shieldMidY = shieldTop + shieldH * 0.55;
+
+  ctx.beginPath();
+  // Top-left rounded corner
+  ctx.moveTo(shieldLeft + shieldW * 0.08, shieldTop);
+  ctx.lineTo(shieldRight - shieldW * 0.08, shieldTop);
+  ctx.quadraticCurveTo(shieldRight, shieldTop, shieldRight, shieldTop + shieldH * 0.08);
+  // Right side down to mid
+  ctx.lineTo(shieldRight, shieldMidY);
+  // Curve to bottom point
+  ctx.quadraticCurveTo(shieldRight, shieldBottom - shieldH * 0.12, cx, shieldBottom);
+  ctx.quadraticCurveTo(shieldLeft, shieldBottom - shieldH * 0.12, shieldLeft, shieldMidY);
+  // Left side up
+  ctx.lineTo(shieldLeft, shieldTop + shieldH * 0.08);
+  ctx.quadraticCurveTo(shieldLeft, shieldTop, shieldLeft + shieldW * 0.08, shieldTop);
+  ctx.closePath();
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+
+  // ── House silhouette inside shield ──
+  const houseScale = s * 0.0045;
+  const houseCx = cx;
+  const houseCy = shieldTop + shieldH * 0.42;
+
+  ctx.fillStyle = '#1B50C8';
+  ctx.beginPath();
+  // Roof (triangle)
+  const roofW = 28 * houseScale;
+  const roofH = 18 * houseScale;
+  ctx.moveTo(houseCx, houseCy - roofH);
+  ctx.lineTo(houseCx + roofW / 2, houseCy);
+  ctx.lineTo(houseCx - roofW / 2, houseCy);
+  ctx.closePath();
+  ctx.fill();
+
+  // Chimney
+  const chimW = 4 * houseScale;
+  const chimH = 8 * houseScale;
+  ctx.fillRect(houseCx + roofW * 0.22, houseCy - roofH + 2 * houseScale, chimW, chimH);
+
+  // House body (rectangle)
+  const bodyW = 22 * houseScale;
+  const bodyH = 14 * houseScale;
+  ctx.fillRect(houseCx - bodyW / 2, houseCy, bodyW, bodyH);
+
+  // Door cutout (white)
+  ctx.fillStyle = '#ffffff';
+  const doorW = 6 * houseScale;
+  const doorH = 9 * houseScale;
+  ctx.fillRect(houseCx - doorW / 2, houseCy + bodyH - doorH, doorW, doorH);
+
+  // Window left (white)
+  const winS = 4.5 * houseScale;
+  ctx.fillRect(houseCx - bodyW / 2 + 2.5 * houseScale, houseCy + 2.5 * houseScale, winS, winS);
+
+  // Window right (white)
+  ctx.fillRect(houseCx + bodyW / 2 - 2.5 * houseScale - winS, houseCy + 2.5 * houseScale, winS, winS);
+
+  // ── Badge circle (bottom-right of shield) ──
+  const badgeR = s * 0.07;
+  const badgeX = shieldRight - badgeR * 0.3;
+  const badgeY = shieldBottom - shieldH * 0.2;
+
+  // White circle border
+  ctx.beginPath();
+  ctx.arc(badgeX, badgeY, badgeR + s * 0.012, 0, Math.PI * 2);
+  ctx.fillStyle = '#1B50C8';
+  ctx.fill();
+
+  // White circle
+  ctx.beginPath();
+  ctx.arc(badgeX, badgeY, badgeR, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+
+  // Blue tick inside
+  ctx.strokeStyle = '#1B50C8';
+  ctx.lineWidth = s * 0.018;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  const tickScale = badgeR * 0.45;
+  ctx.moveTo(badgeX - tickScale * 0.7, badgeY);
+  ctx.lineTo(badgeX - tickScale * 0.1, badgeY + tickScale * 0.6);
+  ctx.lineTo(badgeX + tickScale * 0.8, badgeY - tickScale * 0.5);
+  ctx.stroke();
+}
+
+function download(canvasId, filename) {
+  const canvas = document.getElementById(canvasId);
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// Draw both icons on load
+drawIcon('icon192');
+drawIcon('icon512');
+</script>
+</body>
+</html>

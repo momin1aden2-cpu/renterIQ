@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/app/css/app.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Notifications — RenterIQ</title>
+<style>
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl)}
+.nh-header{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.nh-row{display:flex;align-items:center;justify-content:space-between}
+.nh-back{background:none;border:none;color:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.nh-back-arrow{font-size:22px;font-weight:700;line-height:1}
+.nh-back-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;opacity:.7}
+.nh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
+.nh-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.nh-mark{background:none;border:none;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.7);cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0}
+.notif-card{background:#fff;border-radius:16px;margin:0 16px 10px;padding:14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;gap:13px;align-items:flex-start;transition:all .18s var(--ease-smooth)}
+.notif-card:active{transform:scale(.97);box-shadow:none}
+.notif-unread{border-left:3px solid var(--blue);background:rgba(27,80,200,.015)}
+.notif-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.notif-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.notif-body{font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:4px}
+.notif-actions{display:flex;gap:8px;margin-top:10px}
+.notif-time{font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted)}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.notif-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.sec-label{padding:18px 16px 8px;display:flex;justify-content:space-between;align-items:center}
+.sec-label-text{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+.sec-label-count{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue)}
+.btn-sm-blue{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:10px;padding:8px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 6px rgba(27,80,200,.2);transition:all .18s var(--ease-smooth)}
+.btn-sm-blue:active{transform:scale(.95)}
+.btn-sm-muted{background:var(--blue-xl);color:var(--blue);border:none;border-radius:9px;padding:8px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.notif-toggle{width:36px;height:20px;border-radius:100px;display:flex;align-items:center;padding:2px;cursor:pointer;flex-shrink:0;transition:background .2s;position:relative}
+.notif-toggle-dot{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;transition:right .2s,left .2s}
+.reminder-card{background:#fff;border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:13px;transition:opacity .3s,max-height .3s}
+.type-row{padding:11px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px}
+.type-row:last-child{border-bottom:none}
+.type-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.type-label{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1}
+.teal-lt{background:rgba(0,200,150,.1)}
+.amber-lt{background:rgba(245,166,35,.1)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- STICKY HEADER -->
+<header class="nh-header">
+  <div class="nh-row">
+    <button class="nh-back" onclick="history.back()"><span class="nh-back-arrow">‹</span><span class="nh-back-label">RENTERIQ</span></button>
+    <button class="nh-mark" onclick="markAllRead()">Mark all read</button>
+  </div>
+  <div class="nh-title">Notifications</div>
+  <div class="nh-sub" id="notifSubtitle">5 unread</div>
+</header>
+
+<!-- SETTINGS ROW -->
+<div style="background:#fff;border-bottom:1px solid var(--border-lt);padding:12px 20px;display:flex;align-items:center;justify-content:space-between">
+  <div style="display:flex;gap:10px;align-items:center"><span style="font-size:18px">🔔</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Notification Settings</span></div>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="navigate('/profile#notifications')">Manage →</span>
+</div>
+
+<!-- PUSH PERMISSION BANNER -->
+<div id="pushBanner" style="background:rgba(27,80,200,.06);border-bottom:1.5px solid rgba(27,80,200,.15);padding:13px 20px;display:flex;gap:12px;align-items:flex-start">
+  <span style="font-size:20px;flex-shrink:0">🔔</span>
+  <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Enable push notifications</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Get reminders for inspections, lease expiry and maintenance follow-ups — straight to your phone.</div></div>
+  <button class="btn-sm-blue" style="flex-shrink:0" onclick="requestPushPermission()">Enable</button>
+</div>
+
+<!-- TODAY -->
+<div class="sec-label"><span class="sec-label-text">Today</span><span class="sec-label-count">3 new</span></div>
+
+<div class="notif-card notif-unread" id="notif-0" onclick="markRead(0);navigate('/inspect')">
+  <div class="notif-icon" style="background:rgba(27,80,200,.1)">📅</div>
+  <div style="flex:1">
+    <div class="notif-title">Inspection in 2 hours</div>
+    <div class="notif-body">18 Smith Street, Fitzroy — Today at 10:00am. RenterIQ guided walkthrough is ready for you.</div>
+    <div class="notif-actions">
+      <button class="btn-sm-blue" onclick="event.stopPropagation();navigate('/inspect')">Start Inspection</button>
+      <button class="btn-sm-muted" onclick="event.stopPropagation();showToast('Directions','Opening maps','🗺')">Directions</button>
+    </div>
+  </div>
+  <div class="notif-right"><span class="notif-time">8:12am</span><div class="notif-dot" id="dot-0"></div></div>
+</div>
+
+<div class="notif-card notif-unread" id="notif-1" onclick="markRead(1);navigate('/vault')">
+  <div class="notif-icon amber-lt">🔧</div>
+  <div style="flex:1">
+    <div class="notif-title">Maintenance — no response in 8 days</div>
+    <div class="notif-body">Hot water repair reported 7 March. Your agent has not responded. Consider sending a follow-up.</div>
+    <div class="notif-actions">
+      <button class="btn-sm-blue" onclick="event.stopPropagation();showToast('Follow-up sent','Reminder sent to agent · Logged in Vault','📨')">Send Follow-Up</button>
+      <button class="btn-sm-muted" onclick="event.stopPropagation();navigate('/vault#maintenance')">View in Vault</button>
+    </div>
+  </div>
+  <div class="notif-right"><span class="notif-time">9:30am</span><div class="notif-dot" id="dot-1"></div></div>
+</div>
+
+<div class="notif-card notif-unread" id="notif-2" onclick="markRead(2);navigate('/inspect')">
+  <div class="notif-icon teal-lt">📄</div>
+  <div style="flex:1">
+    <div class="notif-title">Inspection report saved to Vault</div>
+    <div class="notif-body">Your condition report for 18 Smith Street is ready. 8 areas · 24 photos · AI summary complete.</div>
+    <div class="notif-actions">
+      <button class="btn-sm-blue" onclick="event.stopPropagation();navigate('/inspect')">View Report</button>
+      <button class="btn-sm-muted" onclick="event.stopPropagation();navigate('/vault')">Open Vault</button>
+    </div>
+  </div>
+  <div class="notif-right"><span class="notif-time">10:38am</span><div class="notif-dot" id="dot-2"></div></div>
+</div>
+
+<!-- THIS WEEK -->
+<div class="sec-label"><span class="sec-label-text">This Week</span><span class="sec-label-count">1 new</span></div>
+
+<div class="notif-card notif-unread" id="notif-3" onclick="markRead(3);navigate('/search')">
+  <div class="notif-icon" style="background:rgba(27,80,200,.1)">📅</div>
+  <div style="flex:1">
+    <div class="notif-title">Inspection tomorrow — 7/92 Bridge Rd</div>
+    <div class="notif-body">Inspection at 7/92 Bridge Road, Richmond is tomorrow at 11:30am. Tap to prepare.</div>
+    <div class="notif-actions">
+      <button class="btn-sm-muted" onclick="event.stopPropagation();navigate('/search')">View Property</button>
+      <button class="btn-sm-muted" onclick="event.stopPropagation();showToast('Added to calendar','7/92 Bridge Rd · Sun 11:30am','📅')">Add to Calendar</button>
+    </div>
+  </div>
+  <div class="notif-right"><span class="notif-time">Yesterday</span><div class="notif-dot" id="dot-3"></div></div>
+</div>
+
+<!-- EARLIER -->
+<div class="sec-label"><span class="sec-label-text">Earlier</span><span class="sec-label-count" style="color:var(--muted)">Read</span></div>
+
+<div class="notif-card" id="notif-4" style="opacity:.85" onclick="navigate('/search')">
+  <div class="notif-icon" style="background:rgba(27,80,200,.1)">📅</div>
+  <div style="flex:1">
+    <div class="notif-title">Inspection booked — 7/92 Bridge Rd, Richmond</div>
+    <div class="notif-body">Inspection confirmed for Sunday 16 March at 11:30am. Property saved to your profile.</div>
+  </div>
+  <div class="notif-right"><span class="notif-time">2 days ago</span></div>
+</div>
+
+<div class="notif-card" id="notif-5" style="opacity:.85" onclick="navigate('/lease')">
+  <div class="notif-icon" style="background:rgba(27,80,200,.08)">⚖️</div>
+  <div style="flex:1">
+    <div class="notif-title">Lease review complete</div>
+    <div class="notif-body">Your lease for 18 Smith Street has been reviewed. 3 clauses flagged for your attention.</div>
+  </div>
+  <div class="notif-right"><span class="notif-time">3 days ago</span></div>
+</div>
+
+<div class="notif-card" id="notif-6" style="opacity:.85" onclick="navigate('/vault')">
+  <div class="notif-icon teal-lt">🛡</div>
+  <div style="flex:1">
+    <div class="notif-title">Move-in audit saved to Vault</div>
+    <div class="notif-body">Your move-in condition report is saved. Both your report and the agency report are stored.</div>
+  </div>
+  <div class="notif-right"><span class="notif-time">5 days ago</span></div>
+</div>
+
+<div class="notif-card" id="notif-7" style="opacity:.85" onclick="navigate('/dashboard')">
+  <div class="notif-icon teal-lt">🔑</div>
+  <div style="flex:1">
+    <div class="notif-title">Welcome to RenterIQ</div>
+    <div class="notif-body">Your Vault is set up and your tenancy for 18 Smith Street is active. You're protected.</div>
+  </div>
+  <div class="notif-right"><span class="notif-time">15 Mar</span></div>
+</div>
+
+<div class="notif-card" id="notif-8" style="opacity:.85" onclick="navigate('/search')">
+  <div class="notif-icon" style="background:rgba(27,80,200,.1)">🏠</div>
+  <div style="flex:1">
+    <div class="notif-title">Property saved — 18 Smith St, Fitzroy</div>
+    <div class="notif-body">You booked an inspection and the property was saved to your RenterIQ profile automatically.</div>
+  </div>
+  <div class="notif-right"><span class="notif-time">10 Mar</span></div>
+</div>
+
+<!-- UPCOMING REMINDERS -->
+<div style="padding:20px 16px 10px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Upcoming Reminders</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Scheduled alerts</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin:0 16px">
+  <div class="reminder-card" id="reminder-0">
+    <div style="width:40px;height:40px;border-radius:11px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📅</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Inspection reminder — 3/21 Johnston St</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Sat 22 Mar at 12:00pm (noon)</div></div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--muted);cursor:pointer;padding:4px 8px" onclick="event.stopPropagation();dismissReminder(0)">✕</span>
+  </div>
+  <div class="reminder-card" id="reminder-1" style="cursor:pointer" onclick="navigate('/renewal')">
+    <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" class="amber-lt">📋</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease renewal — 90 day reminder</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Scheduled for 31 December 2025</div></div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--muted);padding:4px 8px">›</span>
+  </div>
+  <div class="reminder-card" id="reminder-2">
+    <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" class="amber-lt">🔧</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Maintenance follow-up — 14 days</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">If hot water issue unresolved by 21 March</div></div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--muted);cursor:pointer;padding:4px 8px" onclick="event.stopPropagation();dismissReminder(2)">✕</span>
+  </div>
+</div>
+
+<!-- NOTIFICATION TYPES -->
+<div style="padding:20px 16px 10px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">What RenterIQ notifies you about</div>
+</div>
+<div style="background:#fff;border-radius:16px;margin:0 16px 16px;border:1px solid var(--border-lt);overflow:hidden">
+  <div class="type-row"><div class="type-icon" style="background:var(--blue-xl)">📅</div><span class="type-label">Inspection reminders</span><div class="notif-toggle" id="toggle-0" style="background:var(--teal);justify-content:flex-end" onclick="toggleNotifType(0)"><div class="notif-toggle-dot" id="toggleDot-0" style="right:2px"></div></div></div>
+  <div class="type-row"><div class="type-icon amber-lt">📋</div><span class="type-label">Lease renewal alerts</span><div class="notif-toggle" id="toggle-1" style="background:var(--teal);justify-content:flex-end" onclick="toggleNotifType(1)"><div class="notif-toggle-dot" id="toggleDot-1" style="right:2px"></div></div></div>
+  <div class="type-row"><div class="type-icon amber-lt">🔧</div><span class="type-label">Maintenance follow-ups</span><div class="notif-toggle" id="toggle-2" style="background:var(--teal);justify-content:flex-end" onclick="toggleNotifType(2)"><div class="notif-toggle-dot" id="toggleDot-2" style="right:2px"></div></div></div>
+  <div class="type-row"><div class="type-icon teal-lt">💰</div><span class="type-label">Bond return reminders</span><div class="notif-toggle" id="toggle-3" style="background:var(--teal);justify-content:flex-end" onclick="toggleNotifType(3)"><div class="notif-toggle-dot" id="toggleDot-3" style="right:2px"></div></div></div>
+  <div class="type-row"><div class="type-icon teal-lt">📸</div><span class="type-label">Report ready alerts</span><div class="notif-toggle" id="toggle-4" style="background:var(--teal);justify-content:flex-end" onclick="toggleNotifType(4)"><div class="notif-toggle-dot" id="toggleDot-4" style="right:2px"></div></div></div>
+  <div class="type-row"><div class="type-icon" style="background:var(--blue-xl)">🏠</div><span class="type-label">New inspection times</span><div class="notif-toggle" id="toggle-5" style="background:var(--teal);justify-content:flex-end" onclick="toggleNotifType(5)"><div class="notif-toggle-dot" id="toggleDot-5" style="right:2px"></div></div></div>
+  <div class="type-row"><div class="type-icon" style="background:var(--blue-xl)">📄</div><span class="type-label">Document saved alerts</span><div class="notif-toggle" id="toggle-6" style="background:var(--teal);justify-content:flex-end" onclick="toggleNotifType(6)"><div class="notif-toggle-dot" id="toggleDot-6" style="right:2px"></div></div></div>
+  <div class="type-row"><div class="type-icon" style="background:var(--blue-xl)">🔔</div><span class="type-label">App updates</span><div class="notif-toggle" id="toggle-7" style="background:var(--border);justify-content:flex-start" onclick="toggleNotifType(7)"><div class="notif-toggle-dot" id="toggleDot-7" style="right:auto;left:2px"></div></div></div>
+</div>
+
+<div style="height:24px"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+  <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+</nav>
+
+</div>
+
+<script>
+/* RenterIQ — Notifications JS */
+
+function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+
+function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
+
+// Notification State
+var readNotifs=new Set([4,5,6,7,8]);
+var notifToggles=[true,true,true,true,true,true,true,false];
+
+function markAllRead(){
+  for(var i=0;i<=8;i++){
+    readNotifs.add(i);
+    var card=document.getElementById('notif-'+i);
+    var dot=document.getElementById('dot-'+i);
+    if(card){card.style.borderLeft='1px solid var(--border-lt)';card.style.background='white';card.style.opacity='.85';card.classList.remove('notif-unread')}
+    if(dot)dot.style.display='none';
+  }
+  var subtitle=document.getElementById('notifSubtitle');
+  if(subtitle)subtitle.textContent='All caught up';
+  showToast('All notifications read','','✓');
+}
+
+function markRead(n){
+  readNotifs.add(n);
+  var card=document.getElementById('notif-'+n);
+  var dot=document.getElementById('dot-'+n);
+  if(card){card.style.borderLeft='1px solid var(--border-lt)';card.style.background='white';card.classList.remove('notif-unread')}
+  if(dot)dot.style.display='none';
+  updateUnreadCount();
+}
+
+function updateUnreadCount(){
+  var unread=9-readNotifs.size;
+  var subtitle=document.getElementById('notifSubtitle');
+  if(subtitle)subtitle.textContent=unread>0?unread+' unread':'All caught up';
+}
+
+function dismissReminder(n){
+  var card=document.getElementById('reminder-'+n);
+  if(card){card.style.transition='opacity .3s,max-height .3s';card.style.opacity='0';card.style.maxHeight='0';card.style.padding='0';card.style.margin='0';card.style.overflow='hidden';setTimeout(function(){card.style.display='none'},300)}
+  showToast('Reminder dismissed','','✓');
+}
+
+// Push Permission
+function requestPushPermission(){
+  if('Notification' in window){
+    Notification.requestPermission().then(function(perm){
+      var banner=document.getElementById('pushBanner');
+      if(perm==='granted'){showToast('Notifications enabled ✓','You\'ll receive all RenterIQ alerts','🔔');if(banner)banner.style.display='none'}
+      else{showToast('Notifications blocked','Enable in your browser or phone settings','⚙')}
+    });
+  }else{showToast('Not supported','Your browser doesn\'t support push notifications','⚠️')}
+}
+
+// Toggle Notification Types
+function toggleNotifType(n){
+  notifToggles[n]=!notifToggles[n];
+  var toggle=document.getElementById('toggle-'+n);
+  var dot=document.getElementById('toggleDot-'+n);
+  var on=notifToggles[n];
+  if(toggle){toggle.style.background=on?'var(--teal)':'var(--border)';toggle.style.justifyContent=on?'flex-end':'flex-start'}
+  if(dot){if(on){dot.style.right='2px';dot.style.left='auto'}else{dot.style.right='auto';dot.style.left='2px'}}
+  showToast(on?'Notification enabled':'Notification disabled','',on?'🔔':'🔕');
+}
+
+// Init
+document.addEventListener('DOMContentLoaded',function(){
+  document.body.style.opacity='0';
+  requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
+  if('Notification' in window&&Notification.permission==='granted'){var banner=document.getElementById('pushBanner');if(banner)banner.style.display='none'}
+});
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+</body>
+</html>

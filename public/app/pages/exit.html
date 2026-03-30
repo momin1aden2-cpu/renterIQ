@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/app/css/app.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Exit Inspection — RenterIQ</title>
+<style>
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
+.view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
+.sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.sh-row{display:flex;align-items:center;justify-content:space-between}
+.sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
+.sh-back-arrow{font-size:22px;color:rgba(255,255,255,.8);font-weight:700}
+.sh-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px;text-transform:uppercase}
+.sh-right-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.65)}
+.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
+.sh-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.sec-label{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 10px}
+.fsl{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:block}
+.btn-blue-c{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(27,80,200,.2);transition:all .18s var(--ease-smooth)}
+.btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(27,80,200,.15)}
+.btn-teal-c{background:linear-gradient(135deg,var(--teal),#00DBA6);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,200,150,.25);transition:all .18s var(--ease-smooth)}
+.btn-teal-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,200,150,.2)}
+.btn-muted-c{background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px}
+.btn-outline-c{background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
+.btn-full{width:100%}
+.flex-1{flex:1}
+.tag{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;white-space:nowrap}
+.tag-teal{background:rgba(0,200,150,.1);color:var(--teal-dk)}
+.tag-amber{background:rgba(245,166,35,.1);color:#7A5500}
+.tag-red{background:rgba(232,64,64,.1);color:var(--red)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
+.nav-tab:active{transform:scale(.92)}
+.tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
+.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
+.tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
+.nav-tab.active .tab-label{color:var(--blue)}
+.brief-num{width:28px;height:28px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.brief-text{font-weight:600;font-size:13px;color:var(--muted);line-height:1.6}
+.progress-bar-wrap{background:var(--blue-dk);padding:12px 20px 14px}
+.progress-top{display:flex;justify-content:space-between;align-items:center}
+.progress-label{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)}
+.progress-pct{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--teal)}
+.progress-track{height:5px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--teal);border-radius:100px;width:0;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.room-row{background:#fff;border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
+.room-row:active{transform:scale(.97);box-shadow:none}
+.room-icon-wrap{width:44px;height:44px;border-radius:12px;font-size:22px;display:flex;align-items:center;justify-content:center;background:var(--blue-xl);flex-shrink:0;transition:background .15s}
+.room-body{flex:1;min-width:0}
+.room-name{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)}
+.room-status{font-weight:600;font-size:12px;color:var(--muted);margin-top:2px}
+.room-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .2s}
+.complete-area{position:sticky;bottom:72px;background:linear-gradient(transparent,var(--blue-xl) 30%);padding:24px 16px 12px;z-index:5}
+.complete-hint{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-top:6px}
+.room-header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 0;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.room-emoji{font-size:34px;display:block;margin-top:10px}
+.room-title-big{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:4px}
+.room-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.tab-bar{margin-top:14px;background:rgba(255,255,255,.12);border-radius:10px;padding:3px;display:flex}
+.tab-item{flex:1;text-align:center;border-radius:8px;padding:7px 0;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,.65);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.tab-active{background:#fff!important;color:var(--blue)!important}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.photo-cell{aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;cursor:pointer}
+.photo-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:30px}
+.photo-ts{position:absolute;bottom:5px;left:5px;background:rgba(0,0,0,.5);border-radius:6px;padding:2px 6px;font-family:'Sora',sans-serif;font-size:9px;font-weight:700;color:#fff}
+.add-photo{aspect-ratio:1;border:2px dashed var(--border);background:var(--blue-xl);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.add-photo:active{border-color:var(--blue);background:var(--blue-lt)}
+.add-photo-icon{font-size:24px}
+.add-photo-label{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted)}
+.qn-chip{background:var(--blue-xl);border:1px solid var(--border);border-radius:100px;padding:7px 13px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.chip-active{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important}
+.notes-field{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;min-height:80px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);line-height:1.6;resize:none;outline:none;box-sizing:border-box}
+.notes-field:focus{border-color:var(--blue)}
+.notes-field::placeholder{color:var(--muted)}
+.cond-btn{flex:1;border-radius:14px;padding:14px 8px;border:2px solid var(--border);background:#fff;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+.cond-good-active{border-color:var(--teal)!important;background:rgba(0,200,150,.06)!important}
+.cond-fair-active{border-color:var(--amber)!important;background:rgba(245,166,35,.06)!important}
+.cond-poor-active{border-color:var(--red)!important;background:rgba(232,64,64,.06)!important}
+.room-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10}
+.exit-checkbox{width:26px;height:26px;border-radius:8px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
+.gen-center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center}
+.gen-spinner{width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:28px;animation:aiPulse 1.8s ease-in-out infinite}
+.gen-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);margin-bottom:10px}
+.gen-sub{font-weight:600;font-size:14px;color:var(--muted);line-height:1.7;max-width:300px;margin-bottom:32px}
+.gen-steps{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
+.gen-step{background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px}
+.gen-icon{width:32px;height:32px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:all .3s}
+.gen-step-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+.gen-step-detail{font-weight:600;font-size:11px;color:var(--muted);margin-top:1px}
+.confirm-center{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.confirm-icon{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-dk));display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:24px;animation:successPop .4s cubic-bezier(.175,.885,.32,1.275)}
+.ph-blue{background:linear-gradient(135deg,#1a3a8f,#2E63E0)}
+.ph-teal{background:linear-gradient(135deg,#006B50,#00C896)}
+.ph-slate{background:linear-gradient(135deg,#2a3f6f,#4a6fa5)}
+.checklist-card{background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt)}
+.check-row{display:flex;align-items:center;gap:11px;cursor:pointer;margin-bottom:11px}
+.check-row:last-child{margin-bottom:0}
+.check-row input{width:18px;height:18px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+.check-row label{font-weight:600;font-size:13px;color:var(--text);cursor:pointer}
+.priority-pill{background:var(--blue-xl);border:1.5px solid var(--border);border-radius:100px;padding:8px 16px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s}
+.priority-pill.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.timeline-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.timeline-line{width:2px;flex:1;min-height:20px;background:var(--border-lt);margin:4px auto}
+.timeline-event{display:flex;gap:12px;align-items:flex-start}
+@keyframes aiPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(27,80,200,.3)}50%{transform:scale(1.06);box-shadow:0 0 0 16px rgba(27,80,200,0)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- VIEW A — INTRODUCTION -->
+<div class="view" id="viewA" style="display:flex;flex-direction:column;min-height:100vh">
+  <header class="sh">
+    <div class="sh-row">
+      <button class="sh-back" onclick="navigate('/dashboard')"><span class="sh-back-arrow">‹</span><span class="sh-label">RENTERIQ</span></button>
+      <span style="font-size:20px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Exit Inspection','Complete this after cleaning — before handing back the keys. Your bond depends on it.','🚪')">?</span>
+    </div>
+    <div class="sh-title">Exit Inspection</div>
+    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+  </header>
+
+  <div style="background:var(--blue-dk);padding:13px 20px;display:flex;gap:12px;align-items:center">
+    <span style="font-size:20px;flex-shrink:0">📅</span>
+    <div style="flex:1">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:2px">Lease ending 31 March 2026</div>
+      <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.6)">358 days remaining · Bond: $2,480</div>
+    </div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--teal);cursor:pointer;white-space:nowrap" onclick="navigate('/vault')">View Vault →</span>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding-bottom:100px">
+
+    <div style="margin:16px;background:linear-gradient(135deg,#7A0000,var(--red));border-radius:18px;padding:22px 18px">
+      <span style="font-size:36px;display:block;margin-bottom:14px">🚪</span>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:#fff;margin-bottom:14px">Complete this AFTER you have:</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-radius:5px;flex-shrink:0;margin-top:2px"></div><span style="font-weight:600;font-size:13px;color:rgba(255,255,255,.88);line-height:1.5">Moved ALL belongings out of the property</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-radius:5px;flex-shrink:0;margin-top:2px"></div><span style="font-weight:600;font-size:13px;color:rgba(255,255,255,.88);line-height:1.5">Professionally cleaned or thoroughly cleaned every room including windows and oven</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-radius:5px;flex-shrink:0;margin-top:2px"></div><span style="font-weight:600;font-size:13px;color:rgba(255,255,255,.88);line-height:1.5">Completed any agreed repairs or touch-ups</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-radius:5px;flex-shrink:0;margin-top:2px"></div><span style="font-weight:600;font-size:13px;color:rgba(255,255,255,.88);line-height:1.5">Returned all keys, remotes and access devices</span></div>
+      </div>
+      <div style="margin-top:14px;font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.65">⚠️ Do not complete this walkthrough while your belongings are still in the property. The exit inspection documents the empty, cleaned property only — this is what will be compared against your move-in record.</div>
+    </div>
+
+    <div style="margin:0 16px 14px;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:16px">How the Exit Inspection works</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">1</div><div class="brief-text">Walk through every room and area photographing the current state of the empty, clean property.</div></div>
+        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">2</div><div class="brief-text">RenterIQ's AI compares your exit photos against your move-in report and the agency's report.</div></div>
+        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">3</div><div class="brief-text">Where the AI spots a difference, it asks you — is this something that happened during your tenancy?</div></div>
+        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">4</div><div class="brief-text">You confirm or dismiss each item. Nothing enters the report without your approval.</div></div>
+        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">5</div><div class="brief-text">For any confirmed items, RenterIQ suggests practical fixes to help you recover your full bond.</div></div>
+      </div>
+    </div>
+
+    <div class="sec-label" style="padding:0 16px">Reports Available for Comparison</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin:0 16px 14px">
+      <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📸</div>
+        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Your Move-In Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">15 March 2025 · 8 areas · 24 photos</div></div>
+        <span class="tag tag-teal">✓ Ready</span>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏢</div>
+        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Agency Condition Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Uploaded · 12 pages</div></div>
+        <span class="tag tag-teal">✓ Ready</span>
+      </div>
+    </div>
+
+    <div style="margin:0 16px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:6px">⏱ Best time to do this</div>
+      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">Ideally complete the exit inspection the morning of your key handover — after everything is cleaned and removed. This gives you a few hours to address any issues the AI detects before meeting the agent.</div>
+    </div>
+
+    <div style="padding:0 16px 24px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;font-size:15px" onclick="switchView('B')">I'm Ready — Start Exit Inspection →</button>
+      <button style="background:transparent;color:var(--muted);width:100%;padding:12px;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;text-align:center" onclick="showToast('No problem','Return here when the property is empty and cleaned','🚪')">I'm Not Ready Yet</button>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+    <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  </nav>
+</div>
+
+<!-- VIEW B — PRE-EXIT CHECKLIST -->
+<div class="view" id="viewB" style="display:none">
+  <header class="sh">
+    <div class="sh-row"><button class="sh-back" onclick="switchView('A')"><span class="sh-back-arrow">‹</span><span class="sh-label">BACK</span></button></div>
+    <div class="sh-title">Pre-Exit Checklist</div>
+    <div class="sh-sub">Confirm everything is done before you start</div>
+  </header>
+  <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+
+    <div style="background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Before you start the walkthrough, confirm:</div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div id="exitItem-0" style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer" onclick="toggleExitCheck(0)"><div class="exit-checkbox" id="exitCheck-0"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">All belongings removed from the property</span></div>
+        <div id="exitItem-1" style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer" onclick="toggleExitCheck(1)"><div class="exit-checkbox" id="exitCheck-1"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">All rooms thoroughly cleaned</span></div>
+        <div id="exitItem-2" style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer" onclick="toggleExitCheck(2)"><div class="exit-checkbox" id="exitCheck-2"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Oven, stove and range hood cleaned</span></div>
+        <div id="exitItem-3" style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer" onclick="toggleExitCheck(3)"><div class="exit-checkbox" id="exitCheck-3"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bathrooms scrubbed — grout, tiles, fixtures</span></div>
+        <div id="exitItem-4" style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer" onclick="toggleExitCheck(4)"><div class="exit-checkbox" id="exitCheck-4"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Windows and tracks cleaned inside</span></div>
+        <div id="exitItem-5" style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer" onclick="toggleExitCheck(5)"><div class="exit-checkbox" id="exitCheck-5"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Carpets vacuumed or professionally cleaned</span></div>
+        <div id="exitItem-6" style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer" onclick="toggleExitCheck(6)"><div class="exit-checkbox" id="exitCheck-6"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Garden and outdoor areas tidied</span></div>
+        <div id="exitItem-7" style="display:flex;align-items:center;gap:13px;padding:12px 0;cursor:pointer" onclick="toggleExitCheck(7)"><div class="exit-checkbox" id="exitCheck-7"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">All keys, remotes and access devices ready to return</span></div>
+      </div>
+      <div id="exitCheckProgress" style="font-weight:600;font-size:12px;color:var(--muted);margin-top:12px;text-align:center">0 of 8 items confirmed</div>
+    </div>
+
+    <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:10px">💡 Tips for a successful exit inspection</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">· The agent will look at exactly what they documented in the original condition report. Focus your cleaning and repairs on those areas.</div>
+        <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">· Photographing your cleaning is not required but can be helpful — especially for ovens, carpets and bathrooms.</div>
+        <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">· If you have had professional carpet cleaning, keep the receipt — agencies cannot charge for cleaning that has been professionally done.</div>
+        <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">· Fair wear and tear cannot be charged to you. Minor scuffs, small nail holes and faded paint after a long tenancy are expected.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10">
+    <button class="btn-outline-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="switchView('A')">← Back</button>
+    <button class="btn-blue-c flex-1" id="startExitBtn" style="border-radius:12px;opacity:.5;pointer-events:none" onclick="switchView('C')">Start Exit Walkthrough →</button>
+  </div>
+</div>
+
+<!-- VIEW C — ROOM OVERVIEW -->
+<div class="view" id="viewC" style="display:none">
+  <header class="sh" style="padding-bottom:0">
+    <div class="sh-row">
+      <button class="sh-back" onclick="switchView('B')"><span class="sh-back-arrow">‹</span><span class="sh-label">CHECKLIST</span></button>
+      <span class="sh-right-text">Exit Walkthrough</span>
+    </div>
+    <div class="sh-title" style="margin-top:6px">Exit Walkthrough</div>
+    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+  </header>
+  <div class="progress-bar-wrap">
+    <div class="progress-top">
+      <span class="progress-label" id="exitProgressLabel">0 of 8 areas completed</span>
+      <span class="progress-pct" id="exitProgressPct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="exitProgressFill"></div></div>
+  </div>
+  <div style="background:var(--blue-dk);padding:0 20px 14px;display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:15px;flex-shrink:0;margin-top:1px">📸</span>
+    <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.65);line-height:1.55">Photograph the same areas you documented at move-in. The AI will compare each photo against your original record and the agency report.</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+    <div style="display:flex;flex-direction:column;gap:10px" id="exitAreaList"></div>
+
+    <div style="background:#fff;border-radius:14px;padding:13px 15px;border:1px solid var(--border-lt);margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+      <div style="width:34px;height:34px;border-radius:9px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📋</div>
+      <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">Photograph what the agency will inspect — walls, floors, fixtures, appliances. Match what you documented at move-in.</div>
+    </div>
+  </div>
+  <div class="complete-area">
+    <button class="btn-blue-c btn-full" id="exitCompleteBtn" style="border-radius:14px;padding:14px;font-size:15px;opacity:.4;pointer-events:none" onclick="var b=this;b.style.opacity='.7';b.style.pointerEvents='none';b.textContent='Processing…';switchView('E')">Complete Exit Inspection</button>
+    <div class="complete-hint" id="exitCompleteHint">Complete all 8 areas to generate comparison</div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+    <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  </nav>
+</div>
+
+<!-- VIEW D — ROOM WALKTHROUGH -->
+<div class="view" id="viewD" style="display:none">
+  <header class="room-header">
+    <div class="sh-row">
+      <button class="sh-back" onclick="goBackToExitRooms()"><span class="sh-back-arrow">‹</span><span class="sh-label">ROOMS</span></button>
+      <span class="sh-right-text" id="exitRoomCounter">1 / 8</span>
+    </div>
+    <span class="room-emoji" id="exitRoomEmoji">🚪</span>
+    <div class="room-title-big" id="exitRoomTitle">Entry &amp; Hallway</div>
+    <div class="room-sub">Photograph the current state of this area</div>
+    <div class="tab-bar">
+      <div class="tab-item tab-active" id="exitTab0" onclick="setExitTab(0)">📸 Photos</div>
+      <div class="tab-item" id="exitTab1" onclick="setExitTab(1)">📝 Notes</div>
+      <div class="tab-item" id="exitTab2" onclick="setExitTab(2)">✓ Condition</div>
+    </div>
+  </header>
+
+  <!-- Tab 0 — Photos -->
+  <div id="exitTabContent0" style="flex:1;overflow-y:auto">
+    <div style="padding:16px">
+      <div id="exitMiPhotoCtx" style="background:var(--blue-xl);border-radius:10px;padding:10px 12px;margin-bottom:12px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:14px">📸</span>
+        <span id="exitMiPhotoContext" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Move-in: Good condition · 3 photos</span>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);margin-left:auto;cursor:pointer;white-space:nowrap" onclick="showToast('Move-in photos','Side by side comparison coming after walkthrough','📸')">Compare →</span>
+      </div>
+      <span class="fsl">Photos</span>
+      <div class="photo-grid" id="exitPhotoGrid">
+        <div class="photo-cell"><div class="photo-inner ph-teal">📸</div><span class="photo-ts">09:14</span></div>
+        <div class="photo-cell"><div class="photo-inner ph-blue">🏠</div><span class="photo-ts">09:15</span></div>
+        <div class="add-photo" onclick="addExitPhoto()"><span class="add-photo-icon">📷</span><span class="add-photo-label">Add Photo</span></div>
+      </div>
+      <div style="font-weight:600;font-size:12px;color:var(--muted);text-align:center">Photos are timestamped automatically · Tap any photo to view</div>
+    </div>
+    <div style="padding:0 16px 16px">
+      <span class="fsl">Quick Notes</span>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px">
+        <span class="qn-chip" onclick="addExitQuickNote('✓ Clean',this)">✓ Clean</span>
+        <span class="qn-chip" onclick="addExitQuickNote('✓ Repaired',this)">✓ Repaired</span>
+        <span class="qn-chip" onclick="addExitQuickNote('✓ Good condition',this)">✓ Good condition</span>
+        <span class="qn-chip" onclick="addExitQuickNote('Mark visible',this)">Mark visible</span>
+        <span class="qn-chip" onclick="addExitQuickNote('Scuff noted',this)">Scuff noted</span>
+        <span class="qn-chip" onclick="addExitQuickNote('Stain present',this)">Stain present</span>
+        <span class="qn-chip" onclick="addExitQuickNote('Paint touched up',this)">Paint touched up</span>
+        <span class="qn-chip" onclick="addExitQuickNote('Professionally cleaned',this)">Professionally cleaned</span>
+      </div>
+      <textarea class="notes-field" id="exitNotesField" placeholder="Describe current condition… e.g. 'walls clean, minor mark touched up with paint'"></textarea>
+    </div>
+  </div>
+
+  <!-- Tab 1 — Notes -->
+  <div id="exitTabContent1" style="flex:1;overflow-y:auto;display:none">
+    <div style="padding:16px">
+      <span class="fsl">Detailed Notes</span>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🧱 Walls & Ceiling</div>
+        <textarea class="notes-field" style="min-height:50px" placeholder="Note any marks, scuffs, paint issues…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🪟 Floors & Carpet</div>
+        <textarea class="notes-field" style="min-height:50px" placeholder="Carpet condition, scratches, stains…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">💡 Fixtures & Fittings</div>
+        <textarea class="notes-field" style="min-height:50px" placeholder="Lights, switches, door handles…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🚿 Plumbing & Water</div>
+        <textarea class="notes-field" style="min-height:50px" placeholder="Taps, drains, water pressure…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🔌 Electrical</div>
+        <textarea class="notes-field" style="min-height:50px" placeholder="Power points, switches…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">📝 Other</div>
+        <textarea class="notes-field" id="exitDetailNotes" style="min-height:60px" placeholder="Document the current exit condition in detail…"></textarea>
+      </div>
+      <div style="font-weight:600;font-size:12px;color:var(--muted)">Your notes are private and only used to generate your comparison report.</div>
+    </div>
+  </div>
+
+  <!-- Tab 2 — Condition -->
+  <div id="exitTabContent2" style="flex:1;overflow-y:auto;display:none">
+    <div style="padding:16px">
+      <span class="fsl">Overall Area Condition at Exit</span>
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <button class="cond-btn" id="exit-cond-good" onclick="selectExitCondition('good')"><span style="font-size:24px">😊</span>Clean &amp; good</button>
+        <button class="cond-btn" id="exit-cond-fair" onclick="selectExitCondition('fair')"><span style="font-size:24px">😐</span>Minor issues</button>
+        <button class="cond-btn" id="exit-cond-poor" onclick="selectExitCondition('poor')"><span style="font-size:24px">😟</span>Needs attention</button>
+      </div>
+      <div class="checklist-card">
+        <span class="fsl" style="margin-bottom:12px">Exit Checklist</span>
+        <div class="check-row"><input type="checkbox" id="exck0"><label for="exck0">Area thoroughly cleaned</label></div>
+        <div class="check-row"><input type="checkbox" id="exck1"><label for="exck1">No new damage since move-in</label></div>
+        <div class="check-row"><input type="checkbox" id="exck2"><label for="exck2">All fixtures present and working</label></div>
+        <div class="check-row"><input type="checkbox" id="exck3"><label for="exck3">Floors/carpet clean</label></div>
+        <div class="check-row"><input type="checkbox" id="exck4"><label for="exck4">Walls in acceptable condition</label></div>
+        <div class="check-row"><input type="checkbox" id="exck5"><label for="exck5">Windows clean</label></div>
+        <div class="check-row"><input type="checkbox" id="exck6"><label for="exck6">Any repairs completed</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="room-footer">
+    <button class="btn-outline-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="goBackToExitRooms()">← Back to Rooms</button>
+    <button class="btn-teal-c flex-1" onclick="markExitAreaComplete()">Mark Area Complete ✓</button>
+  </div>
+</div>
+
+<!-- VIEW E — GENERATING COMPARISON -->
+<div class="view" id="viewE" style="display:none">
+  <div class="gen-center">
+    <div class="gen-spinner">⚖️</div>
+    <div class="gen-title">Comparing your reports…</div>
+    <div class="gen-sub">RenterIQ is comparing your exit photos against your move-in record and the agency's condition report. This takes about 15 seconds.</div>
+    <div class="gen-steps">
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-0">📸</div><div><div class="gen-step-name">Processing exit photos</div><div class="gen-step-detail">24 timestamped exit images</div></div></div>
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-1">📋</div><div><div class="gen-step-name">Loading move-in report</div><div class="gen-step-detail">15 March 2025 · 8 areas · 24 photos</div></div></div>
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-2">🏢</div><div><div class="gen-step-name">Loading agency report</div><div class="gen-step-detail">Original condition report · 12 pages</div></div></div>
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-3">🔍</div><div><div class="gen-step-name">Comparing area by area</div><div class="gen-step-detail">Checking all 8 areas for differences</div></div></div>
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-4">⚠️</div><div><div class="gen-step-name">Identifying differences</div><div class="gen-step-detail">Flagging items for your review</div></div></div>
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-5">📊</div><div><div class="gen-step-name">Preparing your review</div><div class="gen-step-detail">Ready for your confirmation</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW F — AI COMPARISON & TENANT REVIEW -->
+<div class="view" id="viewF" style="display:none">
+  <header class="sh">
+    <div class="sh-row"><button class="sh-back" onclick="switchView('C')"><span class="sh-back-arrow">‹</span><span class="sh-label">BACK</span></button></div>
+    <div class="sh-title">Your Review</div>
+    <div class="sh-sub">AI found items for your review</div>
+  </header>
+  <div style="background:var(--blue-dk);padding:12px 20px;display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:14px;flex-shrink:0;margin-top:1px">🤖</span>
+    <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#fff;line-height:1.5">RenterIQ found 2 potential differences. Review each one — you decide what gets recorded.</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+
+    <div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12.5px;color:var(--teal-dk);line-height:1.6">You are in control. The AI surfaces differences — you confirm or dismiss each one. Nothing enters your exit report without your approval.</div>
+    </div>
+
+    <div class="sec-label" style="padding:0 0 10px">All 8 Areas</div>
+    <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:20px">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🚪</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Entry &amp; Hallway</span><span class="tag tag-teal">Match ✓</span></div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🛋</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Living Room</span><span class="tag tag-teal">Match ✓</span></div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px;background:rgba(245,166,35,.03)"><span style="font-size:16px">🍳</span><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--text);flex:1">Kitchen</span><span class="tag tag-amber">Review ⚠</span></div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🛏</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Master Bedroom</span><span class="tag tag-teal">Match ✓</span></div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🛏</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Bedroom 2</span><span class="tag tag-teal">Match ✓</span></div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px;background:rgba(245,166,35,.03)"><span style="font-size:16px">🚿</span><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--text);flex:1">Bathroom</span><span class="tag tag-amber">Review ⚠</span></div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🧺</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Laundry / Garage</span><span class="tag tag-teal">Match ✓</span></div>
+      <div style="padding:10px 14px;display:flex;align-items:center;gap:10px"><span style="font-size:16px">🌿</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Outdoor &amp; Garden</span><span class="tag tag-teal">Match ✓</span></div>
+    </div>
+
+    <div class="sec-label" style="padding:0 0 6px">Items Requiring Your Decision</div>
+    <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">For each item below, RenterIQ will tell you what it noticed. You decide how to handle it.</div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- REVIEW CARD 0 — Kitchen -->
+      <div id="reviewCard-0" style="background:#fff;border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden">
+        <div style="padding:14px 16px;background:rgba(245,166,35,.08);display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🍳</div>
+          <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Kitchen</div><div style="font-weight:600;font-size:12px;color:#8A6500">Difference detected</div></div>
+          <span class="tag tag-amber">⚠️ Review</span>
+        </div>
+        <div style="padding:14px 16px">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:8px"><span style="font-size:12px">🤖</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">RenterIQ noticed:</span></div>
+          <div style="font-weight:600;font-size:13.5px;color:var(--text);line-height:1.75">Your exit photo shows the kitchen splashback has a small stain that appears different in size from your move-in photo. At move-in, a pre-existing stain was documented as approximately 2cm. The exit photo shows a stain that appears larger — approximately 5cm.</div>
+        </div>
+        <div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center">
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Move-in</div>
+            <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-blue">🍳</div>
+            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">Pre-existing 2cm stain noted</div>
+          </div>
+          <div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center">
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Exit</div>
+            <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-teal">🍳</div>
+            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">Stain appears larger at exit</div>
+          </div>
+        </div>
+        <div id="discQuestion-0" style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl)">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Is this something that happened during your tenancy?</div>
+          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report as a discrepancy and RenterIQ will suggest how to address it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>
+          <div style="display:flex;gap:10px">
+            <button id="yesBtn-0" style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed(0)">Yes — this happened during my tenancy</button>
+            <button id="noBtn-0" style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed(0)">No — pre-existing / wear &amp; tear</button>
+          </div>
+        </div>
+        <div id="decidedState-0" style="display:none">
+          <div id="confirmedState-0" style="display:none;background:rgba(232,64,64,.06);border-top:1px solid rgba(232,64,64,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">⚠️</span><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--red);line-height:1.5">Noted — included in your exit report. RenterIQ will suggest fixes in the next step.</div></div>
+          <div id="dismissedState-0" style="display:none;background:rgba(0,200,150,.06);border-top:1px solid rgba(0,200,150,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">✓</span><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);line-height:1.5">Noted as pre-existing or fair wear and tear. Not included as a discrepancy.</div></div>
+        </div>
+      </div>
+
+      <!-- REVIEW CARD 1 — Bathroom -->
+      <div id="reviewCard-1" style="background:#fff;border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden">
+        <div style="padding:14px 16px;background:rgba(245,166,35,.08);display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚿</div>
+          <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Bathroom</div><div style="font-weight:600;font-size:12px;color:#8A6500">Difference detected</div></div>
+          <span class="tag tag-amber">⚠️ Review</span>
+        </div>
+        <div style="padding:14px 16px">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:8px"><span style="font-size:12px">🤖</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">RenterIQ noticed:</span></div>
+          <div style="font-weight:600;font-size:13.5px;color:var(--text);line-height:1.75">Your exit photos show a scuff mark on the bathroom wall that does not appear in either your move-in photos or the agency condition report. The mark appears to be on the south wall near the door frame, approximately 8cm in length.</div>
+        </div>
+        <div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center">
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Move-in</div>
+            <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-teal">🚿</div>
+            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">No mark in move-in photos</div>
+          </div>
+          <div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center">
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Exit</div>
+            <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-blue">🚿</div>
+            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">Scuff mark visible at exit</div>
+          </div>
+        </div>
+        <div id="discQuestion-1" style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl)">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Is this something that happened during your tenancy?</div>
+          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report as a discrepancy and RenterIQ will suggest how to address it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>
+          <div style="display:flex;gap:10px">
+            <button id="yesBtn-1" style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed(1)">Yes — this happened during my tenancy</button>
+            <button id="noBtn-1" style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed(1)">No — pre-existing / wear &amp; tear</button>
+          </div>
+        </div>
+        <div id="decidedState-1" style="display:none">
+          <div id="confirmedState-1" style="display:none;background:rgba(232,64,64,.06);border-top:1px solid rgba(232,64,64,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">⚠️</span><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--red);line-height:1.5">Noted — included in your exit report. RenterIQ will suggest fixes in the next step.</div></div>
+          <div id="dismissedState-1" style="display:none;background:rgba(0,200,150,.06);border-top:1px solid rgba(0,200,150,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">✓</span><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);line-height:1.5">Noted as pre-existing or fair wear and tear. Not included as a discrepancy.</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="reviewFooter" style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10;text-align:center">
+    <div style="font-weight:600;font-size:12px;color:var(--muted);padding:12px">Review both items above to continue</div>
+  </div>
+</div>
+
+<!-- VIEW G — BOND RECOVERY SUGGESTIONS -->
+<div class="view" id="viewG" style="display:none">
+  <header class="sh">
+    <div class="sh-row"><button class="sh-back" onclick="switchView('F')"><span class="sh-back-arrow">‹</span><span class="sh-label">REVIEW</span></button></div>
+    <div class="sh-title">Bond Recovery</div>
+    <div class="sh-sub">Suggestions to get your full bond back</div>
+  </header>
+  <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+
+    <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr)">
+      <div style="padding:14px 10px;text-align:center;border-right:1px solid var(--border-lt)"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">8</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Areas Inspected</div></div>
+      <div style="padding:14px 10px;text-align:center;border-right:1px solid var(--border-lt)"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--teal)">6</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Areas Match</div></div>
+      <div style="padding:14px 10px;text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--red)">2</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Items to Fix</div></div>
+    </div>
+
+    <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:5px">⚠️ These are suggestions only — not legal advice.</div>
+      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">RenterIQ suggests practical fixes based on what was detected. The decision to act on any suggestion is entirely yours. Bond outcomes depend on your specific situation and the agency's assessment. For disputes, contact your state tenancy authority.</div>
+    </div>
+
+    <div class="sec-label" style="padding:0 0 10px">Items You Confirmed</div>
+
+    <!-- FIX CARD 0 — Kitchen Splashback -->
+    <div id="fixCard-0" style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px">
+      <div style="background:var(--blue);padding:14px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🍳</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;flex:1">Kitchen Splashback</span>
+        <span style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 10px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Fix Suggested</span>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:5px">The Issue:</div>
+        <div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.65">Kitchen splashback stain appears larger than documented at move-in. Pre-existing stain was 2cm — exit photo shows approximately 5cm.</div>
+      </div>
+      <div style="padding:0 16px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>
+        <div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:13px 14px">
+          <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.75">Clean the splashback thoroughly with a degreaser or kitchen cleaner (e.g. Exit Mould or Ajax spray). If the stain has grown due to grease or cooking residue, a professional oven/kitchen clean may be required. Many cleaning companies offer kitchen deep cleans for $80–$150. If the stain is permanent, document this and note it was partially pre-existing — your move-in photos support this.</div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl);display:flex;gap:16px">
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">⏱</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">30–60 mins</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">💰</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">$0–$150</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">📈</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Medium</span></div>
+      </div>
+      <div class="fix-action-row" style="padding:12px 16px;display:flex;gap:8px">
+        <button style="flex:1;background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="markFixed(0)">✓ Mark as Fixed</button>
+        <button style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast('Photo added','Evidence saved to exit report','📷')">📷 Add Photo</button>
+        <button style="background:var(--blue-xl);color:var(--muted);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast('Skipped','Item remains in exit report','→')">Skip</button>
+      </div>
+    </div>
+
+    <!-- FIX CARD 1 — Bathroom Scuff -->
+    <div id="fixCard-1" style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px">
+      <div style="background:var(--blue);padding:14px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚿</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;flex:1">Bathroom Scuff Mark</span>
+        <span style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 10px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Fix Suggested</span>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:5px">The Issue:</div>
+        <div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.65">Scuff mark on south bathroom wall approximately 8cm in length. Not present in move-in photos or agency report.</div>
+      </div>
+      <div style="padding:0 16px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>
+        <div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:13px 14px">
+          <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.75">Lightly sand the scuff mark with fine sandpaper (220 grit) then touch up with matching wall paint. Standard rental white is usually Dulux Vivid White or Taubmans Antique White — both available at Bunnings for under $20. Apply one thin coat, allow 2 hours to dry, apply a second coat if needed. Photograph the repaired area before key handover and save to your Vault as evidence of the repair.</div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl);display:flex;gap:16px">
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">⏱</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">20–30 mins</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">💰</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Under $20</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">📈</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Low if repaired</span></div>
+      </div>
+      <div class="fix-action-row" style="padding:12px 16px;display:flex;gap:8px">
+        <button style="flex:1;background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="markFixed(1)">✓ Mark as Fixed</button>
+        <button style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast('Photo added','Evidence saved to exit report','📷')">📷 Add Photo</button>
+        <button style="background:var(--blue-xl);color:var(--muted);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast('Skipped','Item remains in exit report','→')">Skip</button>
+      </div>
+    </div>
+
+    <div class="sec-label" style="padding:6px 0 10px">All Other Areas — No Issues</div>
+    <div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Entry &amp; Hallway</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Living Room</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Master Bedroom</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Bedroom 2</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Laundry / Garage</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Outdoor &amp; Garden</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
+    </div>
+  </div>
+
+  <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10">
+    <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="generateExitReport()">Generate Final Exit Report →</button>
+  </div>
+</div>
+
+<!-- VIEW H — FINAL REPORT & VAULT -->
+<div class="view" id="viewH" style="display:none">
+  <div style="background:var(--blue);padding:50px 24px 44px;text-align:center">
+    <div class="confirm-icon">🛡</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#fff;margin-bottom:10px">Exit Inspection Complete</div>
+    <div style="font-weight:600;font-size:14px;color:rgba(255,255,255,.72);line-height:1.7;max-width:300px;margin:0 auto">Your exit report has been saved to your Vault. You now have a complete, documented record of the property's condition at exit.</div>
+
+    <div style="margin-top:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <div style="text-align:left"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.65)">Bond Amount</div><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:#fff;margin-top:3px">$2,480</div></div>
+      <div style="text-align:right"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.65)">Expected Return</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--teal);margin-top:3px">Full amount</div></div>
+    </div>
+  </div>
+
+  <div style="padding:20px 16px;padding-bottom:100px">
+
+    <div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Saved to Your Vault</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:11px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚪</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit Condition Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">8 areas · 24 timestamped photos · today</div></div></div>
+        <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:11px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📊</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Comparison Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Exit vs move-in vs agency — all 3 compared</div></div></div>
+        <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:11px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚠️</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Discrepancy Record</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">2 items reviewed · tenant decisions recorded</div></div></div>
+        <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:11px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✦</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Fix Evidence</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Repair photos saved · bond recovery documented</div></div></div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Your Tenancy Record</div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div class="timeline-event" style="padding:10px 0;border-bottom:1px solid var(--border-lt)"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--blue)"></div><div class="timeline-line"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Keys collected · Tenancy began</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">1 April 2025</div></div></div>
+        <div class="timeline-event" style="padding:10px 0;border-bottom:1px solid var(--border-lt)"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--teal)"></div><div class="timeline-line"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Move-in audit completed · 8 areas · 24 photos</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">15 March 2025</div></div></div>
+        <div class="timeline-event" style="padding:10px 0;border-bottom:1px solid var(--border-lt)"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--blue)"></div><div class="timeline-line"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease reviewed and saved</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">28 March 2025</div></div></div>
+        <div class="timeline-event" style="padding:10px 0;border-bottom:1px solid var(--border-lt)"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--amber)"></div><div class="timeline-line"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Maintenance request — hot water</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">7 March 2025</div></div></div>
+        <div class="timeline-event" style="padding:10px 0;border-bottom:1px solid var(--border-lt)"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--teal)"></div><div class="timeline-line"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Hot water repair completed</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">12 March 2025</div></div></div>
+        <div class="timeline-event" style="padding:10px 0;border-bottom:1px solid var(--border-lt)"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--red)"></div><div class="timeline-line"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit inspection completed · 2 items reviewed</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Today</div></div></div>
+        <div class="timeline-event" style="padding:10px 0;border-bottom:1px solid var(--border-lt)"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--border)"></div><div class="timeline-line"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Keys to be returned</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Pending</div></div></div>
+        <div class="timeline-event" style="padding:10px 0"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--border)"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond refund expected</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">14–21 days after exit</div></div></div>
+      </div>
+    </div>
+
+    <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:16px;padding:16px;margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:8px">💡 When will you get your bond back?</div>
+      <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">After handing back the keys, the agency has 14 days to lodge a bond claim with the RTBA. If no claim is made, your bond is automatically returned. If a claim is made, you have the right to dispute it. Your RenterIQ reports are your evidence.</div>
+      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;display:block;cursor:pointer" onclick="navigate('/rights')">Know your bond rights →</span>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="navigate('/vault#exit')">View Full Report in Vault</button>
+      <button class="btn-outline-c btn-full" style="border-radius:14px" onclick="navigate('/rights')">Know Your Rights — Bond Disputes</button>
+      <button style="background:transparent;color:var(--muted);width:100%;padding:12px;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;text-align:center" onclick="navigate('/dashboard')">Back to Home</button>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+    <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  </nav>
+</div>
+
+</div><!-- /app-shell -->
+
+<script>
+/* RenterIQ — Exit Inspection JS */
+
+function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+
+function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
+
+// View Management
+var allViews=['A','B','C','D','E','F','G','H'],currentView='A';
+
+function switchView(id){
+  var c=document.getElementById('view'+currentView),n=document.getElementById('view'+id);
+  if(!n||id===currentView)return;
+  c.style.opacity='0';c.style.pointerEvents='none';
+  setTimeout(function(){
+    c.style.display='none';c.style.opacity='';
+    n.style.display='flex';n.style.flexDirection='column';n.style.minHeight='100vh';
+    requestAnimationFrame(function(){
+      n.style.opacity='0';
+      requestAnimationFrame(function(){n.style.transition='opacity .2s ease';n.style.opacity='1';n.style.pointerEvents=''});
+    });
+    window.scrollTo(0,0);
+    if(id==='E')runExitGeneration();
+  },150);
+  currentView=id;
+}
+
+// Pre-Exit Checklist
+var exitChecked=new Set();
+
+function toggleExitCheck(n){
+  var box=document.getElementById('exitCheck-'+n);
+  var item=document.getElementById('exitItem-'+n);
+  var label=item?item.querySelector('.exit-check-label'):null;
+  if(exitChecked.has(n)){
+    exitChecked.delete(n);
+    if(box){box.style.background='white';box.style.borderColor='var(--border)';box.textContent=''}
+    if(label){label.style.color='var(--text)';label.style.textDecoration='none'}
+  }else{
+    exitChecked.add(n);
+    if(box){box.style.background='var(--teal)';box.style.borderColor='var(--teal)';box.style.color='white';box.style.fontFamily='Sora,sans-serif';box.style.fontWeight='700';box.style.fontSize='13px';box.textContent='✓'}
+    if(label){label.style.color='var(--muted)';label.style.textDecoration='line-through'}
+  }
+  updateExitCheckProgress();
+}
+
+function updateExitCheckProgress(){
+  var total=8,done=exitChecked.size;
+  var el=document.getElementById('exitCheckProgress');
+  var btn=document.getElementById('startExitBtn');
+  if(el){el.textContent=done===total?'✓ All items confirmed — ready to start':done+' of '+total+' items confirmed';el.style.color=done===total?'var(--teal-dk)':'var(--muted)'}
+  if(btn){btn.style.opacity=done===total?'1':'.5';btn.style.pointerEvents=done===total?'auto':'none'}
+}
+
+// Room State
+var exitRoomData=[
+  {name:'Entry & Hallway',emoji:'🚪',miContext:'Good condition · 3 photos'},
+  {name:'Living Room',emoji:'🛋',miContext:'Good condition · 4 photos'},
+  {name:'Kitchen',emoji:'🍳',miContext:'1 item noted · 3 photos'},
+  {name:'Master Bedroom',emoji:'🛏',miContext:'Good condition · 3 photos'},
+  {name:'Bedroom 2',emoji:'🛏',miContext:'Good condition · 2 photos'},
+  {name:'Bathroom & Toilet',emoji:'🚿',miContext:'1 item noted · 2 photos'},
+  {name:'Laundry / Garage',emoji:'🧺',miContext:'Good condition · 2 photos'},
+  {name:'Outdoor & Garden',emoji:'🌿',miContext:'Lawn noted · 2 photos'}
+];
+var exitRoomsDone=new Array(8).fill(false);
+var exitCurrentRoom=0;
+var exitSelectedCondition=null;
+
+function buildExitAreaList(){
+  var list=document.getElementById('exitAreaList');
+  if(!list)return;
+  list.innerHTML='';
+  for(var i=0;i<exitRoomData.length;i++){
+    var r=exitRoomData[i];
+    var isFirst=i===0;
+    var row=document.createElement('div');
+    row.className='room-row';
+    row.id='exitRoom-'+i;
+    row.onclick=(function(idx){return function(){openExitRoom(idx)}})(i);
+    if(isFirst){row.style.border='2px solid var(--blue)';row.style.boxShadow='0 4px 16px rgba(27,80,200,.1)'}
+    row.innerHTML='<div class="room-icon-wrap" id="exitIcon-'+i+'" style="'+(isFirst?'background:var(--blue-lt)':'')+'">'+r.emoji+'</div><div class="room-body"><div class="room-name">'+r.name+'</div><div class="room-status" id="exitStatus-'+i+'">'+(isFirst?'Ready — tap to start':'Tap to begin')+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px" id="exitMiContext-'+i+'">Move-in: '+r.miContext+'</div></div><div class="room-check" id="exitCheck2-'+i+'"></div>';
+    list.appendChild(row);
+  }
+}
+
+function openExitRoom(idx){
+  exitCurrentRoom=idx;
+  var r=exitRoomData[idx];
+  document.getElementById('exitRoomEmoji').textContent=r.emoji;
+  document.getElementById('exitRoomTitle').textContent=r.name;
+  document.getElementById('exitRoomCounter').textContent=(idx+1)+' / '+exitRoomData.length;
+  exitSelectedCondition=null;
+  var ctx=document.getElementById('exitMiPhotoContext');
+  if(ctx)ctx.textContent='Move-in: '+r.miContext;
+  ['good','fair','poor'].forEach(function(c){var el=document.getElementById('exit-cond-'+c);if(el)el.className='cond-btn'});
+  var nf=document.getElementById('exitNotesField');if(nf)nf.value='';
+  document.querySelectorAll('#viewD .qn-chip').forEach(function(c){c.classList.remove('chip-active')});
+  for(var i=0;i<7;i++){var cb=document.getElementById('exck'+i);if(cb)cb.checked=false}
+  var pg=document.getElementById('exitPhotoGrid');
+  if(pg){
+    var colors=['ph-teal','ph-blue','ph-slate'];
+    var emojis=['📸','🏠','🪟','🔍','🧱'];
+    pg.innerHTML='<div class="photo-cell"><div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">09:14</span></div><div class="photo-cell"><div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">09:15</span></div><div class="add-photo" onclick="addExitPhoto()"><span class="add-photo-icon">📷</span><span class="add-photo-label">Add Photo</span></div>';
+  }
+  setExitTab(0);
+  switchView('D');
+}
+
+function goBackToExitRooms(){switchView('C')}
+
+function markExitAreaComplete(){
+  exitRoomsDone[exitCurrentRoom]=true;
+  var cond=exitSelectedCondition||'good';
+  var condLabel=cond==='good'?'Clean & good':cond==='fair'?'Minor issues':'Needs attention';
+  var row=document.getElementById('exitRoom-'+exitCurrentRoom);
+  if(row){
+    row.style.borderColor='rgba(0,200,150,.3)';row.style.borderWidth='1.5px';row.style.background='rgba(0,200,150,.02)';row.style.boxShadow='none';
+    var icon=row.querySelector('.room-icon-wrap');var status=row.querySelector('.room-status');var check=row.querySelector('.room-check');
+    if(icon)icon.style.background='rgba(0,200,150,.1)';
+    if(status){status.textContent='Done · '+condLabel;status.style.color='var(--teal-dk)'}
+    if(check){check.style.background='var(--teal)';check.style.borderColor='var(--teal)';check.style.color='white';check.textContent='✓'}
+  }
+  var next=exitRoomsDone.findIndex(function(d,i){return i>exitCurrentRoom&&!d});
+  if(next===-1)next=exitRoomsDone.findIndex(function(d){return!d});
+  if(next!==-1){
+    var nr=document.getElementById('exitRoom-'+next);
+    if(nr){nr.style.border='2px solid var(--blue)';nr.style.boxShadow='0 4px 16px rgba(27,80,200,.1)';var ni=nr.querySelector('.room-icon-wrap');if(ni)ni.style.background='var(--blue-lt)';var ns=nr.querySelector('.room-status');if(ns)ns.textContent='Ready — tap to start'}
+  }
+  updateExitProgress();
+  showToast(exitRoomData[exitCurrentRoom].name+' done ✓',condLabel+' · Saved','✓');
+  switchView('C');
+}
+
+function updateExitProgress(){
+  var done=exitRoomsDone.filter(Boolean).length;
+  var pct=Math.round((done/exitRoomData.length)*100);
+  var lbl=document.getElementById('exitProgressLabel');
+  var pctEl=document.getElementById('exitProgressPct');
+  var fill=document.getElementById('exitProgressFill');
+  var btn=document.getElementById('exitCompleteBtn');
+  var hint=document.getElementById('exitCompleteHint');
+  if(lbl)lbl.textContent=done+' of 8 areas completed';
+  if(pctEl)pctEl.textContent=pct+'%';
+  if(fill)fill.style.width=pct+'%';
+  var allDone=done===exitRoomData.length;
+  if(btn){btn.style.opacity=allDone?'1':'.4';btn.style.pointerEvents=allDone?'auto':'none'}
+  if(hint){hint.textContent=allDone?'All areas done — generating comparison ✓':(exitRoomData.length-done)+' areas remaining';if(allDone)hint.style.color='var(--teal-dk)'}
+}
+
+// Tabs
+function setExitTab(idx){
+  [0,1,2].forEach(function(i){
+    var tab=document.getElementById('exitTab'+i);
+    var content=document.getElementById('exitTabContent'+i);
+    if(tab)tab.classList.toggle('tab-active',i===idx);
+    if(content)content.style.display=i===idx?'block':'none';
+  });
+}
+
+function selectExitCondition(type){
+  exitSelectedCondition=type;
+  ['good','fair','poor'].forEach(function(c){var el=document.getElementById('exit-cond-'+c);if(el)el.className='cond-btn'+(c===type?' cond-'+c+'-active':'')});
+}
+
+function addExitQuickNote(text,el){
+  el.classList.toggle('chip-active');
+  var field=document.getElementById('exitNotesField');
+  if(el.classList.contains('chip-active')&&field){field.value=field.value?field.value+'\n'+text:text}
+}
+
+function addExitPhoto(){
+  var now=new Date();
+  var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  var colors=['ph-blue','ph-teal','ph-slate'];
+  var emojis=['🏠','🪟','📸','🔍','🧱'];
+  var pg=document.getElementById('exitPhotoGrid');
+  var addBtn=pg.querySelector('.add-photo');
+  var cell=document.createElement('div');
+  cell.className='photo-cell';
+  cell.innerHTML='<div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">'+time+'</span>';
+  pg.insertBefore(cell,addBtn);
+  showToast('Photo added · '+time,'Timestamped · Saved to exit report','📷');
+}
+
+// Generation
+function runExitGeneration(){
+  var delays=[600,1400,2200,3200,4400,5400];
+  delays.forEach(function(delay,i){
+    setTimeout(function(){
+      var icon=document.getElementById('exitGenIcon-'+i);
+      if(!icon)return;
+      icon.textContent='✓';icon.style.background='rgba(0,200,150,.15)';icon.style.animation='none';icon.style.color='var(--teal-dk)';icon.style.fontFamily='Sora,sans-serif';icon.style.fontWeight='700';
+      if(i<delays.length-1){var next=document.getElementById('exitGenIcon-'+(i+1));if(next)next.style.animation='spin 1s linear infinite'}
+    },delay);
+  });
+  setTimeout(function(){switchView('F')},6000);
+}
+
+// Tenant Decisions
+var tenantDecisions={};
+
+function tenantConfirmed(n){
+  tenantDecisions[n]='confirmed';
+  var q=document.getElementById('discQuestion-'+n);
+  var d=document.getElementById('decidedState-'+n);
+  var cs=document.getElementById('confirmedState-'+n);
+  if(q)q.style.display='none';
+  if(d)d.style.display='block';
+  if(cs){cs.style.display='flex'}
+  showToast('Noted — included in report','RenterIQ will suggest fixes in the next step','⚠️');
+  checkReviewComplete();
+}
+
+function tenantDismissed(n){
+  tenantDecisions[n]='dismissed';
+  var q=document.getElementById('discQuestion-'+n);
+  var d=document.getElementById('decidedState-'+n);
+  var ds=document.getElementById('dismissedState-'+n);
+  if(q)q.style.display='none';
+  if(d)d.style.display='block';
+  if(ds){ds.style.display='flex'}
+  showToast('Pre-existing noted ✓','Not included as a discrepancy','✓');
+  checkReviewComplete();
+}
+
+function checkReviewComplete(){
+  var done=Object.keys(tenantDecisions).length;
+  if(done>=2){
+    var footer=document.getElementById('reviewFooter');
+    if(footer){footer.innerHTML='<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="switchView(\'G\')">Continue to Bond Recovery →</button>'}
+  }
+}
+
+// Fixed Items
+var fixedItems=new Set();
+
+function markFixed(n){
+  fixedItems.add(n);
+  var card=document.getElementById('fixCard-'+n);
+  if(card){
+    var actionRow=card.querySelector('.fix-action-row');
+    if(actionRow){actionRow.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:4px 0"><div style="width:24px;height:24px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:white;font-family:Sora,sans-serif;font-weight:700;font-size:13px">✓</div><span style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk)">Marked as fixed · Evidence saved</span></div>'}
+    card.style.borderColor='rgba(0,200,150,.4)';
+  }
+  showToast('Fix recorded ✓','Evidence saved to your exit report','✓');
+}
+
+function generateExitReport(){
+  showToast('Generating final report…','Saving everything to Vault','📄');
+  setTimeout(function(){switchView('H')},1200);
+}
+
+// Init
+document.addEventListener('DOMContentLoaded',function(){
+  document.body.style.opacity='0';
+  requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
+  allViews.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
+  buildExitAreaList();
+  updateExitProgress();
+});
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+</body>
+</html>

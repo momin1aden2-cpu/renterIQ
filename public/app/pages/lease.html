@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/app/css/app.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Lease Review — RenterIQ</title>
+<style>
+/* Shell */
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
+.view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
+
+/* Shared Header */
+.sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.sh-row{display:flex;align-items:center;justify-content:space-between}
+.sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
+.sh-back-arrow{font-size:22px;color:rgba(255,255,255,.8);font-weight:700}
+.sh-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px;text-transform:uppercase}
+.sh-right-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.65)}
+.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
+.sh-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.sh-help{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;min-width:44px}
+
+/* Tags */
+.tag-muted{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;background:var(--blue-xl);color:var(--muted)}
+.tag-amber{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;background:var(--amber-lt);color:#7A5500}
+.tag-blue{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;background:rgba(27,80,200,.1);color:var(--blue)}
+
+/* Buttons */
+.btn-blue-c{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(27,80,200,.2);transition:all .18s var(--ease-smooth)}
+.btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(27,80,200,.15)}
+.btn-muted-c{background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px}
+.btn-outline-c{background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
+.btn-full{width:100%}
+.flex-1{flex:1}
+
+/* Sticky Footer */
+.sticky-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10;align-items:center}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
+.nav-tab:active{transform:scale(.92)}
+.tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
+.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
+.tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
+.nav-tab.active .tab-label{color:var(--blue)}
+
+/* Section Labels */
+.sec-label{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 10px}
+
+/* Analysis Animation */
+.gen-icon{width:32px;height:32px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:all .3s}
+@keyframes aiPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(27,80,200,.3)}50%{transform:scale(1.06);box-shadow:0 0 0 16px rgba(27,80,200,0)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* Clause Cards */
+.clause-card{background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden;transition:all .2s var(--ease-smooth)}
+.clause-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.clause-left{display:flex;align-items:center;gap:8px}
+.clause-icon{font-size:20px}
+.clause-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+.plain-english{padding:14px}
+.plain-english-label{display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.plain-english-text{font-weight:600;font-size:13px;color:var(--text);line-height:1.75}
+.original-toggle{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:10px 14px;border-top:1px solid var(--border-lt);-webkit-tap-highlight-color:transparent;min-height:44px}
+.original-label{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)}
+.original-action{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)}
+.original-content{padding:0 14px 14px}
+.original-inner{background:var(--blue-xl);border-radius:10px;padding:14px;font-weight:600;font-size:12px;color:var(--muted);line-height:1.7;font-style:italic}
+.flag-box{background:var(--amber-lt);border-top:1px solid rgba(245,166,35,.25);padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.flag-text{font-weight:600;font-size:12.5px;color:#7A5500;line-height:1.6}
+.understood-wrap{padding:12px 14px;border-top:1px solid var(--border-lt)}
+.understood-btn{width:100%;background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:10px;padding:11px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;min-height:44px}
+
+/* Progress Bars */
+.mini-progress{height:3px;background:rgba(255,255,255,.15);border-radius:100px;margin-top:12px;overflow:hidden}
+.mini-progress-fill{height:100%;background:#fff;border-radius:100px;transition:width .4s ease}
+.clause-progress-bar{height:4px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden}
+.clause-progress-fill{height:100%;background:var(--teal);border-radius:100px;transition:width .5s ease;width:0%}
+
+/* Upload Area */
+.drop-zone{border:2px dashed var(--border);border-radius:16px;padding:36px 20px;background:var(--blue-xl);text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s}
+.drop-zone:active{border-color:var(--blue);background:var(--blue-lt)}
+
+/* Clause Grid */
+.clause-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.clause-grid-cell{background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border-lt);display:flex;gap:8px;align-items:center}
+.clause-grid-text{font-weight:700;font-size:12px;color:var(--text)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- VIEW A — UPLOAD LEASE -->
+<div class="view" id="viewA" style="display:flex;flex-direction:column;min-height:100vh">
+  <header class="sh">
+    <div class="sh-row">
+      <button class="sh-back" onclick="navigate('/dashboard')">
+        <span class="sh-back-arrow">‹</span>
+        <span class="sh-label">RENTERIQ</span>
+      </button>
+      <button class="sh-help" onclick="showToast('Lease Review','Upload your lease and RenterIQ explains every clause in plain English — not legal advice','💡')">?</button>
+    </div>
+    <div class="sh-title">Lease Review</div>
+    <div class="sh-sub">Understand what you're signing</div>
+  </header>
+
+  <div style="flex:1;overflow-y:auto;padding-bottom:100px">
+
+    <!-- What This Does -->
+    <div style="margin:16px;background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">⚖️</div>
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text)">Plain-English Lease Review</div>
+          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">Smart · Reviewed by you</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:28px;height:28px;border-radius:7px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📖</div>
+          <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Clause by clause breakdown</div><div style="font-weight:600;font-size:12px;color:var(--muted);line-height:1.5;margin-top:2px">Every section explained in plain Australian English</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:28px;height:28px;border-radius:7px;background:var(--amber-lt);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⚠️</div>
+          <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Flags unusual terms</div><div style="font-weight:600;font-size:12px;color:var(--muted);line-height:1.5;margin-top:2px">Anything non-standard is highlighted for your attention</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:28px;height:28px;border-radius:7px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🗄️</div>
+          <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Saved to your Vault</div><div style="font-weight:600;font-size:12px;color:var(--muted);line-height:1.5;margin-top:2px">Lease and review summary stored permanently</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div style="margin:0 16px 14px;background:rgba(245,166,35,.07);border:1.5px solid rgba(245,166,35,.25);border-radius:16px;padding:15px 16px;display:flex;gap:11px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0;margin-top:1px">⚠️</span>
+      <div>
+        <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">This is a personal understanding tool — not legal advice. RenterIQ helps you understand your lease in plain English. For legal questions or concerns about specific clauses, always contact your state tenancy authority or seek independent legal advice.</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;display:block;margin-top:8px" onclick="navigate('/rights')">Find free legal help in your state →</span>
+      </div>
+    </div>
+
+    <!-- Upload Area -->
+    <div style="margin:0 16px 14px;background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px">Upload Your Lease Agreement</div>
+      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">PDF format preferred. Photo of document also accepted.</div>
+
+      <div class="drop-zone" id="dropZone" onclick="triggerUpload()">
+        <span style="font-size:44px;display:block;margin-bottom:14px">📄</span>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Tap to upload your lease</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted)">PDF, JPG or PNG · Max 20MB</div>
+      </div>
+      <input type="file" id="leaseFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(this)">
+
+      <div id="fileSelected" style="display:none;padding:20px;text-align:center">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px;color:var(--teal-dk);font-family:'Sora',sans-serif;font-weight:700">✓</div>
+        <div id="fileName" style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">lease_agreement.pdf</div>
+        <div id="fileSize" style="font-weight:600;font-size:12px;color:var(--muted)">2.4 MB · Ready to analyse</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;margin-top:8px;display:block" onclick="triggerUpload()">Change file</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
+        <div style="flex:1;height:1px;background:var(--border-lt)"></div>
+        <span style="font-weight:600;font-size:13px;color:var(--muted)">or</span>
+        <div style="flex:1;height:1px;background:var(--border-lt)"></div>
+      </div>
+
+      <button class="btn-muted-c btn-full" onclick="loadDemoLease()">Use Demo Lease for This Walkthrough</button>
+    </div>
+
+    <!-- What's in a Typical Lease -->
+    <div style="margin:0 16px 16px;background:var(--blue-xl);border-radius:16px;padding:16px;border:1px solid var(--border-lt)">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:12px">What RenterIQ will explain:</div>
+      <div class="clause-grid">
+        <div class="clause-grid-cell"><span style="font-size:16px">📅</span><span class="clause-grid-text">Lease term & dates</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">💰</span><span class="clause-grid-text">Rent & increases</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">🔑</span><span class="clause-grid-text">Bond conditions</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">🔧</span><span class="clause-grid-text">Repairs & maintenance</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">🐾</span><span class="clause-grid-text">Pets & alterations</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">🚪</span><span class="clause-grid-text">Breaking the lease</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">🔇</span><span class="clause-grid-text">Noise & nuisance</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">📋</span><span class="clause-grid-text">Entry by landlord</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">⚡</span><span class="clause-grid-text">Utilities & bills</span></div>
+        <div class="clause-grid-cell"><span style="font-size:16px">🏠</span><span class="clause-grid-text">Property condition</span></div>
+      </div>
+    </div>
+
+    <!-- Analyse Button -->
+    <div style="padding:0 16px 24px">
+      <button class="btn-blue-c btn-full" id="analyseBtn" style="border-radius:14px;opacity:.5;pointer-events:none" onclick="var b=this;b.style.opacity='.7';b.style.pointerEvents='none';b.textContent='Processing…';startAnalysis()">Analyse My Lease →</button>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+    <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  </nav>
+</div>
+
+<!-- VIEW B — ANALYSING -->
+<div class="view" id="viewB" style="display:none">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center;background:var(--blue-xl)">
+    <div style="width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:28px;animation:aiPulse 1.8s ease-in-out infinite">⚖️</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);margin-bottom:10px">Reading your lease…</div>
+    <div style="font-weight:600;font-size:14px;color:var(--muted);line-height:1.7;max-width:300px;margin:0 auto 32px">RenterIQ is working through your tenancy agreement clause by clause. This takes about 15 seconds.</div>
+    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px">
+      <div id="lStep0" style="background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+        <div class="gen-icon" id="lIcon-0">📄</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Reading document</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Extracting text and structure</div></div>
+      </div>
+      <div id="lStep1" style="background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+        <div class="gen-icon" id="lIcon-1">🔍</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Identifying clauses</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Finding all terms and conditions</div></div>
+      </div>
+      <div id="lStep2" style="background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+        <div class="gen-icon" id="lIcon-2">⚖️</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Checking Australian law</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Comparing to standard VIC agreement</div></div>
+      </div>
+      <div id="lStep3" style="background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+        <div class="gen-icon" id="lIcon-3">⚠️</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Flagging unusual terms</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Looking for non-standard clauses</div></div>
+      </div>
+      <div id="lStep4" style="background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+        <div class="gen-icon" id="lIcon-4">📋</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Preparing your summary</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Plain-English breakdown ready</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW C — CLAUSE BY CLAUSE REVIEW -->
+<div class="view" id="viewC" style="display:none">
+  <header class="sh" style="padding-bottom:0">
+    <div class="sh-row">
+      <button class="sh-back" onclick="switchView('A')"><span class="sh-back-arrow">‹</span><span class="sh-label" id="clauseCounter">0 of 12 clauses</span></button>
+    </div>
+    <div class="sh-title">Your Lease Explained</div>
+    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+    <div style="background:var(--blue-dk);margin:14px -20px 0;padding:10px 20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.7)">Clauses reviewed</span>
+        <span id="clausePct" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal)">0%</span>
+      </div>
+      <div class="clause-progress-bar"><div class="clause-progress-fill" id="clauseFill"></div></div>
+    </div>
+  </header>
+
+  <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+    <!-- Tenant Control Note -->
+    <div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:13px 15px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:12.5px;color:var(--teal-dk);line-height:1.6">✓ You're in control — read each clause at your own pace. Mark it as understood when you're ready. Nothing is confirmed without you.</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- Clause 0: Lease Term -->
+      <div class="clause-card" id="clause-0">
+        <div class="clause-header" style="background:rgba(27,80,200,.06)"><div class="clause-left"><span class="clause-icon">📅</span><span class="clause-name">Lease Term</span></div><span class="tag-blue">Important</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">Your lease runs for 12 months — starting 1 April 2025 and ending 31 March 2026. After this date, if neither you nor the landlord gives notice, the lease automatically rolls over to a month-by-month arrangement at the same rent.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(0)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-0">Show ›</span></div>
+        <div class="original-content" id="origContent-0" style="display:none"><div class="original-inner">The tenancy commences on 1 April 2025 and shall continue for a fixed term of twelve (12) months expiring on 31 March 2026 ('the fixed term') unless sooner terminated in accordance with this agreement.</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(0)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 1: Weekly Rent -->
+      <div class="clause-card" id="clause-1">
+        <div class="clause-header" style="background:var(--blue-xl)"><div class="clause-left"><span class="clause-icon">💰</span><span class="clause-name">Weekly Rent</span></div><span class="tag-muted">Standard</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">Your rent is $620 per week, payable every Monday. Payment must be made by direct bank transfer to the agency's trust account. Rent is considered late if it is not received by close of business on the due date.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(1)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-1">Show ›</span></div>
+        <div class="original-content" id="origContent-1" style="display:none"><div class="original-inner">The Tenant shall pay to the Landlord rent in the amount of Six Hundred and Twenty Dollars ($620.00) per week, payable in advance every Monday by direct bank transfer to the Agent's nominated trust account.</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(1)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 2: Rent Increases -->
+      <div class="clause-card" id="clause-2">
+        <div class="clause-header" style="background:rgba(27,80,200,.06)"><div class="clause-left"><span class="clause-icon">💰</span><span class="clause-name">Rent Increases</span></div><span class="tag-blue">Important</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">The landlord can increase the rent, but only after giving you 60 days written notice. During a fixed-term lease, rent can only be increased if the agreement specifically allows it and states the new amount or how it will be calculated. In Victoria, rent cannot be increased more than once every 12 months.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(2)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-2">Show ›</span></div>
+        <div class="original-content" id="origContent-2" style="display:none"><div class="original-inner">Rent may be increased during the tenancy in accordance with the Residential Tenancies Act 1997 (Vic) upon provision of not less than sixty (60) days written notice to the Tenant.</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(2)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 3: Bond / Security Deposit -->
+      <div class="clause-card" id="clause-3">
+        <div class="clause-header" style="background:rgba(27,80,200,.06)"><div class="clause-left"><span class="clause-icon">🔑</span><span class="clause-name">Bond / Security Deposit</span></div><span class="tag-blue">Important</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">A bond of $2,480 (equivalent to 4 weeks rent) has been collected. This must be lodged with the Residential Tenancies Bond Authority (RTBA) by the agent within 10 business days. You should receive a bond lodgement receipt — keep this safe in your Vault. The bond can only be claimed for unpaid rent, damage beyond fair wear and tear, or cleaning costs.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(3)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-3">Show ›</span></div>
+        <div class="original-content" id="origContent-3" style="display:none"><div class="original-inner">A bond of Two Thousand Four Hundred and Eighty Dollars ($2,480.00) being equivalent to four (4) weeks rent shall be paid and held in accordance with the Residential Tenancies Act 1997 (Vic) and lodged with the Residential Tenancies Bond Authority.</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(3)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 4: Repairs & Maintenance -->
+      <div class="clause-card" id="clause-4">
+        <div class="clause-header" style="background:var(--blue-xl)"><div class="clause-left"><span class="clause-icon">🔧</span><span class="clause-name">Repairs & Maintenance</span></div><span class="tag-muted">Standard</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">The landlord must keep the property in good repair. For urgent repairs — like a burst pipe, gas leak or broken heater — the agent must be contactable 24/7 and must respond promptly. For non-urgent repairs, you must notify the agent in writing. Always report issues in writing (text or email) so you have a record.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(4)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-4">Show ›</span></div>
+        <div class="original-content" id="origContent-4" style="display:none"><div class="original-inner">The Landlord shall maintain the premises in good repair. The Tenant must notify the Landlord or Agent of any damage or need for repair as soon as practicable after becoming aware of the damage or need for repair.</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(4)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 5: Pets (FLAGGED) -->
+      <div class="clause-card" id="clause-5">
+        <div class="clause-header" style="background:rgba(245,166,35,.12)"><div class="clause-left"><span class="clause-icon">🐾</span><span class="clause-name">Pets</span></div><span class="tag-amber">Review</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">Pets are not permitted at this property without the landlord's prior written consent. If you have or plan to get a pet, you must apply in writing before bringing it to the property. In Victoria, landlords cannot unreasonably refuse a pet — but they can impose reasonable conditions.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(5)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-5">Show ›</span></div>
+        <div class="original-content" id="origContent-5" style="display:none"><div class="original-inner">No animals or pets of any description shall be kept at the premises without the prior written consent of the Landlord or Agent, such consent not to be unreasonably withheld in accordance with Part 12 of the Residential Tenancies Act 1997 (Vic).</div></div>
+        <div class="flag-box">
+          <span style="font-size:16px;flex-shrink:0">⚠️</span>
+          <div>
+            <div class="flag-text">This is standard wording — however if you have a pet or are considering one, make sure you have written consent before signing. Victoria's rental laws give you the right to request pet approval.</div>
+            <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);display:block;margin-top:6px;cursor:pointer" onclick="navigate('/rights')">Get help with this clause →</span>
+          </div>
+        </div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(5)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 6: Alterations (FLAGGED) -->
+      <div class="clause-card" id="clause-6">
+        <div class="clause-header" style="background:rgba(245,166,35,.12)"><div class="clause-left"><span class="clause-icon">🔨</span><span class="clause-name">Alterations & Modifications</span></div><span class="tag-amber">Review</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">You cannot make any changes to the property — including hanging picture hooks, painting, or installing fixtures — without written permission from the landlord. In Victoria, minor modifications (like picture hooks and furniture anchors) cannot be unreasonably refused. Always get permission in writing.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(6)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-6">Show ›</span></div>
+        <div class="original-content" id="origContent-6" style="display:none"><div class="original-inner">The Tenant shall not make any alterations, additions or improvements to the premises without the prior written consent of the Landlord, which consent may be given or withheld at the absolute discretion of the Landlord.</div></div>
+        <div class="flag-box">
+          <span style="font-size:16px;flex-shrink:0">⚠️</span>
+          <div>
+            <div class="flag-text">The blanket prohibition on 'all modifications' may be broader than Victorian law allows. Under the RTA 1997, tenants have the right to make certain minor modifications. If refused, you can apply to VCAT.</div>
+            <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);display:block;margin-top:6px;cursor:pointer" onclick="navigate('/rights')">Get help with this clause →</span>
+          </div>
+        </div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(6)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 7: Landlord Entry -->
+      <div class="clause-card" id="clause-7">
+        <div class="clause-header" style="background:var(--blue-xl)"><div class="clause-left"><span class="clause-icon">📋</span><span class="clause-name">Landlord Entry</span></div><span class="tag-muted">Standard</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">The landlord or agent can only enter the property with your agreement, or after giving at least 24 hours written notice (except in emergencies). Entry must occur between 8am and 6pm on weekdays, and only between 9am and 6pm on Saturdays — never on Sundays or public holidays without your consent.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(7)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-7">Show ›</span></div>
+        <div class="original-content" id="origContent-7" style="display:none"><div class="original-inner">The Landlord or Agent may enter the premises in accordance with sections 85-91 of the Residential Tenancies Act 1997 (Vic) upon provision of not less than twenty-four (24) hours written notice to the Tenant.</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(7)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 8: Breaking the Lease (FLAGGED) -->
+      <div class="clause-card" id="clause-8">
+        <div class="clause-header" style="background:rgba(245,166,35,.12)"><div class="clause-left"><span class="clause-icon">🚪</span><span class="clause-name">Breaking the Lease</span></div><span class="tag-amber">Review</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">If you need to end the lease early, you must give written notice and pay a break lease fee. The fee depends on how much of the lease is remaining — the earlier you leave, the higher the fee. You may also be responsible for rent until a new tenant is found, plus re-letting and advertising costs.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(8)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-8">Show ›</span></div>
+        <div class="original-content" id="origContent-8" style="display:none"><div class="original-inner">In the event the Tenant vacates the premises prior to the expiration of the fixed term, the Tenant shall be liable for a break fee and associated costs as prescribed under the Residential Tenancies Act 1997 (Vic) including but not limited to re-letting fees and advertising costs.</div></div>
+        <div class="flag-box">
+          <span style="font-size:16px;flex-shrink:0">⚠️</span>
+          <div>
+            <div class="flag-text">Breaking a lease can be expensive. Before signing, make sure you're confident you can commit to the full term. If your circumstances change, contact Consumer Affairs Victoria for advice on your options.</div>
+            <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);display:block;margin-top:6px;cursor:pointer" onclick="navigate('/rights')">Get help with this clause →</span>
+          </div>
+        </div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(8)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 9: Cleanliness & Condition -->
+      <div class="clause-card" id="clause-9">
+        <div class="clause-header" style="background:var(--blue-xl)"><div class="clause-left"><span class="clause-icon">🧹</span><span class="clause-name">Cleanliness & Condition</span></div><span class="tag-muted">Standard</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">You must keep the property reasonably clean and in the same general condition as when you moved in, allowing for fair wear and tear. Fair wear and tear means gradual deterioration from normal everyday use — it does not include damage, stains, or neglect. Your RenterIQ move-in report documents the original condition.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(9)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-9">Show ›</span></div>
+        <div class="original-content" id="origContent-9" style="display:none"><div class="original-inner">The Tenant shall keep the premises in a clean and tidy condition and shall not damage or permit damage to the premises beyond that which constitutes fair wear and tear.</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(9)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 10: Noise & Nuisance -->
+      <div class="clause-card" id="clause-10">
+        <div class="clause-header" style="background:var(--blue-xl)"><div class="clause-left"><span class="clause-icon">🔇</span><span class="clause-name">Noise & Nuisance</span></div><span class="tag-muted">Standard</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">You must not create excessive noise or nuisance that disturbs neighbours or other residents. This is standard and applies to all tenancies. If you receive a noise complaint, respond calmly and keep a record of the communication.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(10)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-10">Show ›</span></div>
+        <div class="original-content" id="origContent-10" style="display:none"><div class="original-inner">The Tenant shall not cause or permit any nuisance at the premises or interfere with the reasonable peace, comfort or privacy of neighbours or persons residing in the neighbourhood.</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(10)">Mark as Understood ✓</button></div>
+      </div>
+
+      <!-- Clause 11: Utilities & Services -->
+      <div class="clause-card" id="clause-11">
+        <div class="clause-header" style="background:rgba(27,80,200,.06)"><div class="clause-left"><span class="clause-icon">⚡</span><span class="clause-name">Utilities & Services</span></div><span class="tag-blue">Important</span></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">You are responsible for paying electricity, gas and water usage charges from the date your tenancy starts. Internet and other services are your responsibility to connect. The landlord pays for water supply charges (the fixed charge on your water bill) — you only pay for usage above the minimum threshold.</div></div>
+        <div class="original-toggle" onclick="toggleOriginal(11)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-11">Show ›</span></div>
+        <div class="original-content" id="origContent-11" style="display:none"><div class="original-inner">The Tenant shall be responsible for all charges for electricity, gas and water consumption relating to the premises from the commencement of the tenancy. The Landlord shall be responsible for any fixed supply charges as required by the Residential Tenancies Act 1997 (Vic).</div></div>
+        <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(11)">Mark as Understood ✓</button></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sticky-footer">
+    <span id="understoodCount" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">0 of 12 understood</span>
+    <div style="flex:1"></div>
+    <button class="btn-blue-c" id="summaryBtn" style="border-radius:12px;padding:12px 20px;opacity:.5;pointer-events:none" onclick="switchView('D')">See Summary →</button>
+  </div>
+</div>
+
+<!-- VIEW D — SUMMARY & FLAGS -->
+<div class="view" id="viewD" style="display:none">
+  <header class="sh">
+    <div class="sh-row">
+      <button class="sh-back" onclick="switchView('C')"><span class="sh-back-arrow">‹</span><span class="sh-label">Review</span></button>
+    </div>
+    <div class="sh-title">Lease Summary</div>
+    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+  </header>
+
+  <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+    <!-- Completion Card -->
+    <div style="background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+      <div style="display:flex;gap:14px;align-items:center">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">✅</div>
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text)">Review Complete</div>
+          <div style="font-weight:600;font-size:13px;color:var(--muted);margin-top:3px">12 of 12 clauses reviewed</div>
+        </div>
+      </div>
+      <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr)">
+        <div style="text-align:center;padding:8px 4px"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">12</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Clauses Reviewed</div></div>
+        <div style="text-align:center;padding:8px 4px"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">3</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Items Flagged</div></div>
+        <div style="text-align:center;padding:8px 4px"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">1</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Action Needed</div></div>
+      </div>
+    </div>
+
+    <!-- Flagged Items -->
+    <div class="sec-label">Items Requiring Your Attention</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#fff;border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
+        <div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">⚠️</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Pets</span></div><span class="tag-amber">Review</span></div>
+        <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6;margin-top:6px">Pet approval required in writing. In Victoria you have the right to request this — it cannot be unreasonably refused.</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer;display:block" onclick="switchView('C')">View Clause 5 →</span>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
+        <div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">⚠️</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Alterations</span></div><span class="tag-amber">Review</span></div>
+        <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6;margin-top:6px">The blanket prohibition may be broader than Victorian law allows. Minor modifications cannot be unreasonably refused under the Residential Tenancies Act.</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer;display:block" onclick="switchView('C')">View Clause 6 →</span>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
+        <div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">⚠️</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Breaking the Lease</span></div><span class="tag-amber">Review</span></div>
+        <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6;margin-top:6px">Early exit can be costly. Ensure you are confident committing to the full 12-month term before signing.</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer;display:block" onclick="switchView('C')">View Clause 8 →</span>
+      </div>
+    </div>
+
+    <!-- Standard Clauses -->
+    <div class="sec-label" style="margin-top:20px">Standard Clauses — No Issues</div>
+    <div style="background:#fff;border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt)">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Term</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Weekly Rent</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond / Security Deposit</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Repairs & Maintenance</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Landlord Entry</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Cleanliness & Condition</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Noise & Nuisance</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Utilities & Services</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Rent Increases</span></div>
+    </div>
+
+    <!-- Your Rights Reminder -->
+    <div style="margin-top:14px;background:linear-gradient(135deg,var(--blue-dk),var(--blue));border-radius:16px;padding:18px;cursor:pointer" onclick="navigate('/rights')">
+      <span style="font-size:28px;display:block;margin-bottom:10px">⚖️</span>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:6px">Know your rights as a Victorian renter</div>
+      <div style="font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.6">Consumer Affairs Victoria provides free advice on any lease clause you're unsure about. VCAT handles disputes.</div>
+      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal);margin-top:10px;display:block">View VIC Tenancy Resources →</span>
+    </div>
+
+    <!-- Disclaimer -->
+    <div style="margin-top:14px;background:rgba(245,166,35,.07);border:1.5px solid rgba(245,166,35,.25);border-radius:16px;padding:15px 16px;display:flex;gap:11px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0;margin-top:1px">⚠️</span>
+      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">This review is an Smart plain-English summary for your personal understanding only. It is not legal advice. For any concerns about specific clauses, contact Consumer Affairs Victoria on 1300 55 81 81 or seek independent legal advice.</div>
+    </div>
+  </div>
+
+  <div class="sticky-footer">
+    <button class="btn-outline-c" onclick="switchView('C')">← Back to Clauses</button>
+    <button class="btn-blue-c flex-1" style="border-radius:12px;padding:13px" onclick="switchView('E')">Save Lease to Vault →</button>
+  </div>
+</div>
+
+<!-- VIEW E — SAVE TO VAULT CONFIRMATION -->
+<div class="view" id="viewE" style="display:none">
+  <!-- Top Section -->
+  <div style="background:var(--blue);padding:50px 24px 44px;text-align:center">
+    <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;animation:successPop .5s cubic-bezier(.34,1.56,.64,1)">🗄️</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:#fff;margin-bottom:10px">Lease Saved to Vault</div>
+    <div style="font-weight:600;font-size:14px;color:rgba(255,255,255,.72);line-height:1.7;max-width:300px;margin:0 auto">Your lease and this plain-English review have been saved to your Vault permanently. You can reference them any time during your tenancy.</div>
+    <div id="savedTime" style="font-weight:600;font-size:12px;color:rgba(255,255,255,.5);margin-top:10px"></div>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:20px 16px;padding-bottom:100px">
+    <!-- What's Saved -->
+    <div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Saved to Your Vault</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Agreement PDF</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">18 Smith St, Fitzroy · Starts 1 Apr 2025</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📋</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Plain-English Review</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">12 clauses reviewed · 3 items flagged</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 0">
+        <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚠️</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Flagged Items Summary</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Pets · Alterations · Break Lease</div></div>
+      </div>
+    </div>
+
+    <!-- What Happens Next -->
+    <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">What to do now</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);flex-shrink:0">1</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Review the 3 flagged clauses with your landlord or agent before signing if you have concerns.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);flex-shrink:0">2</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Once you sign, complete your Move-In Condition Audit before bringing anything into the property.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);flex-shrink:0">3</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">If you need free legal advice about any clause, contact Consumer Affairs Victoria.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);flex-shrink:0">4</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Your lease end date is saved — RenterIQ will remind you at 90, 60 and 30 days before expiry.</div></div>
+      </div>
+    </div>
+
+    <!-- Move In Prompt -->
+    <div style="background:linear-gradient(135deg,var(--blue-dk),var(--blue));border-radius:16px;padding:18px;margin-bottom:14px;cursor:pointer" onclick="navigate('/inspect')">
+      <span style="font-size:28px;display:block;margin-bottom:10px">🔑</span>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:6px">Ready to do your Move-In Audit?</div>
+      <div style="font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.6">Before you bring anything in, document the entire property with timestamped photos. This is your most important protection against bond disputes.</div>
+      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--teal);margin-top:10px;display:block">Start Move-In Audit →</span>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn-blue-c btn-full" style="border-radius:14px" onclick="navigate('/inspect')">Start Move-In Condition Audit</button>
+      <button class="btn-outline-c btn-full" style="border-radius:14px" onclick="navigate('/vault')">View in Vault</button>
+      <button style="background:transparent;color:var(--muted);width:100%;padding:12px;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;text-align:center;min-height:44px" onclick="navigate('/dashboard')">Back to Home</button>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+    <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  </nav>
+</div>
+
+</div><!-- /app-shell -->
+
+<script>
+/* RenterIQ — Lease Review JS */
+
+// Utilities
+function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+
+function showToast(title,sub,icon){
+  var t=document.getElementById('appToast');
+  if(!t){t=document.createElement('div');t.id='appToast';t.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';t.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(t)}
+  document.getElementById('toastIcon').textContent=icon||'✓';
+  document.getElementById('toastText').textContent=title||'';
+  document.getElementById('toastSub').textContent=sub||'';
+  t.style.transform='translateY(0)';t.style.opacity='1';
+  clearTimeout(t._timer);t._timer=setTimeout(function(){t.style.transform='translateY(-90px)';t.style.opacity='0'},3200);
+}
+
+// View Management
+var allViews=['A','B','C','D','E'];
+var currentView='A';
+
+function switchView(id){
+  var cur=document.getElementById('view'+currentView);
+  var nxt=document.getElementById('view'+id);
+  if(!nxt||id===currentView)return;
+  cur.style.opacity='0';cur.style.pointerEvents='none';
+  setTimeout(function(){
+    cur.style.display='none';cur.style.opacity='';
+    nxt.style.display='flex';nxt.style.flexDirection='column';nxt.style.minHeight='100vh';
+    requestAnimationFrame(function(){
+      nxt.style.opacity='0';
+      requestAnimationFrame(function(){
+        nxt.style.transition='opacity .2s ease';nxt.style.opacity='1';nxt.style.pointerEvents='';
+      });
+    });
+    window.scrollTo(0,0);
+  },150);
+  currentView=id;
+}
+
+// File Upload
+function triggerUpload(){document.getElementById('leaseFile').click()}
+
+function handleFileSelect(input){
+  if(!input.files||!input.files[0])return;
+  var file=input.files[0];
+  document.getElementById('dropZone').style.display='none';
+  document.getElementById('fileSelected').style.display='block';
+  document.getElementById('fileName').textContent=file.name;
+  var kb=Math.round(file.size/1024);
+  var mb=(file.size/(1024*1024)).toFixed(1);
+  document.getElementById('fileSize').textContent=(kb>1024?mb+' MB':kb+' KB')+' · Ready to analyse';
+  document.getElementById('analyseBtn').style.opacity='1';
+  document.getElementById('analyseBtn').style.pointerEvents='auto';
+  showToast('Lease uploaded ✓','Tap Analyse to begin your review','📄');
+}
+
+function loadDemoLease(){
+  document.getElementById('dropZone').style.display='none';
+  document.getElementById('fileSelected').style.display='block';
+  document.getElementById('fileName').textContent='lease_18_smith_st_fitzroy.pdf';
+  document.getElementById('fileSize').textContent='2.4 MB · Demo lease loaded';
+  document.getElementById('analyseBtn').style.opacity='1';
+  document.getElementById('analyseBtn').style.pointerEvents='auto';
+  showToast('Demo lease loaded','Tap Analyse to begin','📄');
+}
+
+function startAnalysis(){switchView('B');runAnalysisAnimation()}
+
+// Analysis Animation
+function runAnalysisAnimation(){
+  var delays=[800,1800,3000,4200,5200];
+  // Start first icon spinning
+  var first=document.getElementById('lIcon-0');
+  if(first)first.style.animation='spin 1s linear infinite';
+  delays.forEach(function(delay,i){
+    setTimeout(function(){
+      var icon=document.getElementById('lIcon-'+i);
+      if(!icon)return;
+      icon.textContent='✓';icon.style.background='var(--teal-lt)';icon.style.animation='none';icon.style.color='var(--teal-dk)';icon.style.fontFamily='Sora,sans-serif';icon.style.fontWeight='700';
+      if(i<delays.length-1){var next=document.getElementById('lIcon-'+(i+1));if(next)next.style.animation='spin 1s linear infinite'}
+    },delay);
+  });
+  setTimeout(function(){switchView('C')},5800);
+}
+
+// Clause Review
+var totalClauses=12;
+var understood={};
+
+function markUnderstood(n){
+  understood[n]=true;
+  var card=document.getElementById('clause-'+n);
+  var btn=card?card.querySelector('.understood-btn'):null;
+  if(card){card.style.borderColor='rgba(0,200,150,.3)';card.style.background='rgba(0,200,150,.02)';card.style.opacity='.8'}
+  if(btn){btn.textContent='✓ Understood';btn.style.background='var(--teal-lt)';btn.style.color='var(--teal-dk)';btn.style.borderColor='rgba(0,200,150,.3)';btn.style.pointerEvents='none'}
+  updateClauseProgress();
+}
+
+function updateClauseProgress(){
+  var done=Object.keys(understood).length;
+  var pct=Math.round((done/totalClauses)*100);
+  var counter=document.getElementById('clauseCounter');if(counter)counter.textContent=done+' of '+totalClauses+' clauses';
+  var pctEl=document.getElementById('clausePct');if(pctEl)pctEl.textContent=pct+'%';
+  var fill=document.getElementById('clauseFill');if(fill)fill.style.width=pct+'%';
+  var count=document.getElementById('understoodCount');if(count)count.textContent=done+' of '+totalClauses+' understood';
+  var summaryBtn=document.getElementById('summaryBtn');
+  if(done===totalClauses&&summaryBtn){summaryBtn.style.opacity='1';summaryBtn.style.pointerEvents='auto';showToast('All clauses reviewed ✓','Tap See Summary to view flagged items','✅')}
+}
+
+function toggleOriginal(n){
+  var content=document.getElementById('origContent-'+n);
+  var toggle=document.getElementById('origToggle-'+n);
+  if(!content)return;
+  var isHidden=content.style.display==='none'||!content.style.display;
+  content.style.display=isHidden?'block':'none';
+  if(toggle)toggle.textContent=isHidden?'Hide ‹':'Show ›';
+}
+
+// Save to Vault
+function saveToVault(){
+  var el=document.getElementById('savedTime');
+  if(el){
+    var now=new Date();
+    el.textContent='Saved '+now.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit',hour12:true})+' · '+now.toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+  }
+}
+
+// Init
+document.addEventListener('DOMContentLoaded',function(){
+  document.body.style.opacity='0';
+  requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
+  allViews.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
+  saveToVault();
+});
+
+// Service Worker
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+</body>
+</html>

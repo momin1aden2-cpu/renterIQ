@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/app/css/app.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Your Profile — RenterIQ</title>
+<style>
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl)}
+.view{display:flex;flex-direction:column;min-height:100vh;transition:opacity .2s ease}
+.pr-header{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 28px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.pr-header-sm{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.pr-row{display:flex;align-items:center;justify-content:space-between}
+.pr-back{background:none;border:none;color:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.pr-back-arrow{font-size:22px;font-weight:700;line-height:1}
+.pr-back-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;opacity:.7}
+.pr-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
+.pr-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.sec-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 8px}
+.settings-row{min-height:52px;padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s var(--ease-smooth)}
+.settings-row:last-child{border-bottom:none}
+.settings-row:active{background:rgba(27,80,200,.03);transform:scale(.99)}
+.settings-icon{font-size:20px;width:22px;text-align:center;flex-shrink:0}
+.settings-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.settings-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px}
+.settings-right{margin-left:auto;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);flex-shrink:0}
+.settings-chevron{color:var(--muted);font-size:20px;flex-shrink:0;margin-left:auto}
+.notif-toggle{width:36px;height:20px;border-radius:100px;display:flex;align-items:center;padding:2px;cursor:pointer;flex-shrink:0;transition:background .2s;position:relative}
+.notif-toggle-dot{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;transition:all .2s}
+.danger-row{min-height:52px;padding:14px;border-bottom:1px solid rgba(232,64,64,.15);display:flex;align-items:center;gap:13px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.danger-row:last-child{border-bottom:none}
+.form-field{padding:13px 14px;border-bottom:1px solid var(--border-lt)}
+.form-field:last-child{border-bottom:none}
+.form-label{display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.form-input{width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:transparent;padding:0}
+.teal-lt{background:rgba(0,200,150,.1)}
+.amber-lt{background:rgba(245,166,35,.1)}
+@keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- VIEW A — PROFILE HOME -->
+<div class="view" id="viewA">
+
+<header class="pr-header">
+  <div class="pr-row">
+    <button class="pr-back" onclick="navigate('/dashboard')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">RENTERIQ</span></button>
+    <span style="font-size:20px;color:#fff;cursor:pointer;font-family:'Sora',sans-serif;font-weight:700" onclick="switchView('B')">✏️</span>
+  </div>
+  <div style="display:flex;gap:16px;align-items:center;margin-top:16px">
+    <div style="width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#fff;flex-shrink:0">AJ</div>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#fff">Alexandra Johnson</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.65);margin-top:3px">alex.johnson@email.com</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.5);margin-top:2px">Melbourne, VIC</div>
+    </div>
+  </div>
+</header>
+
+<!-- ACTIVE PLAN BADGE -->
+<div style="background:var(--blue-dk);padding:12px 20px;display:flex;align-items:center;justify-content:space-between">
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <span style="font-size:16px">⭐</span>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff">Free Plan</span>
+    <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.4)">·</span>
+    <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.55)">All features unlocked during beta</span>
+  </div>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal);cursor:pointer;flex-shrink:0" onclick="switchView('E')">Upgrade →</span>
+</div>
+
+<div style="flex:1;padding-bottom:100px">
+
+<!-- PROFILE STATS -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px">
+  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">358</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Days Left</div></div>
+  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">18</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Vault Docs</div></div>
+  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">4</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Reports</div></div>
+</div>
+
+<!-- SETTINGS SECTIONS -->
+<div style="margin:0 16px">
+
+<!-- SECTION 1: ACCOUNT -->
+<div class="sec-label">Account</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="switchView('B')"><span class="settings-icon">👤</span><div style="flex:1"><div class="settings-title">Personal Details</div><div class="settings-sub">Name, email, mobile, date of birth</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="switchView('C')"><span class="settings-icon">🏠</span><div style="flex:1"><div class="settings-title">Property & Tenancy</div><div class="settings-sub">Active property, lease dates, rent</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('State','State selector — change your state to update the Rights Hub','📍')"><span class="settings-icon">📍</span><div style="flex:1"><div class="settings-title">Your State</div></div><span class="settings-right">VIC</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+</div>
+
+<!-- SECTION 2: NOTIFICATIONS -->
+<div class="sec-label">Notifications</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="switchView('D')"><span class="settings-icon">🔔</span><div style="flex:1"><div class="settings-title">Notification Preferences</div><div class="settings-sub">Inspection, renewal, maintenance alerts</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="togglePushNotifs()"><span class="settings-icon">📱</span><div style="flex:1"><div class="settings-title">Push Notifications</div></div><div class="notif-toggle" id="pushMainToggle" style="background:var(--teal)"><div class="notif-toggle-dot" style="right:2px"></div></div><span class="settings-chevron" style="margin-left:8px">›</span></div>
+</div>
+
+<!-- SECTION 3: SUBSCRIPTION -->
+<div class="sec-label">Subscription</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">⭐</span><div style="flex:1"><div class="settings-title">Current Plan</div></div><span class="settings-right">Free Beta</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">💳</span><div style="flex:1"><div class="settings-title">Billing & Payments</div></div><span class="settings-right" style="color:var(--muted)">Not set up</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+</div>
+
+<!-- SECTION 4: DATA & VAULT -->
+<div class="sec-label">Data & Vault</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="navigate('/vault')"><span class="settings-icon">🗄️</span><div style="flex:1"><div class="settings-title">Your Vault</div><div class="settings-sub">18 documents · 36 photos</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('Export','Generating your data export — feature coming soon','📦')"><span class="settings-icon">📦</span><div style="flex:1"><div class="settings-title">Export All Data</div><div class="settings-sub">Download all Vault contents as ZIP</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="switchView('F')"><span class="settings-icon">🔒</span><div style="flex:1"><div class="settings-title">Data & Privacy</div><div class="settings-sub">How RenterIQ handles your data</div></div><span class="settings-chevron">›</span></div>
+</div>
+
+<!-- SECTION 5: SUPPORT -->
+<div class="sec-label">Support</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="showToast('Help','Full help centre coming soon — contact support below','❓')"><span class="settings-icon">❓</span><div style="flex:1"><div class="settings-title">Help & FAQ</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('Support','Email: support@renteriq.com.au','💬')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Contact Support</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('Thank you!','App store rating coming when we launch publicly','⭐')"><span class="settings-icon">⭐</span><div style="flex:1"><div class="settings-title">Rate RenterIQ</div></div><span class="settings-chevron">›</span></div>
+</div>
+
+<!-- SECTION 6: ABOUT -->
+<div class="sec-label">About</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">ℹ️</span><div style="flex:1"><div class="settings-title">About RenterIQ</div></div><span class="settings-right" style="color:var(--muted)">v1.0.0 Beta</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Legal</div><div class="settings-sub">Privacy Policy · Terms · Disclaimer</div></div><span class="settings-chevron">›</span></div>
+</div>
+
+<!-- DANGER ZONE -->
+<div style="margin-top:4px;background:#fff;border-radius:16px;overflow:hidden;border:1px solid rgba(232,64,64,.2)">
+  <div class="danger-row" onclick="signOut()"><span class="settings-icon">🚪</span><div style="flex:1"><div class="settings-title">Sign Out</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Sign out of your account</div></div></div>
+  <div class="danger-row" onclick="confirmDelete()"><span class="settings-icon">🗑️</span><div style="flex:1"><div class="settings-title" style="color:var(--red)">Delete Account</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(232,64,64,.7);margin-top:2px">Permanently delete account and all data</div></div></div>
+</div>
+
+</div><!-- /settings sections -->
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:24px 16px 8px">
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">RenterIQ · Version 1.0.0 Beta</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Built in Australia 🇦🇺</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Not a legal service · Organisation tool only</div>
+</div>
+
+</div><!-- /scrollable -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+  <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+</nav>
+</div><!-- /viewA -->
+
+<!-- VIEW B — PERSONAL DETAILS -->
+<div class="view" id="viewB" style="display:none">
+
+<header class="pr-header-sm">
+  <div class="pr-row">
+    <button class="pr-back" onclick="switchView('A')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">Profile</span></button>
+  </div>
+  <div class="pr-title">Personal Details</div>
+  <div class="pr-sub">Your account information</div>
+</header>
+
+<div style="flex:1;padding:16px;padding-bottom:120px">
+
+<!-- AVATAR SECTION -->
+<div style="text-align:center;padding:20px 0 24px">
+  <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);border:3px solid rgba(27,80,200,.15);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:32px;color:#fff;margin:0 auto">AJ</div>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-top:12px;display:block;cursor:pointer" onclick="showToast('Photo','Profile photo upload coming soon','📷')">Change Photo</span>
+</div>
+
+<!-- PERSONAL INFO -->
+<div class="sec-label">Personal Information</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="form-field"><label class="form-label">Full Name</label><input class="form-input" value="Alexandra Johnson"></div>
+  <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" value="alex.johnson@email.com"></div>
+  <div class="form-field"><label class="form-label">Mobile Number</label><input class="form-input" value="0412 345 678"></div>
+  <div class="form-field"><label class="form-label">Date of Birth</label><input class="form-input" value="14/06/1995"></div>
+  <div class="form-field" style="display:flex;align-items:center;justify-content:space-between"><div><label class="form-label">Current State</label><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">Victoria (VIC)</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="showToast('State','Select your state to update the Rights Hub','📍')">Change ›</span></div>
+  <div class="form-field" style="display:flex;align-items:center;justify-content:space-between"><div><label class="form-label">Preferred Language</label><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">English</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="showToast('Language','Language options coming soon','🌏')">Change ›</span></div>
+</div>
+
+<!-- EMPLOYMENT INFO -->
+<div class="sec-label" style="margin-top:20px">Employment</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="form-field"><label class="form-label">Employment Status</label><input class="form-input" value="Employed Full-Time"></div>
+  <div class="form-field"><label class="form-label">Employer</label><input class="form-input" value="Acme Pty Ltd"></div>
+  <div class="form-field"><label class="form-label">Job Title</label><input class="form-input" value="Senior Designer"></div>
+  <div class="form-field"><label class="form-label">Annual Income</label><input class="form-input" value="$92,000"></div>
+</div>
+<div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55">Employment details are pre-filled in rental applications. Update them here any time.</div>
+
+<!-- SECURITY -->
+<div class="sec-label" style="margin-top:20px">Security</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="showToast('Password','Password change coming soon — auth module in progress','🔑')"><span class="settings-icon">🔑</span><div style="flex:1"><div class="settings-title">Change Password</div><div class="settings-sub">Last changed: Never</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('2FA','Two-factor auth coming soon','🔐')"><span class="settings-icon">🔐</span><div style="flex:1"><div class="settings-title">Two-Factor Authentication</div></div><span class="settings-right" style="color:var(--muted)">OFF</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+</div>
+
+</div>
+
+<!-- STICKY FOOTER -->
+<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
+  <button style="background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
+  <button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Saved ✓','Personal details updated','✓');setTimeout(function(){switchView('A')},800)">Save Changes</button>
+</div>
+</div>
+
+<!-- VIEW C — PROPERTY & TENANCY -->
+<div class="view" id="viewC" style="display:none">
+
+<header class="pr-header-sm">
+  <div class="pr-row">
+    <button class="pr-back" onclick="switchView('A')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">Profile</span></button>
+  </div>
+  <div class="pr-title">Property & Tenancy</div>
+  <div class="pr-sub">Your active tenancy details</div>
+</header>
+
+<div style="flex:1;padding:16px;padding-bottom:120px">
+
+<!-- ACTIVE PROPERTY CARD -->
+<div style="background:#fff;border-radius:18px;padding:18px;border:1.5px solid var(--blue-lt);box-shadow:0 4px 16px rgba(27,80,200,.1);margin-bottom:14px">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🏠</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Active Tenancy</div>
+    </div>
+    <span style="background:rgba(0,200,150,.1);color:var(--teal-dk);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Active</span>
+  </div>
+  <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Property</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">18 Smith St, Fitzroy VIC</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Agent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Nelson Alexander</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Weekly Rent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">$620</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Started</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">1 April 2025</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Ends</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">31 March 2026</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Bond Lodged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">$2,480</div></div>
+  </div>
+  <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;display:block;text-align:center" onclick="showToast('Update','Tenancy details editor coming soon','✏️')">Update tenancy details →</span>
+</div>
+
+<!-- LEASE PROGRESS -->
+<div class="sec-label" style="margin-top:20px">Lease Progress</div>
+<div style="background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">7 of 12 months · 358 days remaining</span></div>
+  <div style="height:8px;background:var(--blue-xl);border-radius:100px;overflow:hidden"><div id="profileLeaseBar" style="height:100%;background:var(--teal);border-radius:100px;width:0;transition:width .8s cubic-bezier(.4,0,.2,1)"></div></div>
+  <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Renewing or moving out?</span>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="navigate('/renewal')">Decide →</span>
+  </div>
+</div>
+
+<!-- PREVIOUS PROPERTIES -->
+<div class="sec-label" style="margin-top:20px">Previous Tenancies</div>
+<div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">8 Smith St, Collingwood VIC</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Jan 2022 – Mar 2024 · Hocking Stuart</div></div>
+    <span style="font-size:16px;cursor:pointer" onclick="showToast('Previous lease','Opening archived lease','📄')">📄</span>
+  </div>
+  <div style="padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="showToast('Import','Previous tenancy import coming soon','📋')">
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">+ Add Previous Property</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Import past tenancy history</div></div>
+    <span style="font-size:20px;color:var(--blue);cursor:pointer">+</span>
+  </div>
+</div>
+
+</div>
+
+<!-- STICKY FOOTER -->
+<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
+  <button style="background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
+  <button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Saved ✓','Property details updated','✓');setTimeout(function(){switchView('A')},800)">Save</button>
+</div>
+</div>
+
+<!-- VIEW D — NOTIFICATION PREFERENCES -->
+<div class="view" id="viewD" style="display:none">
+
+<header class="pr-header-sm">
+  <div class="pr-row">
+    <button class="pr-back" onclick="switchView('A')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">Profile</span></button>
+  </div>
+  <div class="pr-title">Notifications</div>
+  <div class="pr-sub">Manage your alert preferences</div>
+</header>
+
+<div style="flex:1;padding:16px;padding-bottom:120px">
+
+<!-- PUSH STATUS -->
+<div id="pushStatusCard" style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px;margin-bottom:16px">
+  <div style="display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:16px">⚠️</span>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500">Push notifications are not enabled</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:#8A6500;margin-top:3px;line-height:1.55">Enable to receive inspection reminders and lease alerts on this device.</div>
+      <button style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;margin-top:10px;cursor:pointer;width:100%;-webkit-tap-highlight-color:transparent" onclick="requestPushPermission()">Enable Push Notifications</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION CATEGORIES -->
+<div class="sec-label">Alert Types</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+
+  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px">
+    <div style="width:36px;height:36px;border-radius:9px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📅</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Inspection Reminders</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">1 hour and 1 day before each inspection</div></div>
+    <div class="notif-toggle" id="pref-toggle-0" style="background:var(--teal)" onclick="togglePref(0)"><div class="notif-toggle-dot" style="right:2px"></div></div>
+  </div>
+
+  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px">
+    <div style="width:36px;height:36px;border-radius:9px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📋</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Lease Renewal Alerts</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">90, 60 and 30 days before lease ends</div></div>
+    <div class="notif-toggle" id="pref-toggle-1" style="background:var(--teal)" onclick="togglePref(1)"><div class="notif-toggle-dot" style="right:2px"></div></div>
+  </div>
+
+  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px">
+    <div style="width:36px;height:36px;border-radius:9px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔧</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Maintenance Follow-ups</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">If agent doesn't respond within 7 days</div></div>
+    <div class="notif-toggle" id="pref-toggle-2" style="background:var(--teal)" onclick="togglePref(2)"><div class="notif-toggle-dot" style="right:2px"></div></div>
+  </div>
+
+  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px">
+    <div style="width:36px;height:36px;border-radius:9px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">💰</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Bond Return Reminders</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">14 days after confirmed exit</div></div>
+    <div class="notif-toggle" id="pref-toggle-3" style="background:var(--teal)" onclick="togglePref(3)"><div class="notif-toggle-dot" style="right:2px"></div></div>
+  </div>
+
+  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px">
+    <div style="width:36px;height:36px;border-radius:9px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📸</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Report Ready</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">When AI generates a condition report</div></div>
+    <div class="notif-toggle" id="pref-toggle-4" style="background:var(--teal)" onclick="togglePref(4)"><div class="notif-toggle-dot" style="right:2px"></div></div>
+  </div>
+
+  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px">
+    <div style="width:36px;height:36px;border-radius:9px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🏠</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">New Inspection Times</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">For saved properties without a time yet</div></div>
+    <div class="notif-toggle" id="pref-toggle-5" style="background:var(--teal)" onclick="togglePref(5)"><div class="notif-toggle-dot" style="right:2px"></div></div>
+  </div>
+
+  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px">
+    <div style="width:36px;height:36px;border-radius:9px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📄</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Documents Saved</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">When files are saved to your Vault</div></div>
+    <div class="notif-toggle" id="pref-toggle-6" style="background:var(--border)" onclick="togglePref(6)"><div class="notif-toggle-dot" style="right:auto;left:2px"></div></div>
+  </div>
+
+  <div style="padding:14px;display:flex;align-items:center;gap:13px">
+    <div style="width:36px;height:36px;border-radius:9px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔔</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">App Updates</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">New features and improvements</div></div>
+    <div class="notif-toggle" id="pref-toggle-7" style="background:var(--border)" onclick="togglePref(7)"><div class="notif-toggle-dot" style="right:auto;left:2px"></div></div>
+  </div>
+
+</div>
+
+<!-- QUIET HOURS -->
+<div class="sec-label" style="margin-top:20px">Quiet Hours</div>
+<div style="background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt)">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Do Not Disturb</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">No notifications during these hours</div>
+    </div>
+    <div class="notif-toggle" id="quietToggle" style="background:var(--border)" onclick="toggleQuiet()"><div class="notif-toggle-dot" style="right:auto;left:2px"></div></div>
+  </div>
+  <div id="quietHours" style="display:none;margin-top:12px;display:none;align-items:center;gap:12px">
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">From</span>
+    <input type="text" value="10:00 PM" style="background:var(--blue-xl);border-radius:9px;padding:8px 12px;border:1px solid var(--border);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);text-align:center;width:90px">
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">To</span>
+    <input type="text" value="8:00 AM" style="background:var(--blue-xl);border-radius:9px;padding:8px 12px;border:1px solid var(--border);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);text-align:center;width:90px">
+  </div>
+</div>
+
+</div>
+
+<!-- STICKY FOOTER -->
+<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
+  <button style="background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
+  <button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Preferences saved ✓','','✓');setTimeout(function(){switchView('A')},800)">Save Preferences</button>
+</div>
+</div>
+
+<!-- VIEW E — SUBSCRIPTION & BILLING -->
+<div class="view" id="viewE" style="display:none">
+
+<header class="pr-header-sm">
+  <div class="pr-row">
+    <button class="pr-back" onclick="switchView('A')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">Profile</span></button>
+  </div>
+  <div class="pr-title">Subscription</div>
+  <div class="pr-sub">Your RenterIQ plan</div>
+</header>
+
+<div style="flex:1;padding:16px;padding-bottom:100px">
+
+<!-- CURRENT PLAN -->
+<div style="background:linear-gradient(135deg,var(--blue-dk),var(--blue-md));border-radius:18px;padding:22px;margin-bottom:16px">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.6)">⭐ Your Plan</span>
+    <span style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Beta</span>
+  </div>
+  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:28px;color:#fff;margin-top:10px">Free Beta</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.65);margin-top:6px;line-height:1.6">Full access to all RenterIQ features during the beta period. No credit card required.</div>
+  <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Unlimited property searches</span></div>
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">AI inspection reports</span></div>
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Lease plain-English review</span></div>
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Move-in and exit audits</span></div>
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Full Vault access</span></div>
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Bond recovery tools</span></div>
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Renter Rights Hub</span></div>
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Push notifications</span></div>
+  </div>
+</div>
+
+<!-- COMING SOON -->
+<div class="sec-label">Subscription Plans — Coming Soon</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+
+  <!-- RENTER PLAN -->
+  <div style="background:#fff;border-radius:16px;padding:18px;border:2px solid var(--blue);position:relative">
+    <span style="position:absolute;top:14px;right:14px;background:var(--blue);color:#fff;border-radius:100px;padding:4px 10px;font-family:'Sora',sans-serif;font-weight:700;font-size:10px">Most Popular</span>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Renter</div>
+    <div style="margin-top:4px"><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:var(--blue)">$4.99</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted)">/month</span></div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">or $39.99/year · Save 33%</div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">All inspection and audit tools</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">AI lease review and comparison</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Full Vault — unlimited storage</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Bond recovery tools</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Push notifications</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Renter Rights Hub — all states</span></div>
+    </div>
+  </div>
+
+  <!-- BASIC PLAN -->
+  <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt)">
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Basic</div>
+    <div style="margin-top:4px"><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:var(--blue)">Free</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted)"> forever</span></div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Core features only</div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Property search and browsing</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Inspection booking</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Basic Vault (10 documents)</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--muted);font-size:13px">✗</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">AI lease review (Renter plan)</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--muted);font-size:13px">✗</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Bond recovery tools (Renter plan)</span></div>
+    </div>
+  </div>
+
+  <!-- FAMILY PLAN -->
+  <div style="background:var(--blue-xl);border-radius:16px;padding:18px;border:1px solid var(--border-lt);opacity:.5">
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Family</div>
+    <div style="margin-top:4px"><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:var(--blue)">TBA</span></div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Multiple tenants and properties</div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Everything in Renter</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Up to 3 tenants on one account</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Multiple active properties</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Shared Vault access</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NOTIFY ME -->
+<div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:16px;padding:16px;margin-top:16px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px">🔔 Be first to know when subscriptions launch</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:14px">We'll notify you when paid plans are available — and offer early beta users a discount.</div>
+  <div style="display:flex;gap:8px">
+    <input id="notifyEmail" type="email" placeholder="your@email.com" style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);outline:none">
+    <button style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent" onclick="notifyMe()">Notify Me</button>
+  </div>
+</div>
+
+<!-- RESTORE / MANAGE -->
+<div style="background:#fff;border-radius:14px;margin-top:14px;border:1px solid var(--border-lt);overflow:hidden">
+  <div class="settings-row" onclick="showToast('Restore','No active subscription to restore — you\'re on the free beta','🔄')"><span class="settings-icon">🔄</span><div style="flex:1"><div class="settings-title">Restore Purchase</div><div class="settings-sub">If you've already subscribed on another device</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms & Refund Policy</div><div class="settings-sub">View subscription terms</div></div><span class="settings-chevron">›</span></div>
+</div>
+
+</div>
+</div>
+
+<!-- VIEW F — DATA & PRIVACY -->
+<div class="view" id="viewF" style="display:none">
+
+<header class="pr-header-sm">
+  <div class="pr-row">
+    <button class="pr-back" onclick="switchView('A')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">Profile</span></button>
+  </div>
+  <div class="pr-title">Data & Privacy</div>
+  <div class="pr-sub">How RenterIQ handles your information</div>
+</header>
+
+<div style="flex:1;padding:16px;padding-bottom:100px">
+
+<!-- PRIVACY SUMMARY -->
+<div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <span style="font-size:36px;display:block;margin-bottom:14px">🔒</span>
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:12px">Your data belongs to you</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.15);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal-dk);flex-shrink:0;margin-top:2px">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Your documents and photos are stored securely and are never shared with landlords, agencies or third parties without your consent.</span></div>
+    <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.15);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal-dk);flex-shrink:0;margin-top:2px">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">RenterIQ does not sell your data or use it for advertising purposes.</span></div>
+    <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.15);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal-dk);flex-shrink:0;margin-top:2px">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">You can export or delete all your data at any time from this screen.</span></div>
+  </div>
+</div>
+
+<!-- DATA STORED -->
+<div class="sec-label">Data Stored in Your Vault</div>
+<div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div style="padding:12px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📄</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Documents & Leases</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">2 files</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">📄</span></div>
+  <div style="padding:12px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📸</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Photos</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">36 images · ~48 MB</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">📸</span></div>
+  <div style="padding:12px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📋</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Reports</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">4 reports</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">📋</span></div>
+  <div style="padding:12px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">💬</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Communications</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">7 messages</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">💬</span></div>
+  <div style="padding:12px 14px;display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🧾</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Receipts</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">7 receipts</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">🧾</span></div>
+</div>
+
+<!-- DATA ACTIONS -->
+<div class="sec-label" style="margin-top:20px">Your Data</div>
+<div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="showToast('Export','Data export feature coming soon','📦')"><span class="settings-icon">📦</span><div style="flex:1"><div class="settings-title">Export All Data</div><div class="settings-sub">Download all Vault contents as a ZIP file</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('Cache cleared','Temporary files removed','✓')"><span class="settings-icon">🗑️</span><div style="flex:1"><div class="settings-title">Clear Cache</div><div class="settings-sub">Remove temporary app data</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="confirmDataDelete()"><span class="settings-icon">❌</span><div style="flex:1"><div class="settings-title" style="color:var(--red)">Delete All Data</div><div class="settings-sub" style="color:rgba(232,64,64,.7)">Permanently delete all documents and photos</div></div><span class="settings-chevron">›</span></div>
+</div>
+
+<!-- LEGAL LINKS -->
+<div class="sec-label" style="margin-top:20px">Legal</div>
+<div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="showToast('Privacy Policy','renteriq.com.au/privacy','📋')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Privacy Policy</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('Terms','renteriq.com.au/terms','📋')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms of Service</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Disclaimer</div><div class="settings-sub">RenterIQ is not a legal service</div></div><span class="settings-chevron">›</span></div>
+</div>
+
+</div>
+</div>
+
+<!-- VIEW G — ABOUT RENTERIQ -->
+<div class="view" id="viewG" style="display:none">
+
+<header class="pr-header-sm">
+  <div class="pr-row">
+    <button class="pr-back" onclick="switchView('A')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">Profile</span></button>
+  </div>
+  <div class="pr-title">About RenterIQ</div>
+  <div class="pr-sub">Version 1.0.0 Beta</div>
+</header>
+
+<div style="flex:1;padding:16px;padding-bottom:100px">
+
+<!-- LOGO CARD -->
+<div style="background:#fff;border-radius:18px;padding:28px 20px;border:1px solid var(--border-lt);text-align:center;margin-bottom:14px">
+  <svg width="56" height="64" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin:0 auto 16px;display:block">
+    <path d="M11 0L21.5 5V13C21.5 20.18 17.16 26.36 11 28C4.84 26.36 0.5 20.18 0.5 13V5L11 0Z" fill="var(--blue-lt)"/>
+    <path d="M11 4L7 9.5V15.5H9.5V12H12.5V15.5H15V9.5L11 4Z" fill="var(--blue)"/>
+  </svg>
+  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:var(--blue-dk)">RenterIQ</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:1.5px">Rent Smart. Stay Protected.</div>
+  <div style="height:1px;background:var(--border-lt);margin:16px 0"></div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Version 1.0.0 Beta · Built in Australia 🇦🇺</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">© 2025 RenterIQ Pty Ltd</div>
+</div>
+
+<!-- WHAT RENTERIQ IS -->
+<div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px">What RenterIQ is</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75">RenterIQ is a personal organisation and documentation tool for Australian renters. It helps you find properties, document inspections, understand lease agreements, and protect your bond.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75;margin-top:12px">RenterIQ is NOT a legal service. All AI-generated content is for personal reference and understanding only. For legal advice, always contact your state tenancy authority.</div>
+</div>
+
+<!-- DISCLAIMER -->
+<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:16px;margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#7A5500;margin-bottom:10px">⚠️ Important Disclaimer</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65;margin-bottom:8px">RenterIQ is an organisation and documentation tool — not a legal service. Nothing in this app constitutes legal advice. All AI-generated summaries, comparisons, and suggestions are for personal reference only.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65;margin-bottom:8px">Tenancy laws differ by state and territory. Outcomes in any dispute depend on your individual circumstances. Always contact your state tenancy authority for legal questions.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">RenterIQ is not affiliated with any government body, real estate agency, or tenancy authority. Links to third-party websites are provided for convenience only.</div>
+</div>
+
+<!-- TECH CREDITS -->
+<div style="background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">Built with</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text)">AI</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Anthropic Claude API</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Listings</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Domain.com.au API</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Platform</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Progressive Web App</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Storage</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Encrypted local vault</span></div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="showToast('Website','Opening renteriq.com.au','🌐')"><span class="settings-icon">🌐</span><div style="flex:1"><div class="settings-title">renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('Email','Opening email client','📧')"><span class="settings-icon">📧</span><div style="flex:1"><div class="settings-title">support@renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('Feedback','In-app feedback form coming soon','💬')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Send Feedback</div></div><span class="settings-chevron">›</span></div>
+</div>
+
+</div>
+</div>
+
+</div><!-- /app-shell -->
+
+<script>
+/* RenterIQ — Profile & Settings JS */
+
+function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+
+function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
+
+// View Management
+var views=['A','B','C','D','E','F','G'];
+var currentView='A';
+
+function switchView(id){
+  var cur=document.getElementById('view'+currentView);
+  var nxt=document.getElementById('view'+id);
+  if(!nxt||id===currentView)return;
+  cur.style.opacity='0';cur.style.pointerEvents='none';
+  setTimeout(function(){
+    cur.style.display='none';
+    nxt.style.display='flex';nxt.style.flexDirection='column';nxt.style.minHeight='100vh';
+    requestAnimationFrame(function(){
+      nxt.style.opacity='0';
+      requestAnimationFrame(function(){nxt.style.transition='opacity .2s ease';nxt.style.opacity='1';nxt.style.pointerEvents=''});
+    });
+    window.scrollTo(0,0);
+  },150);
+  currentView=id;
+}
+
+// Push Notifications
+var pushEnabled=false;
+
+function togglePushNotifs(){
+  if(!pushEnabled){requestPushPermission()}
+  else{pushEnabled=false;updatePushToggle(false);showToast('Push notifications disabled','','🔕')}
+}
+
+function requestPushPermission(){
+  if('Notification' in window){
+    Notification.requestPermission().then(function(perm){
+      if(perm==='granted'){
+        pushEnabled=true;updatePushToggle(true);
+        showToast('Push notifications enabled ✓','You\'ll receive all RenterIQ alerts','🔔');
+        updatePushStatusCard(true);
+      }else{showToast('Notifications blocked','Enable in your phone settings → RenterIQ','⚙')}
+    });
+  }else{showToast('Not supported','Your browser doesn\'t support push notifications','⚠️')}
+}
+
+function updatePushToggle(on){
+  var toggle=document.getElementById('pushMainToggle');
+  if(toggle){
+    toggle.style.background=on?'var(--teal)':'var(--border)';
+    var dot=toggle.querySelector('.notif-toggle-dot');
+    if(dot){dot.style.right=on?'2px':'auto';dot.style.left=on?'auto':'2px'}
+  }
+}
+
+function updatePushStatusCard(enabled){
+  var card=document.getElementById('pushStatusCard');
+  if(!card)return;
+  if(enabled){
+    card.style.background='rgba(0,200,150,.06)';card.style.borderColor='rgba(0,200,150,.25)';
+    card.innerHTML='<div style="display:flex;gap:10px;align-items:center"><span style="color:var(--teal-dk);font-size:16px">✓</span><div><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk)">Push notifications enabled</div><div style="font-family:Nunito,sans-serif;font-size:12px;color:var(--teal-dk);margin-top:3px">You\'ll receive all alerts on this device.</div></div></div>';
+  }
+}
+
+// Notification Preferences
+var prefToggles=[true,true,true,true,true,true,false,false];
+
+function togglePref(n){
+  prefToggles[n]=!prefToggles[n];
+  var toggle=document.getElementById('pref-toggle-'+n);
+  var on=prefToggles[n];
+  if(toggle){
+    toggle.style.background=on?'var(--teal)':'var(--border)';
+    var dot=toggle.querySelector('.notif-toggle-dot');
+    if(dot){dot.style.right=on?'2px':'auto';dot.style.left=on?'auto':'2px'}
+  }
+  showToast(on?'Enabled':'Disabled','',on?'🔔':'🔕');
+}
+
+// Quiet Hours
+var quietOn=false;
+
+function toggleQuiet(){
+  quietOn=!quietOn;
+  var toggle=document.getElementById('quietToggle');
+  var hours=document.getElementById('quietHours');
+  if(toggle){
+    toggle.style.background=quietOn?'var(--teal)':'var(--border)';
+    var dot=toggle.querySelector('.notif-toggle-dot');
+    if(dot){dot.style.right=quietOn?'2px':'auto';dot.style.left=quietOn?'auto':'2px'}
+  }
+  if(hours)hours.style.display=quietOn?'flex':'none';
+}
+
+// Subscription
+function notifyMe(){
+  var input=document.getElementById('notifyEmail');
+  var email=input?input.value:'';
+  if(email&&email.indexOf('@')!==-1){
+    showToast('Added to waitlist ✓','We\'ll email you when subscriptions launch','⭐');
+    if(input)input.value='';
+  }else{showToast('Enter a valid email','','⚠️')}
+}
+
+// Danger Zone
+function signOut(){
+  showToast('Signing out…','Return to the home screen to sign back in','🚪');
+  setTimeout(function(){navigate('/dashboard')},1500);
+}
+
+function confirmDelete(){
+  showToast('Are you sure?','Tap delete again to permanently remove all your data','🗑️');
+}
+
+function confirmDataDelete(){
+  showToast('Data deletion','Contact support@renteriq.com.au to request full data deletion','❌');
+}
+
+// Init
+document.addEventListener('DOMContentLoaded',function(){
+  document.body.style.opacity='0';
+  requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
+
+  views.forEach(function(v){
+    var el=document.getElementById('view'+v);
+    if(el)el.style.display=v==='A'?'flex':'none';
+  });
+
+  setTimeout(function(){
+    var bar=document.getElementById('profileLeaseBar');
+    if(bar)bar.style.width='41%';
+  },400);
+
+  var hash=window.location.hash;
+  if(hash==='#notifications')switchView('D');
+  if(hash==='#subscription')switchView('E');
+  if(hash==='#privacy')switchView('F');
+
+  if('Notification' in window&&Notification.permission==='granted'){
+    pushEnabled=true;updatePushToggle(true);updatePushStatusCard(true);
+  }
+});
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+</body>
+</html>

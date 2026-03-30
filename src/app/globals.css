@@ -36,7 +36,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Sora', sans-serif;
   font-weight: 700;
 }
@@ -78,9 +83,11 @@ h1, h2, h3, h4, h5, h6 {
   .text-balance {
     text-wrap: balance;
   }
+
   .font-sora {
     font-family: 'Sora', sans-serif;
   }
+
   .font-nunito {
     font-family: 'Nunito', sans-serif;
   }
