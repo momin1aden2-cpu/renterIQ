@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#050A1A">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F4F7FF">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#050A1A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="/app/css/app.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,15 +17,15 @@
 .view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
 
 /* Shared Header */
-.sh{position:sticky;top:0;z-index:10;background:var(--blue-xl);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(0,0,0,.5)}
+.sh{position:sticky;top:0;z-index:10;background:var(--blue-xl);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);padding:14px 20px 20px;box-shadow:0 2px 16px var(--overlay-bg)}
 .sh-row{display:flex;align-items:center;justify-content:space-between}
 .sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
-.sh-back-arrow{font-size:22px;color:rgba(255,255,255,.8);font-weight:700}
-.sh-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px;text-transform:uppercase}
-.sh-right-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.65)}
-.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
-.sh-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
-.sh-help{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;min-width:44px}
+.sh-back-arrow{font-size:22px;color:var(--muted);font-weight:700}
+.sh-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.sh-right-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)}
+.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);margin-top:8px}
+.sh-sub{font-weight:600;font-size:13px;color:var(--muted);margin-top:3px}
+.sh-help{width:28px;height:28px;border-radius:50%;background:var(--glass-surface-2);border:none;color:var(--text);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;min-width:44px}
 
 /* Tags */
 .tag-muted{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;background:var(--blue-xl);color:var(--muted)}
@@ -32,18 +33,18 @@
 .tag-blue{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;background:rgba(27,80,200,.1);color:var(--blue)}
 
 /* Buttons */
-.btn-blue-c{background:linear-gradient(135deg,rgba(0,229,255,0.2),rgba(0,229,255,0.05));color:#fff;border:1px solid rgba(0,229,255,0.4);border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,229,255,.15);transition:all .18s var(--ease-smooth)}
+.btn-blue-c{background:linear-gradient(135deg,rgba(0,229,255,0.2),rgba(0,229,255,0.05));color:var(--text-on-primary);border:1px solid rgba(0,229,255,0.4);border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,229,255,.15);transition:all .18s var(--ease-smooth)}
 .btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,229,255,.1)}
 .btn-muted-c{background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px}
-.btn-outline-c{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
+.btn-outline-c{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
 .btn-full{width:100%}
 .flex-1{flex:1}
 
 /* Sticky Footer */
-.sticky-footer{position:sticky;bottom:0;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10;align-items:center}
+.sticky-footer{position:sticky;bottom:0;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10;align-items:center}
 
 /* Bottom Nav */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px var(--glass-surface-3)}
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
 .nav-tab:active{transform:scale(.92)}
 .tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
@@ -61,7 +62,7 @@
 @keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 
 /* Clause Cards */
-.clause-card{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden;transition:all .2s var(--ease-smooth)}
+.clause-card{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden;transition:all .2s var(--ease-smooth)}
 .clause-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
 .clause-left{display:flex;align-items:center;gap:8px}
 .clause-icon{font-size:20px}
@@ -80,9 +81,9 @@
 .understood-btn{width:100%;background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:10px;padding:11px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;min-height:44px}
 
 /* Progress Bars */
-.mini-progress{height:3px;background:rgba(255,255,255,.15);border-radius:100px;margin-top:12px;overflow:hidden}
-.mini-progress-fill{height:100%;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:100px;transition:width .4s ease}
-.clause-progress-bar{height:4px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden}
+.mini-progress{height:3px;background:var(--glass-surface-2);border-radius:100px;margin-top:12px;overflow:hidden}
+.mini-progress-fill{height:100%;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:100px;transition:width .4s ease}
+.clause-progress-bar{height:4px;background:var(--glass-surface-2);border-radius:100px;overflow:hidden}
 .clause-progress-fill{height:100%;background:var(--teal);border-radius:100px;transition:width .5s ease;width:0%}
 
 /* Upload Area */
@@ -91,7 +92,7 @@
 
 /* Clause Grid */
 .clause-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.clause-grid-cell{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:10px;padding:10px 12px;border:1px solid var(--border-lt);display:flex;gap:8px;align-items:center}
+.clause-grid-cell{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:10px;padding:10px 12px;border:1px solid var(--border-lt);display:flex;gap:8px;align-items:center}
 .clause-grid-text{font-weight:700;font-size:12px;color:var(--text)}
 </style>
 </head>
@@ -115,7 +116,7 @@
   <div style="flex:1;overflow-y:auto;padding-bottom:100px">
 
     <!-- What This Does -->
-    <div style="margin:16px;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
+    <div style="margin:16px;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
         <div style="width:52px;height:52px;border-radius:14px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">⚖️</div>
         <div>
@@ -149,7 +150,7 @@
     </div>
 
     <!-- Upload Area -->
-    <div style="margin:0 16px 14px;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
+    <div style="margin:0 16px 14px;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px">Upload Your Lease Agreement</div>
       <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">PDF format preferred. Photo of document also accepted.</div>
 
@@ -214,23 +215,23 @@
     <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);margin-bottom:10px">Reading your lease…</div>
     <div style="font-weight:600;font-size:14px;color:var(--muted);line-height:1.7;max-width:300px;margin:0 auto 32px">RenterIQ is working through your tenancy agreement clause by clause. This takes about 15 seconds.</div>
     <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px">
-      <div id="lStep0" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+      <div id="lStep0" style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div class="gen-icon" id="lIcon-0">📄</div>
         <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Reading document</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Extracting text and structure</div></div>
       </div>
-      <div id="lStep1" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+      <div id="lStep1" style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div class="gen-icon" id="lIcon-1">🔍</div>
         <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Identifying clauses</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Finding all terms and conditions</div></div>
       </div>
-      <div id="lStep2" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+      <div id="lStep2" style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div class="gen-icon" id="lIcon-2">⚖️</div>
         <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Checking Australian law</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Comparing to standard VIC agreement</div></div>
       </div>
-      <div id="lStep3" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+      <div id="lStep3" style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div class="gen-icon" id="lIcon-3">⚠️</div>
         <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Flagging unusual terms</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Looking for non-standard clauses</div></div>
       </div>
-      <div id="lStep4" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+      <div id="lStep4" style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div class="gen-icon" id="lIcon-4">📋</div>
         <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Preparing your summary</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Plain-English breakdown ready</div></div>
       </div>
@@ -248,7 +249,7 @@
     <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
     <div style="background:var(--blue-dk);margin:14px -20px 0;padding:10px 20px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.7)">Clauses reviewed</span>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Clauses reviewed</span>
         <span id="clausePct" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal)">0%</span>
       </div>
       <div class="clause-progress-bar"><div class="clause-progress-fill" id="clauseFill"></div></div>
@@ -414,7 +415,7 @@
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
     <!-- Completion Card -->
-    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+    <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
       <div style="display:flex;gap:14px;align-items:center">
         <div style="width:52px;height:52px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">✅</div>
         <div>
@@ -433,17 +434,17 @@
     <!-- Flagged Items -->
     <div class="sec-label">Items Requiring Your Attention</div>
     <div style="display:flex;flex-direction:column;gap:10px">
-      <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
+      <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
         <div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">⚠️</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Pets</span></div><span class="tag-amber">Review</span></div>
         <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6;margin-top:6px">Pet approval required in writing. In Victoria you have the right to request this — it cannot be unreasonably refused.</div>
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer;display:block" onclick="switchView('C')">View Clause 5 →</span>
       </div>
-      <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
+      <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
         <div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">⚠️</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Alterations</span></div><span class="tag-amber">Review</span></div>
         <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6;margin-top:6px">The blanket prohibition may be broader than Victorian law allows. Minor modifications cannot be unreasonably refused under the Residential Tenancies Act.</div>
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer;display:block" onclick="switchView('C')">View Clause 6 →</span>
       </div>
-      <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
+      <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
         <div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">⚠️</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Breaking the Lease</span></div><span class="tag-amber">Review</span></div>
         <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6;margin-top:6px">Early exit can be costly. Ensure you are confident committing to the full 12-month term before signing.</div>
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer;display:block" onclick="switchView('C')">View Clause 8 →</span>
@@ -452,7 +453,7 @@
 
     <!-- Standard Clauses -->
     <div class="sec-label" style="margin-top:20px">Standard Clauses — No Issues</div>
-    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt)">
+    <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt)">
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Term</span></div>
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Weekly Rent</span></div>
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond / Security Deposit</span></div>
@@ -467,8 +468,8 @@
     <!-- Your Rights Reminder -->
     <div style="margin-top:14px;background:linear-gradient(135deg,var(--blue-dk),var(--blue));border-radius:16px;padding:18px;cursor:pointer" onclick="navigate('/rights')">
       <span style="font-size:28px;display:block;margin-bottom:10px">⚖️</span>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:6px">Know your rights as a Victorian renter</div>
-      <div style="font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.6">Consumer Affairs Victoria provides free advice on any lease clause you're unsure about. VCAT handles disputes.</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Know your rights as a Victorian renter</div>
+      <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">Consumer Affairs Victoria provides free advice on any lease clause you're unsure about. VCAT handles disputes.</div>
       <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal);margin-top:10px;display:block">View VIC Tenancy Resources →</span>
     </div>
 
@@ -489,15 +490,15 @@
 <div class="view" id="viewE" style="display:none">
   <!-- Top Section -->
   <div style="background:var(--blue);padding:50px 24px 44px;text-align:center">
-    <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;animation:successPop .5s cubic-bezier(.34,1.56,.64,1)">🗄️</div>
-    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:#fff;margin-bottom:10px">Lease Saved to Vault</div>
-    <div style="font-weight:600;font-size:14px;color:rgba(255,255,255,.72);line-height:1.7;max-width:300px;margin:0 auto">Your lease and this plain-English review have been saved to your Vault permanently. You can reference them any time during your tenancy.</div>
-    <div id="savedTime" style="font-weight:600;font-size:12px;color:rgba(255,255,255,.5);margin-top:10px"></div>
+    <div style="width:80px;height:80px;border-radius:50%;background:var(--glass-surface-2);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;animation:successPop .5s cubic-bezier(.34,1.56,.64,1)">🗄️</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:var(--text);margin-bottom:10px">Lease Saved to Vault</div>
+    <div style="font-weight:600;font-size:14px;color:var(--muted);line-height:1.7;max-width:300px;margin:0 auto">Your lease and this plain-English review have been saved to your Vault permanently. You can reference them any time during your tenancy.</div>
+    <div id="savedTime" style="font-weight:600;font-size:12px;color:var(--muted);margin-top:10px"></div>
   </div>
 
   <div style="flex:1;overflow-y:auto;padding:20px 16px;padding-bottom:100px">
     <!-- What's Saved -->
-    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
+    <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Saved to Your Vault</div>
       <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-lt)">
         <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div>
@@ -514,7 +515,7 @@
     </div>
 
     <!-- What Happens Next -->
-    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+    <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">What to do now</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);flex-shrink:0">1</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Review the 3 flagged clauses with your landlord or agent before signing if you have concerns.</div></div>
@@ -527,8 +528,8 @@
     <!-- Move In Prompt -->
     <div style="background:linear-gradient(135deg,var(--blue-dk),var(--blue));border-radius:16px;padding:18px;margin-bottom:14px;cursor:pointer" onclick="navigate('/inspect')">
       <span style="font-size:28px;display:block;margin-bottom:10px">🔑</span>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:6px">Ready to do your Move-In Audit?</div>
-      <div style="font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.6">Before you bring anything in, document the entire property with timestamped photos. This is your most important protection against bond disputes.</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Ready to do your Move-In Audit?</div>
+      <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">Before you bring anything in, document the entire property with timestamped photos. This is your most important protection against bond disputes.</div>
       <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--teal);margin-top:10px;display:block">Start Move-In Audit →</span>
     </div>
 
@@ -558,7 +559,7 @@ function navigate(p){document.body.style.opacity='0';document.body.style.transit
 
 function showToast(title,sub,icon){
   var t=document.getElementById('appToast');
-  if(!t){t=document.createElement('div');t.id='appToast';t.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';t.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(t)}
+  if(!t){t=document.createElement('div');t.id='appToast';t.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:var(--text);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';t.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:var(--muted);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(t)}
   document.getElementById('toastIcon').textContent=icon||'✓';
   document.getElementById('toastText').textContent=title||'';
   document.getElementById('toastSub').textContent=sub||'';
