@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#1B50C8">
+<meta name="theme-color" content="#050A1A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="/app/css/app.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,7 @@
 <style>
 .app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
 .view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
-.sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.sh{position:sticky;top:0;z-index:10;background:var(--blue-xl);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(0,0,0,.5)}
 .sh-row{display:flex;align-items:center;justify-content:space-between}
 .sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
 .sh-back-arrow{font-size:22px;color:rgba(255,255,255,.8);font-weight:700}
@@ -23,12 +23,12 @@
 .sh-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
 .sec-label{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 10px}
 .fsl{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:block}
-.btn-blue-c{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(27,80,200,.2);transition:all .18s var(--ease-smooth)}
-.btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(27,80,200,.15)}
+.btn-blue-c{background:linear-gradient(135deg,rgba(0,229,255,0.2),rgba(0,229,255,0.05));color:#fff;border:1px solid rgba(0,229,255,0.4);border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,229,255,.15);transition:all .18s var(--ease-smooth)}
+.btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,229,255,.1)}
 .btn-teal-c{background:linear-gradient(135deg,var(--teal),#00DBA6);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,200,150,.25);transition:all .18s var(--ease-smooth)}
 .btn-teal-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,200,150,.2)}
 .btn-muted-c{background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px}
-.btn-outline-c{background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
+.btn-outline-c{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
 .btn-full{width:100%}
 .flex-1{flex:1}
 .tag{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;white-space:nowrap}
@@ -39,7 +39,7 @@
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
 .nav-tab:active{transform:scale(.92)}
 .tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
-.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
+.nav-tab.active .tab-icon{background:rgba(0,229,255,0.15);border:1px solid rgba(0,229,255,0.3);box-shadow:0 0 12px rgba(0,229,255,0.3);color:var(--blue)}
 .tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
 .nav-tab.active .tab-label{color:var(--blue)}
 .brief-num{width:28px;height:28px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
@@ -50,7 +50,7 @@
 .progress-pct{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--teal)}
 .progress-track{height:5px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden;margin-top:8px}
 .progress-fill{height:100%;background:var(--teal);border-radius:100px;width:0;transition:width .5s cubic-bezier(.4,0,.2,1)}
-.room-row{background:#fff;border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
+.room-row{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
 .room-row:active{transform:scale(.97);box-shadow:none}
 .room-icon-wrap{width:44px;height:44px;border-radius:12px;font-size:22px;display:flex;align-items:center;justify-content:center;background:var(--blue-xl);flex-shrink:0;transition:background .15s}
 .room-body{flex:1;min-width:0}
@@ -59,13 +59,13 @@
 .room-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .2s}
 .complete-area{position:sticky;bottom:72px;background:linear-gradient(transparent,var(--blue-xl) 30%);padding:24px 16px 12px;z-index:5}
 .complete-hint{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-top:6px}
-.room-header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 0;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.room-header{position:sticky;top:0;z-index:10;background:var(--blue-xl);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);padding:14px 20px 0;box-shadow:0 2px 16px rgba(0,0,0,.5)}
 .room-emoji{font-size:34px;display:block;margin-top:10px}
 .room-title-big{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:4px}
 .room-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
 .tab-bar{margin-top:14px;background:rgba(255,255,255,.12);border-radius:10px;padding:3px;display:flex}
 .tab-item{flex:1;text-align:center;border-radius:8px;padding:7px 0;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,.65);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
-.tab-active{background:#fff!important;color:var(--blue)!important}
+.tab-active{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);!important;color:var(--blue)!important}
 .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .photo-cell{aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;cursor:pointer}
 .photo-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:30px}
@@ -76,21 +76,21 @@
 .add-photo-label{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted)}
 .qn-chip{background:var(--blue-xl);border:1px solid var(--border);border-radius:100px;padding:7px 13px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
 .chip-active{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important}
-.notes-field{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;min-height:80px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);line-height:1.6;resize:none;outline:none;box-sizing:border-box}
+.notes-field{width:100%;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;min-height:80px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);line-height:1.6;resize:none;outline:none;box-sizing:border-box}
 .notes-field:focus{border-color:var(--blue)}
 .notes-field::placeholder{color:var(--muted)}
-.cond-btn{flex:1;border-radius:14px;padding:14px 8px;border:2px solid var(--border);background:#fff;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+.cond-btn{flex:1;border-radius:14px;padding:14px 8px;border:2px solid var(--border);background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
 .cond-good-active{border-color:var(--teal)!important;background:rgba(0,200,150,.06)!important}
 .cond-fair-active{border-color:var(--amber)!important;background:rgba(245,166,35,.06)!important}
 .cond-poor-active{border-color:var(--red)!important;background:rgba(232,64,64,.06)!important}
-.room-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10}
-.exit-checkbox{width:26px;height:26px;border-radius:8px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
+.room-footer{position:sticky;bottom:0;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10}
+.exit-checkbox{width:26px;height:26px;border-radius:8px;border:2px solid var(--border);background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
 .gen-center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center}
 .gen-spinner{width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:28px;animation:aiPulse 1.8s ease-in-out infinite}
 .gen-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);margin-bottom:10px}
 .gen-sub{font-weight:600;font-size:14px;color:var(--muted);line-height:1.7;max-width:300px;margin-bottom:32px}
 .gen-steps{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
-.gen-step{background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px}
+.gen-step{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px}
 .gen-icon{width:32px;height:32px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:all .3s}
 .gen-step-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
 .gen-step-detail{font-weight:600;font-size:11px;color:var(--muted);margin-top:1px}
@@ -99,7 +99,7 @@
 .ph-blue{background:linear-gradient(135deg,#1a3a8f,#2E63E0)}
 .ph-teal{background:linear-gradient(135deg,#006B50,#00C896)}
 .ph-slate{background:linear-gradient(135deg,#2a3f6f,#4a6fa5)}
-.checklist-card{background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt)}
+.checklist-card{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt)}
 .check-row{display:flex;align-items:center;gap:11px;cursor:pointer;margin-bottom:11px}
 .check-row:last-child{margin-bottom:0}
 .check-row input{width:18px;height:18px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
@@ -151,7 +151,7 @@
       <div style="margin-top:14px;font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.65">⚠️ Do not complete this walkthrough while your belongings are still in the property. The exit inspection documents the empty, cleaned property only — this is what will be compared against your move-in record.</div>
     </div>
 
-    <div style="margin:0 16px 14px;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
+    <div style="margin:0 16px 14px;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:16px">How the Exit Inspection works</div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">1</div><div class="brief-text">Walk through every room and area photographing the current state of the empty, clean property.</div></div>
@@ -164,12 +164,12 @@
 
     <div class="sec-label" style="padding:0 16px">Reports Available for Comparison</div>
     <div style="display:flex;flex-direction:column;gap:8px;margin:0 16px 14px">
-      <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+      <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📸</div>
         <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Your Move-In Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">15 March 2025 · 8 areas · 24 photos</div></div>
         <span class="tag tag-teal">✓ Ready</span>
       </div>
-      <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
+      <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div style="width:38px;height:38px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏢</div>
         <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Agency Condition Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Uploaded · 12 pages</div></div>
         <span class="tag tag-teal">✓ Ready</span>
@@ -204,7 +204,7 @@
   </header>
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
 
-    <div style="background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Before you start the walkthrough, confirm:</div>
       <div style="display:flex;flex-direction:column;gap:0">
         <div id="exitItem-0" style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer" onclick="toggleExitCheck(0)"><div class="exit-checkbox" id="exitCheck-0"></div><span class="exit-check-label" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">All belongings removed from the property</span></div>
@@ -230,7 +230,7 @@
     </div>
   </div>
 
-  <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10">
+  <div style="position:sticky;bottom:0;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10">
     <button class="btn-outline-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="switchView('A')">← Back</button>
     <button class="btn-blue-c flex-1" id="startExitBtn" style="border-radius:12px;opacity:.5;pointer-events:none" onclick="switchView('C')">Start Exit Walkthrough →</button>
   </div>
@@ -260,7 +260,7 @@
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
     <div style="display:flex;flex-direction:column;gap:10px" id="exitAreaList"></div>
 
-    <div style="background:#fff;border-radius:14px;padding:13px 15px;border:1px solid var(--border-lt);margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:13px 15px;border:1px solid var(--border-lt);margin-top:12px;display:flex;gap:12px;align-items:flex-start">
       <div style="width:34px;height:34px;border-radius:9px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📋</div>
       <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">Photograph what the agency will inspect — walls, floors, fixtures, appliances. Match what you documented at move-in.</div>
     </div>
@@ -411,7 +411,7 @@
     </div>
 
     <div class="sec-label" style="padding:0 0 10px">All 8 Areas</div>
-    <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:20px">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:20px">
       <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🚪</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Entry &amp; Hallway</span><span class="tag tag-teal">Match ✓</span></div>
       <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🛋</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Living Room</span><span class="tag tag-teal">Match ✓</span></div>
       <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px;background:rgba(245,166,35,.03)"><span style="font-size:16px">🍳</span><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--text);flex:1">Kitchen</span><span class="tag tag-amber">Review ⚠</span></div>
@@ -428,7 +428,7 @@
     <div style="display:flex;flex-direction:column;gap:16px">
 
       <!-- REVIEW CARD 0 — Kitchen -->
-      <div id="reviewCard-0" style="background:#fff;border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden">
+      <div id="reviewCard-0" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden">
         <div style="padding:14px 16px;background:rgba(245,166,35,.08);display:flex;align-items:center;gap:10px">
           <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🍳</div>
           <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Kitchen</div><div style="font-weight:600;font-size:12px;color:#8A6500">Difference detected</div></div>
@@ -455,7 +455,7 @@
           <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report as a discrepancy and RenterIQ will suggest how to address it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>
           <div style="display:flex;gap:10px">
             <button id="yesBtn-0" style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed(0)">Yes — this happened during my tenancy</button>
-            <button id="noBtn-0" style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed(0)">No — pre-existing / wear &amp; tear</button>
+            <button id="noBtn-0" style="flex:1;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed(0)">No — pre-existing / wear &amp; tear</button>
           </div>
         </div>
         <div id="decidedState-0" style="display:none">
@@ -465,7 +465,7 @@
       </div>
 
       <!-- REVIEW CARD 1 — Bathroom -->
-      <div id="reviewCard-1" style="background:#fff;border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden">
+      <div id="reviewCard-1" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden">
         <div style="padding:14px 16px;background:rgba(245,166,35,.08);display:flex;align-items:center;gap:10px">
           <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚿</div>
           <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Bathroom</div><div style="font-weight:600;font-size:12px;color:#8A6500">Difference detected</div></div>
@@ -492,7 +492,7 @@
           <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report as a discrepancy and RenterIQ will suggest how to address it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>
           <div style="display:flex;gap:10px">
             <button id="yesBtn-1" style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed(1)">Yes — this happened during my tenancy</button>
-            <button id="noBtn-1" style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed(1)">No — pre-existing / wear &amp; tear</button>
+            <button id="noBtn-1" style="flex:1;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed(1)">No — pre-existing / wear &amp; tear</button>
           </div>
         </div>
         <div id="decidedState-1" style="display:none">
@@ -504,7 +504,7 @@
     </div>
   </div>
 
-  <div id="reviewFooter" style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10;text-align:center">
+  <div id="reviewFooter" style="position:sticky;bottom:0;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10;text-align:center">
     <div style="font-weight:600;font-size:12px;color:var(--muted);padding:12px">Review both items above to continue</div>
   </div>
 </div>
@@ -518,7 +518,7 @@
   </header>
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
 
-    <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr)">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr)">
       <div style="padding:14px 10px;text-align:center;border-right:1px solid var(--border-lt)"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">8</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Areas Inspected</div></div>
       <div style="padding:14px 10px;text-align:center;border-right:1px solid var(--border-lt)"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--teal)">6</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Areas Match</div></div>
       <div style="padding:14px 10px;text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--red)">2</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Items to Fix</div></div>
@@ -532,7 +532,7 @@
     <div class="sec-label" style="padding:0 0 10px">Items You Confirmed</div>
 
     <!-- FIX CARD 0 — Kitchen Splashback -->
-    <div id="fixCard-0" style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px">
+    <div id="fixCard-0" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px">
       <div style="background:var(--blue);padding:14px 16px;display:flex;align-items:center;gap:12px">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🍳</div>
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;flex:1">Kitchen Splashback</span>
@@ -561,7 +561,7 @@
     </div>
 
     <!-- FIX CARD 1 — Bathroom Scuff -->
-    <div id="fixCard-1" style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px">
+    <div id="fixCard-1" style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px">
       <div style="background:var(--blue);padding:14px 16px;display:flex;align-items:center;gap:12px">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚿</div>
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;flex:1">Bathroom Scuff Mark</span>
@@ -590,7 +590,7 @@
     </div>
 
     <div class="sec-label" style="padding:6px 0 10px">All Other Areas — No Issues</div>
-    <div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;flex-direction:column;gap:0">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;flex-direction:column;gap:0">
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Entry &amp; Hallway</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Living Room</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Master Bedroom</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
@@ -600,7 +600,7 @@
     </div>
   </div>
 
-  <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10">
+  <div style="position:sticky;bottom:0;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10">
     <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="generateExitReport()">Generate Final Exit Report →</button>
   </div>
 </div>
@@ -620,7 +620,7 @@
 
   <div style="padding:20px 16px;padding-bottom:100px">
 
-    <div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Saved to Your Vault</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:11px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚪</div><div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit Condition Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">8 areas · 24 timestamped photos · today</div></div></div>
@@ -630,7 +630,7 @@
       </div>
     </div>
 
-    <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Your Tenancy Record</div>
       <div style="display:flex;flex-direction:column;gap:0">
         <div class="timeline-event" style="padding:10px 0;border-bottom:1px solid var(--border-lt)"><div style="display:flex;flex-direction:column;align-items:center"><div class="timeline-dot" style="background:var(--blue)"></div><div class="timeline-line"></div></div><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Keys collected · Tenancy began</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">1 April 2025</div></div></div>

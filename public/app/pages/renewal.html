@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#1B50C8">
+<meta name="theme-color" content="#050A1A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="/app/css/app.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
 <title>Lease Renewal — RenterIQ</title>
 <style>
 .app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl)}
-.rn-header{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.rn-header{background:var(--blue-xl);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);padding:14px 20px 20px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(0,0,0,.5)}
 .rn-row{display:flex;align-items:center;justify-content:space-between}
 .rn-back{background:none;border:none;color:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
 .rn-back-arrow{font-size:22px;font-weight:700;line-height:1}
@@ -26,7 +26,7 @@
 .blue-lt-bg{background:var(--blue-xl)}
 .sp-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
 .sp-text{font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55}
-.bond-checkbox{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
+.bond-checkbox{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
 @keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 .change-row{padding:11px 0;border-bottom:1px solid var(--border-lt);display:flex;align-items:flex-start;gap:12px}
 .change-row:last-child{border-bottom:none}
@@ -56,7 +56,7 @@
 <div style="flex:1;padding-bottom:100px">
 
 <!-- LEASE STATUS CARD -->
-<div style="margin:16px;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.08)">
+<div style="margin:16px;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.08)">
   <div style="display:flex;gap:14px;align-items:center">
     <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📅</div>
     <div>
@@ -82,7 +82,7 @@
   <div style="display:flex;flex-direction:column;gap:12px">
 
     <!-- RENEWING -->
-    <div style="background:#fff;border-radius:18px;padding:20px;border:2px solid var(--blue);box-shadow:0 4px 16px rgba(27,80,200,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s" onclick="switchView('B')" onpointerdown="this.style.transform='scale(.98)'" onpointerup="this.style.transform=''">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:2px solid var(--blue);box-shadow:0 4px 16px rgba(27,80,200,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s" onclick="switchView('B')" onpointerdown="this.style.transform='scale(.98)'" onpointerup="this.style.transform=''">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div style="width:52px;height:52px;border-radius:14px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:26px">🔄</div>
         <span style="background:var(--blue);color:#fff;border-radius:100px;padding:5px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Renewing</span>
@@ -93,7 +93,7 @@
     </div>
 
     <!-- NOT RENEWING -->
-    <div style="background:#fff;border-radius:18px;padding:20px;border:1.5px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s" onclick="switchView('D')" onpointerdown="this.style.transform='scale(.98)'" onpointerup="this.style.transform=''">
+    <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1.5px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s" onclick="switchView('D')" onpointerdown="this.style.transform='scale(.98)'" onpointerup="this.style.transform=''">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div style="width:52px;height:52px;border-radius:14px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:26px">🚪</div>
       </div>
@@ -131,7 +131,7 @@
   </div>
   <div class="rn-title">New Lease Upload</div>
   <div class="rn-sub">Upload your renewed lease for review</div>
-  <div style="margin-top:14px;height:6px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden"><div style="height:100%;width:50%;background:#fff;border-radius:100px"></div></div>
+  <div style="margin-top:14px;height:6px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden"><div style="height:100%;width:50%;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:100px"></div></div>
 </header>
 
 <div style="flex:1;padding:16px;padding-bottom:120px">
@@ -149,7 +149,7 @@
 </div>
 
 <!-- UPLOAD CARD -->
-<div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
+<div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px">Upload New Lease Agreement</div>
   <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Replace the current saved lease with your renewed one.</div>
 
@@ -190,8 +190,8 @@
 </div>
 
 <!-- STICKY FOOTER -->
-<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
-  <button style="background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
+<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
+  <button style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
   <button id="analyseRenewalBtn" style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;opacity:.5;pointer-events:none;-webkit-tap-highlight-color:transparent" onclick="startRenewalAnalysis()">Analyse New Lease →</button>
 </div>
 </div>
@@ -209,7 +209,7 @@
 <div style="flex:1;padding:20px 16px;padding-bottom:100px">
 
 <!-- WHAT CHANGED -->
-<div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
+<div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Changes from your previous lease</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="change-row">
@@ -239,10 +239,10 @@
 </div>
 
 <!-- FULL REVIEW PROMPT -->
-<div style="background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border-lt);margin-bottom:14px">
+<div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:16px;border:1px solid var(--border-lt);margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px">Want to review all 12 clauses?</div>
   <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:14px">RenterIQ can give you a full plain-English review of the new lease — not just the changes.</div>
-  <button style="width:100%;background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/lease')">Full Lease Review →</button>
+  <button style="width:100%;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/lease')">Full Lease Review →</button>
 </div>
 
 <!-- SAVE PROMPT -->
@@ -256,7 +256,7 @@
 <!-- ACTION BUTTONS -->
 <div style="display:flex;flex-direction:column;gap:10px">
   <button style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:14px;padding:16px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="saveRenewalToVault()">Save New Lease to Vault</button>
-  <button style="width:100%;background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/dashboard')">Back to Home</button>
+  <button style="width:100%;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/dashboard')">Back to Home</button>
 </div>
 
 </div>
@@ -283,7 +283,7 @@
 </div>
 
 <!-- MOVING OUT TIMELINE -->
-<div style="background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+<div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:18px">Your Moving Out Timeline</div>
   <div style="display:flex;flex-direction:column;gap:0">
 
@@ -329,7 +329,7 @@
 </div>
 
 <!-- BOND CHECKLIST -->
-<div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+<div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Bond Return Checklist</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleBondCheck(0)"><div class="bond-checkbox" id="bondCheck-0"></div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.4" id="bondLabel-0">Exit inspection completed and saved to Vault</span></div>

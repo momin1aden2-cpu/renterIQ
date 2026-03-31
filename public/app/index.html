@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#1B50C8">
+<meta name="theme-color" content="#050A1A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RenterIQ">
@@ -40,7 +40,7 @@
 .hdr-avatar:active{transform:scale(.9)}
 
 /* Active Property Card */
-.prop-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 2px 8px rgba(27,80,200,.06),0 8px 32px rgba(27,80,200,.12);position:relative;z-index:5;transition:transform .18s var(--ease-smooth)}
+.prop-card{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:22px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.3),0 8px 32px rgba(0,0,0,.6);position:relative;z-index:5;transition:transform .18s var(--ease-smooth)}
 .prop-card:active{transform:scale(.985)}
 .prop-top{display:flex;align-items:center;justify-content:space-between}
 .prop-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
@@ -64,7 +64,7 @@
 
 /* Inspection Cards */
 .insp-scroll{display:flex;gap:12px;overflow-x:auto;padding:2px 16px 4px;margin:0 -16px;-webkit-overflow-scrolling:touch}
-.insp-card{width:210px;flex-shrink:0;background:#fff;border-radius:18px;padding:14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);transition:all .18s var(--ease-smooth)}
+.insp-card{width:210px;flex-shrink:0;background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);transition:all .18s var(--ease-smooth)}
 .insp-card.today{border:1.5px solid var(--blue-lt);box-shadow:var(--shadow-elevated)}
 .insp-card:active{transform:scale(.97)}
 .ic-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -84,7 +84,7 @@
 
 /* Vault Stats */
 .vault-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.vault-stat{background:#fff;border-radius:16px;padding:16px 14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
+.vault-stat{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:16px 14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
 .vault-stat:active{transform:scale(.96);box-shadow:none}
 .vs-top{display:flex;justify-content:space-between;align-items:center}
 .vs-icon{font-size:22px}
@@ -111,7 +111,7 @@
 .alert-chev{color:var(--muted);font-size:22px;margin-left:auto;flex-shrink:0}
 
 /* Rights CTA */
-.rights-cta{background:linear-gradient(135deg,var(--blue-dk) 0%,var(--blue-md) 100%);border-radius:18px;padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;transition:all .18s var(--ease-smooth);box-shadow:0 4px 16px rgba(10,36,96,.2)}
+.rights-cta{background:linear-gradient(135deg,var(--blue-dk) 0%,var(--blue-md) 100%);border-radius:18px;padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;transition:all .18s var(--ease-smooth);box-shadow:0 4px 16px rgba(0,0,0,.6)}
 .rights-cta:active{transform:scale(.97)}
 .rc-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .rc-body{flex:1;min-width:0}
@@ -120,7 +120,7 @@
 .rc-chev{color:rgba(255,255,255,.5);font-size:24px;margin-left:auto;flex-shrink:0}
 
 /* Activity Feed */
-.activity-card{background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden}
+.activity-card{background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden}
 .activity-row{padding:13px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .12s}
 .activity-row:last-child{border-bottom:none}
 .activity-row:active{background:var(--blue-xl)}
@@ -143,7 +143,7 @@
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
 .nav-tab:active{transform:scale(.92)}
 .tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
-.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
+.nav-tab.active .tab-icon{background:rgba(0,229,255,0.15);border:1px solid rgba(0,229,255,0.3);box-shadow:0 0 12px rgba(0,229,255,0.3);color:var(--blue)}
 .tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
 .nav-tab.active .tab-label{color:var(--blue)}
 
@@ -315,7 +315,7 @@
 
     <!-- Lease Review -->
     <div style="margin:12px 16px 12px" onclick="navigate('/lease')" style="cursor:pointer">
-      <div style="background:#fff;border:1.5px solid var(--blue-lt);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(27,80,200,.08);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/lease')">
+      <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border:1.5px solid var(--blue-lt);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.6);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/lease')">
         <div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📑</div>
         <div style="flex:1;min-width:0">
           <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Review Your Lease Agreement</div>
@@ -327,7 +327,7 @@
 
     <!-- Routine Inspection -->
     <div style="margin:0 16px 12px" onclick="navigate('/inspect/routine')">
-      <div style="background:#fff;border:1.5px solid rgba(0,200,150,.3);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(0,200,150,.08);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/inspect/routine')">
+      <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border:1.5px solid rgba(0,200,150,.3);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(0,200,150,.08);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/inspect/routine')">
         <div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--teal),#00DBA6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,200,150,.25)">🏠</div>
         <div style="flex:1;min-width:0">
           <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Routine Inspection Due</div>
@@ -382,7 +382,7 @@
           <span class="ar-chev">›</span>
         </div>
         <div class="activity-row" onclick="navigate('/vault')">
-          <div class="ar-icon" style="background:rgba(27,80,200,.08)">⚖️</div>
+          <div class="ar-icon" style="background:rgba(0,0,0,.6)">⚖️</div>
           <div class="ar-body">
             <div class="ar-text">Lease reviewed and saved to Vault</div>
             <div class="ar-date">12 Mar, 9:45am</div>
