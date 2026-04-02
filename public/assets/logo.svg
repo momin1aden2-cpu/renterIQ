@@ -1,8 +1,26 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="40" height="40" rx="8" fill="#1B50C8"/>
-  <path d="M20 8L8 16V32C8 33.1 8.9 34 10 34H30C31.1 34 32 33.1 32 32V16L20 8Z" fill="white"/>
-  <path d="M16 22V32H24V22H16Z" fill="#1B50C8"/>
-  <path d="M14 18L20 13L26 18" stroke="#1B50C8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="30" cy="30" r="6" fill="#00C896"/>
-  <path d="M27.5 30L29 31.5L32.5 28" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="2" dy="16" stdDeviation="12" flood-color="#0A2460" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Blue Shield Background -->
+  <!-- Flat top, straight sides, curving to a crest point -->
+  <path d="M 256 40 L 440 75 L 440 250 C 440 390 340 460 256 490 C 172 460 72 390 72 250 L 72 75 Z" fill="#1B50C8"/>
+  <path d="M 256 40 L 256 490 C 172 460 72 390 72 250 L 72 75 Z" fill="#0A2460" fill-opacity="0.12"/> <!-- Subtle left side shading -->
+
+  <g filter="url(#shadow)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left house wall & floor line -->
+    <path d="M 160 235 L 160 380 L 240 380" stroke="white" stroke-width="46"/>
+    
+    <!-- Right house wall (shorter to make room for tick) -->
+    <path d="M 352 235 L 352 300" stroke="white" stroke-width="46"/>
+
+    <!-- Roof line extending past the walls -->
+    <path d="M 110 250 L 256 128 L 402 250" stroke="white" stroke-width="46"/>
+
+    <!-- Bold Green Tick Checkmark -->
+    <path d="M 260 360 L 320 420 L 420 280" stroke="#00C896" stroke-width="50"/>
+  </g>
 </svg>

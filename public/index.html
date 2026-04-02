@@ -63,16 +63,17 @@ a { text-decoration: none; color: inherit; }
 .hero .btn-teal:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 30px rgba(0,184,217,0.5), 0 0 60px rgba(0,200,150,0.3); }
 .hero .btn-outline { background: rgba(255,255,255,0.03); color: var(--text); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; padding: 15px 32px; border-radius: 100px; border: 1px solid var(--border); transition: all 0.2s; backdrop-filter: blur(8px); display: inline-flex; align-items: center;}
 .hero .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: var(--text); box-shadow: 0 0 20px rgba(255,255,255,0.1); }
-.hero-search { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 100px; padding: 8px; display: flex; align-items: center; gap: 8px; max-width: 480px; margin-bottom: 24px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.hero-search { background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 100px; padding: 8px; display: flex; align-items: center; gap: 8px; max-width: 480px; margin-bottom: 24px; backdrop-filter: blur(12px); box-shadow: var(--shadow-float); }
 .hero-search input { flex: 1; min-width: 0; background: transparent; border: none; padding: 12px 16px; font-family: 'Nunito', sans-serif; font-size: 15px; color: var(--text); outline: none; }
 .hero-search input::placeholder { color: var(--muted); }
-.hero-search button { background: var(--blue); color: #000; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 100px; border: none; cursor: pointer; transition: all 0.2s; }
+.hero-search button { background: linear-gradient(135deg, var(--blue), var(--teal)); color: #fff; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 100px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-neon); }
 .hero-search button:hover { background: #fff; transform: scale(1.02); box-shadow: 0 0 20px rgba(0,184,217,0.5); }
 .hero-note { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 
 /* Phone Mockup - Liquid Glass */
 .phone-wrap { position: relative; width: 100%; max-width: 320px; margin: 0 auto; z-index: 2; transform: perspective(1000px) rotateY(-15deg) rotateX(5deg); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .phone-wrap:hover { transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) translateY(-10px); }
+.phone-screen { display: flex; flex: 1; flex-direction: column; height: 100%; }
 .phone { background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 40px; height: 650px; position: relative; overflow: hidden; box-shadow: var(--shadow-float), 0 0 60px rgba(0, 229, 255, 0.15); display: flex; flex-direction: column; }
 .phone::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 40%); pointer-events: none; }
 .phone-header { background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(16px); padding: 48px 20px 20px; border-bottom: 1px solid var(--border); }
@@ -297,61 +298,125 @@ a { text-decoration: none; color: inherit; }
   <div class="container">
     <div class="hero-content">
       <div class="hero-badge"><span class="dot"></span><span>Rent Smarter. Stay Protected.</span></div>
-      <h1>The ultimate renting intelligence.<br>Built for the modern tenant.</h1>
-      <p class="hero-sub">Track inspections, verify condition reports, and securely analyze your lease with AI. Everything you need to secure your bond and rent confidently — right in your pocket.</p>
+      <h1>Rent smarter.<br>Protect your bond.</h1>
+      <p class="hero-sub">Your complete renting companion. Track inspections, understand your lease, and secure your bond with AI — all from your pocket.</p>
       <div class="hero-search">
         <input type="text" placeholder="Search suburb, postcode or street…">
         <button>Search Rentals</button>
       </div>
-      <div class="hero-btns">
-        <a href="#how-it-works" class="btn-outline">See How It Works</a>
-        <a href="/dashboard" class="btn-teal install-btn">📱 Get the App</a>
-      </div>
+      
       <p class="hero-note">🇦🇺 All 8 states &amp; territories · Free for renters · No account needed to search</p>
     </div>
-    <div class="phone-wrap">
-      <div class="float-badge float-badge-top">
-        <div class="fb-icon">📄</div>
-        <div><div class="fb-text">AI Report Ready</div><div class="fb-sub">Inspection Complete ✓</div></div>
-      </div>
-      <div class="phone">
-        <div class="phone-header">
-          <div class="ph-brand">RENTERIQ</div>
-          <div class="ph-loc">Melbourne VIC</div>
-          <div class="ph-count">Available Rentals · 42 found</div>
-          <div class="ph-search">Search suburb or address…</div>
+    <div class="carousel-container" style="display: flex; align-items: center; gap: 16px; margin: 0 auto; z-index: 2;">
+      <button class="carousel-btn" id="c-prev" aria-label="Previous screen" style="background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); font-size: 18px; box-shadow: var(--shadow-float); backdrop-filter: blur(8px); transition: all 0.2s;">❮</button>
+      
+      <div class="phone-wrap" style="margin: 0;">
+        <div class="float-badge float-badge-top" id="hero-badge-top">
+          <div class="fb-icon">👋</div>
+          <div><div class="fb-text">Home Dashboard</div><div class="fb-sub">Everything in order</div></div>
         </div>
-        <div class="phone-cards">
-          <div class="phone-card">
-            <div class="pc-price">$520/wk</div>
-            <div class="pc-addr">14 Church St, Richmond VIC 3121</div>
-            <div class="pc-tags"><span class="pc-tag">2 Bed</span><span class="pc-tag">1 Bath</span><span class="pc-tag teal">Open Sat</span></div>
+                <div class="phone">
+          <!-- SCREEN 1: HOME -->
+          <div class="phone-screen" id="screen-home">
+            <div class="phone-header">
+              <div class="ph-brand">RENTERIQ</div>
+              <div class="ph-loc">Welcome, Mumin</div>
+              <div class="ph-search" style="border: 1px solid rgba(0, 229, 255, 0.3); color: var(--teal-dk); background: #D6F5EC; font-weight: bold; text-align: center;">Your rental health is 100%</div>
+            </div>
+            <div class="phone-cards">
+              <div class="phone-card">
+                <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px;">Next Rent Due</div>
+                <div class="pc-price">$520/wk</div>
+                <div class="pc-tags"><span class="pc-tag teal">Due in 3 days</span></div>
+              </div>
+              <div class="phone-card">
+                <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px;">Active Lease</div>
+                <div class="pc-addr" style="font-size: 13px;">14 Church St, Richmond VIC</div>
+                <div class="pc-tags"><span class="pc-tag">11 Months Left</span></div>
+              </div>
+            </div>
           </div>
-          <div class="phone-card">
-            <div class="pc-price">$680/wk</div>
-            <div class="pc-addr">7/88 Flinders Ln, Melbourne VIC 3000</div>
-            <div class="pc-tags"><span class="pc-tag">2 Bed</span><span class="pc-tag">2 Bath</span><span class="pc-tag teal">Inspect</span></div>
+
+          <!-- SCREEN 2: SEARCH -->
+          <div class="phone-screen" id="screen-search" style="display:none;">
+            <div class="phone-header">
+              <div class="ph-brand">RENTERIQ</div>
+              <div class="ph-loc">Melbourne VIC</div>
+              <div class="ph-search">Search suburb or address…</div>
+            </div>
+            <div class="phone-cards">
+              <div class="phone-card">
+                <div class="pc-price">$520/wk</div>
+                <div class="pc-addr">14 Church St, Richmond VIC 3121</div>
+                <div class="pc-tags"><span class="pc-tag">2 Bed</span><span class="pc-tag">1 Bath</span><span class="pc-tag teal">Open Sat</span></div>
+              </div>
+              <div class="phone-card">
+                <div class="pc-price">$680/wk</div>
+                <div class="pc-addr">7/88 Flinders Ln, Melbourne VIC 3000</div>
+                <div class="pc-tags"><span class="pc-tag">2 Bed</span><span class="pc-tag">2 Bath</span><span class="pc-tag teal">Inspect</span></div>
+              </div>
+            </div>
           </div>
-          <div class="phone-card">
-            <div class="pc-price">$445/wk</div>
-            <div class="pc-addr">3 Smith St, Fitzroy VIC 3065</div>
-            <div class="pc-tags"><span class="pc-tag">1 Bed</span><span class="pc-tag">1 Bath</span><span class="pc-tag teal">New</span></div>
+
+          <!-- SCREEN 3: INSPECT -->
+          <div class="phone-screen" id="screen-inspect" style="display:none;">
+            <div class="phone-header">
+              <div class="ph-brand">ROUTINE</div>
+              <div class="ph-loc">Condition Report</div>
+              <div class="ph-search" style="text-align: center; color: var(--text);">Living Room Analysis</div>
+            </div>
+            <div class="phone-cards">
+              <div class="phone-card" style="display:flex; justify-content:center; padding: 24px;">
+                <div style="font-size:32px;">📷</div>
+              </div>
+              <div class="phone-card">
+                <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px;">Add note on carpet</div>
+                <div class="pc-addr" style="font-size: 13px;">Pre-existing stain near window. Small 2cm mark on the left side.</div>
+                <button style="width: 100%; background: var(--blue-lt); border: 1px solid rgba(0, 229, 255, 0.2); color: var(--blue); font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 700; padding: 8px; border-radius: 8px; cursor: pointer;">Save to Vault</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SCREEN 4: VAULT -->
+          <div class="phone-screen" id="screen-vault" style="display:none;">
+            <div class="phone-header">
+              <div class="ph-brand">SECURE</div>
+              <div class="ph-loc">My Vault</div>
+              <div class="ph-search" style="text-align: center; color: var(--text);">3 Documents stored</div>
+            </div>
+            <div class="phone-cards">
+              <div class="phone-card" style="display:flex; align-items:center; gap: 12px;">
+                <span style="font-size:24px;">📄</span>
+                <div>
+                   <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px; margin-bottom: 2px;">Lease Agreement</div>
+                   <div class="pc-tags"><span class="pc-tag">Signed Mar 12</span></div>
+                </div>
+              </div>
+              <div class="phone-card" style="display:flex; align-items:center; gap: 12px;">
+                <span style="font-size:24px;">📸</span>
+                <div>
+                   <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px; margin-bottom: 2px;">Move-in Audit</div>
+                   <div class="pc-tags"><span class="pc-tag">42 Photos</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="phone-tabs">
+            <div class="phone-tab active" id="tab-home"><div class="tab-icon">🏠</div>Home</div>
+            <div class="phone-tab" id="tab-search"><div class="tab-icon">🔍</div>Search</div>
+            <div class="phone-tab" id="tab-inspect"><div class="tab-icon">📋</div>Inspect</div>
+            <div class="phone-tab" id="tab-vault"><div class="tab-icon">🔒</div>Vault</div>
           </div>
         </div>
-        <div class="phone-tabs">
-          <div class="phone-tab active"><div class="tab-icon">🔍</div>Search</div>
-          <div class="phone-tab"><div class="tab-icon">❤️</div>Saved</div>
-          <div class="phone-tab"><div class="tab-icon">📋</div>Inspect</div>
-          <div class="phone-tab"><div class="tab-icon">🔒</div>Vault</div>
+        <div class="float-badge float-badge-bottom" id="hero-badge-bottom">
+          <div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">📅</div>
+          <div><div class="fb-text">Lease Active</div><div class="fb-sub">Rent due in 3 days</div></div>
         </div>
       </div>
-      <div class="float-badge float-badge-bottom">
-        <div class="fb-icon">🛡️</div>
-        <div><div class="fb-text">Bond Protected</div><div class="fb-sub">Vault Updated ✓</div></div>
-      </div>
-    </div>
-  </div>
-</section>
+      
+      <button class="carousel-btn" id="c-next" aria-label="Next screen" style="background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); font-size: 18px; box-shadow: var(--shadow-float); backdrop-filter: blur(8px); transition: all 0.2s;">❯</button>
+    </div>\n  </div>\n</section>
 
 <!-- Trust Bar -->
 <section class="trust-bar">
@@ -381,49 +446,49 @@ a { text-decoration: none; color: inherit; }
         <div class="step-num">1</div>
         <div class="step-icon">🔍</div>
         <h3>Search Rentals</h3>
-        <p>Live listings from Australia's major platforms, all in one place. Filter by suburb, price, bedrooms, and inspection times without bouncing between tabs.</p>
+        <p>Live listings from Australia's major platforms, all in one place. No more bouncing between tabs.</p>
       </div>
       <div class="step-card">
         <div class="step-num">2</div>
         <div class="step-icon">📅</div>
         <h3>Book Inspections</h3>
-        <p>See inspection times, book directly with the agency, and RenterIQ saves the property to your profile automatically. No more tracking everything in your notes app.</p>
+        <p>Book directly with the agency. RenterIQ saves the property to your profile automatically.</p>
       </div>
       <div class="step-card">
         <div class="step-num">3</div>
         <div class="step-icon">🏠</div>
         <h3>Guided Inspection</h3>
-        <p>At the property, RenterIQ walks you through every room. Photograph anything that matters, add notes on the spot, and leave with a complete record every single time.</p>
+        <p>We walk you through every room. Photograph anything that matters, add notes, and leave with a complete record.</p>
       </div>
       <div class="step-card">
         <div class="step-num">4</div>
         <div class="step-icon">📄</div>
         <h3>AI Inspection Report</h3>
-        <p>Tap complete and RenterIQ's AI compiles your photos and notes into a professional, timestamped PDF — the kind of documentation that holds up in a dispute.</p>
+        <p>Tap complete and AI compiles your photos into a professional, timestamped PDF.</p>
       </div>
       <div class="step-card">
         <div class="step-num">5</div>
         <div class="step-icon">✍️</div>
         <h3>Application Support</h3>
-        <p>Ready to apply? RenterIQ guides you through the process, helps you organise supporting documents, and lets you sign digitally from your phone — nothing missed, nothing delayed.</p>
+        <p>RenterIQ guides you through the process, helps you organise documents, and lets you sign digitally.</p>
       </div>
       <div class="step-card">
         <div class="step-num">6</div>
         <div class="step-icon">📑</div>
         <h3>Lease Review</h3>
-        <p>Upload your tenancy agreement and RenterIQ's AI reads every clause, explains them in plain English, and flags anything unusual before you sign your name to it.</p>
+        <p>Upload your tenancy agreement and AI reads every clause, explaining them in plain English before you sign.</p>
       </div>
       <div class="step-card">
         <div class="step-num">7</div>
         <div class="step-icon">🔑</div>
         <h3>Move-In Condition Audit</h3>
-        <p>Before a single box goes through the door, document the entire property room by room with timestamped photos. Compare directly against the agency's report. This is your insurance policy.</p>
+        <p>Document the property room by room with timestamped photos. This is your insurance policy.</p>
       </div>
       <div class="step-card">
         <div class="step-num">8</div>
         <div class="step-icon">🚪</div>
         <h3>Exit &amp; Bond Recovery</h3>
-        <p>Complete a full exit inspection and RenterIQ compares it against your move-in record in the background. Where the AI spots a potential difference, it asks you — you confirm, dismiss, or add context. Your report, your call.</p>
+        <p>Complete an exit inspection. AI compares it against your move-in record and spots any differences.</p>
       </div>
     </div>
   </div>
@@ -439,7 +504,7 @@ a { text-decoration: none; color: inherit; }
       <div class="feature-card">
         <div class="feature-icon">📸</div>
         <h3>AI Inspection Reports</h3>
-        <p>A verbal 'the place was fine when I moved in' won't hold up when someone disagrees. A professionally formatted, AI-generated PDF report with timestamped photo evidence will. RenterIQ produces that report in seconds — at any inspection, at any stage of your tenancy.</p>
+        <p>A professionally formatted, AI-generated PDF report with timestamped photo evidence. Produced in seconds — at any inspection, at any stage of your tenancy.</p>
         <ul class="feature-check">
           <li>Room-by-room guided walkthrough</li>
           <li>Timestamped, dated photo evidence</li>
@@ -450,7 +515,7 @@ a { text-decoration: none; color: inherit; }
       <div class="feature-card">
         <div class="feature-icon">⚖️</div>
         <h3>Lease Plain-English Review</h3>
-        <p>Tenancy agreements are written by lawyers, for landlords. Most renters sign them without fully understanding what they've agreed to. RenterIQ's AI reads your lease and translates every clause into language that makes sense — before your signature goes on it.</p>
+        <p>Tenancy agreements are written by lawyers, for landlords. RenterIQ's AI translates every clause into simple English before you sign.</p>
         <ul class="feature-check">
           <li>Full clause-by-clause breakdown</li>
           <li>Flags non-standard or unusual terms</li>
@@ -461,7 +526,7 @@ a { text-decoration: none; color: inherit; }
       <div class="feature-card">
         <div class="feature-icon">🛡️</div>
         <h3>Bond Back Protection</h3>
-        <p>Bond disputes almost always come down to one thing: who has better documentation. With RenterIQ, that's always you. At exit, the AI quietly compares your photos against your move-in record and surfaces anything that looks different — but every call is yours. You review each flag, confirm it or dismiss it, and decide what goes into the final report.</p>
+        <p>Bond disputes come down to documentation. At exit, our AI compares your photos against your move-in record and flags any differences for you to securely handle.</p>
         <ul class="feature-check">
           <li>Side-by-side move-in vs exit comparison</li>
           <li>AI surfaces potential differences for your review</li>
@@ -767,9 +832,9 @@ a { text-decoration: none; color: inherit; }
     <div class="pi-icon"><img src="/assets/logo.svg" alt="RenterIQ App" width="64" height="64"></div>
     <h2>Install RenterIQ on your device</h2>
     <p class="pi-sub">Add to your home screen instantly. No app store. Works fully offline.</p>
-    <div class="pwa-btns">
-      <button class="btn-white install-btn">📲 Get the App — Free</button>
-      <a href="/dashboard" class="btn-ghost">Open Web App</a>
+    <div class="pwa-btns" style="display:flex; justify-content:center; gap:16px; margin: 24px 0;">
+      <button class="install-btn" style="background: linear-gradient(135deg, var(--blue), var(--teal)); color: #fff; padding: 16px 32px; border-radius: 100px; font-family: 'Sora', sans-serif; font-weight: 700; border: none; font-size:15px; cursor: pointer; box-shadow: var(--shadow-neon);">📲 Download the App</button>
+      <a href="/dashboard" style="background: rgba(255,255,255,0.05); color: var(--text); padding: 16px 32px; border-radius: 100px; font-family: 'Sora', sans-serif; font-weight: 700; border: 1px solid var(--border); font-size:15px; text-decoration: none; display:flex; align-items:center;">Open in Web</a>
     </div>
     <div class="pwa-features">
       <span class="pwa-feat">Works offline</span>
@@ -940,6 +1005,83 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/app/sw.js');
   });
 }
+</script>
+
+<!-- Carousel Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const screens = ['home', 'search', 'inspect', 'vault'];
+    const badges = [
+      {
+        top: '<div class="fb-icon">👋</div><div><div class="fb-text">Home Dashboard</div><div class="fb-sub">Everything in order</div></div>',
+        bottom: '<div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">📅</div><div><div class="fb-text">Lease Active</div><div class="fb-sub">Rent due in 3 days</div></div>'
+      },
+      {
+        top: '<div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">⚡</div><div><div class="fb-text">Live Search</div><div class="fb-sub">New listing found</div></div>',
+        bottom: '<div class="fb-icon">🏠</div><div><div class="fb-text">Inspection Booked</div><div class="fb-sub">Saturday 10:00 AM</div></div>'
+      },
+      {
+        top: '<div class="fb-icon">📄</div><div><div class="fb-text">AI Report Ready</div><div class="fb-sub">Items flagged securely</div></div>',
+        bottom: '<div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">📸</div><div><div class="fb-text">Timestamped</div><div class="fb-sub">Metadata saved ✓</div></div>'
+      },
+      {
+        top: '<div class="fb-icon">🔒</div><div><div class="fb-text">Bond Protected</div><div class="fb-sub">Evidence stacked ✓</div></div>',
+        bottom: '<div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">⚖️</div><div><div class="fb-text">AI Lease Review</div><div class="fb-sub">Clauses highlighted</div></div>'
+      }
+    ];
+
+    let currentIndex = 0;
+    
+    function showScreen(index) {
+      screens.forEach((id, i) => {
+        const screenEl = document.getElementById(`screen-${id}`);
+        const tabEl = document.getElementById(`tab-${id}`);
+        if(screenEl) screenEl.style.display = (i === index) ? 'flex' : 'none';
+        if(tabEl) {
+          if(i === index) tabEl.classList.add('active');
+          else tabEl.classList.remove('active');
+        }
+      });
+      
+      const topBadge = document.getElementById('hero-badge-top');
+      const bottomBadge = document.getElementById('hero-badge-bottom');
+      if(topBadge && badges[index]) topBadge.innerHTML = badges[index].top;
+      if(bottomBadge && badges[index]) bottomBadge.innerHTML = badges[index].bottom;
+    }
+    
+    const btnPrev = document.getElementById('c-prev');
+    const btnNext = document.getElementById('c-next');
+    
+    if(btnPrev) {
+      btnPrev.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + screens.length) % screens.length;
+        showScreen(currentIndex);
+      });
+      btnPrev.addEventListener('mouseover', () => { btnPrev.style.background = 'var(--blue)'; btnPrev.style.color = '#fff'; });
+      btnPrev.addEventListener('mouseout', () => { btnPrev.style.background = 'var(--glass-surface-3)'; btnPrev.style.color = 'var(--text)'; });
+    }
+    
+    if(btnNext) {
+      btnNext.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % screens.length;
+        showScreen(currentIndex);
+      });
+      btnNext.addEventListener('mouseover', () => { btnNext.style.background = 'var(--blue)'; btnNext.style.color = '#fff'; });
+      btnNext.addEventListener('mouseout', () => { btnNext.style.background = 'var(--glass-surface-3)'; btnNext.style.color = 'var(--text)'; });
+    }
+    
+    // Add click listeners to phone tabs
+    screens.forEach((id, i) => {
+      const tabEl = document.getElementById(`tab-${id}`);
+      if(tabEl) {
+        tabEl.addEventListener('click', () => {
+          currentIndex = i;
+          showScreen(currentIndex);
+        });
+        tabEl.style.cursor = 'pointer';
+      }
+    });
+  });
 </script>
 </body>
 </html>
