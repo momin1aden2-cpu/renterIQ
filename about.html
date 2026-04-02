@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="About RenterIQ — why we built it, and the experience that started it all.">
+<meta name="theme-color" content="#1B50C8">
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<title>About RenterIQ — Why We Built It</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;color:#0F1C3F;background:#F4F7FF;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+:root{--blue:#1B50C8;--blue-dk:#0A2460;--blue-md:#2E63E0;--blue-lt:#D8E7FC;--blue-xl:#F4F7FF;--teal:#00C896;--teal-dk:#009E78;--text:#0F1C3F;--muted:#5A6B8A;--border:#D5E2F8;--border-lt:#EDF3FC}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;height:70px;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #EDF3FC;display:flex;align-items:center}
+.nav .container{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1200px;margin:0 auto;padding:0 24px}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#0A2460}
+.nav-back{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--blue)}
+
+/* PAGE LAYOUT */
+.page-hero{background:linear-gradient(170deg,#0A2460 0%,#1B50C8 100%);padding:72px 0 80px;text-align:center}
+.page-hero .container{max-width:720px;margin:0 auto;padding:0 24px}
+.page-label{font-family:'Sora',sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:16px}
+.page-hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(28px,5vw,46px);color:#fff;line-height:1.15;margin-bottom:20px}
+.page-hero p{font-size:17px;color:rgba(255,255,255,.7);line-height:1.8;max-width:560px;margin:0 auto}
+
+/* CONTENT */
+.content-wrap{max-width:760px;margin:0 auto;padding:72px 24px 96px}
+
+/* STORY SECTIONS */
+.story-intro{background:#fff;border-radius:24px;padding:40px 40px;border:1px solid var(--border-lt);box-shadow:0 4px 24px rgba(27,80,200,.06);margin-bottom:40px;font-size:17px;color:var(--text);line-height:1.85}
+.story-intro p{margin-bottom:20px}
+.story-intro p:last-child{margin-bottom:0}
+.story-intro strong{color:var(--blue-dk)}
+.story-intro em{font-style:italic;color:var(--muted)}
+
+.callout{background:linear-gradient(135deg,#0A2460,#1B50C8);border-radius:20px;padding:32px 36px;margin:40px 0;color:#fff}
+.callout h3{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;margin-bottom:12px}
+.callout p{font-size:15px;line-height:1.8;color:rgba(255,255,255,.8)}
+
+.feature-story{margin:40px 0}
+.fs-item{display:flex;gap:20px;padding:28px 0;border-bottom:1px solid var(--border-lt)}
+.fs-item:last-child{border-bottom:none}
+.fs-icon{font-size:32px;flex-shrink:0;width:52px;height:52px;background:var(--blue-xl);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.fs-body h4{font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--blue-dk);margin-bottom:8px}
+.fs-body p{font-size:15px;color:var(--muted);line-height:1.75}
+
+.closing-cta{text-align:center;padding:48px 32px;background:#fff;border-radius:24px;border:1px solid var(--border-lt);margin-top:48px}
+.closing-cta h2{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:var(--blue-dk);margin-bottom:12px}
+.closing-cta p{font-size:16px;color:var(--muted);line-height:1.75;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto}
+.btn-primary{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;padding:14px 32px;border-radius:100px;display:inline-flex;align-items:center;gap:8px;transition:background .2s}
+.btn-primary:hover{background:var(--blue-md)}
+
+/* FOOTER */
+.footer{background:#0A2460;padding:40px 0;margin-top:0}
+.footer .container{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-copy{font-size:13px;color:rgba(255,255,255,.4)}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,.4);transition:color .2s}
+.footer-links a:hover{color:#fff}
+
+@media(max-width:600px){
+  .story-intro{padding:28px 24px}
+  .callout{padding:24px}
+  .fs-item{flex-direction:column;gap:14px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <a href="/" class="nav-brand">
+      <img src="/assets/logo.svg" alt="RenterIQ" width="36" height="36">
+      <span class="wordmark">RenterIQ</span>
+    </a>
+    <a href="/" class="nav-back">← Back to Home</a>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="page-label">Our Story</div>
+    <h1>We built this because we've been there.</h1>
+    <p>A bond dispute. No evidence. A lesson that every Australian renter deserves better.</p>
+  </div>
+</section>
+
+<div class="content-wrap">
+
+  <div class="story-intro">
+    <p>I found the apartment on a Thursday. By Saturday I had signed the lease. It was a two-bedroom in Melbourne's inner north — nothing fancy, but it felt like home. I did the entry inspection with the property manager, ticked the boxes on the paper form they handed me, handed it back, and thought nothing more of it.</p>
+    <p>I lived there for fourteen months. I was a good tenant. I paid rent on time. I reported a leaking tap within a week of it starting. I swept the floors before I left. I thought I'd done everything right.</p>
+    <p>Then the bond claim arrived.</p>
+    <p><strong>$1,840 for carpet replacement in the main bedroom. $320 for repainting a wall in the hallway.</strong> They said it was damage I'd caused. I knew it wasn't — the carpet had been worn when I moved in, and that mark on the wall was there on day one. I remembered it clearly.</p>
+    <p>But <em>remembering</em> something and <em>proving</em> something are completely different things.</p>
+    <p>I had no photos from move-in. The entry report I'd signed was the agency's version, checked off in a rush on a Saturday morning. I had nothing timestamped, nothing room-by-room, nothing that could stand up against the agency's claim. The tenancy tribunal told me, politely, that without evidence the balance of probability favoured the landlord.</p>
+    <p><strong>I lost $2,160 of my bond.</strong></p>
+    <p>Not because I'd caused any damage. But because I didn't have the tools to prove I hadn't.</p>
+  </div>
+
+  <div class="callout">
+    <h3>That experience didn't just cost money. It changed how I thought about renting.</h3>
+    <p>Every Australian renter has the right to get their bond back if they've looked after a property. But the system is built around whoever has the better paperwork. Agencies have professional condition reports. Renters have whatever they had time to write down on a Saturday morning. That imbalance is what RenterIQ is built to fix.</p>
+  </div>
+
+  <div class="story-intro">
+    <p>I spent the months after that dispute learning everything I could about how bond claims work, what evidence tribunals accept, and what renters are actually entitled to under Australian tenancy law. What I found was consistent across every state: <strong>the outcome almost always follows the evidence trail.</strong></p>
+    <p>So I started building the tool I wished I'd had. Something that would walk you through a property room by room, photograph what matters, timestamp it all, and generate a professional report — before you ever hand the entry form back. Something that would read your lease in plain English before you signed it, so you'd know what you were agreeing to. Something that would store everything in one place, so that fourteen months later, you'd have everything you needed.</p>
+    <p>That tool is RenterIQ.</p>
+    <p>It's built for the renter who works hard, pays their rent, and deserves to get their full bond back. It's built for the person who doesn't know their rights but should. It's built so that the next time a property manager makes a claim with no basis, you have a timestamped, room-by-room, professionally formatted report sitting in your vault — and the conversation ends there.</p>
+  </div>
+
+  <div class="feature-story">
+    <div class="fs-item">
+      <div class="fs-icon">🔍</div>
+      <div class="fs-body">
+        <h4>Search &amp; Book Inspections — Free</h4>
+        <p>Search available rentals across every Australian state. Filter by price, bedrooms and type. Tap any listing to view inspection times and book directly on the agency's site. No account required, no cost.</p>
+      </div>
+    </div>
+    <div class="fs-item">
+      <div class="fs-icon">📸</div>
+      <div class="fs-body">
+        <h4>AI Inspection Reports — The thing I didn't have</h4>
+        <p>Walk through the property room by room. Photograph every wall, every floor, every fitting. RenterIQ's AI compiles it into a professional, timestamped condition report in under a minute — the same standard as an agency-issued document, but yours, from day one.</p>
+      </div>
+    </div>
+    <div class="fs-item">
+      <div class="fs-icon">⚖️</div>
+      <div class="fs-body">
+        <h4>Lease Review — Know what you're signing</h4>
+        <p>Upload your tenancy agreement before you sign. RenterIQ's AI reads every clause and explains it in plain English, flagging anything unusual, non-standard, or worth questioning. Stored in your Vault for the entire tenancy.</p>
+      </div>
+    </div>
+    <div class="fs-item">
+      <div class="fs-icon">🛡️</div>
+      <div class="fs-body">
+        <h4>Bond Protection — Exit with evidence</h4>
+        <p>At the end of your tenancy, RenterIQ compares your exit photos against your move-in evidence side by side. AI flags any differences for your review — you confirm, dismiss, or add context. The final report is yours. Nothing enters it without your approval.</p>
+      </div>
+    </div>
+    <div class="fs-item">
+      <div class="fs-icon">🗄️</div>
+      <div class="fs-body">
+        <h4>The Vault — Everything, organised, always</h4>
+        <p>Every report, lease, receipt, maintenance log and photo stored in one secure place. It stays with you beyond the tenancy — so if a dispute arises weeks after you've handed back the keys, your evidence is still there.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-intro">
+    <p>RenterIQ is currently in open beta. Every feature is free. We're asking early users to share their experience — what works, what doesn't, what you wish it did. This product is being built by someone who rents, for people who rent. Your feedback shapes it directly.</p>
+    <p><strong>If you've ever lost a bond you didn't deserve to lose — this one's for you.</strong></p>
+  </div>
+
+  <div class="closing-cta">
+    <h2>Start your tenancy the right way.</h2>
+    <p>Free to use. No account required. Available across all Australian states and territories.</p>
+    <a href="/app/index.html" class="btn-primary">📱 Get the App — Free</a>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <span class="footer-copy">© 2025 RenterIQ · Built in Australia 🇦🇺</span>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Use</a>
+      <a href="/disclaimer.html">Disclaimer</a>
+      <a href="/">Home</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
