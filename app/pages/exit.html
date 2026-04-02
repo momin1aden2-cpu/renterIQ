@@ -125,14 +125,14 @@
       <span style="font-size:20px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Exit Inspection','Complete this after cleaning — before handing back the keys. Your bond depends on it.','🚪')">?</span>
     </div>
     <div class="sh-title">Exit Inspection</div>
-    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+    <div class="sh-sub">Protect your bond &mdash; document everything</div>
   </header>
 
   <div style="background:var(--blue-dk);padding:13px 20px;display:flex;gap:12px;align-items:center">
     <span style="font-size:20px;flex-shrink:0">📅</span>
     <div style="flex:1">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:2px">Lease ending 31 March 2026</div>
-      <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.6)">358 days remaining · Bond: $2,480</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:2px">Complete after cleaning &amp; before handing keys</div>
+      <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.6)">Documents your property for bond protection</div>
     </div>
     <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--teal);cursor:pointer;white-space:nowrap" onclick="navigate('/app/pages/vault.html')">View Vault →</span>
   </div>
@@ -166,13 +166,13 @@
     <div style="display:flex;flex-direction:column;gap:8px;margin:0 16px 14px">
       <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📸</div>
-        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Your Move-In Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">15 March 2025 · 8 areas · 24 photos</div></div>
-        <span class="tag tag-teal">✓ Ready</span>
+        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Your Move-In Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Complete an inspection to generate this</div></div>
+        <span class="tag tag-muted">Not ready</span>
       </div>
       <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div style="width:38px;height:38px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏢</div>
-        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Agency Condition Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Uploaded · 12 pages</div></div>
-        <span class="tag tag-teal">✓ Ready</span>
+        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Agency Condition Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Upload your agency report to Vault</div></div>
+        <span class="tag tag-muted">Not uploaded</span>
       </div>
     </div>
 
@@ -384,9 +384,9 @@
     <div class="gen-sub">RenterIQ is comparing your exit photos against your move-in record and the agency's condition report. This takes about 15 seconds.</div>
     <div class="gen-steps">
       <div class="gen-step"><div class="gen-icon" id="exitGenIcon-0">📸</div><div><div class="gen-step-name">Processing exit photos</div><div class="gen-step-detail">24 timestamped exit images</div></div></div>
-      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-1">📋</div><div><div class="gen-step-name">Loading move-in report</div><div class="gen-step-detail">15 March 2025 · 8 areas · 24 photos</div></div></div>
-      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-2">🏢</div><div><div class="gen-step-name">Loading agency report</div><div class="gen-step-detail">Original condition report · 12 pages</div></div></div>
-      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-3">🔍</div><div><div class="gen-step-name">Comparing area by area</div><div class="gen-step-detail">Checking all 8 areas for differences</div></div></div>
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-1">📋</div><div><div class="gen-step-name">Loading move-in report</div><div class="gen-step-detail">Your condition report from move-in</div></div></div>
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-2">🏢</div><div><div class="gen-step-name">Loading agency report</div><div class="gen-step-detail">Original condition report from Vault</div></div></div>
+      <div class="gen-step"><div class="gen-icon" id="exitGenIcon-3">🔍</div><div><div class="gen-step-name">Comparing area by area</div><div class="gen-step-detail">Checking all areas for differences</div></div></div>
       <div class="gen-step"><div class="gen-icon" id="exitGenIcon-4">⚠️</div><div><div class="gen-step-name">Identifying differences</div><div class="gen-step-detail">Flagging items for your review</div></div></div>
       <div class="gen-step"><div class="gen-icon" id="exitGenIcon-5">📊</div><div><div class="gen-step-name">Preparing your review</div><div class="gen-step-detail">Ready for your confirmation</div></div></div>
     </div>

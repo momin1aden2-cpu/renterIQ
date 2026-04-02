@@ -50,7 +50,7 @@
     <button class="rn-help" onclick="showToast('Lease Renewal','Renewing or moving out? RenterIQ guides both','💡')">?</button>
   </div>
   <div class="rn-title">Lease Renewal</div>
-  <div class="rn-sub">18 Smith Street, Fitzroy VIC 3065</div>
+  <div class="rn-sub">Renew or move out &mdash; RenterIQ guides both</div>
 </header>
 
 <div style="flex:1;padding-bottom:100px">
@@ -60,13 +60,13 @@
   <div style="display:flex;gap:14px;align-items:center">
     <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📅</div>
     <div>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Current Lease Ending</div>
-      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:var(--blue);margin-top:3px">31 March 2026</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">358 days remaining</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Lease End Date</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:var(--blue);margin-top:3px">Not set up yet</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Add your lease to track renewal</div>
     </div>
   </div>
   <div style="height:1px;background:var(--border-lt);margin:12px 0"></div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Time elapsed</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">7 of 12 months</span></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Time elapsed</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">&mdash;</span></div>
   <div style="height:8px;background:var(--blue-xl);border-radius:100px;overflow:hidden"><div id="renewalLeaseBar" style="height:100%;background:var(--teal);border-radius:100px;width:0;transition:width .8s cubic-bezier(.4,0,.2,1)"></div></div>
   <div style="margin-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
     <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Reminders set:</span>
@@ -214,15 +214,15 @@
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="change-row">
       <div class="change-icon amber-lt">⚠️</div>
-      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Rent increased</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Previous: $620/wk · New: $645/wk<br>Increase of $25/wk from 1 April 2026. 60 days notice provided — compliant with VIC law.</div></div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Rent increased</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Rent increase proposed. 60 days notice required under VIC law.</div></div>
     </div>
     <div class="change-row">
       <div class="change-icon teal-lt">✓</div>
-      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease term unchanged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">12 months · 1 April 2026 – 31 March 2027. Same duration as your current agreement.</div></div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease term unchanged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">12 months. Same duration as your current agreement.</div></div>
     </div>
     <div class="change-row">
       <div class="change-icon teal-lt">✓</div>
-      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond unchanged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">$2,480 · No additional bond requested.</div></div>
+      <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond unchanged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">No additional bond requested.</div></div>
     </div>
     <div class="change-row">
       <div class="change-icon amber-lt">⚠️</div>
@@ -234,7 +234,7 @@
 <!-- RENT INCREASE INFO -->
 <div style="background:rgba(27,80,200,.04);border:1px solid rgba(27,80,200,.12);border-radius:14px;padding:15px 16px;margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:8px">💡 About the rent increase</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Your new rent of $645/wk represents a 4% increase. The average Melbourne rental increase in early 2025 was 4.2% — this is within typical range. RenterIQ is not providing financial advice — this is for your reference only.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Check whether the proposed increase falls within typical market range for your area. RenterIQ is not providing financial advice — this is for your reference only.</div>
   <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;display:block;cursor:pointer" onclick="navigate('/app/pages/rights.html#VIC')">Check VIC rent increase rules →</span>
 </div>
 

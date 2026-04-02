@@ -67,25 +67,70 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 .nav-links.show{display:flex;flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);padding:16px 24px 20px;border-bottom:1px solid var(--border-lt);gap:16px;z-index:99}
 
 /* HERO */
-.hero{background:linear-gradient(170deg,#EBF0FF 0%,#F4F7FF 60%);padding:72px 0 80px;overflow:hidden;text-align:center}
-.hero .container{display:flex;flex-direction:column;align-items:center;max-width:680px}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(27,80,200,.1);border-radius:100px;padding:6px 16px 6px 12px;margin-bottom:20px}
-.hero-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse-dot 2s ease-in-out infinite}
-.hero-badge span{font-family:'Sora',sans-serif;font-weight:700;font-size:12.5px;color:var(--blue)}
-.hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(32px,5.5vw,54px);color:#0A2460;line-height:1.1;margin-bottom:16px}
-.hero-sub{font-size:17px;color:#5A6B8A;line-height:1.7;max-width:480px;margin-bottom:36px}
-.hero-search{display:flex;align-items:center;background:#fff;border-radius:100px;padding:6px 6px 6px 24px;box-shadow:0 8px 40px rgba(27,80,200,.14),0 2px 8px rgba(27,80,200,.06);margin-bottom:20px;width:100%;max-width:580px}
-.hero-search input{flex:1;font-size:15px;color:var(--text);min-width:0}
-.hero-search input::placeholder{color:#9EAEC4}
-.hero-search button{background:var(--blue);color:#fff;font-weight:700;font-size:14px;padding:13px 28px;border-radius:100px;white-space:nowrap;transition:background .2s}
-.hero-search button:hover{background:var(--blue-md)}
-.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--border);font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.hero{background:linear-gradient(150deg,#060F2A 0%,#0A2460 52%,#143a8a 100%);padding:80px 0 72px;overflow:hidden;text-align:center;position:relative}
+.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:1000px;height:800px;background:radial-gradient(ellipse,rgba(46,99,224,.32) 0%,transparent 65%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent)}
+.hero .container{display:flex;flex-direction:column;align-items:center;max-width:960px;position:relative;z-index:1}
+/* HERO PROCESS & CLEAN SEARCH */
+.hero-process{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:28px}
+.hero-process>span{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)}
+.hp-arr{color:rgba(255,255,255,.2);font-size:12px;font-weight:400}
+.hero-sb-wrap{width:100%;max-width:680px}
+.hero-clean-bar{display:flex;align-items:center;background:#fff;border-radius:16px;padding:7px 7px 7px 20px;box-shadow:0 20px 60px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.12);gap:8px}
+.hero-clean-bar input{flex:1;font-size:15px;font-family:'Nunito',sans-serif;font-weight:600;color:#0F1C3F;min-width:0;background:none;border:none;outline:none;height:44px}
+.hero-clean-bar input::placeholder{color:#B0BDD4}
+.hcb-div{width:1px;height:26px;background:#E5EBF8;flex-shrink:0}
+.ls-filters-btn{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#0A2460;background:#F4F7FF;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .15s;flex-shrink:0;white-space:nowrap}
+.ls-filters-btn:hover{background:#EBF0FF}
+.ls-filters-btn.active{background:var(--blue);color:#fff}
+.hero-clean-search{background:linear-gradient(135deg,#1B50C8,#2E63E0);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:12px 28px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;flex-shrink:0;box-shadow:0 2px 14px rgba(27,80,200,.4)}
+.hero-clean-search:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(27,80,200,.55)}
+.ls-filter-panel{display:none;background:#fff;border-radius:0 0 16px 16px;border:1.5px solid #E5EBF8;border-top:none;padding:20px 22px 16px;box-shadow:0 16px 48px rgba(27,80,200,.14);position:relative;z-index:50}
+.ls-filter-panel.open{display:block}
+.lfp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.lfp-group label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px}
+.lfp-select{width:100%;padding:9px 30px 9px 12px;border:1.5px solid var(--border-lt);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%235A6B8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='2 4 6 8 10 4'/%3E%3C/svg%3E") no-repeat right 10px center;appearance:none;cursor:pointer;transition:border-color .15s}
+.lfp-select:focus{border-color:var(--blue);outline:none}
+.lfp-features{grid-column:1/-1}
+.lfp-feat-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px}
+.lfp-feat-chips{display:flex;flex-wrap:wrap;gap:8px}
+.lfp-chip{padding:7px 15px;border-radius:100px;border:1.5px solid var(--border-lt);font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none}
+.lfp-chip:hover{border-color:var(--blue);color:var(--blue)}
+.lfp-chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.lfp-footer{display:flex;justify-content:flex-end;gap:10px;padding-top:14px;border-top:1px solid var(--border-lt)}
+.lfp-clear{background:none;border:1.5px solid var(--border-lt);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);padding:9px 20px;border-radius:100px;cursor:pointer;transition:all .15s}
+.lfp-clear:hover{border-color:var(--blue);color:var(--blue)}
+.lfp-apply{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;padding:9px 24px;border-radius:100px;border:none;cursor:pointer;transition:background .15s}
+.lfp-apply:hover{background:var(--blue-md)}
+@media(max-width:760px){.lfp-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.hp-arr{display:none}.hero-process{gap:8px}.hero-process>span{font-size:12px}.hero-clean-bar{flex-wrap:wrap;border-radius:14px;padding:10px}.hero-clean-bar input{width:100%;order:1}.hcb-div{display:none}.ls-filters-btn{order:2;flex:1;justify-content:center}.hero-clean-search{order:3;flex:1;text-align:center}.ls-filter-panel{border-radius:14px;margin-top:8px;border-top:1.5px solid #E5EBF8}}
+@media(max-width:480px){.lfp-grid{grid-template-columns:1fr}}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:100px;padding:6px 16px 6px 12px;margin-bottom:28px}
+.hero-badge .dot{width:7px;height:7px;border-radius:50%;background:#00C896;animation:pulse-dot 2s ease-in-out infinite;flex-shrink:0}
+.hero-badge span{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.8)}
+.hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(36px,6vw,60px);color:#fff;line-height:1.06;margin-bottom:20px}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,#00C896 10%,#2BE8B0 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:17px;color:rgba(255,255,255,.58);line-height:1.75;max-width:520px;margin-bottom:32px}
+.hero-search-wrap{width:100%;max-width:660px;margin-bottom:18px}
+.hero-search-bar{display:flex;align-items:center;background:#fff;border-radius:18px;padding:7px 7px 7px 22px;box-shadow:0 20px 64px rgba(0,0,0,.38),0 4px 16px rgba(0,0,0,.14);gap:8px}
+.hero-search-bar input{flex:1;font-size:15px;font-family:'Nunito',sans-serif;font-weight:600;color:#0F1C3F;min-width:0;background:none;border:none;outline:none;height:44px}
+.hero-search-bar input::placeholder{color:#B0BDD4}
+.hero-sb-divider{width:1px;height:28px;background:#E5EBF8;flex-shrink:0}
+.hero-sb-state{display:flex;align-items:center;gap:5px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#0A2460;background:#F4F7FF;border-radius:11px;padding:10px 14px;cursor:default;white-space:nowrap;border:none;flex-shrink:0}
+.hero-sb-state svg{opacity:.6}
+.hero-sb-btn{background:linear-gradient(135deg,#1B50C8,#2E63E0);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:13px 30px;border-radius:12px;white-space:nowrap;flex-shrink:0;transition:all .2s;border:none;cursor:pointer;box-shadow:0 2px 14px rgba(27,80,200,.4)}
+.hero-sb-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(27,80,200,.55)}
+.hero-state-chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
+.hero-state-chip{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.5);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:7px 16px;cursor:pointer;transition:all .18s;-webkit-tap-highlight-color:transparent}
+.hero-state-chip:hover,.hero-state-chip.sel{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.25)}
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap}
+.hero-trust-item{display:flex;align-items:center;gap:7px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.38)}
+.hero-trust-item::before{content:'';width:4px;height:4px;border-radius:50%;background:#00C896;flex-shrink:0}
+.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--border);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:13px 24px;border-radius:100px;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
 .btn-outline:hover{border-color:var(--blue);background:var(--blue-xl)}
 .btn-teal{background:var(--teal);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;transition:background .2s;display:inline-flex;align-items:center;gap:8px}
 .btn-teal:hover{background:var(--teal-dk)}
-.hero-trust{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:16px}
-.hero-trust-item{display:flex;align-items:center;gap:7px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:#5A6B8A}
-.hero-trust-item::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0}
+@media(max-width:640px){.hero{padding:72px 0 64px}.hero-search-bar{flex-wrap:wrap;padding:12px 12px 8px;border-radius:16px;gap:8px}.hero-search-bar>svg{display:none}.hero-search-bar input{width:100%;order:1;height:40px;font-size:14px}.hero-sb-divider{display:none}.hero-sb-state{order:2;flex:1;justify-content:center;border-radius:10px;padding:9px 12px}.hero-sb-btn{order:3;flex:1;border-radius:10px;padding:12px 20px;text-align:center}.hero-state-chips{gap:6px}.hero-state-chip{font-size:11px;padding:6px 12px}}
 
 /* APP SHOWCASE */
 .showcase{background:#fff;padding:80px 0;overflow:hidden}
@@ -319,12 +364,6 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 .feature-tag.paid{color:var(--blue);background:rgba(27,80,200,.09)}
 .feature-tag.free{color:var(--teal-dk);background:rgba(0,200,150,.1)}
 
-/* HERO FILTERS */
-.hero-filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;justify-content:center}
-.hf-chip{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.22);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.85);cursor:pointer;transition:all .18s;white-space:nowrap;backdrop-filter:blur(4px)}
-.hf-chip:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);color:#fff}
-.hf-chip svg{flex-shrink:0;opacity:.7}
-
 /* PRICING */
 .pricing{background:#fff;padding:88px 0}
 .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:860px;margin:48px auto 0}
@@ -359,7 +398,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 @media(max-width:680px){.pricing-grid{grid-template-columns:1fr}}
 
 /* LANDING SEARCH SECTION */
-.ls-section{background:#F4F7FF;padding:72px 0 80px}
+.ls-section{background:#F4F7FF;padding:40px 0 80px}
 .ls-filter-bar{background:#fff;border-radius:16px;border:1.5px solid var(--border-lt);box-shadow:0 2px 16px rgba(27,80,200,.08);display:flex;align-items:stretch;overflow:visible;margin-bottom:32px;position:relative}
 .ls-fb-search{flex:1;display:flex;align-items:center;gap:10px;padding:0 18px;border-right:1.5px solid var(--border-lt);min-width:180px}
 .ls-fb-search input{flex:1;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:transparent;height:54px;min-width:0}
@@ -494,10 +533,8 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
       </div>
     </a>
     <div class="nav-links">
-      <a href="#search">Search</a>
       <a href="#how-it-works">How It Works</a>
       <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
       <a href="#rights">Renter Rights</a>
     </div>
     <a href="/app/index.html" class="nav-cta install-btn">Get the App</a>
@@ -510,204 +547,114 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 <!-- Hero -->
 <section class="hero" id="hero">
   <div class="container">
-    <div class="hero-badge"><span class="dot"></span><span>Search &amp; book inspections — always free</span></div>
-    <h1>Find rentals.<br>Book inspections.<br>Protect your bond.</h1>
-    <p class="hero-sub">Search properties across every Australian state and book inspections for free. Subscribe to unlock AI reports, lease review and bond protection.</p>
-    <div class="hero-search" id="heroSearchForm">
-      <input type="text" id="heroSearchInput" placeholder="Search suburb, postcode or address…" onkeydown="if(event.key==='Enter')heroSearch()">
-      <button onclick="heroSearch()">Search →</button>
-    </div>
-    <div class="hero-trust">
-      <div class="hero-trust-item">All states &amp; territories</div>
-      <div class="hero-trust-item">Search &amp; book free</div>
-      <div class="hero-trust-item">No account required</div>
-    </div>
-  </div>
-</section>
+    <h1>Find your next rental.<br>Protect your <em>bond.</em></h1>
 
-<!-- Trust Bar -->
-<section class="trust-bar">
-  <div class="container">
-    <div class="trust-states">
-      <span class="trust-state">NSW</span>
-      <span class="trust-state">VIC</span>
-      <span class="trust-state">QLD</span>
-      <span class="trust-state">WA</span>
-      <span class="trust-state">SA</span>
-      <span class="trust-state">TAS</span>
-      <span class="trust-state">ACT</span>
-      <span class="trust-state">NT</span>
+    <div class="hero-process">
+      <span>🔍 Search</span>
+      <span class="hp-arr">→</span>
+      <span>📸 Inspect</span>
+      <span class="hp-arr">→</span>
+      <span>⚖️ Review Lease</span>
+      <span class="hp-arr">→</span>
+      <span>🛡️ Track Issues</span>
+      <span class="hp-arr">→</span>
+      <span>🔑 Exit Clean</span>
     </div>
-    <span class="trust-motto">Every state. Every territory. Every renter.</span>
-  </div>
-</section>
 
-<!-- Landing Search Section -->
-<section class="ls-section" id="search">
-  <div class="container">
-    <div class="section-label">FIND YOUR NEXT RENTAL</div>
-    <h2 class="section-h2" style="margin-bottom:28px">Search &amp; book inspections.</h2>
-
-    <!-- Filter Bar -->
-    <div class="ls-filter-bar">
-      <!-- Suburb search -->
-      <div class="ls-fb-search">
-        <span class="ls-fb-icon">🔍</span>
-        <input type="text" id="lsInput" placeholder="Suburb, postcode or address…" oninput="lsFilter()" onkeydown="if(event.key==='Enter')lsFilter()">
-      </div>
-      <!-- Price -->
-      <div class="ls-dd-wrap" id="ddPrice">
-        <button class="ls-dd-btn" onclick="lsToggleDd('ddPrice')" aria-expanded="false">
-          <span id="ddPriceLabel">Price</span>
-          <span class="ls-dd-chevron">▾</span>
+    <div class="hero-sb-wrap">
+      <div class="hero-clean-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9EAEC4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="lsInput" placeholder="Suburb, postcode or address…" oninput="lsFilter()" onkeydown="if(event.key==='Enter')lsFilter()" autocomplete="off">
+        <div class="hcb-div"></div>
+        <button class="ls-filters-btn" id="filtersPanelBtn" onclick="toggleFilterPanel()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+          <span id="filtersBtnLabel">Filters</span>
         </button>
-        <div class="ls-dd-panel" id="ddPricePanel">
-          <div class="ls-dd-option selected" onclick="lsSelectDd('price','any','Price','ddPrice',this)">Any Price</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('price','400','Under $400','ddPrice',this)">Under $400/wk</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('price','600','Under $600','ddPrice',this)">Under $600/wk</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('price','600+','$600+/wk','ddPrice',this)">$600+/wk</div>
-        </div>
+        <button class="hero-clean-search" onclick="lsFilter()">Search</button>
       </div>
-      <!-- Beds -->
-      <div class="ls-dd-wrap" id="ddBeds">
-        <button class="ls-dd-btn" onclick="lsToggleDd('ddBeds')" aria-expanded="false">
-          <span id="ddBedsLabel">Beds</span>
-          <span class="ls-dd-chevron">▾</span>
-        </button>
-        <div class="ls-dd-panel" id="ddBedsPanel">
-          <div class="ls-dd-option selected" onclick="lsSelectDd('beds','any','Beds','ddBeds',this)">Any</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('beds','1','1+ Beds','ddBeds',this)">1+ Bedrooms</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('beds','2','2+ Beds','ddBeds',this)">2+ Bedrooms</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('beds','3','3+ Beds','ddBeds',this)">3+ Bedrooms</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('beds','4','4+ Beds','ddBeds',this)">4+ Bedrooms</div>
-        </div>
-      </div>
-      <!-- Property Type -->
-      <div class="ls-dd-wrap" id="ddType">
-        <button class="ls-dd-btn" onclick="lsToggleDd('ddType')" aria-expanded="false">
-          <span id="ddTypeLabel">Property Type</span>
-          <span class="ls-dd-chevron">▾</span>
-        </button>
-        <div class="ls-dd-panel" id="ddTypePanel">
-          <div class="ls-dd-option selected" onclick="lsSelectDd('type','any','Property Type','ddType',this)">Any Type</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('type','house','House','ddType',this)">House</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('type','apartment','Apartment','ddType',this)">Apartment / Unit</div>
-          <div class="ls-dd-option" onclick="lsSelectDd('type','townhouse','Townhouse','ddType',this)">Townhouse</div>
-        </div>
-      </div>
-      <!-- More Filters -->
-      <div class="ls-dd-wrap" id="ddMore">
-        <button class="ls-dd-btn" onclick="lsToggleDd('ddMore')" aria-expanded="false">
-          <span id="ddMoreLabel">More Filters</span>
-          <span class="ls-dd-chevron">▾</span>
-        </button>
-        <div class="ls-dd-panel" id="ddMorePanel" style="right:0;left:auto;min-width:260px">
-          <div class="ls-dd-section-label">Inspections</div>
-          <div class="ls-dd-option" id="lsInspOption" onclick="lsToggleInsp()">📅 Inspections Only</div>
-          <div class="ls-dd-divider"></div>
-          <div class="ls-dd-section-label">Features</div>
-          <div class="ls-dd-more-grid">
-            <div class="ls-dd-more-option" onclick="this.classList.toggle('selected')">Pet Friendly</div>
-            <div class="ls-dd-more-option" onclick="this.classList.toggle('selected')">Parking</div>
-            <div class="ls-dd-more-option" onclick="this.classList.toggle('selected')">Balcony</div>
-            <div class="ls-dd-more-option" onclick="this.classList.toggle('selected')">Air Con</div>
-            <div class="ls-dd-more-option" onclick="this.classList.toggle('selected')">Garden</div>
-            <div class="ls-dd-more-option" onclick="this.classList.toggle('selected')">Dishwasher</div>
+      <div class="ls-filter-panel" id="lsFilterPanel">
+        <div class="lfp-grid">
+          <div class="lfp-group">
+            <label>State</label>
+            <select class="lfp-select" id="fpState">
+              <option value="any">All States</option>
+              <option value="VIC">Victoria</option>
+              <option value="NSW">New South Wales</option>
+              <option value="QLD">Queensland</option>
+              <option value="SA">South Australia</option>
+              <option value="WA">Western Australia</option>
+              <option value="TAS">Tasmania</option>
+              <option value="ACT">ACT</option>
+              <option value="NT">Northern Territory</option>
+            </select>
+          </div>
+          <div class="lfp-group">
+            <label>Weekly Price</label>
+            <select class="lfp-select" id="fpPrice">
+              <option value="any">Any Price</option>
+              <option value="400">Under $400/wk</option>
+              <option value="600">Under $600/wk</option>
+              <option value="600+">$600+/wk</option>
+            </select>
+          </div>
+          <div class="lfp-group">
+            <label>Bedrooms</label>
+            <select class="lfp-select" id="fpBeds">
+              <option value="any">Any</option>
+              <option value="1">1+ Bedrooms</option>
+              <option value="2">2+ Bedrooms</option>
+              <option value="3">3+ Bedrooms</option>
+              <option value="4">4+ Bedrooms</option>
+            </select>
+          </div>
+          <div class="lfp-group">
+            <label>Property Type</label>
+            <select class="lfp-select" id="fpType">
+              <option value="any">Any Type</option>
+              <option value="house">House</option>
+              <option value="apartment">Apartment / Unit</option>
+              <option value="townhouse">Townhouse</option>
+            </select>
+          </div>
+          <div class="lfp-features">
+            <div class="lfp-feat-label">Features</div>
+            <div class="lfp-feat-chips">
+              <span class="lfp-chip" onclick="this.classList.toggle('sel')">Pet Friendly</span>
+              <span class="lfp-chip" onclick="this.classList.toggle('sel')">Parking</span>
+              <span class="lfp-chip" onclick="this.classList.toggle('sel')">Balcony</span>
+              <span class="lfp-chip" onclick="this.classList.toggle('sel')">Air Con</span>
+              <span class="lfp-chip" onclick="this.classList.toggle('sel')">Garden</span>
+              <span class="lfp-chip" onclick="this.classList.toggle('sel')">Dishwasher</span>
+              <span class="lfp-chip" id="fpInspOnly" onclick="this.classList.toggle('sel');lsFilters.insp=this.classList.contains('sel')">&#128197; Inspections Only</span>
+            </div>
           </div>
         </div>
+        <div class="lfp-footer">
+          <button class="lfp-clear" onclick="clearFilters()">Clear All</button>
+          <button class="lfp-apply" onclick="applyFilters()">Apply Filters</button>
+        </div>
       </div>
-      <!-- Search button -->
-      <button class="ls-fb-search-btn" onclick="lsFilter()">Search →</button>
     </div>
+  </div>
+</section>
 
+<!-- Results Section -->
+<section class="ls-section" id="search" style="display:none">
+  <div class="container">
     <!-- Results Bar -->
-    <div class="ls-results-bar">
+    <div class="ls-results-bar" id="lsResultsBar" style="display:none">
       <div>
-        <div class="ls-results-count" id="lsCount">4 properties found</div>
-        <div class="ls-results-sub" id="lsSubtitle">Showing all available rentals</div>
+        <div class="ls-results-count" id="lsCount"></div>
+        <div class="ls-results-sub" id="lsSubtitle"></div>
       </div>
     </div>
 
     <!-- Property Grid -->
-    <div class="ls-grid" id="lsGrid">
-
-      <div class="ls-card" data-beds="3" data-price="620" data-type="house" data-insp="true">
-        <div class="ls-card-image" style="background:linear-gradient(135deg,#1a3a8f,#2E63E0)">
-          <span class="ls-emoji">🏠</span>
-          <button class="ls-card-save" id="lssave-p1" onclick="lsSave('p1',this)">♡</button>
-          <div class="ls-card-badge"><span style="width:7px;height:7px;background:#00C896;border-radius:50%;display:inline-block;animation:lspulse 2s infinite"></span>Inspection Sat 10:00am</div>
-        </div>
-        <div class="ls-card-body">
-          <div class="ls-card-price">$620<span>/wk</span></div>
-          <div class="ls-card-addr">18 Smith Street, Fitzroy VIC 3065</div>
-          <div class="ls-card-feats"><span class="ls-card-feat">🛏 3</span><span class="ls-card-feat">🚿 1</span><span class="ls-card-feat">🚗 2</span><span class="ls-card-feat">180m²</span></div>
-          <div class="ls-card-tags"><span class="tag tag-teal">Inspection Available</span><span class="tag tag-blue">Pet Friendly</span></div>
-          <div class="ls-card-btns">
-            <button class="ls-btn-book" onclick="lsBook('https://www.domain.com.au/rent/fitzroy-vic-3065/')">📅 Book Inspection</button>
-            <button class="ls-btn-save" id="lsbtn-p1" onclick="lsSave('p1',this)">♡</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="ls-card" data-beds="2" data-price="480" data-type="apartment" data-insp="true">
-        <div class="ls-card-image" style="background:linear-gradient(135deg,#006B50,#00C896)">
-          <span class="ls-emoji">🏢</span>
-          <button class="ls-card-save" id="lssave-p2" onclick="lsSave('p2',this)">♡</button>
-          <div class="ls-card-badge"><span style="width:7px;height:7px;background:#00C896;border-radius:50%;display:inline-block;animation:lspulse 2s infinite"></span>Inspection Sun 11:30am</div>
-        </div>
-        <div class="ls-card-body">
-          <div class="ls-card-price">$480<span>/wk</span></div>
-          <div class="ls-card-addr">7/92 Bridge Road, Richmond VIC 3121</div>
-          <div class="ls-card-feats"><span class="ls-card-feat">🛏 2</span><span class="ls-card-feat">🚿 1</span><span class="ls-card-feat">🚗 1</span><span class="ls-card-feat">85m²</span></div>
-          <div class="ls-card-tags"><span class="tag tag-teal">Inspection Available</span><span class="tag tag-amber">New Listing</span></div>
-          <div class="ls-card-btns">
-            <button class="ls-btn-book" onclick="lsBook('https://www.domain.com.au/rent/richmond-vic-3121/')">📅 Book Inspection</button>
-            <button class="ls-btn-save" id="lsbtn-p2" onclick="lsSave('p2',this)">♡</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="ls-card" data-beds="2" data-price="545" data-type="apartment" data-insp="false">
-        <div class="ls-card-image" style="background:linear-gradient(135deg,#0A2460,#1B50C8)">
-          <span class="ls-emoji">🏡</span>
-          <button class="ls-card-save" id="lssave-p3" onclick="lsSave('p3',this)">♡</button>
-          <div class="ls-card-badge"><span style="width:6px;height:6px;background:#F5A623;border-radius:50%;display:inline-block"></span>No inspection yet</div>
-        </div>
-        <div class="ls-card-body">
-          <div class="ls-card-price">$545<span>/wk</span></div>
-          <div class="ls-card-addr">44 Gertrude Street, Fitzroy VIC 3065</div>
-          <div class="ls-card-feats"><span class="ls-card-feat">🛏 2</span><span class="ls-card-feat">🚿 1</span><span class="ls-card-feat">🚗 0</span><span class="ls-card-feat">72m²</span></div>
-          <div class="ls-card-tags"><span class="tag tag-amber">Inspection TBA</span><span class="tag tag-blue">Bills Included</span></div>
-          <div class="ls-card-btns">
-            <button class="ls-btn-book" onclick="lsBook('https://www.domain.com.au/rent/fitzroy-vic-3065/')">🔔 Notify Me</button>
-            <button class="ls-btn-save" id="lsbtn-p3" onclick="lsSave('p3',this)">♡</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="ls-card" data-beds="3" data-price="710" data-type="townhouse" data-insp="true">
-        <div class="ls-card-image" style="background:linear-gradient(135deg,#1A4A6B,#2299CC)">
-          <span class="ls-emoji">🏘</span>
-          <button class="ls-card-save" id="lssave-p4" onclick="lsSave('p4',this)">♡</button>
-          <div class="ls-card-badge"><span style="width:7px;height:7px;background:#00C896;border-radius:50%;display:inline-block;animation:lspulse 2s infinite"></span>Inspection Sat 1:00pm</div>
-        </div>
-        <div class="ls-card-body">
-          <div class="ls-card-price">$710<span>/wk</span></div>
-          <div class="ls-card-addr">3/21 Johnston Street, Collingwood VIC 3066</div>
-          <div class="ls-card-feats"><span class="ls-card-feat">🛏 3</span><span class="ls-card-feat">🚿 2</span><span class="ls-card-feat">🚗 1</span><span class="ls-card-feat">145m²</span></div>
-          <div class="ls-card-tags"><span class="tag tag-teal">Inspection Available</span><span class="tag tag-blue">Garage</span></div>
-          <div class="ls-card-btns">
-            <button class="ls-btn-book" onclick="lsBook('https://www.domain.com.au/rent/collingwood-vic-3066/')">📅 Book Inspection</button>
-            <button class="ls-btn-save" id="lsbtn-p4" onclick="lsSave('p4',this)">♡</button>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /ls-grid -->
-    <div id="lsNoResults" class="ls-no-results" style="display:none">
-      <div class="ls-no-icon">🏘</div>
-      <h3>No properties found</h3>
-      <p style="font-size:14px">Try adjusting your filters or searching a different suburb.</p>
+    <div class="ls-grid" id="lsGrid" style="display:none"></div>
+    <div id="lsNoResults" class="ls-no-results">
+      <div class="ls-no-icon">🏠</div>
+      <h3>Search for rentals above</h3>
+      <p style="font-size:14px">Enter a suburb or postcode and use the filters to find your next home.</p>
     </div>
   </div>
 </section>
@@ -930,7 +877,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   <div class="container">
     <div class="section-label">FEATURES</div>
     <h2 class="section-h2">More than a search app.</h2>
-    <p class="section-sub" style="margin-bottom:40px">Search and book inspections are always free. Subscribe to unlock the full protection suite.</p>
+    <p class="section-sub" style="margin-bottom:40px">Search and book inspections are free. Subscribe to unlock the full protection suite.</p>
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon">📸</div>
@@ -951,58 +898,6 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
 </section>
 
-<!-- Pricing -->
-<section class="pricing" id="pricing">
-  <div class="container">
-    <div class="section-label">PLANS &amp; PRICING</div>
-    <h2 class="section-h2">Simple, honest pricing.</h2>
-    <p class="section-sub">Search and book inspections are always free. Upgrade when you need the full toolkit.</p>
-    <div class="pricing-grid">
-
-      <!-- Free Plan -->
-      <div class="plan-card plan-free">
-        <div class="plan-name">Free</div>
-        <div class="plan-price">$0<span>/forever</span></div>
-        <div class="plan-alt">No card required. Always free.</div>
-        <div class="plan-features-list">
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Search rentals across all states &amp; territories</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>View inspection times</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Book inspections (opens agency site)</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Application help &amp; tenancy guides</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>1 free inspection report</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>1 free lease AI review</span></div>
-          <div class="pfl-item muted"><span class="pfl-check">—</span><span>Unlimited inspection reports</span></div>
-          <div class="pfl-item muted"><span class="pfl-check">—</span><span>Bond protection exit comparison</span></div>
-          <div class="pfl-item muted"><span class="pfl-check">—</span><span>Document Vault (unlimited)</span></div>
-          <div class="pfl-item muted"><span class="pfl-check">—</span><span>Maintenance tracker</span></div>
-        </div>
-        <a href="/app/index.html" class="plan-cta">Start for Free →</a>
-      </div>
-
-      <!-- Pro Plan -->
-      <div class="plan-card plan-pro">
-        <div class="plan-badge popular">MOST POPULAR</div>
-        <div class="plan-name">Pro</div>
-        <div class="plan-price">$5.99<span>/month</span></div>
-        <div class="plan-alt">or $59.99/year — save 2 months free</div>
-        <div class="plan-features-list">
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Everything in Free</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Unlimited AI inspection reports</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Unlimited lease AI translations</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Move-in photo documentation</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Bond protection exit comparison</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Document Vault — unlimited storage</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Maintenance issue tracker</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Evidence export &amp; PDF sharing</span></div>
-          <div class="pfl-item"><span class="pfl-check">✅</span><span>Priority email support</span></div>
-        </div>
-        <a href="/app/index.html" class="plan-cta">Get Pro →</a>
-      </div>
-
-    </div>
-    <p class="pricing-note">Pay per use also available — generate individual reports without a subscription.</p>
-  </div>
-</section>
 
 <!-- REMOVED: Vault, Bond Back, Rights, Feedback, Legal sections -->
 <div style="display:none" id="vault">
@@ -1339,16 +1234,16 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   <div class="container">
     <div class="pi-icon"><img src="/assets/logo.svg" alt="RenterIQ App" width="64" height="64"></div>
     <h2>Your rental companion. On your phone.</h2>
-    <p class="pi-sub">Add to your home screen in seconds. No app store, no account required. Free for every Australian renter.</p>
+    <p class="pi-sub">Add to your home screen in seconds. No app store, no account required. Works on iPhone &amp; Android.</p>
     <div class="pwa-btns">
-      <button class="btn-white install-btn">📲 Get the App — Free</button>
+      <button class="btn-white install-btn">📲 Get the App</button>
       <a href="/app/index.html" class="btn-ghost">Open Web App</a>
     </div>
     <div class="pwa-features">
       <span class="pwa-feat">Works offline</span>
       <span class="pwa-feat">No app store needed</span>
       <span class="pwa-feat">iPhone &amp; Android</span>
-      <span class="pwa-feat">Always free</span>
+      <span class="pwa-feat">Free to start</span>
     </div>
   </div>
 </section>
@@ -1366,10 +1261,8 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
       </div>
       <div class="footer-col">
         <h4>Quick Links</h4>
-        <a href="#search">Search Rentals</a>
         <a href="#how-it-works">How It Works</a>
         <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
         <a href="#rights">Renter Rights</a>
         <a href="#pwa">Get the App</a>
       </div>
@@ -1378,7 +1271,13 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
         <a href="mailto:support@renteriq.com.au">support@renteriq.com.au</a>
         <a href="mailto:support@renteriq.com.au?subject=Feedback">Send Feedback</a>
         <a href="mailto:support@renteriq.com.au?subject=Review">Leave a Review</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
         <a href="/about.html">About RenterIQ</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms of Use</a>
+        <a href="/disclaimer.html">Disclaimer</a>
       </div>
     </div>
     <div class="footer-divider"></div>
@@ -1410,29 +1309,73 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 </div>
 
 <script>
-// Hero search — scrolls to landing search section and pre-fills the filter input
+// Filter Panel
+function toggleFilterPanel() {
+  var panel = document.getElementById('lsFilterPanel');
+  var btn = document.getElementById('filtersPanelBtn');
+  if (!panel) return;
+  var open = panel.classList.toggle('open');
+  if (btn) btn.classList.toggle('active', open);
+}
+
+function applyFilters() {
+  lsFilters.state = (document.getElementById('fpState') || {}).value || 'any';
+  lsFilters.price = (document.getElementById('fpPrice') || {}).value || 'any';
+  lsFilters.beds  = (document.getElementById('fpBeds')  || {}).value || 'any';
+  lsFilters.type  = (document.getElementById('fpType')  || {}).value || 'any';
+  var active = ['state','price','beds','type'].filter(function(k){ return lsFilters[k] !== 'any'; }).length;
+  var lbl = document.getElementById('filtersBtnLabel');
+  if (lbl) lbl.textContent = active > 0 ? 'Filters (' + active + ')' : 'Filters';
+  toggleFilterPanel();
+  lsFilter();
+}
+
+function clearFilters() {
+  lsFilters = {beds:'any', price:'any', type:'any', insp:false, state:'any'};
+  ['fpState','fpPrice','fpBeds','fpType'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value='any'; });
+  document.querySelectorAll('.lfp-chip').forEach(function(c){ c.classList.remove('sel'); });
+  var lbl = document.getElementById('filtersBtnLabel'); if(lbl) lbl.textContent='Filters';
+}
+
+// Hero Search
+var heroCurrentState = 'any';
+
+function setHeroState(state) {
+  heroCurrentState = state;
+  var label = document.getElementById('heroStateLabel');
+  if (label) label.textContent = state;
+  document.querySelectorAll('.hero-state-chip').forEach(function(c) {
+    c.classList.toggle('sel', c.textContent.trim() === state);
+  });
+  heroSearch();
+}
+
 function heroSearch() {
-  var q = document.getElementById('heroSearchInput').value.trim();
+  var q = (document.getElementById('heroSearchInput') || {}).value || '';
   var section = document.getElementById('search');
-  if (section) {
-    section.scrollIntoView({behavior:'smooth', block:'start'});
-    if (q) {
-      setTimeout(function(){
-        var lsIn = document.getElementById('lsInput');
-        if (lsIn) { lsIn.value = q; lsFilter(); }
-      }, 400);
-    }
-  }
+  if (!section) return;
+  section.scrollIntoView({behavior:'smooth', block:'start'});
+  setTimeout(function() {
+    var lsIn = document.getElementById('lsInput');
+    if (lsIn && q.trim()) lsIn.value = q.trim();
+    if (heroCurrentState !== 'any') { lsFilterState(heroCurrentState); }
+    else if (q.trim()) { lsFilter(); }
+  }, 420);
 }
 
 // Landing Search JS
-var lsFilters = {beds:'any', price:'any', type:'any', insp:false};
-var lsData = [
-  {id:'p1', beds:3, price:620, type:'house', insp:true, addr:'18 Smith Street, Fitzroy VIC 3065', priceStr:'$620/wk'},
-  {id:'p2', beds:2, price:480, type:'apartment', insp:true, addr:'7/92 Bridge Road, Richmond VIC 3121', priceStr:'$480/wk'},
-  {id:'p3', beds:2, price:545, type:'apartment', insp:false, addr:'44 Gertrude Street, Fitzroy VIC 3065', priceStr:'$545/wk'},
-  {id:'p4', beds:3, price:710, type:'townhouse', insp:true, addr:'3/21 Johnston Street, Collingwood VIC 3066', priceStr:'$710/wk'}
-];
+var lsFilters = {beds:'any', price:'any', type:'any', insp:false, state:'any'};
+
+function lsFilterState(state) {
+  lsFilters.state = state;
+  var labelEl = document.getElementById('ddStateLabel');
+  if (labelEl) labelEl.textContent = state;
+  var btn = document.getElementById('ddState');
+  if (btn) btn.querySelector('.ls-dd-btn').classList.add('has-value');
+  var section = document.getElementById('search');
+  if (section) section.scrollIntoView({behavior:'smooth', block:'start'});
+  setTimeout(function(){ lsFilter(); }, 450);
+}
 
 function lsToggleDd(id) {
   var panel = document.getElementById(id+'Panel');
@@ -1483,6 +1426,7 @@ function lsFilter() {
     if (lsFilters.price === '600+' && price < 600) show = false;
     if (lsFilters.type !== 'any' && type !== lsFilters.type) show = false;
     if (lsFilters.insp && !insp) show = false;
+    if (lsFilters.state !== 'any') { var cardState = card.dataset.state || ''; if (cardState && cardState !== lsFilters.state) show = false; }
     card.style.display = show ? '' : 'none';
     if (show) shown++;
   });
@@ -1490,10 +1434,16 @@ function lsFilter() {
   var subEl = document.getElementById('lsSubtitle');
   var noRes = document.getElementById('lsNoResults');
   var grid = document.getElementById('lsGrid');
+  var hasSearch = q || lsFilters.beds !== 'any' || lsFilters.price !== 'any' || lsFilters.type !== 'any' || lsFilters.insp || lsFilters.state !== 'any';
+  var section = document.getElementById('search');
+  if (section) section.style.display = '';
   if (countEl) countEl.textContent = shown + ' propert' + (shown === 1 ? 'y' : 'ies') + ' found';
-  if (subEl) subEl.textContent = q ? 'Results for "' + q + '"' : 'Showing all available rentals';
-  if (noRes) noRes.style.display = shown === 0 ? 'block' : 'none';
-  if (grid) grid.style.display = shown === 0 ? 'none' : '';
+  if (subEl) subEl.textContent = q ? 'Results for "' + q + '"' : 'Filtered results';
+  var resultsBar = document.getElementById('lsResultsBar');
+  if (resultsBar) resultsBar.style.display = hasSearch ? '' : 'none';
+  if (noRes) noRes.style.display = (hasSearch && shown === 0) ? 'block' : 'none';
+  if (noRes && hasSearch && shown === 0) { noRes.querySelector('h3').textContent = 'No properties found'; noRes.querySelector('p').textContent = 'Try adjusting your filters or searching a different suburb.'; noRes.querySelector('.ls-no-icon').textContent = '\ud83c\udfd8'; }
+  if (grid) grid.style.display = (shown === 0 || !hasSearch) ? 'none' : '';
 }
 
 function lsBook(url) {
@@ -1501,10 +1451,11 @@ function lsBook(url) {
 }
 
 function lsSave(id, btn) {
-  var data = lsData.find(function(p){ return p.id === id; });
-  if (!data) return;
-  document.getElementById('lsModalAddr').textContent = data.addr;
-  document.getElementById('lsModalPrice').textContent = data.priceStr;
+  var card = btn ? btn.closest('.ls-card') : null;
+  var addr = card ? (card.querySelector('.ls-card-addr') || {}).textContent : '';
+  var price = card ? (card.querySelector('.ls-card-price') || {}).textContent : '';
+  document.getElementById('lsModalAddr').textContent = addr;
+  document.getElementById('lsModalPrice').textContent = price;
   var overlay = document.getElementById('lsModalOverlay');
   var modal = document.getElementById('lsModal');
   overlay.style.display = 'flex';
@@ -1587,7 +1538,8 @@ document.querySelectorAll('.install-btn').forEach(btn => {
 });
 
 function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  return (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
 function isStandalone() {

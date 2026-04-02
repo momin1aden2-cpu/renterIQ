@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F4F7FF">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#050A1A">
+<meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RenterIQ">
@@ -12,7 +11,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
 <link rel="manifest" href="/app/manifest.json">
-<link rel="stylesheet" href="/app/css/app.css?v=2">
+<link rel="stylesheet" href="/app/css/app.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -25,23 +24,23 @@
 .install-banner{background:var(--blue-dk);padding:12px 16px;display:flex;align-items:center;gap:12px}
 .install-banner .ib-icon{font-size:22px;flex-shrink:0}
 .install-banner .ib-body{flex:1;min-width:0}
-.install-banner .ib-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
-.install-banner .ib-sub{font-size:11px;color:var(--muted)}
-.install-banner .ib-install{background:linear-gradient(135deg,var(--teal),#00DBA6);color:var(--text);font-family:'Sora',sans-serif;font-size:11px;font-weight:700;padding:7px 16px;border-radius:100px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;min-height:44px;box-shadow:0 2px 8px rgba(0,200,150,.3)}
-.install-banner .ib-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;line-height:1;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center}
+.install-banner .ib-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#fff}
+.install-banner .ib-sub{font-size:11px;color:rgba(255,255,255,.6)}
+.install-banner .ib-install{background:linear-gradient(135deg,var(--teal),#00DBA6);color:#fff;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;padding:7px 16px;border-radius:100px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;min-height:44px;box-shadow:0 2px 8px rgba(0,200,150,.3)}
+.install-banner .ib-close{background:none;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;line-height:1;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center}
 
 /* Header */
 .hdr-top{display:flex;align-items:center;justify-content:space-between}
 .hdr-brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;-webkit-tap-highlight-color:transparent}
 .hdr-brand svg{flex-shrink:0}
-.hdr-brand-text{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:2px}
+.hdr-brand-text{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.9);letter-spacing:2px}
 .hdr-actions{display:flex;align-items:center;gap:12px}
 .hdr-bell{font-size:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center}
-.hdr-avatar{width:34px;height:34px;border-radius:50%;background:var(--glass-surface-2);border:1.5px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.hdr-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
 .hdr-avatar:active{transform:scale(.9)}
 
 /* Active Property Card */
-.prop-card{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:22px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.3),0 8px 32px rgba(0,0,0,.6);position:relative;z-index:5;transition:transform .18s var(--ease-smooth)}
+.prop-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 2px 8px rgba(27,80,200,.06),0 8px 32px rgba(27,80,200,.12);position:relative;z-index:5;transition:transform .18s var(--ease-smooth)}
 .prop-card:active{transform:scale(.985)}
 .prop-top{display:flex;align-items:center;justify-content:space-between}
 .prop-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
@@ -65,7 +64,7 @@
 
 /* Inspection Cards */
 .insp-scroll{display:flex;gap:12px;overflow-x:auto;padding:2px 16px 4px;margin:0 -16px;-webkit-overflow-scrolling:touch}
-.insp-card{width:210px;flex-shrink:0;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);transition:all .18s var(--ease-smooth)}
+.insp-card{width:210px;flex-shrink:0;background:#fff;border-radius:18px;padding:14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);transition:all .18s var(--ease-smooth)}
 .insp-card.today{border:1.5px solid var(--blue-lt);box-shadow:var(--shadow-elevated)}
 .insp-card:active{transform:scale(.97)}
 .ic-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -85,7 +84,7 @@
 
 /* Vault Stats */
 .vault-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.vault-stat{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:16px 14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
+.vault-stat{background:#fff;border-radius:16px;padding:16px 14px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
 .vault-stat:active{transform:scale(.96);box-shadow:none}
 .vs-top{display:flex;justify-content:space-between;align-items:center}
 .vs-icon{font-size:22px}
@@ -95,7 +94,7 @@
 /* Alert Cards */
 .alert-card{border-radius:18px;padding:16px;display:flex;gap:13px;align-items:flex-start}
 .alert-card.amber{background:rgba(245,166,35,.07);border:1.5px solid rgba(245,166,35,.3)}
-.alert-card.blue{background:var(--glass-surface-3);border:1.5px solid rgba(27,80,200,.15);align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.alert-card.blue{background:rgba(27,80,200,.04);border:1.5px solid rgba(27,80,200,.15);align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .alert-card.blue:active{transform:scale(.98)}
 .alert-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .alert-icon.amber{background:rgba(245,166,35,.15)}
@@ -112,16 +111,16 @@
 .alert-chev{color:var(--muted);font-size:22px;margin-left:auto;flex-shrink:0}
 
 /* Rights CTA */
-.rights-cta{background:linear-gradient(135deg,var(--blue-dk) 0%,var(--blue-md) 100%);border-radius:18px;padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;transition:all .18s var(--ease-smooth);box-shadow:0 4px 16px rgba(0,0,0,.6)}
+.rights-cta{background:linear-gradient(135deg,var(--blue-dk) 0%,var(--blue-md) 100%);border-radius:18px;padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;transition:all .18s var(--ease-smooth);box-shadow:0 4px 16px rgba(10,36,96,.2)}
 .rights-cta:active{transform:scale(.97)}
-.rc-icon{width:44px;height:44px;border-radius:12px;background:var(--glass-surface-2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.rc-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .rc-body{flex:1;min-width:0}
-.rc-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
-.rc-sub{font-size:12px;font-weight:600;color:var(--muted);margin-top:3px}
-.rc-chev{color:var(--muted);font-size:24px;margin-left:auto;flex-shrink:0}
+.rc-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#fff}
+.rc-sub{font-size:12px;font-weight:600;color:rgba(255,255,255,.65);margin-top:3px}
+.rc-chev{color:rgba(255,255,255,.5);font-size:24px;margin-left:auto;flex-shrink:0}
 
 /* Activity Feed */
-.activity-card{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden}
+.activity-card{background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden}
 .activity-row{padding:13px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .12s}
 .activity-row:last-child{border-bottom:none}
 .activity-row:active{background:var(--blue-xl)}
@@ -140,19 +139,19 @@
 .content{flex:1;overflow-y:auto;padding-bottom:100px}
 
 /* Bottom Nav */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px var(--glass-surface-3)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
 .nav-tab:active{transform:scale(.92)}
 .tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
-.nav-tab.active .tab-icon{background:rgba(0,229,255,0.15);border:1px solid rgba(0,229,255,0.3);box-shadow:0 0 12px rgba(0,229,255,0.3);color:var(--blue)}
+.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
 .tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
 .nav-tab.active .tab-label{color:var(--blue)}
 
 /* Update Bar */
-.update-bar{position:fixed;bottom:74px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:var(--text);border-radius:14px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:9999;transform:translateY(30px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:var(--shadow-float)}
+.update-bar{position:fixed;bottom:74px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:9999;transform:translateY(30px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:var(--shadow-float)}
 .update-bar.show{transform:translateY(0);opacity:1;pointer-events:auto}
 .update-bar span{font-family:'Sora',sans-serif;font-size:13px;font-weight:700}
-.update-bar button{background:var(--teal);color:var(--text);font-family:'Sora',sans-serif;font-size:12px;font-weight:700;border:none;border-radius:100px;padding:7px 16px;cursor:pointer;white-space:nowrap}
+.update-bar button{background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;border:none;border-radius:100px;padding:7px 16px;cursor:pointer;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -163,9 +162,9 @@
     <path d="M11 0L21.5 5V13C21.5 20.18 17.16 26.36 11 28C4.84 26.36 0.5 20.18 0.5 13V5L11 0Z" fill="rgba(255,255,255,.85)"/>
     <path d="M11 4L7 9.5V15.5H9.5V12H12.5V15.5H15V9.5L11 4Z" fill="#1B50C8"/>
   </svg>
-  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;color:var(--text);margin-top:16px">RenterIQ</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:6px">Rent Smart. Stay Protected.</div>
-  <div style="margin-top:32px;width:120px;height:3px;background:var(--border);border-radius:100px;overflow:hidden">
+  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;color:#fff;margin-top:16px">RenterIQ</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1.5px;margin-top:6px">Rent Smart. Stay Protected.</div>
+  <div style="margin-top:32px;width:120px;height:3px;background:rgba(255,255,255,.2);border-radius:100px;overflow:hidden">
     <div id="splashBar" style="height:100%;background:var(--teal);border-radius:100px;width:0%"></div>
   </div>
 </div>
@@ -187,12 +186,12 @@
   <header class="screen-header" style="padding:14px 20px 20px">
     <div class="hdr-top">
       <a href="/index.html" class="hdr-brand">
-        <img src="/assets/logo.svg" alt="RenterIQ" width="28" height="28" style="filter:brightness(0) invert(1)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10.5z"/><path d="M9 22V12h6v10"/></svg>
         <span class="hdr-brand-text">RENTERIQ</span>
       </a>
       <div class="hdr-actions">
-        <span class="hdr-bell" role="button" aria-label="Notifications" onclick="navigate('/notifications')">🔔</span>
-        <div class="hdr-avatar" onclick="navigate('/profile')">A</div>
+        <span class="hdr-bell" role="button" aria-label="Notifications" onclick="navigate('/app/pages/notifications.html')">🔔</span>
+        <div class="hdr-avatar" onclick="navigate('/app/pages/profile.html')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       </div>
     </div>
     <div class="hdr-title" id="greeting" style="font-size:24px;font-weight:800;margin-top:10px">Good morning</div>
@@ -207,24 +206,12 @@
       <div class="prop-card">
         <div class="prop-top">
           <span class="prop-label">ACTIVE PROPERTY</span>
-          <span class="prop-badge">Lease Active</span>
         </div>
-        <div class="prop-addr">18 Smith Street, Fitzroy VIC 3065</div>
-        <div class="prop-meta">$620 / week · Lease ends 14 March 2026</div>
-        <div class="prop-progress">
-          <div class="pp-row">
-            <span class="pp-label">Lease Progress</span>
-            <span class="pp-val">7 months remaining</span>
-          </div>
-          <div class="prop-bar">
-            <div class="prop-bar-fill" id="leaseBar"></div>
-          </div>
-        </div>
+        <div class="prop-addr" style="color:var(--muted);font-size:14px;font-weight:600;margin-top:8px">No active property yet</div>
+        <div class="prop-meta">Search for a rental and save it to get started.</div>
         <div class="prop-divider"></div>
         <div class="prop-actions">
-          <button class="btn btn-blue" onclick="navigate('/inspect')">📋 Inspect</button>
-          <button class="btn btn-muted" style="color:var(--blue);border:1.5px solid var(--border)" onclick="navigate('/vault')">🗄️ Vault</button>
-          <button class="btn btn-muted" style="border:1.5px solid var(--border)" onclick="navigate('/exit')">🚪 Exit</button>
+          <button class="btn btn-blue" onclick="navigate('/app/pages/search.html')">� Search Rentals</button>
         </div>
       </div>
     </div>
@@ -233,42 +220,12 @@
     <div style="padding:20px 16px 0">
       <div class="sec-row">
         <span class="sec-title">Upcoming Inspections</span>
-        <span class="sec-link" onclick="navigate('/inspect')">View all →</span>
+        <span class="sec-link" onclick="navigate('/app/pages/search.html')">Find one →</span>
       </div>
-      <div class="insp-scroll">
-        <!-- Card 1 — Today -->
-        <div class="insp-card today">
-          <div class="ic-top">
-            <div class="ic-left"><span class="pulse-dot"></span><span class="ic-label">Today</span></div>
-            <span class="ic-time-right">10:00am</span>
-          </div>
-          <div class="ic-addr">18 Smith St, Fitzroy</div>
-          <div class="ic-time">10:00am – 10:30am</div>
-          <div class="ic-features"><span>🛏 3</span><span>🚿 1</span><span>🚗 2</span></div>
-          <button class="btn btn-blue" onclick="navigate('/inspect')">📋 Start Inspection</button>
-        </div>
-        <!-- Card 2 — Upcoming -->
-        <div class="insp-card">
-          <div class="ic-top">
-            <div class="ic-left"><span class="ic-label muted">Sun 16 Mar</span></div>
-            <span class="ic-time-right muted">11:30am</span>
-          </div>
-          <div class="ic-addr">7/92 Bridge Rd, Richmond</div>
-          <div class="ic-time">11:30am – 12:00pm</div>
-          <div class="ic-features"><span>🛏 2</span><span>🚿 1</span><span>🚗 1</span></div>
-          <button class="btn btn-muted" style="color:var(--blue);border:1.5px solid var(--border)" onclick="navigate('/inspect')">View Details</button>
-        </div>
-        <!-- Card 3 — Upcoming -->
-        <div class="insp-card">
-          <div class="ic-top">
-            <div class="ic-left"><span class="ic-label muted">Sat 22 Mar</span></div>
-            <span class="ic-time-right muted">1:00pm</span>
-          </div>
-          <div class="ic-addr">3/21 Johnston St, Collingwood</div>
-          <div class="ic-time">1:00pm – 1:30pm</div>
-          <div class="ic-features"><span>🛏 3</span><span>🚿 2</span><span>🚗 1</span></div>
-          <button class="btn btn-muted" style="color:var(--blue);border:1.5px solid var(--border)" onclick="navigate('/inspect')">View Details</button>
-        </div>
+      <div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:24px 16px;text-align:center;color:var(--muted)">
+        <div style="font-size:32px;margin-bottom:8px">�</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:4px">No inspections booked yet</div>
+        <div style="font-size:12px">Book an inspection from the Search tab to see it here.</div>
       </div>
     </div>
 
@@ -276,23 +233,23 @@
     <div style="padding:20px 16px 0">
       <div class="sec-row">
         <span class="sec-title">Your Vault</span>
-        <span class="sec-link" onclick="navigate('/vault')">Open Vault →</span>
+        <span class="sec-link" onclick="navigate('/app/pages/vault.html')">Open Vault →</span>
       </div>
       <div class="vault-grid">
-        <div class="vault-stat" onclick="navigate('/vault')">
-          <div class="vs-top"><span class="vs-icon">📑</span><span class="vs-count">2</span></div>
+        <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
+          <div class="vs-top"><span class="vs-icon">📑</span><span class="vs-count">0</span></div>
           <span class="vs-label">Lease Agreements</span>
         </div>
-        <div class="vault-stat" onclick="navigate('/vault')">
-          <div class="vs-top"><span class="vs-icon">📸</span><span class="vs-count">3</span></div>
+        <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
+          <div class="vs-top"><span class="vs-icon">📸</span><span class="vs-count">0</span></div>
           <span class="vs-label">Condition Reports</span>
         </div>
-        <div class="vault-stat" onclick="navigate('/vault')">
-          <div class="vs-top"><span class="vs-icon">🔧</span><span class="vs-count">4</span></div>
+        <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
+          <div class="vs-top"><span class="vs-icon">🔧</span><span class="vs-count">0</span></div>
           <span class="vs-label">Maintenance Logs</span>
         </div>
-        <div class="vault-stat" onclick="navigate('/vault')">
-          <div class="vs-top"><span class="vs-icon">🧾</span><span class="vs-count">7</span></div>
+        <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
+          <div class="vs-top"><span class="vs-icon">🧾</span><span class="vs-count">0</span></div>
           <span class="vs-label">Receipts Saved</span>
         </div>
       </div>
@@ -300,23 +257,11 @@
     </div>
 
     <!-- Maintenance Alert -->
-    <div id="maintenanceCard" style="padding:16px 16px 0">
-      <div class="alert-card amber">
-        <div class="alert-icon amber">⚠️</div>
-        <div style="flex:1;min-width:0">
-          <div class="alert-title amber">Maintenance Follow-Up</div>
-          <div class="alert-sub amber">Hot water repair — reported 8 days ago. No response from agent yet.</div>
-          <div class="alert-btns">
-            <button class="alert-pill" onclick="showToast('Reminder sent','Agent notified via email','📨')">Send Reminder</button>
-            <button class="alert-pill" onclick="navigate('/vault')">View in Vault</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div id="maintenanceCard" style="display:none;padding:16px 16px 0"></div>
 
     <!-- Lease Review -->
-    <div style="margin:12px 16px 12px" onclick="navigate('/lease')" style="cursor:pointer">
-      <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border:1.5px solid var(--blue-lt);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.6);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/lease')">
+    <div style="margin:12px 16px 12px" onclick="navigate('/app/pages/lease.html')" style="cursor:pointer">
+      <div style="background:#fff;border:1.5px solid var(--blue-lt);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(27,80,200,.08);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/app/pages/lease.html')">
         <div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📑</div>
         <div style="flex:1;min-width:0">
           <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Review Your Lease Agreement</div>
@@ -327,32 +272,23 @@
     </div>
 
     <!-- Routine Inspection -->
-    <div style="margin:0 16px 12px" onclick="navigate('/inspect/routine')">
-      <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border:1.5px solid rgba(0,200,150,.3);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(0,200,150,.08);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/inspect/routine')">
+    <div style="margin:0 16px 12px" onclick="navigate('/app/pages/routine-inspection.html')">
+      <div style="background:#fff;border:1.5px solid rgba(0,200,150,.3);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(0,200,150,.08);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/app/pages/routine-inspection.html')">
         <div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--teal),#00DBA6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,200,150,.25)">🏠</div>
         <div style="flex:1;min-width:0">
           <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Routine Inspection Due</div>
-          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Next inspection 15 Apr — record the report, AI categorises items by responsibility.</div>
+          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Record your routine inspection — AI categorises items by responsibility.</div>
         </div>
         <span style="font-size:22px;color:var(--muted);flex-shrink:0">›</span>
       </div>
     </div>
 
     <!-- Lease Expiry Reminder -->
-    <div id="renewalCard" style="padding:12px 16px 0">
-      <div class="alert-card blue" onclick="navigate('/renewal')">
-        <div class="alert-icon blue">📅</div>
-        <div style="flex:1;min-width:0">
-          <div class="alert-title blue">Lease Renewal Due</div>
-          <div class="alert-sub blue">Your lease expires 14 March 2026 — 358 days away. RenterIQ will remind you at 90, 60 and 30 days.</div>
-        </div>
-        <span class="alert-chev">›</span>
-      </div>
-    </div>
+    <div id="renewalCard" style="display:none;padding:12px 16px 0"></div>
 
     <!-- Renter Rights -->
     <div style="padding:12px 16px 0">
-      <div class="rights-cta" onclick="navigate('/rights')">
+      <div class="rights-cta" onclick="navigate('/app/pages/rights.html')">
         <div class="rc-icon">⚖️</div>
         <div class="rc-body">
           <div class="rc-title">Know Your Rights</div>
@@ -363,49 +299,12 @@
     </div>
 
     <!-- Recent Activity -->
-    <div style="padding:20px 16px 0">
+    <div style="padding:20px 16px 0" id="recentActivitySection">
       <div class="sec-title" style="margin-bottom:12px">Recent Activity</div>
-      <div class="activity-card">
-        <div class="activity-row" onclick="navigate('/inspect')">
-          <div class="ar-icon" style="background:var(--teal-lt)">📄</div>
-          <div class="ar-body">
-            <div class="ar-text">Inspection report saved — 18 Smith St</div>
-            <div class="ar-date">Today, 10:38am</div>
-          </div>
-          <span class="ar-chev">›</span>
-        </div>
-        <div class="activity-row" onclick="navigate('/inspect')">
-          <div class="ar-icon" style="background:var(--blue-lt)">📅</div>
-          <div class="ar-body">
-            <div class="ar-text">Inspection booked — 7/92 Bridge Rd</div>
-            <div class="ar-date">Yesterday, 3:12pm</div>
-          </div>
-          <span class="ar-chev">›</span>
-        </div>
-        <div class="activity-row" onclick="navigate('/vault')">
-          <div class="ar-icon" style="background:rgba(0,0,0,.6)">⚖️</div>
-          <div class="ar-body">
-            <div class="ar-text">Lease reviewed and saved to Vault</div>
-            <div class="ar-date">12 Mar, 9:45am</div>
-          </div>
-          <span class="ar-chev">›</span>
-        </div>
-        <div class="activity-row" onclick="navigate('/vault')">
-          <div class="ar-icon" style="background:var(--amber-lt)">🔧</div>
-          <div class="ar-body">
-            <div class="ar-text">Maintenance request logged — hot water</div>
-            <div class="ar-date">7 Mar, 2:20pm</div>
-          </div>
-          <span class="ar-chev">›</span>
-        </div>
-        <div class="activity-row" onclick="navigate('/inspect')">
-          <div class="ar-icon" style="background:var(--teal-lt)">📸</div>
-          <div class="ar-body">
-            <div class="ar-text">Move-in condition report completed</div>
-            <div class="ar-date">1 Mar, 11:05am</div>
-          </div>
-          <span class="ar-chev">›</span>
-        </div>
+      <div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:24px 16px;text-align:center;color:var(--muted)">
+        <div style="font-size:32px;margin-bottom:8px">📂</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:4px">No activity yet</div>
+        <div style="font-size:12px">Your reports, inspections and documents will appear here.</div>
       </div>
     </div>
 
@@ -421,19 +320,19 @@
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
-    <button class="nav-tab active" onclick="navigate('/dashboard')">
+    <button class="nav-tab active" onclick="navigate('/app/index.html')">
       <div class="tab-icon">🏠</div>
       <span class="tab-label">Home</span>
     </button>
-    <button class="nav-tab" onclick="navigate('/search')">
+    <button class="nav-tab" onclick="navigate('/app/pages/search.html')">
       <div class="tab-icon">🔍</div>
       <span class="tab-label">Search</span>
     </button>
-    <button class="nav-tab" onclick="navigate('/inspect')">
+    <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')">
       <div class="tab-icon">📋</div>
       <span class="tab-label">Inspect</span>
     </button>
-    <button class="nav-tab" onclick="navigate('/vault')">
+    <button class="nav-tab" onclick="navigate('/app/pages/vault.html')">
       <div class="tab-icon">🗂️</div>
       <span class="tab-label">Vault</span>
     </button>
@@ -464,7 +363,7 @@ function getGreeting() {
   if (h >= 5 && h < 12) return 'Good morning';
   if (h >= 12 && h < 17) return 'Good afternoon';
   if (h >= 17 && h < 21) return 'Good evening';
-  return 'Good night';
+  return 'Good evening';
 }
 
 function formatDate(date) {
@@ -510,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Greeting
   var greetEl = document.getElementById('greeting');
-  if (greetEl) greetEl.textContent = getGreeting() + ', Alex';
+  if (greetEl) greetEl.textContent = getGreeting();
 
   // Date
   var dateEl = document.getElementById('currentDate');

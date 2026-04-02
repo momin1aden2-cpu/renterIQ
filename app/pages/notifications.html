@@ -73,110 +73,11 @@
   <button class="btn-sm-blue" style="flex-shrink:0" onclick="requestPushPermission()">Enable</button>
 </div>
 
-<!-- TODAY -->
-<div class="sec-label"><span class="sec-label-text">Today</span><span class="sec-label-count">3 new</span></div>
-
-<div class="notif-card notif-unread" id="notif-0" onclick="markRead(0);navigate('/app/pages/inspection.html')">
-  <div class="notif-icon" style="background:rgba(27,80,200,.1)">📅</div>
-  <div style="flex:1">
-    <div class="notif-title">Inspection in 2 hours</div>
-    <div class="notif-body">18 Smith Street, Fitzroy — Today at 10:00am. RenterIQ guided walkthrough is ready for you.</div>
-    <div class="notif-actions">
-      <button class="btn-sm-blue" onclick="event.stopPropagation();navigate('/app/pages/inspection.html')">Start Inspection</button>
-      <button class="btn-sm-muted" onclick="event.stopPropagation();showToast('Directions','Opening maps','🗺')">Directions</button>
-    </div>
-  </div>
-  <div class="notif-right"><span class="notif-time">8:12am</span><div class="notif-dot" id="dot-0"></div></div>
-</div>
-
-<div class="notif-card notif-unread" id="notif-1" onclick="markRead(1);navigate('/app/pages/vault.html')">
-  <div class="notif-icon amber-lt">🔧</div>
-  <div style="flex:1">
-    <div class="notif-title">Maintenance — no response in 8 days</div>
-    <div class="notif-body">Hot water repair reported 7 March. Your agent has not responded. Consider sending a follow-up.</div>
-    <div class="notif-actions">
-      <button class="btn-sm-blue" onclick="event.stopPropagation();showToast('Follow-up sent','Reminder sent to agent · Logged in Vault','📨')">Send Follow-Up</button>
-      <button class="btn-sm-muted" onclick="event.stopPropagation();navigate('/app/pages/vault.html#maintenance')">View in Vault</button>
-    </div>
-  </div>
-  <div class="notif-right"><span class="notif-time">9:30am</span><div class="notif-dot" id="dot-1"></div></div>
-</div>
-
-<div class="notif-card notif-unread" id="notif-2" onclick="markRead(2);navigate('/app/pages/inspection.html')">
-  <div class="notif-icon teal-lt">📄</div>
-  <div style="flex:1">
-    <div class="notif-title">Inspection report saved to Vault</div>
-    <div class="notif-body">Your condition report for 18 Smith Street is ready. 8 areas · 24 photos · AI summary complete.</div>
-    <div class="notif-actions">
-      <button class="btn-sm-blue" onclick="event.stopPropagation();navigate('/app/pages/inspection.html')">View Report</button>
-      <button class="btn-sm-muted" onclick="event.stopPropagation();navigate('/app/pages/vault.html')">Open Vault</button>
-    </div>
-  </div>
-  <div class="notif-right"><span class="notif-time">10:38am</span><div class="notif-dot" id="dot-2"></div></div>
-</div>
-
-<!-- THIS WEEK -->
-<div class="sec-label"><span class="sec-label-text">This Week</span><span class="sec-label-count">1 new</span></div>
-
-<div class="notif-card notif-unread" id="notif-3" onclick="markRead(3);navigate('/app/pages/search.html')">
-  <div class="notif-icon" style="background:rgba(27,80,200,.1)">📅</div>
-  <div style="flex:1">
-    <div class="notif-title">Inspection tomorrow — 7/92 Bridge Rd</div>
-    <div class="notif-body">Inspection at 7/92 Bridge Road, Richmond is tomorrow at 11:30am. Tap to prepare.</div>
-    <div class="notif-actions">
-      <button class="btn-sm-muted" onclick="event.stopPropagation();navigate('/app/pages/search.html')">View Property</button>
-      <button class="btn-sm-muted" onclick="event.stopPropagation();showToast('Added to calendar','7/92 Bridge Rd · Sun 11:30am','📅')">Add to Calendar</button>
-    </div>
-  </div>
-  <div class="notif-right"><span class="notif-time">Yesterday</span><div class="notif-dot" id="dot-3"></div></div>
-</div>
-
-<!-- EARLIER -->
-<div class="sec-label"><span class="sec-label-text">Earlier</span><span class="sec-label-count" style="color:var(--muted)">Read</span></div>
-
-<div class="notif-card" id="notif-4" style="opacity:.85" onclick="navigate('/app/pages/search.html')">
-  <div class="notif-icon" style="background:rgba(27,80,200,.1)">📅</div>
-  <div style="flex:1">
-    <div class="notif-title">Inspection booked — 7/92 Bridge Rd, Richmond</div>
-    <div class="notif-body">Inspection confirmed for Sunday 16 March at 11:30am. Property saved to your profile.</div>
-  </div>
-  <div class="notif-right"><span class="notif-time">2 days ago</span></div>
-</div>
-
-<div class="notif-card" id="notif-5" style="opacity:.85" onclick="navigate('/app/pages/lease.html')">
-  <div class="notif-icon" style="background:rgba(27,80,200,.08)">⚖️</div>
-  <div style="flex:1">
-    <div class="notif-title">Lease review complete</div>
-    <div class="notif-body">Your lease for 18 Smith Street has been reviewed. 3 clauses flagged for your attention.</div>
-  </div>
-  <div class="notif-right"><span class="notif-time">3 days ago</span></div>
-</div>
-
-<div class="notif-card" id="notif-6" style="opacity:.85" onclick="navigate('/app/pages/vault.html')">
-  <div class="notif-icon teal-lt">🛡</div>
-  <div style="flex:1">
-    <div class="notif-title">Move-in audit saved to Vault</div>
-    <div class="notif-body">Your move-in condition report is saved. Both your report and the agency report are stored.</div>
-  </div>
-  <div class="notif-right"><span class="notif-time">5 days ago</span></div>
-</div>
-
-<div class="notif-card" id="notif-7" style="opacity:.85" onclick="navigate('/app/index.html')">
-  <div class="notif-icon teal-lt">🔑</div>
-  <div style="flex:1">
-    <div class="notif-title">Welcome to RenterIQ</div>
-    <div class="notif-body">Your Vault is set up and your tenancy for 18 Smith Street is active. You're protected.</div>
-  </div>
-  <div class="notif-right"><span class="notif-time">15 Mar</span></div>
-</div>
-
-<div class="notif-card" id="notif-8" style="opacity:.85" onclick="navigate('/app/pages/search.html')">
-  <div class="notif-icon" style="background:rgba(27,80,200,.1)">🏠</div>
-  <div style="flex:1">
-    <div class="notif-title">Property saved — 18 Smith St, Fitzroy</div>
-    <div class="notif-body">You booked an inspection and the property was saved to your RenterIQ profile automatically.</div>
-  </div>
-  <div class="notif-right"><span class="notif-time">10 Mar</span></div>
+<!-- EMPTY STATE -->
+<div style="text-align:center;padding:48px 24px 24px">
+  <div style="font-size:44px;margin-bottom:12px">�</div>
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:6px">No notifications yet</div>
+  <div style="font-weight:600;font-size:13px;color:var(--muted)">Inspection reminders, lease alerts and maintenance follow-ups will appear here once you're active in the app.</div>
 </div>
 
 <!-- UPCOMING REMINDERS -->
@@ -184,22 +85,10 @@
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Upcoming Reminders</div>
   <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Scheduled alerts</div>
 </div>
-<div style="display:flex;flex-direction:column;gap:10px;margin:0 16px">
-  <div class="reminder-card" id="reminder-0">
-    <div style="width:40px;height:40px;border-radius:11px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📅</div>
-    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Inspection reminder — 3/21 Johnston St</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Sat 22 Mar at 12:00pm (noon)</div></div>
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--muted);cursor:pointer;padding:4px 8px" onclick="event.stopPropagation();dismissReminder(0)">✕</span>
-  </div>
-  <div class="reminder-card" id="reminder-1" style="cursor:pointer" onclick="navigate('/app/pages/renewal.html')">
-    <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" class="amber-lt">📋</div>
-    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease renewal — 90 day reminder</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Scheduled for 31 December 2025</div></div>
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--muted);padding:4px 8px">›</span>
-  </div>
-  <div class="reminder-card" id="reminder-2">
-    <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" class="amber-lt">🔧</div>
-    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Maintenance follow-up — 14 days</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">If hot water issue unresolved by 21 March</div></div>
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--muted);cursor:pointer;padding:4px 8px" onclick="event.stopPropagation();dismissReminder(2)">✕</span>
-  </div>
+<div style="margin:0 16px;background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);text-align:center;color:var(--muted)">
+  <div style="font-size:24px;margin-bottom:6px">📋</div>
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk);margin-bottom:4px">No reminders set</div>
+  <div style="font-size:12px">Reminders for inspections, lease renewal and maintenance will appear here.</div>
 </div>
 
 <!-- NOTIFICATION TYPES -->

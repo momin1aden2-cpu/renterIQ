@@ -216,7 +216,7 @@
       <button class="sh-right" onclick="showToast('Info','Routine inspections happen every 3–6 months','📋')">ℹ️</button>
     </div>
     <div class="sh-title">Routine Inspections</div>
-    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+    <div class="sh-sub">Track and respond to routine inspections</div>
   </header>
 
   <div class="content">
@@ -226,16 +226,16 @@
         <div class="cd-icon">🏠</div>
         <div>
           <div class="cd-title">Next Scheduled Inspection</div>
-          <div class="cd-date">15 April 2026</div>
-          <div class="cd-sub">Confirmed by Ray White Fitzroy</div>
+          <div class="cd-date">Not scheduled yet</div>
+          <div class="cd-sub">Add your tenancy to set inspection dates</div>
         </div>
       </div>
       <div class="cd-divider"></div>
       <div class="cd-days">
-        <div class="cd-num">24</div>
+        <div class="cd-num">&mdash;</div>
         <div>
           <div class="cd-num-label">days until inspection</div>
-          <div style="font-weight:600;font-size:11px;color:var(--amber);margin-top:2px">⏰ Prepare your property</div>
+          <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">No upcoming inspection</div>
         </div>
       </div>
       <div class="cd-actions">
@@ -247,42 +247,10 @@
     <!-- Past Inspections -->
     <div style="padding:0 16px"><div class="sec-label">PAST INSPECTIONS</div></div>
 
-    <div class="ri-card" onclick="switchView('G')">
-      <div class="ri-top">
-        <div>
-          <div class="ri-date">15 January 2026</div>
-          <div class="ri-addr">18 Smith St, Fitzroy VIC 3065</div>
-        </div>
-        <span class="tag tag-teal">Resolved</span>
-      </div>
-      <div class="ri-summary">
-        <div class="ri-stat"><div class="ri-stat-dot" style="background:var(--red)"></div>2 Owner</div>
-        <div class="ri-stat"><div class="ri-stat-dot" style="background:var(--amber)"></div>3 Tenant</div>
-        <div class="ri-stat"><div class="ri-stat-dot" style="background:var(--teal)"></div>All fixed</div>
-      </div>
-      <div class="ri-progress">
-        <div class="ri-progress-label"><span>Response progress</span><span>100%</span></div>
-        <div class="ri-progress-bar"><div class="ri-progress-fill" style="width:100%"></div></div>
-      </div>
-    </div>
-
-    <div class="ri-card" onclick="switchView('G')">
-      <div class="ri-top">
-        <div>
-          <div class="ri-date">12 October 2025</div>
-          <div class="ri-addr">18 Smith St, Fitzroy VIC 3065</div>
-        </div>
-        <span class="tag tag-teal">Resolved</span>
-      </div>
-      <div class="ri-summary">
-        <div class="ri-stat"><div class="ri-stat-dot" style="background:var(--red)"></div>1 Owner</div>
-        <div class="ri-stat"><div class="ri-stat-dot" style="background:var(--amber)"></div>2 Tenant</div>
-        <div class="ri-stat"><div class="ri-stat-dot" style="background:var(--teal)"></div>All fixed</div>
-      </div>
-      <div class="ri-progress">
-        <div class="ri-progress-label"><span>Response progress</span><span>100%</span></div>
-        <div class="ri-progress-bar"><div class="ri-progress-fill" style="width:100%"></div></div>
-      </div>
+    <div style="margin:0 16px 12px;background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);text-align:center;color:var(--muted)">
+      <div style="font-size:28px;margin-bottom:8px">📋</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk);margin-bottom:4px">No past inspections yet</div>
+      <div style="font-size:12px">Completed inspection records will appear here.</div>
     </div>
 
     <!-- Disclaimer -->

@@ -245,7 +245,7 @@
       <button class="sh-back" onclick="switchView('A')"><span class="sh-back-arrow">‹</span><span class="sh-label" id="clauseCounter">0 of 12 clauses</span></button>
     </div>
     <div class="sh-title">Your Lease Explained</div>
-    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+    <div class="sh-sub">Your lease &mdash; clause by clause</div>
     <div style="background:var(--blue-dk);margin:14px -20px 0;padding:10px 20px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.7)">Clauses reviewed</span>
@@ -266,18 +266,18 @@
       <!-- Clause 0: Lease Term -->
       <div class="clause-card" id="clause-0">
         <div class="clause-header" style="background:rgba(27,80,200,.06)"><div class="clause-left"><span class="clause-icon">📅</span><span class="clause-name">Lease Term</span></div><span class="tag-blue">Important</span></div>
-        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">Your lease runs for 12 months — starting 1 April 2025 and ending 31 March 2026. After this date, if neither you nor the landlord gives notice, the lease automatically rolls over to a month-by-month arrangement at the same rent.</div></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">Your lease runs for a fixed term. After this date, if neither you nor the landlord gives notice, the lease automatically rolls over to a month-by-month arrangement at the same rent.</div></div>
         <div class="original-toggle" onclick="toggleOriginal(0)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-0">Show ›</span></div>
-        <div class="original-content" id="origContent-0" style="display:none"><div class="original-inner">The tenancy commences on 1 April 2025 and shall continue for a fixed term of twelve (12) months expiring on 31 March 2026 ('the fixed term') unless sooner terminated in accordance with this agreement.</div></div>
+        <div class="original-content" id="origContent-0" style="display:none"><div class="original-inner">The tenancy commences on [start date] and shall continue for a fixed term expiring on [end date] ('the fixed term') unless sooner terminated in accordance with this agreement.</div></div>
         <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(0)">Mark as Understood ✓</button></div>
       </div>
 
       <!-- Clause 1: Weekly Rent -->
       <div class="clause-card" id="clause-1">
         <div class="clause-header" style="background:var(--blue-xl)"><div class="clause-left"><span class="clause-icon">💰</span><span class="clause-name">Weekly Rent</span></div><span class="tag-muted">Standard</span></div>
-        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">Your rent is $620 per week, payable every Monday. Payment must be made by direct bank transfer to the agency's trust account. Rent is considered late if it is not received by close of business on the due date.</div></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">Your weekly rent is payable every week on the agreed day. Payment must be made by direct bank transfer to the agency's trust account. Rent is considered late if it is not received by close of business on the due date.</div></div>
         <div class="original-toggle" onclick="toggleOriginal(1)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-1">Show ›</span></div>
-        <div class="original-content" id="origContent-1" style="display:none"><div class="original-inner">The Tenant shall pay to the Landlord rent in the amount of Six Hundred and Twenty Dollars ($620.00) per week, payable in advance every Monday by direct bank transfer to the Agent's nominated trust account.</div></div>
+        <div class="original-content" id="origContent-1" style="display:none"><div class="original-inner">The Tenant shall pay to the Landlord rent in the agreed amount per week, payable in advance on the agreed day by direct bank transfer to the Agent's nominated trust account.</div></div>
         <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(1)">Mark as Understood ✓</button></div>
       </div>
 
@@ -293,9 +293,9 @@
       <!-- Clause 3: Bond / Security Deposit -->
       <div class="clause-card" id="clause-3">
         <div class="clause-header" style="background:rgba(27,80,200,.06)"><div class="clause-left"><span class="clause-icon">🔑</span><span class="clause-name">Bond / Security Deposit</span></div><span class="tag-blue">Important</span></div>
-        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">A bond of $2,480 (equivalent to 4 weeks rent) has been collected. This must be lodged with the Residential Tenancies Bond Authority (RTBA) by the agent within 10 business days. You should receive a bond lodgement receipt — keep this safe in your Vault. The bond can only be claimed for unpaid rent, damage beyond fair wear and tear, or cleaning costs.</div></div>
+        <div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">A bond equivalent to 4 weeks rent has been collected. This must be lodged with the Residential Tenancies Bond Authority (RTBA) by the agent within 10 business days. You should receive a bond lodgement receipt — keep this safe in your Vault. The bond can only be claimed for unpaid rent, damage beyond fair wear and tear, or cleaning costs.</div></div>
         <div class="original-toggle" onclick="toggleOriginal(3)"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-3">Show ›</span></div>
-        <div class="original-content" id="origContent-3" style="display:none"><div class="original-inner">A bond of Two Thousand Four Hundred and Eighty Dollars ($2,480.00) being equivalent to four (4) weeks rent shall be paid and held in accordance with the Residential Tenancies Act 1997 (Vic) and lodged with the Residential Tenancies Bond Authority.</div></div>
+        <div class="original-content" id="origContent-3" style="display:none"><div class="original-inner">A bond equivalent to four (4) weeks rent shall be paid and held in accordance with the Residential Tenancies Act 1997 (Vic) and lodged with the Residential Tenancies Bond Authority.</div></div>
         <div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood(3)">Mark as Understood ✓</button></div>
       </div>
 
@@ -409,7 +409,7 @@
       <button class="sh-back" onclick="switchView('C')"><span class="sh-back-arrow">‹</span><span class="sh-label">Review</span></button>
     </div>
     <div class="sh-title">Lease Summary</div>
-    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+    <div class="sh-sub">Your lease review results</div>
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
@@ -501,7 +501,7 @@
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Saved to Your Vault</div>
       <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-lt)">
         <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div>
-        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Agreement PDF</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">18 Smith St, Fitzroy · Starts 1 Apr 2025</div></div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Agreement PDF</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Your uploaded lease document</div></div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-lt)">
         <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📋</div>
@@ -609,7 +609,7 @@ function handleFileSelect(input){
 function loadDemoLease(){
   document.getElementById('dropZone').style.display='none';
   document.getElementById('fileSelected').style.display='block';
-  document.getElementById('fileName').textContent='lease_18_smith_st_fitzroy.pdf';
+  document.getElementById('fileName').textContent='sample_lease.pdf';
   document.getElementById('fileSize').textContent='2.4 MB · Demo lease loaded';
   document.getElementById('analyseBtn').style.opacity='1';
   document.getElementById('analyseBtn').style.pointerEvents='auto';

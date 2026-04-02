@@ -55,11 +55,11 @@
     <span style="font-size:20px;color:#fff;cursor:pointer;font-family:'Sora',sans-serif;font-weight:700" onclick="switchView('B')">✏️</span>
   </div>
   <div style="display:flex;gap:16px;align-items:center;margin-top:16px">
-    <div style="width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#fff;flex-shrink:0">AJ</div>
+    <div style="width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#fff;flex-shrink:0">👤</div>
     <div>
-      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#fff">Alexandra Johnson</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.65);margin-top:3px">alex.johnson@email.com</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.5);margin-top:2px">Melbourne, VIC</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#fff">Your Profile</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.65);margin-top:3px">Tap to add your details</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.5);margin-top:2px">Australia</div>
     </div>
   </div>
 </header>
@@ -79,9 +79,9 @@
 
 <!-- PROFILE STATS -->
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px">
-  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">358</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Days Left</div></div>
-  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">18</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Vault Docs</div></div>
-  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">4</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Reports</div></div>
+  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">&mdash;</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Days Left</div></div>
+  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">0</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Vault Docs</div></div>
+  <div style="background:#fff;border-radius:14px;padding:14px 10px;border:1px solid var(--border-lt);text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">0</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Reports</div></div>
 </div>
 
 <!-- SETTINGS SECTIONS -->
@@ -112,7 +112,7 @@
 <!-- SECTION 4: DATA & VAULT -->
 <div class="sec-label">Data & Vault</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="navigate('/app/pages/vault.html')"><span class="settings-icon">🗄️</span><div style="flex:1"><div class="settings-title">Your Vault</div><div class="settings-sub">18 documents · 36 photos</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="navigate('/app/pages/vault.html')"><span class="settings-icon">�️</span><div style="flex:1"><div class="settings-title">Your Vault</div><div class="settings-sub">0 documents</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="showToast('Export','Generating your data export — feature coming soon','📦')"><span class="settings-icon">📦</span><div style="flex:1"><div class="settings-title">Export All Data</div><div class="settings-sub">Download all Vault contents as ZIP</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="switchView('F')"><span class="settings-icon">🔒</span><div style="flex:1"><div class="settings-title">Data & Privacy</div><div class="settings-sub">How RenterIQ handles your data</div></div><span class="settings-chevron">›</span></div>
 </div>
@@ -180,10 +180,10 @@
 <!-- PERSONAL INFO -->
 <div class="sec-label">Personal Information</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="form-field"><label class="form-label">Full Name</label><input class="form-input" value="Alexandra Johnson"></div>
-  <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" value="alex.johnson@email.com"></div>
-  <div class="form-field"><label class="form-label">Mobile Number</label><input class="form-input" value="0412 345 678"></div>
-  <div class="form-field"><label class="form-label">Date of Birth</label><input class="form-input" value="14/06/1995"></div>
+  <div class="form-field"><label class="form-label">Full Name</label><input class="form-input" placeholder="Your full name"></div>
+  <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" placeholder="your@email.com"></div>
+  <div class="form-field"><label class="form-label">Mobile Number</label><input class="form-input" placeholder="04xx xxx xxx"></div>
+  <div class="form-field"><label class="form-label">Date of Birth</label><input class="form-input" placeholder="DD/MM/YYYY"></div>
   <div class="form-field" style="display:flex;align-items:center;justify-content:space-between"><div><label class="form-label">Current State</label><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">Victoria (VIC)</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="showToast('State','Select your state to update the Rights Hub','📍')">Change ›</span></div>
   <div class="form-field" style="display:flex;align-items:center;justify-content:space-between"><div><label class="form-label">Preferred Language</label><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">English</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="showToast('Language','Language options coming soon','🌏')">Change ›</span></div>
 </div>
@@ -191,10 +191,10 @@
 <!-- EMPLOYMENT INFO -->
 <div class="sec-label" style="margin-top:20px">Employment</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="form-field"><label class="form-label">Employment Status</label><input class="form-input" value="Employed Full-Time"></div>
-  <div class="form-field"><label class="form-label">Employer</label><input class="form-input" value="Acme Pty Ltd"></div>
-  <div class="form-field"><label class="form-label">Job Title</label><input class="form-input" value="Senior Designer"></div>
-  <div class="form-field"><label class="form-label">Annual Income</label><input class="form-input" value="$92,000"></div>
+  <div class="form-field"><label class="form-label">Employment Status</label><input class="form-input" placeholder="e.g. Employed Full-Time"></div>
+  <div class="form-field"><label class="form-label">Employer</label><input class="form-input" placeholder="Your employer"></div>
+  <div class="form-field"><label class="form-label">Job Title</label><input class="form-input" placeholder="Your job title"></div>
+  <div class="form-field"><label class="form-label">Annual Income</label><input class="form-input" placeholder="$0"></div>
 </div>
 <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55">Employment details are pre-filled in rental applications. Update them here any time.</div>
 
@@ -238,12 +238,12 @@
   </div>
   <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Property</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">18 Smith St, Fitzroy VIC</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Agent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Nelson Alexander</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Weekly Rent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">$620</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Started</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">1 April 2025</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Ends</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">31 March 2026</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Bond Lodged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">$2,480</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Property</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Not set</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Agent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Not set</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Weekly Rent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Started</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Ends</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Bond Lodged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
   </div>
   <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
   <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;display:block;text-align:center" onclick="showToast('Update','Tenancy details editor coming soon','✏️')">Update tenancy details →</span>
@@ -252,7 +252,7 @@
 <!-- LEASE PROGRESS -->
 <div class="sec-label" style="margin-top:20px">Lease Progress</div>
 <div style="background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt)">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">7 of 12 months · 358 days remaining</span></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Add your lease to track progress</span></div>
   <div style="height:8px;background:var(--blue-xl);border-radius:100px;overflow:hidden"><div id="profileLeaseBar" style="height:100%;background:var(--teal);border-radius:100px;width:0;transition:width .8s cubic-bezier(.4,0,.2,1)"></div></div>
   <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
     <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Renewing or moving out?</span>
@@ -264,8 +264,7 @@
 <div class="sec-label" style="margin-top:20px">Previous Tenancies</div>
 <div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
   <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
-    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">8 Smith St, Collingwood VIC</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Jan 2022 – Mar 2024 · Hocking Stuart</div></div>
-    <span style="font-size:16px;cursor:pointer" onclick="showToast('Previous lease','Opening archived lease','📄')">📄</span>
+    <div style="flex:1;color:var(--muted)"><div style="font-family:'Sora',sans-serif;font-weight:600;font-size:13px">No previous tenancies added</div></div>
   </div>
   <div style="padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="showToast('Import','Previous tenancy import coming soon','📋')">
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">+ Add Previous Property</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Import past tenancy history</div></div>

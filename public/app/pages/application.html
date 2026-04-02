@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F4F7FF">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#050A1A">
+<meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="/app/css/app.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,18 +16,18 @@
 .view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
 
 /* Shared Header */
-.sh{position:sticky;top:0;z-index:10;background:var(--blue-xl);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);padding:14px 20px 20px;box-shadow:0 2px 16px var(--overlay-bg)}
+.sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
 .sh-row{display:flex;align-items:center;justify-content:space-between}
 .sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
-.sh-back-arrow{font-size:22px;color:var(--muted);font-weight:700}
-.sh-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
-.sh-right-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)}
-.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:21px;color:var(--text);margin-top:8px}
-.sh-sub{font-weight:600;font-size:13px;color:var(--muted);margin-top:3px}
-.sh-help{width:28px;height:28px;border-radius:50%;background:var(--glass-surface-2);border:none;color:var(--text);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;min-width:44px}
+.sh-back-arrow{font-size:22px;color:rgba(255,255,255,.8);font-weight:700}
+.sh-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px;text-transform:uppercase}
+.sh-right-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.65)}
+.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:21px;color:#fff;margin-top:8px}
+.sh-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.sh-help{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;min-width:44px}
 
 /* Mini Progress */
-.mini-progress{height:3px;background:var(--glass-surface-2);border-radius:100px;margin-top:12px;overflow:hidden}
+.mini-progress{height:3px;background:rgba(255,255,255,.15);border-radius:100px;margin-top:12px;overflow:hidden}
 .mini-progress-fill{height:100%;border-radius:100px;transition:width .4s ease}
 
 /* Section Labels */
@@ -36,31 +35,31 @@
 .sec-label-action{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer;text-transform:none;letter-spacing:0}
 
 /* Buttons */
-.btn-blue-c{background:linear-gradient(135deg,rgba(0,229,255,0.2),rgba(0,229,255,0.05));color:var(--text-on-primary);border:1px solid rgba(0,229,255,0.4);border-radius:12px;padding:11px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,229,255,.15);transition:all .18s var(--ease-smooth)}
-.btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,229,255,.1)}
+.btn-blue-c{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:12px;padding:11px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(27,80,200,.2);transition:all .18s var(--ease-smooth)}
+.btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(27,80,200,.15)}
 .btn-muted-c{background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:10px;padding:11px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px}
-.btn-outline-c{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
-.btn-teal-c{background:linear-gradient(135deg,var(--teal),#00DBA6);color:var(--text-on-primary);border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,200,150,.25);transition:all .18s var(--ease-smooth)}
+.btn-outline-c{background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
+.btn-teal-c{background:linear-gradient(135deg,var(--teal),#00DBA6);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(0,200,150,.25);transition:all .18s var(--ease-smooth)}
 .btn-teal-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,200,150,.2)}
 .btn-full{width:100%}
 .flex-1{flex:1}
 
 /* Sticky Footer */
-.sticky-footer{position:sticky;bottom:0;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10}
+.sticky-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10}
 
 /* Bottom Nav */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px var(--glass-surface-3)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
 .nav-tab:active{transform:scale(.92)}
 .tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
-.nav-tab.active .tab-icon{background:rgba(0,229,255,0.15);border:1px solid rgba(0,229,255,0.3);box-shadow:0 0 12px rgba(0,229,255,0.3);color:var(--blue)}
+.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
 .tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
 .nav-tab.active .tab-label{color:var(--blue)}
 
 /* How This Works Banner */
 .how-banner{background:var(--blue-dk);padding:13px 20px;display:flex;gap:10px;align-items:flex-start}
-.how-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px}
-.how-sub{font-weight:600;font-size:12px;color:var(--muted);line-height:1.55}
+.how-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:3px}
+.how-sub{font-weight:600;font-size:12px;color:rgba(255,255,255,.65);line-height:1.55}
 
 /* Checklist */
 .check-item{display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -72,7 +71,7 @@
 .check-right{color:var(--muted);font-size:20px;flex-shrink:0}
 
 /* Form Fields */
-.form-card{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;overflow:hidden;border:1px solid var(--border-lt);box-shadow:var(--shadow-card)}
+.form-card{background:#fff;border-radius:18px;overflow:hidden;border:1px solid var(--border-lt);box-shadow:var(--shadow-card)}
 .form-field{padding:13px 14px;border-bottom:1px solid var(--border-lt)}
 .form-field:last-child{border-bottom:none}
 .form-label{display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
@@ -81,7 +80,7 @@
 .form-note{font-weight:600;font-size:11px;color:var(--muted);margin-top:4px}
 
 /* Document Cards */
-.doc-card{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);margin-bottom:10px;transition:transform .18s var(--ease-smooth)}
+.doc-card{background:#fff;border-radius:18px;padding:16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);margin-bottom:10px;transition:transform .18s var(--ease-smooth)}
 .doc-card:active{transform:scale(.98)}
 .doc-top{display:flex;gap:14px;align-items:center}
 .doc-icon{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--blue-xl);transition:all .3s}
@@ -100,12 +99,12 @@
 /* Portal Checklist */
 .portal-item{display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .portal-item:last-child{border-bottom:none}
-.portal-checkbox{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
+.portal-checkbox{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
 .portal-label{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);transition:all .15s}
 
 /* Quick Ref Grid */
 .qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.qr-cell{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:10px;padding:10px 12px;border:1px solid var(--border-lt);position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.qr-cell{background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border-lt);position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .qr-label{font-family:'Sora',sans-serif;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
 .qr-value{font-weight:700;font-size:12px;color:var(--text);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .qr-copy{position:absolute;top:8px;right:8px;font-size:11px;color:var(--blue);font-family:'Sora',sans-serif;font-weight:700}
@@ -128,14 +127,14 @@
 <div class="view" id="viewA" style="display:flex;flex-direction:column;min-height:100vh">
   <header class="sh">
     <div class="sh-row">
-      <button class="sh-back" onclick="navigate('/inspect')">
+      <button class="sh-back" onclick="navigate('/app/pages/inspection.html')">
         <span class="sh-back-arrow">‹</span>
         <span class="sh-label">INSPECTIONS</span>
       </button>
       <button class="sh-help" onclick="showToast('How it works','RenterIQ prepares you to apply — you submit via the agency portal','💡')">?</button>
     </div>
     <div class="sh-title">Apply for This Property</div>
-    <div class="sh-sub">18 Smith Street, Fitzroy VIC 3065</div>
+    <div class="sh-sub">Prepare and submit your rental application</div>
   </header>
 
   <!-- How This Works Banner -->
@@ -150,13 +149,13 @@
   <div style="flex:1;overflow-y:auto;padding-bottom:100px">
 
     <!-- Property Card -->
-    <div style="margin:16px;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:16px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.08)">
+    <div style="margin:16px;background:#fff;border-radius:18px;padding:16px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.08)">
       <div style="display:flex;gap:14px;align-items:center">
         <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#1a3a8f,#2E63E0);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🏠</div>
         <div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">18 Smith Street, Fitzroy VIC 3065</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--blue);margin-top:2px">$620/wk</div>
-          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:1px">Nelson Alexander — Fitzroy</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Select a property to apply for</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--blue);margin-top:2px">&mdash;</div>
+          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:1px">Search for a property first</div>
         </div>
       </div>
       <div style="height:1px;background:var(--border-lt);margin:12px 0"></div>
@@ -169,7 +168,7 @@
     </div>
 
     <!-- Preparation Checklist -->
-    <div style="margin:0 16px 14px;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
+    <div style="margin:0 16px 14px;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text)">Get Ready to Apply</div>
       <div style="font-weight:600;font-size:13px;color:var(--muted);margin-top:3px">Complete each section in RenterIQ before opening the agency portal. Takes about 5 minutes.</div>
       <div style="margin-top:16px">
@@ -204,21 +203,21 @@
     <!-- Portal Info Card -->
     <div style="margin:0 16px 14px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:16px;padding:16px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Which portal does this agency use?</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt)">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt)">
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:36px;height:36px;border-radius:9px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px">🏢</div>
-          <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Nelson Alexander</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Uses 1Form</div></div>
+          <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Agency</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Check the listing for the portal used</div></div>
         </div>
-        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">1form.com.au</span>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">&mdash;</span>
       </div>
       <div style="font-weight:600;font-size:12px;color:var(--muted);line-height:1.55;margin-top:10px">1Form is used by most Australian agencies. Some agencies have their own portal — check the listing or contact the agency directly if you're unsure.</div>
     </div>
 
     <!-- Tips Card -->
-    <div style="margin:0 16px 16px;background:var(--glass-surface-3);border:1.5px solid rgba(27,80,200,.12);border-radius:16px;padding:16px">
+    <div style="margin:0 16px 16px;background:rgba(27,80,200,.04);border:1.5px solid rgba(27,80,200,.12);border-radius:16px;padding:16px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue);margin-bottom:12px">💡 Application Tips</div>
       <div style="display:flex;flex-direction:column;gap:9px">
-        <div style="display:flex;gap:9px;align-items:flex-start"><div class="tip-dot"></div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.55">Apply within 24 hours of your inspection — agencies move fast in competitive markets like Fitzroy.</div></div>
+        <div style="display:flex;gap:9px;align-items:flex-start"><div class="tip-dot"></div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.55">Apply within 24 hours of your inspection — agencies move fast in competitive rental markets.</div></div>
         <div style="display:flex;gap:9px;align-items:flex-start"><div class="tip-dot"></div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.55">Have all your documents open and ready before you start the agency portal — don't get halfway through then have to search for a payslip.</div></div>
         <div style="display:flex;gap:9px;align-items:flex-start"><div class="tip-dot"></div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.55">A personalised cover letter makes a real difference. RenterIQ helps you write one in under 2 minutes.</div></div>
         <div style="display:flex;gap:9px;align-items:flex-start"><div class="tip-dot"></div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.55">Once submitted, save a copy of your application confirmation to your Vault.</div></div>
@@ -232,10 +231,10 @@
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-    <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
-    <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-    <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+    <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/search.html')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
   </nav>
 </div>
 
@@ -248,7 +247,7 @@
     </div>
     <div class="sh-title" style="font-size:22px">Your Details</div>
     <div class="sh-sub">Fill in once — use for every application</div>
-    <div class="mini-progress"><div class="mini-progress-fill" style="width:25%;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);"></div></div>
+    <div class="mini-progress"><div class="mini-progress-fill" style="width:25%;background:#fff"></div></div>
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
@@ -261,13 +260,13 @@
     <!-- Personal Details -->
     <div class="sec-label">Personal Details</div>
     <div class="form-card">
-      <div class="form-field"><label class="form-label">Full Legal Name</label><input class="form-input" value="Alexandra Johnson"></div>
-      <div class="form-field"><label class="form-label">Date of Birth</label><input class="form-input" value="14/06/1995"></div>
-      <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" type="email" value="alex.johnson@email.com"></div>
-      <div class="form-field"><label class="form-label">Mobile Number</label><input class="form-input" type="tel" value="0412 345 678"></div>
-      <div class="form-field"><label class="form-label">Current Address</label><input class="form-input" value="12 Brunswick St, Fitzroy VIC 3065"></div>
-      <div class="form-field"><label class="form-label">Time at Address</label><input class="form-input" value="2 years 3 months"></div>
-      <div class="form-field"><label class="form-label">Reason for Moving</label><input class="form-input" value="Lease expiring, looking for more space"></div>
+      <div class="form-field"><label class="form-label">Full Legal Name</label><input class="form-input" placeholder="Your full legal name"></div>
+      <div class="form-field"><label class="form-label">Date of Birth</label><input class="form-input" placeholder="DD/MM/YYYY"></div>
+      <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" type="email" placeholder="your@email.com"></div>
+      <div class="form-field"><label class="form-label">Mobile Number</label><input class="form-input" type="tel" placeholder="04xx xxx xxx"></div>
+      <div class="form-field"><label class="form-label">Current Address</label><input class="form-input" placeholder="Your current address"></div>
+      <div class="form-field"><label class="form-label">Time at Address</label><input class="form-input" placeholder="e.g. 2 years"></div>
+      <div class="form-field"><label class="form-label">Reason for Moving</label><input class="form-input" placeholder="Briefly explain your reason"></div>
     </div>
     <button class="btn-muted-c btn-full" style="border-radius:10px;margin-top:10px;font-size:13px" onclick="copyDetails('personal')">📋 Copy Personal Details</button>
 
@@ -275,15 +274,15 @@
     <div class="sec-label" style="margin-top:20px">Employment</div>
     <div class="form-card">
       <div class="form-field" style="display:flex;align-items:center;justify-content:space-between">
-        <div style="flex:1"><label class="form-label">Employment Status</label><input class="form-input" value="Employed Full-Time" readonly></div>
+        <div style="flex:1"><label class="form-label">Employment Status</label><input class="form-input" placeholder="e.g. Employed Full-Time" readonly></div>
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;flex-shrink:0" onclick="showToast('Status','Full-Time · Part-Time · Self-Employed · Student · Other','💼')">Change ›</span>
       </div>
-      <div class="form-field"><label class="form-label">Employer</label><input class="form-input" value="Acme Pty Ltd"></div>
-      <div class="form-field"><label class="form-label">Job Title</label><input class="form-input" value="Senior Designer"></div>
-      <div class="form-field"><label class="form-label">Duration</label><input class="form-input" value="3 years 1 month"></div>
+      <div class="form-field"><label class="form-label">Employer</label><input class="form-input" placeholder="Your employer"></div>
+      <div class="form-field"><label class="form-label">Job Title</label><input class="form-input" placeholder="Your job title"></div>
+      <div class="form-field"><label class="form-label">Duration</label><input class="form-input" placeholder="e.g. 2 years"></div>
       <div class="form-field">
         <label class="form-label">Annual Income</label>
-        <input class="form-input" value="$92,000 (before tax)">
+        <input class="form-input" placeholder="$0 (before tax)">
         <div class="form-note">Agencies may ask for payslips to verify this figure</div>
       </div>
     </div>
@@ -292,10 +291,10 @@
     <!-- Rental History -->
     <div class="sec-label" style="margin-top:20px">Rental History</div>
     <div class="form-card">
-      <div class="form-field"><label class="form-label">Previous Address</label><input class="form-input" value="8 Smith St, Collingwood VIC 3066"></div>
-      <div class="form-field"><label class="form-label">Previous Agency</label><input class="form-input" value="Hocking Stuart — Collingwood"></div>
-      <div class="form-field"><label class="form-label">Landlord Contact</label><input class="form-input" type="tel" value="03 9415 7800"></div>
-      <div class="form-field"><label class="form-label">Duration</label><input class="form-input" value="2 years"></div>
+      <div class="form-field"><label class="form-label">Previous Address</label><input class="form-input" placeholder="Your previous rental address"></div>
+      <div class="form-field"><label class="form-label">Previous Agency</label><input class="form-input" placeholder="Agency or landlord name"></div>
+      <div class="form-field"><label class="form-label">Landlord Contact</label><input class="form-input" type="tel" placeholder="Phone number"></div>
+      <div class="form-field"><label class="form-label">Duration</label><input class="form-input" placeholder="e.g. 2 years"></div>
     </div>
     <button class="btn-muted-c btn-full" style="border-radius:10px;margin-top:10px;font-size:13px" onclick="copyDetails('rental')">📋 Copy Rental History</button>
   </div>
@@ -315,12 +314,12 @@
     </div>
     <div class="sh-title" style="font-size:22px">Your Documents</div>
     <div class="sh-sub">Organised and ready to attach</div>
-    <div class="mini-progress"><div class="mini-progress-fill" style="width:50%;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);"></div></div>
+    <div class="mini-progress"><div class="mini-progress-fill" style="width:50%;background:#fff"></div></div>
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
     <!-- Why This Matters -->
-    <div style="background:var(--glass-surface-3);border:1.5px solid rgba(27,80,200,.12);border-radius:14px;padding:14px 15px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
+    <div style="background:rgba(27,80,200,.04);border:1.5px solid rgba(27,80,200,.12);border-radius:14px;padding:14px 15px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
       <span style="font-size:18px;flex-shrink:0">🗄️</span>
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Your documents are saved to your Vault</div>
@@ -425,29 +424,29 @@
       <span class="sh-right-text">Step 3 of 4</span>
     </div>
     <div class="sh-title" style="font-size:22px">Cover Letter</div>
-    <div class="sh-sub">Personalised for 18 Smith St, Fitzroy</div>
-    <div class="mini-progress"><div class="mini-progress-fill" style="width:75%;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);"></div></div>
+    <div class="sh-sub">Personalised for this property</div>
+    <div class="mini-progress"><div class="mini-progress-fill" style="width:75%;background:#fff"></div></div>
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
     <!-- Why It Matters -->
-    <div style="background:var(--glass-surface-3);border:1.5px solid rgba(27,80,200,.12);border-radius:14px;padding:14px 15px;margin-bottom:16px">
+    <div style="background:rgba(27,80,200,.04);border:1.5px solid rgba(27,80,200,.12);border-radius:14px;padding:14px 15px;margin-bottom:16px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:6px">💡 Cover letters are not required — but they work.</div>
-      <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">In competitive suburbs like Fitzroy, a genuine, personalised letter can be the difference between being shortlisted and being overlooked. It takes 2 minutes with RenterIQ.</div>
+      <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">In competitive rental markets, a genuine, personalised letter can be the difference between being shortlisted and being overlooked. It takes 2 minutes with RenterIQ.</div>
     </div>
 
     <!-- AI Generation Card -->
-    <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+    <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:14px">Generate Your Cover Letter</div>
-      <div class="form-field" style="padding:0 0 12px;border-bottom:1px solid var(--border-lt)"><label class="form-label">Who You Are</label><input class="form-input" value="I'm a senior designer who works nearby in Fitzroy"></div>
-      <div class="form-field" style="padding:12px 0;border-bottom:1px solid var(--border-lt)"><label class="form-label">Why This Property</label><input class="form-input" value="The location suits my lifestyle perfectly and I love the outdoor space"></div>
-      <div class="form-field" style="padding:12px 0 0"><label class="form-label">Your Situation</label><input class="form-input" value="I'm a long-term renter — 2 years at my current place with excellent references. Non-smoker, no pets."></div>
-      <button id="generateBtn" style="width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:var(--text-on-primary);border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px" onclick="generateCoverLetter()">✦ Generate Cover Letter</button>
+      <div class="form-field" style="padding:0 0 12px;border-bottom:1px solid var(--border-lt)"><label class="form-label">Who You Are</label><input class="form-input" placeholder="Briefly describe yourself"></div>
+      <div class="form-field" style="padding:12px 0;border-bottom:1px solid var(--border-lt)"><label class="form-label">Why This Property</label><input class="form-input" placeholder="Why do you want this property?"></div>
+      <div class="form-field" style="padding:12px 0 0"><label class="form-label">Your Situation</label><input class="form-input" placeholder="Long-term renter, non-smoker, no pets, etc."></div>
+      <button id="generateBtn" style="width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px" onclick="generateCoverLetter()">✦ Generate Cover Letter</button>
     </div>
 
     <!-- Generated Letter -->
     <div id="letterSection" style="display:none">
-      <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:18px;border:1.5px solid var(--blue-lt);margin-bottom:14px;box-shadow:0 4px 16px rgba(27,80,200,.08)">
+      <div style="background:#fff;border-radius:16px;padding:18px;border:1.5px solid var(--blue-lt);margin-bottom:14px;box-shadow:0 4px 16px rgba(27,80,200,.08)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">✦ Smart Cover Letter</span>
           <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="makeEditable()">Edit</span>
@@ -455,20 +454,7 @@
         <div style="background:var(--teal-lt);border-radius:9px;padding:9px 12px;margin-bottom:12px">
           <span style="font-weight:700;font-size:12px;color:var(--teal-dk)">✓ Review this letter carefully — you're approving every word before it goes to the agency.</span>
         </div>
-        <div class="letter-area" id="letterContent">Dear Nelson Alexander Team,
-
-I am writing to express my interest in the property at 18 Smith Street, Fitzroy VIC 3065, listed at $620 per week.
-
-I'm a senior designer who works nearby in Fitzroy, and the location suits my lifestyle perfectly — I love the outdoor space and the character of the home.
-
-I am a long-term, responsible tenant. I have rented my current property in Brunswick Street for over 2 years, always paid rent on time, and maintained the property well. I can provide a strong reference from my current property manager at Hocking Stuart, Collingwood.
-
-I am a non-smoker with no pets, and I am looking for a long-term tenancy. I am in stable, full-time employment as a Senior Designer at Acme Pty Ltd and can provide all required documentation.
-
-I would be grateful for the opportunity to be considered. Please feel free to contact me on 0412 345 678 or alex.johnson@email.com.
-
-Kind regards,
-Alexandra Johnson</div>
+        <div class="letter-area" id="letterContent">Fill in the fields above and tap Generate to create your personalised cover letter.</div>
         <textarea class="letter-edit" id="letterEdit"></textarea>
         <div style="display:flex;gap:10px;margin-top:14px">
           <button class="btn-blue-c flex-1" style="border-radius:11px;padding:12px;font-size:13px" onclick="copyLetter()">📋 Copy Letter</button>
@@ -501,7 +487,7 @@ Alexandra Johnson</div>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
     <!-- Info Note -->
-    <div style="background:var(--glass-surface-3);border:1.5px solid rgba(27,80,200,.12);border-radius:14px;padding:14px 15px;margin-bottom:16px">
+    <div style="background:rgba(27,80,200,.04);border:1.5px solid rgba(27,80,200,.12);border-radius:14px;padding:14px 15px;margin-bottom:16px">
       <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">Add your references here once. They're saved to your profile and ready for every future application. You'll copy these details into the agency portal's reference section.</div>
     </div>
 
@@ -509,12 +495,12 @@ Alexandra Johnson</div>
     <div class="sec-label">Previous Landlord or Property Manager<span class="sec-label-action" onclick="copyRef(1)">📋 Copy All</span></div>
     <div class="form-card">
       <div class="ref-header"><div class="ref-icon">🏠</div><span class="ref-title">Previous Property Manager</span></div>
-      <div class="form-field"><label class="form-label">Full Name</label><input class="form-input" value="Sarah Mitchell"></div>
-      <div class="form-field"><label class="form-label">Agency / Company</label><input class="form-input" value="Hocking Stuart — Collingwood"></div>
-      <div class="form-field"><label class="form-label">Phone</label><input class="form-input" type="tel" value="03 9415 7800"></div>
-      <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" value="s.mitchell@hockingstuart.com.au"></div>
-      <div class="form-field"><label class="form-label">Relationship</label><input class="form-input" value="Previous Property Manager"></div>
-      <div class="form-field"><label class="form-label">Tenancy Period</label><input class="form-input" value="Jan 2022 – Mar 2024"></div>
+      <div class="form-field"><label class="form-label">Full Name</label><input class="form-input" placeholder="Reference name"></div>
+      <div class="form-field"><label class="form-label">Agency / Company</label><input class="form-input" placeholder="Agency or company"></div>
+      <div class="form-field"><label class="form-label">Phone</label><input class="form-input" type="tel" placeholder="Phone number"></div>
+      <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="Email address"></div>
+      <div class="form-field"><label class="form-label">Relationship</label><input class="form-input" placeholder="e.g. Previous Property Manager"></div>
+      <div class="form-field"><label class="form-label">Tenancy Period</label><input class="form-input" placeholder="e.g. Jan 2022 – Mar 2024"></div>
     </div>
     <div style="font-weight:600;font-size:11px;color:var(--muted);line-height:1.55;padding:8px 2px 0">⚠️ Make sure this person knows they may be contacted by the agency before you list them.</div>
 
@@ -559,19 +545,19 @@ Alexandra Johnson</div>
 <div class="view" id="viewF" style="display:none">
   <!-- Blue Hero -->
   <div style="background:var(--blue);padding:40px 24px 36px;text-align:center">
-    <div style="width:80px;height:80px;border-radius:50%;background:var(--glass-surface-2);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:40px">🚀</div>
-    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:var(--text);margin-bottom:10px">You're Ready to Apply</div>
-    <div style="font-weight:600;font-size:14px;color:var(--muted);line-height:1.7;max-width:300px;margin:0 auto">All your documents and details are prepared. Now open the agency's application portal and use your checklist below as you work through it.</div>
-    <div style="margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:var(--glass-surface-2);border:1px solid var(--border);border-radius:100px;padding:8px 18px">
+    <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.12);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:40px">🚀</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:#fff;margin-bottom:10px">You're Ready to Apply</div>
+    <div style="font-weight:600;font-size:14px;color:rgba(255,255,255,.72);line-height:1.7;max-width:300px;margin:0 auto">All your documents and details are prepared. Now open the agency's application portal and use your checklist below as you work through it.</div>
+    <div style="margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:8px 18px">
       <span style="font-size:14px">🏢</span>
-      <span style="font-weight:700;font-size:13px;color:var(--text)">Nelson Alexander — 1form.com.au</span>
+      <span style="font-weight:700;font-size:13px;color:#fff">Nelson Alexander — 1form.com.au</span>
     </div>
   </div>
 
   <div style="flex:1;overflow-y:auto;padding-bottom:24px">
     <!-- Open Portal Button -->
     <div style="margin:20px 16px 0">
-      <button onclick="openAgencyPortal()" style="width:100%;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:16px;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(27,80,200,.2);-webkit-tap-highlight-color:transparent;transition:transform .12s;min-height:44px">
+      <button onclick="openAgencyPortal()" style="width:100%;background:#fff;color:var(--blue);border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:16px;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(27,80,200,.2);-webkit-tap-highlight-color:transparent;transition:transform .12s;min-height:44px">
         <div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">🔗</span>Open Agency Application Portal</div>
         <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">Opens 1form.com.au · Most agencies use this</div>
       </button>
@@ -579,7 +565,7 @@ Alexandra Johnson</div>
     </div>
 
     <!-- Portal Checklist -->
-    <div style="margin:20px 16px 0;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
+    <div style="margin:20px 16px 0;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">As you fill in the portal, tick each step:</div>
       <div>
         <div class="portal-item" id="portalCheck-0" onclick="togglePortalCheck(0)"><div class="portal-checkbox"></div><span class="portal-label">Personal details entered</span></div>
@@ -612,12 +598,12 @@ Alexandra Johnson</div>
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Save your application confirmation</div>
         <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.55">Once the agency confirms receipt, save a screenshot or confirmation email to your Vault.</div>
-        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer;display:block" onclick="navigate('/vault')">Save to Vault →</span>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer;display:block" onclick="navigate('/app/pages/vault.html')">Save to Vault →</span>
       </div>
     </div>
 
     <!-- What Happens Next -->
-    <div style="margin:14px 16px 0;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;padding:18px;border:1px solid var(--border-lt)">
+    <div style="margin:14px 16px 0;background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">What happens next</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);flex-shrink:0">1</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">The agency reviews your application — this usually takes 1–3 business days.</div></div>
@@ -628,7 +614,7 @@ Alexandra Johnson</div>
     </div>
 
     <!-- Lease Review Entry -->
-    <div style="margin-top:14px;margin-left:16px;margin-right:16px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/lease')">
+    <div style="margin-top:14px;margin-left:16px;margin-right:16px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/app/pages/lease.html')">
       <div style="width:44px;height:44px;border-radius:12px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📑</div>
       <div style="flex:1;min-width:0">
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Got your lease? Review it here</div>
@@ -642,10 +628,10 @@ Alexandra Johnson</div>
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-tab" onclick="navigate('/dashboard')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-    <button class="nav-tab" onclick="navigate('/search')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
-    <button class="nav-tab" onclick="navigate('/inspect')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-    <button class="nav-tab" onclick="navigate('/vault')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+    <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/search.html')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
   </nav>
 </div>
 
@@ -659,7 +645,7 @@ function navigate(p){document.body.style.opacity='0';document.body.style.transit
 
 function showToast(title,sub,icon){
   var t=document.getElementById('appToast');
-  if(!t){t=document.createElement('div');t.id='appToast';t.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:var(--text);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';t.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:var(--muted);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(t)}
+  if(!t){t=document.createElement('div');t.id='appToast';t.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';t.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(t)}
   document.getElementById('toastIcon').textContent=icon||'✓';
   document.getElementById('toastText').textContent=title||'';
   document.getElementById('toastSub').textContent=sub||'';
