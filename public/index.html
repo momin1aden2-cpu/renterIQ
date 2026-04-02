@@ -13,260 +13,352 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
 <link rel="manifest" href="/app/manifest.json">
-<link rel="stylesheet" href="/app/css/app.css">
 <meta property="og:title" content="RenterIQ — Your Complete Renting Companion">
 <meta property="og:description" content="From property search to bond return. Track inspections, store evidence, know your rights. Built for Australian renters.">
 <meta property="og:image" content="/assets/icons/icon-512.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <title>RenterIQ — Your Complete Renting Companion</title>
+<!-- RenterIQ Landing Page v2 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* RenterIQ "Liquid Glass" Premium Core System */
-/* Root variables now inherited from app.css */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Nunito', sans-serif; background: var(--blue-xl); color: var(--text); line-height: 1.6; font-size: 15px; -webkit-font-smoothing: antialiased; }
-h1, h2, h3, h4, .wordmark, .btn-primary, .btn-ghost, .nav-links a { font-family: 'Sora', sans-serif; font-weight: 700; }
-a { text-decoration: none; color: inherit; }
-.container { max-width: 1140px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 2; }
-.section-label { font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--blue); text-transform: uppercase; margin-bottom: 12px; }
-.section-h2 { font-size: clamp(28px, 4vw, 42px); color: var(--text); line-height: 1.15; margin-bottom: 20px; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-.section-sub { font-size: 16px; color: var(--muted); max-width: 600px; line-height: 1.8; margin-bottom: 48px; }
+/* RESET & BASE */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Nunito',sans-serif;font-weight:400;color:#0F1C3F;background:#F4F7FF;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
+h1,h2,h3,h4,h5,h6{font-family:'Sora',sans-serif;font-weight:700}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+ul{list-style:none}
+button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
+input{font-family:'Nunito',sans-serif;border:none;outline:none}
 
-/* Sticky Nav - Glassmorphism */
-.nav { position: fixed; top: 0; left: 0; right: 0; background: var(--glass-bg); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); z-index: 100; transition: all 0.3s; padding: 16px 0; }
-.nav .container { display: flex; align-items: center; justify-content: space-between; }
-.nav-brand { display: flex; align-items: center; gap: 12px; }
-.nav-brand-text { display: flex; flex-direction: column; }
-.wordmark { font-size: 18px; color: var(--text); letter-spacing: 0.5px; }
-.tagline { font-family: 'Nunito', sans-serif; font-size: 10.5px; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; }
-.nav-links { display: flex; gap: 28px; align-items: center; }
-.nav-links a { font-size: 13.5px; color: var(--muted); transition: color 0.2s, text-shadow 0.2s; }
-.nav-links a:hover { color: var(--text); text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-.nav-cta { background: var(--blue); color: var(--blue-xl) !important; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 13px; padding: 10px 24px; border-radius: 100px; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 14px rgba(255,255,255,0.1); }
-.nav-cta:hover { transform: translateY(-2px); background: #fff; box-shadow: 0 4px 20px rgba(255,255,255,0.25); }
-.nav-mobile-btn { display: none; background: none; border: none; cursor: pointer; }
-
-/* Desktop Hero */
-.hero { position: relative; padding: 140px 0 80px; overflow: hidden; background: radial-gradient(circle at top right, rgba(0,200,150,0.3), transparent 60%), radial-gradient(circle at bottom left, var(--blue-lt), transparent 60%); }
-.hero::before { content: ""; position: absolute; inset: 0; background: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1.5" fill="rgba(255,255,255,0.03)"/></svg>'); z-index: 0; }
-.hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-.hero-content { position: relative; z-index: 2; }
-.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 229, 255, 0.08); border: 1px solid var(--blue-lt); padding: 8px 16px; border-radius: 100px; font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 24px; box-shadow: 0 0 20px rgba(0,229,255,0.1); }
-.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 10px var(--blue); animation: pulse 2s infinite; }
-.hero h1 { font-size: clamp(40px, 5.5vw, 56px); color: var(--text); line-height: 1.1; margin-bottom: 24px; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-.hero-sub { font-size: 18px; color: var(--muted); line-height: 1.7; margin-bottom: 40px; max-width: 500px; }
-.hero-btns { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 24px; }
-.hero .btn-teal { background: linear-gradient(135deg, var(--blue), var(--teal)); color: var(--text-on-primary); padding: 16px 32px; border-radius: 100px; font-size: 15px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-neon); letter-spacing: 0.5px; font-family: 'Sora', sans-serif; font-weight: 700; display: inline-flex; align-items: center;}
-.hero .btn-teal:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 30px rgba(0,184,217,0.5), 0 0 60px rgba(0,200,150,0.3); }
-.hero .btn-outline { background: rgba(255,255,255,0.03); color: var(--text); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; padding: 15px 32px; border-radius: 100px; border: 1px solid var(--border); transition: all 0.2s; backdrop-filter: blur(8px); display: inline-flex; align-items: center;}
-.hero .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: var(--text); box-shadow: 0 0 20px rgba(255,255,255,0.1); }
-.hero-search { background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 100px; padding: 8px; display: flex; align-items: center; gap: 8px; max-width: 480px; margin-bottom: 24px; backdrop-filter: blur(12px); box-shadow: var(--shadow-float); }
-.hero-search input { flex: 1; min-width: 0; background: transparent; border: none; padding: 12px 16px; font-family: 'Nunito', sans-serif; font-size: 15px; color: var(--text); outline: none; }
-.hero-search input::placeholder { color: var(--muted); }
-.hero-search button { background: linear-gradient(135deg, var(--blue), var(--teal)); color: #fff; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 100px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-neon); }
-.hero-search button:hover { background: #fff; transform: scale(1.02); box-shadow: 0 0 20px rgba(0,184,217,0.5); }
-.hero-note { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-
-/* Phone Mockup - Liquid Glass */
-.phone-wrap { position: relative; width: 100%; max-width: 320px; margin: 0 auto; z-index: 2; transform: perspective(1000px) rotateY(-15deg) rotateX(5deg); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.phone-wrap:hover { transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) translateY(-10px); }
-.phone-screen { display: flex; flex: 1; flex-direction: column; height: 100%; }
-.phone { background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 40px; height: 650px; position: relative; overflow: hidden; box-shadow: var(--shadow-float), 0 0 60px rgba(0, 229, 255, 0.15); display: flex; flex-direction: column; }
-.phone::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 40%); pointer-events: none; }
-.phone-header { background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(16px); padding: 48px 20px 20px; border-bottom: 1px solid var(--border); }
-.ph-brand { font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 800; color: var(--blue); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
-.ph-loc { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-.ph-count { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 16px; }
-.ph-search { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 13px; color: var(--muted); }
-.phone-cards { flex: 1; padding: 16px; background: var(--glass-surface-3); display: flex; flex-direction: column; gap: 12px; }
-.phone-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 16px; padding: 16px; backdrop-filter: blur(8px); }
-.pc-price { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 800; color: var(--blue); margin-bottom: 4px; }
-.pc-addr { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
-.pc-tags { display: flex; gap: 8px; }
-.pc-tag { font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 100px; background: rgba(255,255,255,0.05); color: var(--text); }
-.pc-tag.teal { background: var(--blue-lt); color: var(--blue); border: 1px solid rgba(0, 229, 255, 0.2); }
-.phone-tabs { background: rgba(7, 11, 20, 0.9); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 12px 16px 24px; display: flex; justify-content: space-between; position: absolute; bottom: 0; left: 0; right: 0; }
-.phone-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700; color: var(--muted); }
-.phone-tab.active { color: var(--blue); }
-.tab-icon { font-size: 20px; margin-bottom: 2px; }
-.float-badge { position: absolute; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5; animation: float 6s ease-in-out infinite; }
-.float-badge-top { top: 60px; right: -40px; animation-delay: 0s; }
-.float-badge-bottom { bottom: 80px; left: -60px; animation-delay: -3s; }
-.fb-icon { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--blue), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: var(--shadow-neon); }
-.fb-text { font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 800; color: var(--text); }
-.fb-sub { font-size: 11px; font-weight: 700; color: var(--blue); margin-top: 2px; }
-
-/* How It Works - Premium Dark Cards */
-.how-it-works, .features, .inspection, .vault, .exit-compare, .rights, .pwa-install { padding: 100px 0; background: var(--blue-xl); position: relative; border-bottom: 1px solid var(--border); }
-.how-it-works { background: var(--glass-surface-3); }
-.steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.step-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; transition: all 0.3s; position: relative; overflow: hidden; }
-.step-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(0,229,255,0.3); transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0, 229, 255, 0.08); }
-.step-num { position: absolute; top: 16px; right: 20px; font-family: 'Sora', sans-serif; font-size: 64px; font-weight: 800; color: rgba(255,255,255,0.03); line-height: 1; transition: color 0.3s; }
-.step-card:hover .step-num { color: rgba(0,229,255,0.1); }
-.step-icon { width: 48px; height: 48px; border-radius: 14px; background: rgba(79, 70, 229, 0.15); border: 1px solid rgba(79, 70, 229, 0.3); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 24px; box-shadow: 0 0 20px rgba(79, 70, 229, 0.2); }
-.step-card:hover .step-icon { background: var(--blue-lt); border-color: var(--blue); box-shadow: 0 0 20px rgba(0,184,217,0.5); }
-.step-card h3 { font-family: 'Sora', sans-serif; font-size: 18px; color: var(--text); margin-bottom: 12px; }
-.step-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
-
-/* Features */
-.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.feature-card { background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid var(--border); border-radius: 24px; padding: 40px 32px; transition: all 0.3s; }
-.feature-card:hover { border-color: var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%); }
-.feature-icon { font-size: 40px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(0,229,255,0.3)); }
-.feature-card h3 { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--text); margin-bottom: 16px; }
-.feature-card p { font-size: 14.5px; color: var(--muted); margin-bottom: 24px; min-height: 90px; line-height: 1.7; }
-.feature-check { list-style: none; padding: 0; }
-.feature-check li { position: relative; padding-left: 28px; font-size: 14px; font-weight: 600; color: #cbd5e1; margin-bottom: 12px; }
-.feature-check li::before { content: '✦'; position: absolute; left: 0; color: var(--blue); font-size: 16px; filter: drop-shadow(0 0 5px rgba(0,184,217,0.5)); }
-
-/* Inspection Steps */
-.inspection .container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-.inspection-steps { margin-top: 32px; display: flex; flex-direction: column; gap: 24px; }
-.inspection-step { display: flex; gap: 16px; align-items: flex-start; }
-.is-num { width: 32px; height: 32px; border-radius: 50%; background: var(--blue-lt); color: var(--blue); border: 1px solid rgba(0,229,255,0.3); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 14px; flex-shrink: 0; box-shadow: 0 0 15px rgba(0,184,217,0.5); }
-.inspection-step p { font-size: 14.5px; color: var(--muted); line-height: 1.6; }
-.inspection-step p strong { color: var(--text); font-family: 'Sora', sans-serif; display: block; margin-bottom: 4px; }
-
-/* Report Mockup */
-.report-mock { background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-float); }
-.report-header { background: rgba(255,255,255,0.03); padding: 24px; border-bottom: 1px solid var(--border); }
-.rh-title { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-.rh-sub { font-size: 13px; color: var(--blue); font-weight: 700; }
-.report-rooms { padding: 8px 24px; }
-.report-room { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-.report-room:last-child { border-bottom: none; }
-.rr-name { font-size: 14.5px; color: var(--text); font-weight: 700; margin-bottom: 6px; }
-.rr-photos { display: flex; gap: 6px; }
-.rr-photo { font-size: 14px; background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; }
-.rr-badge { font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 100px; text-transform: uppercase; }
-.rr-badge.satisfactory { background: rgba(0,229,255,0.1); color: var(--blue); border: 1px solid rgba(0,229,255,0.2); }
-.rr-badge.noted { background: rgba(245,166,35,0.1); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
-.report-ai { background: linear-gradient(90deg, rgba(79,70,229,0.1), transparent); border-left: 3px solid var(--teal); margin: 24px; padding: 20px; border-radius: 0 16px 16px 0; }
-.ra-label { font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800; color: var(--blue); margin-bottom: 8px; text-transform: uppercase; }
-.report-ai p { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
-
-/* Vault Grid */
-.vault { background: var(--glass-surface-3); }
-.vault .container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-.vault-label { font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--blue); text-transform: uppercase; margin-bottom: 12px; }
-.vault-desc { font-size: 16px; color: var(--muted); line-height: 1.8; margin-bottom: 32px; }
-.vault .btn-teal { background: linear-gradient(135deg, var(--blue), var(--teal)); color: var(--text-on-primary); border-radius: 100px; font-family: 'Sora', sans-serif; font-weight: 700; }
-.vault-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.vault-folder { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s; }
-.vault-folder:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
-.vf-icon { font-size: 28px; margin-bottom: 16px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
-.vault-folder h4 { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-.vault-folder p { font-size: 13px; color: var(--muted); }
-
-/* Exit Comparison */
-.exit-compare { background: var(--blue-xl); }
-.comparison-mock { max-width: 680px; margin: 0 auto; background: var(--glass-surface-3); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-float); overflow: hidden; }
-.cm-header { background: rgba(255,255,255,0.03); padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--border); }
-.cm-header .cm-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); }
-.cm-header .cm-badge { background: var(--blue-lt); color: var(--blue); border: 1px solid rgba(0,229,255,0.3); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 10.5px; padding: 4px 12px; border-radius: 100px; }
-.cm-columns { display: grid; grid-template-columns: 1fr 1fr; text-align: center; padding: 14px 22px 8px; gap: 12px; }
-.cm-col-label { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 11.5px; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-.cm-rows { padding: 0 22px 16px; }
-.cm-row { display: grid; grid-template-columns: 1fr 30px 1fr; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); gap: 8px; }
-.cm-row:last-child { border-bottom: none; }
-.cm-cell { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text); }
-.cm-cell:last-child { justify-content: flex-end; }
-.cm-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
-.cm-icon.pass { background: rgba(0,229,255,0.1); color: var(--blue); }
-.cm-icon.flag { background: rgba(245,166,35,0.1); color: var(--amber); }
-.cm-status { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-.cm-status.pass { background: rgba(0,229,255,0.1); color: var(--blue); font-size: 14px; font-weight: 800; border: 1px solid rgba(0,229,255,0.2); }
-.cm-status.flag { background: rgba(245,166,35,0.1); color: var(--amber); font-size: 14px; font-weight: 800; border: 1px solid rgba(245,166,35,0.2); }
-.cm-question { margin: 0 22px 16px; background: rgba(79,70,229,0.1); border-radius: 14px; padding: 18px; border: 1px solid rgba(79,70,229,0.3); }
-.cm-question p { font-size: 13px; color: var(--text); line-height: 1.7; margin-bottom: 14px; }
-.cmq-btns { display: flex; gap: 10px; flex-wrap: wrap; }
-.cmq-btn { padding: 10px 18px; border-radius: 100px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 12px; transition: all 0.2s; border: none; cursor: pointer; }
-.cmq-btn.blue { background: var(--teal); color: var(--text); box-shadow: var(--shadow-neon); }
-.cmq-btn.blue:hover { background: var(--teal-dk); }
-.cmq-btn.outline { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
-.cmq-btn.outline:hover { background: rgba(255,255,255,0.1); }
-.cm-fix { margin: 0 22px 22px; background: rgba(0,229,255,0.05); border: 1px solid rgba(0,229,255,0.2); border-radius: 14px; padding: 16px; }
-.cf-label { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 11px; color: var(--blue); margin-bottom: 8px; text-transform: uppercase; }
-.cm-fix p { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
-.exit-disclaimer { text-align: center; max-width: 640px; margin: 24px auto 0; font-size: 12.5px; color: var(--muted); line-height: 1.7; font-style: italic; }
-
-/* Rights */
-.rights { background: var(--glass-surface-3); }
-.rights-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-.rights-card { background: rgba(255,255,255,0.02); border-radius: 16px; padding: 24px 20px; border: 1px solid var(--border); transition: all 0.25s; }
-.rights-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(0,229,255,0.3); transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
-.rc-abbr { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 28px; color: var(--blue); margin-bottom: 2px; }
-.rc-name { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
-.rc-links { display: flex; flex-direction: column; gap: 8px; }
-.rc-link { font-size: 12.5px; color: var(--text); font-weight: 600; line-height: 1.4; transition: color 0.2s; }
-.rc-link:hover { color: var(--blue); }
-.rights-info { margin-top: 32px; background: rgba(79,70,229,0.1); border: 1px solid rgba(79,70,229,0.3); border-radius: 16px; padding: 22px 28px; display: flex; gap: 14px; align-items: flex-start; }
-.ri-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
-.rights-info p { font-size: 14px; color: var(--text); line-height: 1.7; }
-
-/* Legal Disclaimer */
-.legal-bar { background: rgba(245,166,35,0.05); border-top: 1px solid rgba(245,166,35,0.15); border-bottom: 1px solid rgba(245,166,35,0.15); padding: 22px 0; }
-.legal-bar .container { display: flex; gap: 14px; align-items: flex-start; }
-.lb-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
-.legal-bar p { font-size: 12.5px; color: #cbd5e1; line-height: 1.75; }
-
-/* PWA Install */
-.pwa-install { padding: 100px 0; background: radial-gradient(circle at center, rgba(79,70,229,0.15), var(--glass-surface-3) 70%); text-align: center; border-bottom: 1px solid var(--border); }
-.pi-icon { background: rgba(255,255,255,0.05); border: 1px solid var(--border); width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 32px; box-shadow: var(--shadow-neon); filter: drop-shadow(0 0 10px rgba(0,229,255,0.3)); }
-.pwa-install h2 { font-family: 'Sora', sans-serif; font-weight: 800; font-size: clamp(32px, 5vw, 48px); color: var(--text); margin-bottom: 20px; }
-.pi-sub { font-size: 18px; color: var(--muted); max-width: 600px; margin: 0 auto 40px; }
-.pwa-btns { display: flex; justify-content: center; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
-.btn-white { background: #fff; color: var(--blue-xl); font-family: 'Sora', sans-serif; font-weight: 800; font-size: 15px; padding: 16px 32px; border-radius: 100px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
-.btn-white:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,255,255,0.4); }
-
-/* Footer */
-.footer { padding: 60px 0 0; background: var(--blue-xl); border-top: 1px solid var(--border); }
-.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-.footer-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.footer-brand p { font-size: 13.5px; color: var(--muted); line-height: 1.7; max-width: 280px; }
-.footer-col h4 { font-family: 'Sora', sans-serif; font-size: 13px; color: var(--text); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
-.footer-col a { display: block; font-size: 14px; color: var(--muted); margin-bottom: 12px; transition: color 0.2s; }
-.footer-col a:hover { color: var(--blue); text-shadow: 0 0 10px rgba(0,184,217,0.5); }
-.footer-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
-.footer-bottom { padding-bottom: 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-.fb-copy { font-size: 13px; color: var(--muted); }
-.fb-links { display: flex; gap: 20px; }
-.fb-links a { font-size: 13px; color: var(--muted); transition: color 0.2s; }
-.fb-links a:hover { color: var(--text); }
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .hero .container { grid-template-columns: 1fr; text-align: center; }
-  .hero-sub { margin: 0 auto 40px; }
-  .hero-btns { justify-content: center; }
-  .phone-wrap { display: none; }
-  .inspection .container { grid-template-columns: 1fr; }
-  .report-mock { margin-top: 40px; }
-  .vault .container { grid-template-columns: 1fr; }
-  .vault-grid { margin-top: 40px; }
-  .steps-grid { grid-template-columns: repeat(2, 1fr); }
-  .features-grid { grid-template-columns: repeat(2, 1fr); }
-  .rights-grid { grid-template-columns: repeat(2, 1fr); }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
+/* VARIABLES */
+:root{
+  --blue:#1B50C8;--blue-dk:#0A2460;--blue-md:#2E63E0;--blue-lt:#D8E7FC;--blue-xl:#F4F7FF;
+  --teal:#00C896;--teal-dk:#009E78;
+  --text:#0F1C3F;--muted:#5A6B8A;--border:#D5E2F8;--border-lt:#EDF3FC;
 }
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .nav-mobile-btn { display: block; background: none; border: none; }
-  .steps-grid { grid-template-columns: 1fr; }
-  .features-grid { grid-template-columns: 1fr; }
-  .rights-grid { grid-template-columns: 1fr; }
-  .cm-columns { grid-template-columns: 1fr 1fr; }
-  .cm-row { grid-template-columns: 1fr 24px 1fr; font-size: 12px; }
-  .footer-grid { grid-template-columns: 1fr; }
-  .footer-bottom { flex-direction: column; text-align: center; }
-  .pwa-features { flex-direction: column; align-items: center; gap: 16px; }
+
+/* UTILITIES */
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.section-label{font-family:'Sora',sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+.section-h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(26px,4vw,42px);color:var(--blue-dk);line-height:1.15;margin-bottom:16px}
+.section-sub{font-size:16.5px;color:var(--muted);line-height:1.75;max-width:720px;margin-bottom:40px}
+
+/* ANIMATIONS */
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* STICKY NAV */
+.nav{position:sticky;top:0;z-index:100;height:70px;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #EDF3FC;display:flex;align-items:center}
+.nav .container{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-brand-text{display:flex;flex-direction:column}
+.nav-brand-text .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#0A2460;line-height:1.1}
+.nav-brand-text .tagline{font-family:'Nunito',sans-serif;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#5A6B8A;line-height:1}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-family:'Sora',sans-serif;font-weight:600;font-size:14px;color:#5A6B8A;transition:color .2s}
+.nav-links a:hover{color:#1B50C8}
+.nav-cta{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:10px 24px;border-radius:100px;transition:background .2s}
+.nav-cta:hover{background:var(--blue-md)}
+.nav-mobile-btn{display:none;background:none;padding:8px}
+.nav-links.show{display:flex;flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);padding:16px 24px 20px;border-bottom:1px solid var(--border-lt);gap:16px;z-index:99}
+
+/* HERO */
+.hero{background:linear-gradient(170deg,#EBF0FF 0%,#F4F7FF 60%);padding:72px 0 80px;overflow:hidden;text-align:center}
+.hero .container{display:flex;flex-direction:column;align-items:center;max-width:680px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(27,80,200,.1);border-radius:100px;padding:6px 16px 6px 12px;margin-bottom:20px}
+.hero-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse-dot 2s ease-in-out infinite}
+.hero-badge span{font-family:'Sora',sans-serif;font-weight:700;font-size:12.5px;color:var(--blue)}
+.hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(32px,5.5vw,54px);color:#0A2460;line-height:1.1;margin-bottom:16px}
+.hero-sub{font-size:17px;color:#5A6B8A;line-height:1.7;max-width:480px;margin-bottom:36px}
+.hero-search{display:flex;align-items:center;background:#fff;border-radius:100px;padding:6px 6px 6px 24px;box-shadow:0 8px 40px rgba(27,80,200,.14),0 2px 8px rgba(27,80,200,.06);margin-bottom:20px;width:100%;max-width:580px}
+.hero-search input{flex:1;font-size:15px;color:var(--text);min-width:0}
+.hero-search input::placeholder{color:#9EAEC4}
+.hero-search button{background:var(--blue);color:#fff;font-weight:700;font-size:14px;padding:13px 28px;border-radius:100px;white-space:nowrap;transition:background .2s}
+.hero-search button:hover{background:var(--blue-md)}
+.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--border);font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-outline:hover{border-color:var(--blue);background:var(--blue-xl)}
+.btn-teal{background:var(--teal);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;transition:background .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-teal:hover{background:var(--teal-dk)}
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:16px}
+.hero-trust-item{display:flex;align-items:center;gap:7px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:#5A6B8A}
+.hero-trust-item::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0}
+
+/* APP SHOWCASE */
+.showcase{background:#fff;padding:80px 0;overflow:hidden}
+.showcase>.container{text-align:center}
+.phones-row{display:flex;gap:16px;justify-content:center;align-items:flex-start;margin-top:48px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.sp-item{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0}
+.sp-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+.sp-phone{width:190px;background:#fff;border-radius:32px;border:2px solid var(--blue-lt);box-shadow:0 12px 48px rgba(27,80,200,.12),0 2px 8px rgba(27,80,200,.05);overflow:hidden}
+.sp-head{padding:14px 14px 12px;color:#fff}
+.sp-head.blue-bg{background:var(--blue)}
+.sp-head.navy-bg{background:var(--blue-dk)}
+.sp-head-label{font-family:'Sora',sans-serif;font-weight:800;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:5px}
+.sp-head-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px}
+.sp-head-sub{font-size:10px;opacity:.6}
+.sp-body{padding:10px 11px;background:var(--blue-xl);display:flex;flex-direction:column;gap:7px}
+.sp-card{background:#fff;border-radius:10px;padding:9px 11px;border:1px solid var(--border-lt)}
+.sp-card-price{font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--blue-dk)}
+.sp-card-addr{font-size:10px;color:var(--muted);margin:2px 0 5px}
+.sp-card-tags{display:flex;gap:4px}
+.sp-card-tag{font-family:'Sora',sans-serif;font-weight:700;font-size:8.5px;padding:2px 7px;border-radius:100px;background:var(--blue-xl);color:var(--blue)}
+.sp-card-tag.tl{background:#D6F5EC;color:var(--teal-dk)}
+.sp-row{background:#fff;border-radius:10px;padding:9px 11px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:8px}
+.sp-row-icon{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:var(--blue-xl)}
+.sp-row-name{font-family:'Sora',sans-serif;font-weight:700;font-size:10.5px;color:var(--text)}
+.sp-row-sub{font-size:9px;color:var(--muted)}
+.sp-row-badge{font-family:'Sora',sans-serif;font-weight:700;font-size:8.5px;padding:2px 7px;border-radius:100px;margin-left:auto;white-space:nowrap}
+.sp-badge-teal{background:#D6F5EC;color:var(--teal-dk)}
+.sp-badge-amber{background:#FFF3D6;color:#7A5500}
+.sp-badge-blue{background:var(--blue-xl);color:var(--blue)}
+.sp-stats{display:flex;gap:6px;margin-bottom:0}
+.sp-stat{flex:1;background:#fff;border-radius:9px;padding:8px 6px;border:1px solid var(--border-lt);text-align:center}
+.sp-stat-num{font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--blue)}
+.sp-stat-lbl{font-size:8.5px;color:var(--muted);margin-top:1px}
+.sp-tabs{display:flex;justify-content:space-around;padding:8px 10px 11px;background:#fff;border-top:1px solid var(--border-lt)}
+.sp-tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Sora',sans-serif;font-weight:700;font-size:8px;color:var(--muted)}
+.sp-tab.act{color:var(--blue)}
+.sp-tab-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px}
+.sp-tab.act .sp-tab-icon{background:var(--blue)}
+
+/* Phone Mockup */
+.phone-wrap{position:relative;width:300px;flex-shrink:0}
+.phone{background:#fff;border-radius:38px;border:2.5px solid #D8E7FC;box-shadow:0 20px 80px rgba(27,80,200,.18),0 4px 20px rgba(27,80,200,.08);overflow:hidden;width:300px}
+.phone-header{background:var(--blue);padding:20px 18px 16px;color:#fff}
+.phone-header .ph-brand{font-family:'Sora',sans-serif;font-weight:800;font-size:11px;letter-spacing:2px;opacity:.7;margin-bottom:6px}
+.phone-header .ph-loc{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px}
+.phone-header .ph-count{font-size:12px;opacity:.7;margin-bottom:12px}
+.phone-header .ph-search{background:rgba(255,255,255,.15);border-radius:100px;padding:8px 14px;font-size:12px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:6px}
+.phone-header .ph-search::before{content:'';display:block;width:14px;height:14px;border:2px solid rgba(255,255,255,.5);border-radius:50%}
+.phone-cards{padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:#F4F7FF}
+.phone-card{background:#fff;border-radius:14px;padding:12px;border:1px solid #EDF3FC}
+.phone-card .pc-price{font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--blue-dk)}
+.phone-card .pc-addr{font-size:12px;color:var(--muted);margin:2px 0 6px}
+.phone-card .pc-tags{display:flex;gap:6px}
+.phone-card .pc-tag{font-family:'Sora',sans-serif;font-weight:700;font-size:9.5px;padding:3px 8px;border-radius:100px;background:var(--blue-xl);color:var(--blue)}
+.phone-card .pc-tag.teal{background:#D6F5EC;color:var(--teal-dk)}
+.phone-tabs{display:flex;justify-content:space-around;padding:10px 14px 16px;background:#fff;border-top:1px solid #EDF3FC}
+.phone-tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Sora',sans-serif;font-weight:700;font-size:9px;color:var(--muted)}
+.phone-tab.active{color:var(--blue)}
+.phone-tab .tab-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.phone-tab.active .tab-icon{background:var(--blue);color:#fff;font-size:13px}
+
+/* Floating badges */
+.float-badge{position:absolute;background:#fff;border-radius:14px;padding:10px 16px;box-shadow:0 8px 30px rgba(27,80,200,.12);display:flex;align-items:center;gap:8px;white-space:nowrap;z-index:2}
+.float-badge .fb-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.float-badge .fb-text{font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:var(--blue-dk)}
+.float-badge .fb-sub{font-size:10px;color:var(--teal);font-weight:700}
+.float-badge-top{top:-10px;right:-30px}
+.float-badge-top .fb-icon{background:var(--blue-lt);color:var(--blue)}
+.float-badge-bottom{bottom:60px;left:-40px}
+.float-badge-bottom .fb-icon{background:#D6F5EC;color:var(--teal)}
+
+/* TRUST BAR */
+.trust-bar{background:#0A2460;padding:15px 0}
+.trust-bar .container{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.trust-states{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.trust-state{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,.8)}
+.trust-state::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.trust-motto{font-size:13px;color:rgba(255,255,255,.45);font-style:italic;white-space:nowrap}
+
+/* HOW IT WORKS */
+.how-it-works{background:#fff;padding:80px 0}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step-card{background:#fff;border-radius:20px;padding:28px 24px;border:1px solid var(--border-lt);transition:transform .25s,box-shadow .25s;cursor:default}
+.step-card:hover{transform:translateY(-5px);box-shadow:0 12px 40px rgba(27,80,200,.08)}
+.step-num{width:36px;height:36px;border-radius:10px;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.step-icon{font-size:28px;margin-bottom:12px}
+.step-card h3{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk);margin-bottom:8px}
+.step-card p{font-size:13.5px;color:var(--muted);line-height:1.7}
+
+/* CORE FEATURES */
+.features{background:#F4F7FF;padding:80px 0}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{background:#fff;border-radius:20px;padding:32px 28px;border:1px solid var(--border-lt);transition:transform .25s,box-shadow .25s}
+.feature-card:hover{transform:translateY(-5px);box-shadow:0 12px 40px rgba(27,80,200,.08)}
+.feature-icon{font-size:36px;margin-bottom:16px}
+.feature-card h3{font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--blue-dk);margin-bottom:10px}
+.feature-card>p{font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+.feature-check{display:flex;flex-direction:column;gap:10px}
+.feature-check li{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:var(--text);font-weight:600}
+.feature-check li::before{content:'✓';color:var(--teal);font-weight:800;flex-shrink:0;margin-top:1px}
+
+/* INSPECTION DETAIL */
+.inspection{background:#fff;padding:80px 0}
+.inspection .container{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.inspection-steps{display:flex;flex-direction:column;gap:20px;margin-top:8px}
+.inspection-step{display:flex;gap:14px;align-items:flex-start}
+.inspection-step .is-num{width:32px;height:32px;border-radius:10px;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.inspection-step p{font-size:14px;color:var(--muted);line-height:1.7}
+.inspection-step p strong{color:var(--text);font-weight:700}
+
+/* Report mockup */
+.report-mock{background:#fff;border-radius:20px;border:1px solid var(--border-lt);box-shadow:0 8px 40px rgba(27,80,200,.08);overflow:hidden}
+.report-header{background:var(--blue);padding:20px 22px;color:#fff}
+.report-header .rh-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px}
+.report-header .rh-sub{font-size:11.5px;opacity:.7}
+.report-rooms{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.report-room{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#F8FAFF;border-radius:12px}
+.report-room .rr-left{display:flex;align-items:center;gap:10px}
+.report-room .rr-name{font-family:'Sora',sans-serif;font-weight:700;font-size:12.5px;color:var(--blue-dk)}
+.report-room .rr-photos{display:flex;gap:3px}
+.report-room .rr-photo{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px}
+.report-room .rr-badge{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;padding:4px 10px;border-radius:100px}
+.rr-badge.satisfactory{background:#D6F5EC;color:var(--teal-dk)}
+.rr-badge.noted{background:var(--blue-lt);color:var(--blue)}
+.report-ai{margin:0 18px 18px;background:#EDFAF5;border:1px solid #B4E8D8;border-radius:14px;padding:16px}
+.report-ai .ra-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--teal-dk);margin-bottom:8px}
+.report-ai p{font-size:12px;color:var(--muted);line-height:1.7}
+
+/* VAULT */
+.vault{background:#0A2460;padding:80px 0}
+.vault .container{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.vault-label{font-family:'Sora',sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.vault h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(26px,4vw,38px);color:#fff;line-height:1.15;margin-bottom:16px}
+.vault-desc{font-size:16px;color:rgba(255,255,255,.7);line-height:1.75;margin-bottom:32px;max-width:500px}
+.vault-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.vault-folder{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px 18px;transition:transform .25s,background .25s}
+.vault-folder:hover{transform:translateY(-5px);background:rgba(255,255,255,.11)}
+.vault-folder .vf-icon{width:40px;height:40px;border-radius:12px;background:rgba(0,200,150,.15);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.vault-folder h4{font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:#fff;margin-bottom:4px}
+.vault-folder p{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.5}
+
+/* EXIT COMPARISON */
+.exit-compare{background:#F4F7FF;padding:80px 0}
+.comparison-mock{max-width:680px;margin:0 auto;background:#fff;border-radius:20px;border:1px solid var(--border-lt);box-shadow:0 8px 40px rgba(27,80,200,.08);overflow:hidden}
+.cm-header{background:#0A2460;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.cm-header .cm-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff}
+.cm-header .cm-badge{background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:10.5px;padding:4px 12px;border-radius:100px}
+.cm-columns{display:grid;grid-template-columns:1fr 1fr;text-align:center;padding:14px 22px 8px;gap:12px}
+.cm-col-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border-lt)}
+.cm-rows{padding:0 22px 16px}
+.cm-row{display:grid;grid-template-columns:1fr 30px 1fr;align-items:center;padding:12px 0;border-bottom:1px solid #F4F7FF;gap:8px}
+.cm-row:last-child{border-bottom:none}
+.cm-cell{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text)}
+.cm-cell:last-child{justify-content:flex-end}
+.cm-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.cm-icon.pass{background:#D6F5EC;color:var(--teal)}
+.cm-icon.flag{background:#FFF3D6;color:#A6700A}
+.cm-status{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.cm-status.pass{background:#D6F5EC;color:var(--teal);font-size:14px;font-weight:800}
+.cm-status.flag{background:#FFF3D6;color:#A6700A;font-size:14px;font-weight:800}
+
+.cm-question{margin:0 22px 16px;background:#F0F4FF;border-radius:14px;padding:18px;border:1px solid var(--blue-lt)}
+.cm-question p{font-size:13px;color:var(--text);line-height:1.7;margin-bottom:14px}
+.cm-question .cmq-btns{display:flex;gap:10px;flex-wrap:wrap}
+.cm-question .cmq-btn{padding:10px 18px;border-radius:100px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;transition:all .2s}
+.cmq-btn.blue{background:var(--blue);color:#fff}
+.cmq-btn.blue:hover{background:var(--blue-md)}
+.cmq-btn.outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.cmq-btn.outline:hover{border-color:var(--blue)}
+
+.cm-fix{margin:0 22px 22px;background:#EDFAF5;border:1px solid #B4E8D8;border-radius:14px;padding:16px}
+.cm-fix .cf-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--teal-dk);margin-bottom:8px}
+.cm-fix p{font-size:12.5px;color:var(--muted);line-height:1.7}
+
+.exit-disclaimer{text-align:center;max-width:640px;margin:24px auto 0;font-size:12.5px;color:var(--muted);line-height:1.7;font-style:italic}
+
+/* RENTER RIGHTS */
+.rights{background:#fff;padding:80px 0}
+.rights-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.rights-card{background:#F4F7FF;border-radius:16px;padding:24px 20px;border:2px solid transparent;transition:all .25s}
+.rights-card:hover{background:#fff;border-color:var(--blue);transform:translateY(-5px);box-shadow:0 8px 30px rgba(27,80,200,.07)}
+.rights-card .rc-abbr{font-family:'Sora',sans-serif;font-weight:800;font-size:28px;color:var(--blue);margin-bottom:2px}
+.rights-card .rc-name{font-size:12px;color:var(--muted);margin-bottom:14px}
+.rights-card .rc-links{display:flex;flex-direction:column;gap:8px}
+.rights-card .rc-link{font-size:12.5px;color:var(--blue);font-weight:600;line-height:1.4;transition:color .2s}
+.rights-card .rc-link:hover{color:var(--blue-md);text-decoration:underline}
+.rights-info{margin-top:32px;background:#F0F4FF;border-radius:16px;padding:22px 28px;display:flex;gap:14px;align-items:flex-start}
+.rights-info .ri-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.rights-info p{font-size:14px;color:var(--text);line-height:1.7}
+
+/* LEGAL DISCLAIMER */
+.legal-bar{background:#FFFDF0;border-top:1px solid #FFE090;border-bottom:1px solid #FFE090;padding:22px 0}
+.legal-bar .container{display:flex;gap:14px;align-items:flex-start}
+.legal-bar .lb-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.legal-bar p{font-size:12.5px;color:#7A6200;line-height:1.75}
+
+/* PWA INSTALL */
+.pwa-install{background:#1B50C8;padding:80px 0;text-align:center}
+.pwa-install .pi-icon{width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 24px}
+.pwa-install h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(24px,4vw,36px);color:#fff;line-height:1.2;margin-bottom:16px;max-width:560px;margin-left:auto;margin-right:auto}
+.pwa-install .pi-sub{font-size:16px;color:rgba(255,255,255,.75);line-height:1.75;max-width:560px;margin:0 auto 32px}
+.pwa-btns{display:flex;gap:12px;justify-content:center;margin-bottom:32px;flex-wrap:wrap}
+.btn-white{background:#fff;color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:14px 28px;border-radius:100px;transition:all .2s}
+.btn-white:hover{background:#F4F7FF}
+.btn-ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:14px 28px;border-radius:100px;transition:all .2s}
+.btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.1)}
+.pwa-features{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.pwa-feat{display:flex;align-items:center;gap:8px;font-size:13.5px;color:rgba(255,255,255,.6)}
+.pwa-feat::before{content:'✓';color:var(--teal);font-weight:800}
+
+/* FOOTER */
+.footer{background:#0A2460;padding:60px 0 0}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand p{font-size:13.5px;color:rgba(255,255,255,.45);line-height:1.7;margin-top:16px;max-width:280px}
+.footer-col h4{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,.7);margin-bottom:16px}
+.footer-col a{display:block;font-size:13.5px;color:rgba(255,255,255,.45);margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:#fff}
+.footer-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:20px}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-bottom:24px;flex-wrap:wrap;gap:12px}
+.footer-bottom .fb-copy{font-size:12px;color:rgba(255,255,255,.35)}
+.footer-bottom .fb-links{display:flex;gap:20px}
+.footer-bottom .fb-links a{font-size:12px;color:rgba(255,255,255,.35);transition:color .2s}
+.footer-bottom .fb-links a:hover{color:#fff}
+
+/* Logo in footer */
+.footer-logo{display:flex;align-items:center;gap:10px}
+.footer-logo .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff}
+
+/* FEATURE TAG */
+.feature-tag{display:inline-block;margin-top:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--teal-dk);background:rgba(0,200,150,.1);border-radius:100px;padding:4px 12px;letter-spacing:.5px}
+
+/* FEEDBACK / REVIEWS */
+.feedback{background:#fff;padding:80px 0}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.review-card{background:var(--blue-xl);border-radius:20px;padding:28px 24px;border:1px solid var(--border-lt)}
+.review-stars{color:#F5A623;font-size:16px;letter-spacing:2px;margin-bottom:14px}
+.review-text{font-size:14.5px;color:var(--blue-dk);line-height:1.75;margin-bottom:20px}
+.review-author{display:flex;align-items:center;gap:10px}
+.review-avatar{width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.review-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk)}
+.review-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.feedback-cta{margin-top:40px;text-align:center;padding:32px;background:var(--blue-xl);border-radius:20px;border:1px solid var(--border-lt)}
+.feedback-cta p{font-size:15px;color:var(--muted);margin-top:8px;margin-bottom:20px}
+@media(max-width:768px){.reviews-grid{grid-template-columns:1fr}}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .steps-grid{grid-template-columns:repeat(3,1fr)}
+  .features-grid{grid-template-columns:repeat(3,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-mobile-btn{display:block}
+  .steps-grid{grid-template-columns:1fr}
+  .features-grid{grid-template-columns:1fr}
+  .rights-grid{grid-template-columns:1fr}
+  .cm-columns{grid-template-columns:1fr 1fr}
+  .cm-row{grid-template-columns:1fr 24px 1fr;font-size:12px}
+  .footer-grid{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;text-align:center}
+  .hero{padding:44px 0 56px}
+  .trust-states{gap:12px}
+  .trust-motto{display:none}
+  .pwa-features{flex-direction:column;align-items:center;gap:14px}
+  .phones-row{gap:12px;padding:0 16px 16px}
+  .sp-phone{width:170px}
+}
+@media(max-width:480px){
+  .steps-grid{grid-template-columns:1fr}
+  .hero-trust{gap:14px}
 }
 </style>
-
 </head>
 <body>
 
@@ -283,10 +375,9 @@ a { text-decoration: none; color: inherit; }
     <div class="nav-links">
       <a href="#how-it-works">How It Works</a>
       <a href="#features">Features</a>
-      <a href="#vault">Vault</a>
       <a href="#rights">Renter Rights</a>
     </div>
-    <a href="/dashboard" class="nav-cta install-btn">Get the App</a>
+    <a href="/app/index.html" class="nav-cta install-btn">Get the App</a>
     <button class="nav-mobile-btn" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('show')">
       <svg width="24" height="24" fill="none" stroke="#0A2460" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
     </button>
@@ -296,127 +387,21 @@ a { text-decoration: none; color: inherit; }
 <!-- Hero -->
 <section class="hero" id="hero">
   <div class="container">
-    <div class="hero-content">
-      <div class="hero-badge"><span class="dot"></span><span>Rent Smarter. Stay Protected.</span></div>
-      <h1>Rent smarter.<br>Protect your bond.</h1>
-      <p class="hero-sub">Your complete renting companion. Track inspections, understand your lease, and secure your bond with AI — all from your pocket.</p>
-      <div class="hero-search">
-        <input type="text" placeholder="Search suburb, postcode or street…">
-        <button>Search Rentals</button>
-      </div>
-      
-      <p class="hero-note">🇦🇺 All 8 states &amp; territories · Free for renters · No account needed to search</p>
+    <div class="hero-badge"><span class="dot"></span><span>Free for all Australian renters</span></div>
+    <h1>Find rentals.<br>Book inspections.<br>Protect your bond.</h1>
+    <p class="hero-sub">Search properties across every state, book inspections, and manage your whole tenancy — free.</p>
+    <div class="hero-search" id="heroSearchForm">
+      <input type="text" id="heroSearchInput" placeholder="Search suburb, postcode or address…" onkeydown="if(event.key==='Enter')heroSearch()">
+      <button onclick="heroSearch()">Search Free →</button>
     </div>
-    <div class="carousel-container" style="display: flex; align-items: center; gap: 16px; margin: 0 auto; z-index: 2;">
-      <button class="carousel-btn" id="c-prev" aria-label="Previous screen" style="background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); font-size: 18px; box-shadow: var(--shadow-float); backdrop-filter: blur(8px); transition: all 0.2s;">❮</button>
-      
-      <div class="phone-wrap" style="margin: 0;">
-        <div class="float-badge float-badge-top" id="hero-badge-top">
-          <div class="fb-icon">👋</div>
-          <div><div class="fb-text">Home Dashboard</div><div class="fb-sub">Everything in order</div></div>
-        </div>
-                <div class="phone">
-          <!-- SCREEN 1: HOME -->
-          <div class="phone-screen" id="screen-home">
-            <div class="phone-header">
-              <div class="ph-brand">RENTERIQ</div>
-              <div class="ph-loc">Welcome, Mumin</div>
-              <div class="ph-search" style="border: 1px solid rgba(0, 229, 255, 0.3); color: var(--teal-dk); background: #D6F5EC; font-weight: bold; text-align: center;">Your rental health is 100%</div>
-            </div>
-            <div class="phone-cards">
-              <div class="phone-card">
-                <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px;">Next Rent Due</div>
-                <div class="pc-price">$520/wk</div>
-                <div class="pc-tags"><span class="pc-tag teal">Due in 3 days</span></div>
-              </div>
-              <div class="phone-card">
-                <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px;">Active Lease</div>
-                <div class="pc-addr" style="font-size: 13px;">14 Church St, Richmond VIC</div>
-                <div class="pc-tags"><span class="pc-tag">11 Months Left</span></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- SCREEN 2: SEARCH -->
-          <div class="phone-screen" id="screen-search" style="display:none;">
-            <div class="phone-header">
-              <div class="ph-brand">RENTERIQ</div>
-              <div class="ph-loc">Melbourne VIC</div>
-              <div class="ph-search">Search suburb or address…</div>
-            </div>
-            <div class="phone-cards">
-              <div class="phone-card">
-                <div class="pc-price">$520/wk</div>
-                <div class="pc-addr">14 Church St, Richmond VIC 3121</div>
-                <div class="pc-tags"><span class="pc-tag">2 Bed</span><span class="pc-tag">1 Bath</span><span class="pc-tag teal">Open Sat</span></div>
-              </div>
-              <div class="phone-card">
-                <div class="pc-price">$680/wk</div>
-                <div class="pc-addr">7/88 Flinders Ln, Melbourne VIC 3000</div>
-                <div class="pc-tags"><span class="pc-tag">2 Bed</span><span class="pc-tag">2 Bath</span><span class="pc-tag teal">Inspect</span></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- SCREEN 3: INSPECT -->
-          <div class="phone-screen" id="screen-inspect" style="display:none;">
-            <div class="phone-header">
-              <div class="ph-brand">ROUTINE</div>
-              <div class="ph-loc">Condition Report</div>
-              <div class="ph-search" style="text-align: center; color: var(--text);">Living Room Analysis</div>
-            </div>
-            <div class="phone-cards">
-              <div class="phone-card" style="display:flex; justify-content:center; padding: 24px;">
-                <div style="font-size:32px;">📷</div>
-              </div>
-              <div class="phone-card">
-                <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px;">Add note on carpet</div>
-                <div class="pc-addr" style="font-size: 13px;">Pre-existing stain near window. Small 2cm mark on the left side.</div>
-                <button style="width: 100%; background: var(--blue-lt); border: 1px solid rgba(0, 229, 255, 0.2); color: var(--blue); font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 700; padding: 8px; border-radius: 8px; cursor: pointer;">Save to Vault</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- SCREEN 4: VAULT -->
-          <div class="phone-screen" id="screen-vault" style="display:none;">
-            <div class="phone-header">
-              <div class="ph-brand">SECURE</div>
-              <div class="ph-loc">My Vault</div>
-              <div class="ph-search" style="text-align: center; color: var(--text);">3 Documents stored</div>
-            </div>
-            <div class="phone-cards">
-              <div class="phone-card" style="display:flex; align-items:center; gap: 12px;">
-                <span style="font-size:24px;">📄</span>
-                <div>
-                   <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px; margin-bottom: 2px;">Lease Agreement</div>
-                   <div class="pc-tags"><span class="pc-tag">Signed Mar 12</span></div>
-                </div>
-              </div>
-              <div class="phone-card" style="display:flex; align-items:center; gap: 12px;">
-                <span style="font-size:24px;">📸</span>
-                <div>
-                   <div class="pc-addr" style="font-weight: bold; color: var(--text); font-size: 14px; margin-bottom: 2px;">Move-in Audit</div>
-                   <div class="pc-tags"><span class="pc-tag">42 Photos</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="phone-tabs">
-            <div class="phone-tab active" id="tab-home"><div class="tab-icon">🏠</div>Home</div>
-            <div class="phone-tab" id="tab-search"><div class="tab-icon">🔍</div>Search</div>
-            <div class="phone-tab" id="tab-inspect"><div class="tab-icon">📋</div>Inspect</div>
-            <div class="phone-tab" id="tab-vault"><div class="tab-icon">🔒</div>Vault</div>
-          </div>
-        </div>
-        <div class="float-badge float-badge-bottom" id="hero-badge-bottom">
-          <div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">📅</div>
-          <div><div class="fb-text">Lease Active</div><div class="fb-sub">Rent due in 3 days</div></div>
-        </div>
-      </div>
-      
-      <button class="carousel-btn" id="c-next" aria-label="Next screen" style="background: var(--glass-surface-3); border: 1px solid var(--border); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); font-size: 18px; box-shadow: var(--shadow-float); backdrop-filter: blur(8px); transition: all 0.2s;">❯</button>
-    </div>\n  </div>\n</section>
+    <a href="/app/index.html" class="btn-outline install-btn">📱 Open the App</a>
+    <div class="hero-trust">
+      <div class="hero-trust-item">All states &amp; territories</div>
+      <div class="hero-trust-item">Search &amp; book free</div>
+      <div class="hero-trust-item">All features free in beta</div>
+    </div>
+  </div>
+</section>
 
 <!-- Trust Bar -->
 <section class="trust-bar">
@@ -431,7 +416,7 @@ a { text-decoration: none; color: inherit; }
       <span class="trust-state">ACT</span>
       <span class="trust-state">NT</span>
     </div>
-    <span class="trust-motto" style="color:var(--muted); font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">Nationwide Rental Defence.</span>
+    <span class="trust-motto">Every state. Every territory. Every renter.</span>
   </div>
 </section>
 
@@ -439,190 +424,233 @@ a { text-decoration: none; color: inherit; }
 <section class="how-it-works" id="how-it-works">
   <div class="container">
     <div class="section-label">HOW IT WORKS</div>
-    <h2 class="section-h2">Eight critical moments. Zero mistakes.</h2>
-    <p class="section-sub">Most renters lose money or their bond because they missed a single detail. RenterIQ closes every gap — from your first search to the day you hand back the keys.</p>
+    <h2 class="section-h2">Three steps. Total coverage.</h2>
+    <p class="section-sub">From first search to bond return.</p>
     <div class="steps-grid">
       <div class="step-card">
         <div class="step-num">1</div>
         <div class="step-icon">🔍</div>
-        <h3>Search Rentals</h3>
-        <p>Live listings from Australia's major platforms, all in one place. No more bouncing between tabs.</p>
+        <h3>Search &amp; Book</h3>
+        <p>Type your suburb, filter by price and beds. Tap any listing to view inspection times and book — you'll go directly to the agency's site to confirm.</p>
       </div>
       <div class="step-card">
         <div class="step-num">2</div>
-        <div class="step-icon">📅</div>
-        <h3>Book Inspections</h3>
-        <p>Book directly with the agency. RenterIQ saves the property to your profile automatically.</p>
+        <div class="step-icon">�</div>
+        <h3>Document</h3>
+        <p>Walk through the property with a guided room-by-room checklist. Photograph everything. RenterIQ generates a timestamped AI report in under a minute.</p>
       </div>
       <div class="step-card">
         <div class="step-num">3</div>
-        <div class="step-icon">🏠</div>
-        <h3>Guided Inspection</h3>
-        <p>We walk you through every room. Photograph anything that matters, add notes, and leave with a complete record.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">4</div>
-        <div class="step-icon">📄</div>
-        <h3>AI Inspection Report</h3>
-        <p>Tap complete and AI compiles your photos into a professional, timestamped PDF.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">5</div>
-        <div class="step-icon">✍️</div>
-        <h3>Application Support</h3>
-        <p>RenterIQ guides you through the process, helps you organise documents, and lets you sign digitally.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">6</div>
-        <div class="step-icon">📑</div>
-        <h3>Lease Review</h3>
-        <p>Upload your tenancy agreement and AI reads every clause, explaining them in plain English before you sign.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">7</div>
-        <div class="step-icon">🔑</div>
-        <h3>Move-In Condition Audit</h3>
-        <p>Document the property room by room with timestamped photos. This is your insurance policy.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">8</div>
-        <div class="step-icon">🚪</div>
-        <h3>Exit &amp; Bond Recovery</h3>
-        <p>Complete an exit inspection. AI compares it against your move-in record and spots any differences.</p>
+        <div class="step-icon">🛡️</div>
+        <h3>Protect</h3>
+        <p>Store your lease, reports and receipts in your Vault. At exit, AI compares move-in and exit photos so you can dispute any unfair bond deductions with evidence.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Core Features -->
+<!-- REMOVED App Showcase -->
+<section class="showcase" id="app" style="display:none">
+  <div class="container">
+    <div class="section-label" style="text-align:center">THE APP</div>
+    <h2 class="section-h2" style="text-align:center;margin-left:auto;margin-right:auto">Built for renters. Every screen.</h2>
+    <div class="phones-row">
+
+      <!-- Home Dashboard -->
+      <div class="sp-item">
+        <div class="sp-phone">
+          <div class="sp-head blue-bg">
+            <div class="sp-head-label">RenterIQ</div>
+            <div class="sp-head-title">Dashboard</div>
+            <div class="sp-head-sub">18 Smith St · Active</div>
+          </div>
+          <div class="sp-body">
+            <div class="sp-stats">
+              <div class="sp-stat"><div class="sp-stat-num">14</div><div class="sp-stat-lbl">Docs</div></div>
+              <div class="sp-stat"><div class="sp-stat-num">38</div><div class="sp-stat-lbl">Photos</div></div>
+              <div class="sp-stat"><div class="sp-stat-num">3</div><div class="sp-stat-lbl">Reports</div></div>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">📅</div>
+              <div><div class="sp-row-name">Routine Inspection</div><div class="sp-row-sub">Due in 3 days</div></div>
+              <span class="sp-row-badge sp-badge-amber">Soon</span>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">💰</div>
+              <div><div class="sp-row-name">Rent Due</div><div class="sp-row-sub">$620 · Mon 7 Apr</div></div>
+              <span class="sp-row-badge sp-badge-blue">7d</span>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">🛡️</div>
+              <div><div class="sp-row-name">Bond Protected</div><div class="sp-row-sub">$2,480 lodged</div></div>
+              <span class="sp-row-badge sp-badge-teal">Safe</span>
+            </div>
+          </div>
+          <div class="sp-tabs">
+            <div class="sp-tab act"><div class="sp-tab-icon">🏠</div>Home</div>
+            <div class="sp-tab"><div class="sp-tab-icon">🔍</div>Search</div>
+            <div class="sp-tab"><div class="sp-tab-icon">📋</div>Inspect</div>
+            <div class="sp-tab"><div class="sp-tab-icon">🔒</div>Vault</div>
+          </div>
+        </div>
+        <div class="sp-label">Home</div>
+      </div>
+
+      <!-- Search -->
+      <div class="sp-item">
+        <div class="sp-phone">
+          <div class="sp-head blue-bg">
+            <div class="sp-head-label">RenterIQ</div>
+            <div class="sp-head-title">Melbourne VIC</div>
+            <div class="sp-head-sub">42 listings found</div>
+          </div>
+          <div class="sp-body">
+            <div class="sp-card">
+              <div class="sp-card-price">$520/wk</div>
+              <div class="sp-card-addr">14 Church St, Richmond</div>
+              <div class="sp-card-tags"><span class="sp-card-tag">2 Bed</span><span class="sp-card-tag">1 Bath</span><span class="sp-card-tag tl">Open Sat</span></div>
+            </div>
+            <div class="sp-card">
+              <div class="sp-card-price">$680/wk</div>
+              <div class="sp-card-addr">7/88 Flinders Ln, Melbourne</div>
+              <div class="sp-card-tags"><span class="sp-card-tag">2 Bed</span><span class="sp-card-tag">2 Bath</span><span class="sp-card-tag tl">Inspect</span></div>
+            </div>
+            <div class="sp-card">
+              <div class="sp-card-price">$445/wk</div>
+              <div class="sp-card-addr">3 Smith St, Fitzroy</div>
+              <div class="sp-card-tags"><span class="sp-card-tag">1 Bed</span><span class="sp-card-tag">1 Bath</span><span class="sp-card-tag tl">New</span></div>
+            </div>
+          </div>
+          <div class="sp-tabs">
+            <div class="sp-tab"><div class="sp-tab-icon">🏠</div>Home</div>
+            <div class="sp-tab act"><div class="sp-tab-icon">🔍</div>Search</div>
+            <div class="sp-tab"><div class="sp-tab-icon">📋</div>Inspect</div>
+            <div class="sp-tab"><div class="sp-tab-icon">🔒</div>Vault</div>
+          </div>
+        </div>
+        <div class="sp-label">Search</div>
+      </div>
+
+      <!-- Inspection -->
+      <div class="sp-item">
+        <div class="sp-phone">
+          <div class="sp-head blue-bg">
+            <div class="sp-head-label">RenterIQ</div>
+            <div class="sp-head-title">Inspection</div>
+            <div class="sp-head-sub">18 Smith St · In progress</div>
+          </div>
+          <div class="sp-body">
+            <div class="sp-row">
+              <div class="sp-row-icon">🛋️</div>
+              <div><div class="sp-row-name">Living Room</div><div class="sp-row-sub">3 photos · Noted</div></div>
+              <span class="sp-row-badge sp-badge-teal">Done</span>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">🍳</div>
+              <div><div class="sp-row-name">Kitchen</div><div class="sp-row-sub">2 photos · Review</div></div>
+              <span class="sp-row-badge sp-badge-amber">Flag</span>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">🛏️</div>
+              <div><div class="sp-row-name">Bedroom</div><div class="sp-row-sub">2 photos · Good</div></div>
+              <span class="sp-row-badge sp-badge-teal">Done</span>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">🚿</div>
+              <div><div class="sp-row-name">Bathroom</div><div class="sp-row-sub">Pending</div></div>
+              <span class="sp-row-badge sp-badge-blue">Next</span>
+            </div>
+          </div>
+          <div class="sp-tabs">
+            <div class="sp-tab"><div class="sp-tab-icon">🏠</div>Home</div>
+            <div class="sp-tab"><div class="sp-tab-icon">🔍</div>Search</div>
+            <div class="sp-tab act"><div class="sp-tab-icon">📋</div>Inspect</div>
+            <div class="sp-tab"><div class="sp-tab-icon">🔒</div>Vault</div>
+          </div>
+        </div>
+        <div class="sp-label">Inspect</div>
+      </div>
+
+      <!-- Vault -->
+      <div class="sp-item">
+        <div class="sp-phone">
+          <div class="sp-head navy-bg">
+            <div class="sp-head-label">RenterIQ</div>
+            <div class="sp-head-title">The Vault</div>
+            <div class="sp-head-sub">14 docs · 38 photos</div>
+          </div>
+          <div class="sp-body">
+            <div class="sp-row">
+              <div class="sp-row-icon">📑</div>
+              <div><div class="sp-row-name">Lease Agreement</div><div class="sp-row-sub">Signed · Mar 2025</div></div>
+              <span class="sp-row-badge sp-badge-teal">AI ✓</span>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">📸</div>
+              <div><div class="sp-row-name">Entry Report</div><div class="sp-row-sub">38 photos · PDF</div></div>
+              <span class="sp-row-badge sp-badge-blue">Saved</span>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">🔧</div>
+              <div><div class="sp-row-name">Maintenance</div><div class="sp-row-sub">2 open requests</div></div>
+              <span class="sp-row-badge sp-badge-amber">Open</span>
+            </div>
+            <div class="sp-row">
+              <div class="sp-row-icon">🧾</div>
+              <div><div class="sp-row-name">Rent Receipts</div><div class="sp-row-sub">12 months stored</div></div>
+              <span class="sp-row-badge sp-badge-teal">All</span>
+            </div>
+          </div>
+          <div class="sp-tabs">
+            <div class="sp-tab"><div class="sp-tab-icon">🏠</div>Home</div>
+            <div class="sp-tab"><div class="sp-tab-icon">🔍</div>Search</div>
+            <div class="sp-tab"><div class="sp-tab-icon">📋</div>Inspect</div>
+            <div class="sp-tab act"><div class="sp-tab-icon">🔒</div>Vault</div>
+          </div>
+        </div>
+        <div class="sp-label">Vault</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
 <section class="features" id="features">
   <div class="container">
-    <div class="section-label">CORE FEATURES</div>
-    <h2 class="section-h2">The toolkit for the modern renter.</h2>
-    <p class="section-sub">These aren't nice-to-haves. They're the critical features that stand between you and a signed bad lease, an undocumented defect, or a lost bond.</p>
+    <div class="section-label">FEATURES</div>
+    <h2 class="section-h2">More than a search app.</h2>
+    <p class="section-sub" style="margin-bottom:40px">Tools for every stage of your tenancy — free during beta.</p>
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon">📸</div>
         <h3>AI Inspection Reports</h3>
-        <p>A professionally formatted, AI-generated PDF report with timestamped photo evidence. Produced in seconds — at any inspection, at any stage of your tenancy.</p>
-        <ul class="feature-check">
-          <li>Room-by-room guided walkthrough</li>
-          <li>Timestamped, dated photo evidence</li>
-          <li>Professional PDF in under 60 seconds</li>
-          <li>Saved permanently to your Vault</li>
-        </ul>
+        <p>Walk through the property, photograph each room, and RenterIQ generates a professional timestamped PDF — the same standard as an agency report.</p>
+        <span class="feature-tag">Free in beta</span>
       </div>
       <div class="feature-card">
         <div class="feature-icon">⚖️</div>
-        <h3>Lease Plain-English Review</h3>
-        <p>Tenancy agreements are written by lawyers, for landlords. RenterIQ's AI translates every clause into simple English before you sign.</p>
-        <ul class="feature-check">
-          <li>Full clause-by-clause breakdown</li>
-          <li>Flags non-standard or unusual terms</li>
-          <li>Covers all Australian state agreements</li>
-          <li>Stored in Vault for future reference</li>
-        </ul>
+        <h3>Lease Review</h3>
+        <p>Upload your lease and AI explains every clause in plain English, flagging anything unusual — before you sign.</p>
+        <span class="feature-tag">Free in beta</span>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🛡️</div>
-        <h3>Bond Back Protection</h3>
-        <p>Bond disputes come down to documentation. At exit, our AI compares your photos against your move-in record and flags any differences for you to securely handle.</p>
-        <ul class="feature-check">
-          <li>Side-by-side move-in vs exit comparison</li>
-          <li>AI surfaces potential differences for your review</li>
-          <li>You confirm, dismiss, or add context to each item</li>
-          <li>Complete evidence trail — built by you, for you</li>
-        </ul>
+        <h3>Bond Protection</h3>
+        <p>At exit, AI compares your move-in and exit photos side by side. You review every flag and own the final report.</p>
+        <span class="feature-tag">Free in beta</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Inspection Detail -->
-<section class="inspection" id="inspection">
+<!-- REMOVED: Vault, Bond Back, Rights, Feedback, Legal sections -->
+<div style="display:none" id="vault">
   <div class="container">
     <div>
-      <div class="section-label">INSPECTION REPORTS</div>
-      <h2 class="section-h2">AI Condition Reports. Bulletproof evidence.</h2>
-      <p class="section-sub">Agencies submit detailed condition reports. Most tenants don't. That imbalance is where disputes start. RenterIQ levels the playing field instantly.</p>
-      <div class="inspection-steps">
-        <div class="inspection-step">
-          <div class="is-num">1</div>
-          <p><strong>Open the inspection checklist</strong> — RenterIQ walks you through every area of the property — living spaces, kitchen, bedrooms, bathrooms, storage, and outdoor areas. Nothing gets overlooked.</p>
-        </div>
-        <div class="inspection-step">
-          <div class="is-num">2</div>
-          <p><strong>Photograph and annotate as you go</strong> — Tap to capture anything worth documenting — scuff marks, worn carpet, a cracked tile, a pre-existing stain. Add a note and move on. It takes seconds.</p>
-        </div>
-        <div class="inspection-step">
-          <div class="is-num">3</div>
-          <p><strong>Tap Complete</strong> — RenterIQ's AI compiles your entire walkthrough into a professional, dated condition report — formatted to the same standard as an agency-issued document.</p>
-        </div>
-        <div class="inspection-step">
-          <div class="is-num">4</div>
-          <p><strong>Stored in your Vault, permanently</strong> — The report is saved automatically and accessible at any time — six weeks or two years later, if it ever comes to that.</p>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="report-mock">
-        <div class="report-header">
-          <div class="rh-title">Condition Report · 18 Smith St, Fitzroy VIC 3065</div>
-          <div class="rh-sub">RenterIQ Tenant Report · 12 March 2025 · 10:47am AEDT</div>
-        </div>
-        <div class="report-rooms">
-          <div class="report-room">
-            <div class="rr-left">
-              <div class="rr-name">Living Room</div>
-              <div class="rr-photos"><span class="rr-photo" style="background:#D8E7FC">📷</span><span class="rr-photo" style="background:#D8E7FC">📷</span><span class="rr-photo" style="background:#D8E7FC">📷</span></div>
-            </div>
-            <span class="rr-badge satisfactory">Satisfactory</span>
-          </div>
-          <div class="report-room">
-            <div class="rr-left">
-              <div class="rr-name">Kitchen</div>
-              <div class="rr-photos"><span class="rr-photo" style="background:#D8E7FC">📷</span><span class="rr-photo" style="background:#FFF3D6">📷</span><span class="rr-photo" style="background:#D8E7FC">📷</span></div>
-            </div>
-            <span class="rr-badge noted">Items Noted</span>
-          </div>
-          <div class="report-room">
-            <div class="rr-left">
-              <div class="rr-name">Master Bedroom</div>
-              <div class="rr-photos"><span class="rr-photo" style="background:#D8E7FC">📷</span><span class="rr-photo" style="background:#D8E7FC">📷</span></div>
-            </div>
-            <span class="rr-badge satisfactory">Satisfactory</span>
-          </div>
-          <div class="report-room">
-            <div class="rr-left">
-              <div class="rr-name">Main Bathroom</div>
-              <div class="rr-photos"><span class="rr-photo" style="background:#D8E7FC">📷</span><span class="rr-photo" style="background:#FFF3D6">📷</span><span class="rr-photo" style="background:#D8E7FC">📷</span></div>
-            </div>
-            <span class="rr-badge noted">Items Noted</span>
-          </div>
-          <div class="report-room">
-            <div class="rr-left">
-              <div class="rr-name">Outdoor / Garden</div>
-              <div class="rr-photos"><span class="rr-photo" style="background:#D8E7FC">📷</span><span class="rr-photo" style="background:#D8E7FC">📷</span></div>
-            </div>
-            <span class="rr-badge satisfactory">Satisfactory</span>
-          </div>
-        </div>
-        <div class="report-ai">
-          <div class="ra-label">✦ Smart Summary — reviewed &amp; approved by tenant</div>
-          <p>Property is in satisfactory condition throughout. Pre-existing staining noted on kitchen splashback (Item K1) and grout discolouration in main bathroom (Item B1). Both items were flagged by RenterIQ, confirmed by the tenant as pre-existing, and are photographically documented and timestamped at commencement of tenancy.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- The Vault -->
-<section class="vault" id="vault">
-  <div class="container">
-    <div>
-      <div class="vault-label">THE VAULT</div>
-      <h2>Everything about your tenancy. One secure place. Always yours.</h2>
-      <p class="vault-desc">Receipts buried in email threads. Leases lost in downloads. Maintenance requests sent and never followed up. The Vault ends all of that. Every document, report, receipt, and communication — organised, searchable, and accessible long after the tenancy ends.</p>
+      <div class="vault-label">VAULT</div>
+      <h2>Every document. One secure place.</h2>
+      <p class="vault-desc">Every document, report, receipt, and communication — organised, searchable, and yours long after the tenancy ends.</p>
       <a href="#pwa" class="btn-teal" style="display:inline-flex;align-items:center;gap:6px;font-size:15px;padding:14px 32px">Start Your Vault →</a>
     </div>
     <div class="vault-grid">
@@ -664,9 +692,9 @@ a { text-decoration: none; color: inherit; }
 <section class="exit-compare" id="exit">
   <div class="container">
     <div style="text-align:center;margin-bottom:48px">
-      <div class="section-label">BOND RECOVERY</div>
-      <h2 class="section-h2" style="max-width:640px;margin-left:auto;margin-right:auto">You compare. You decide. The AI just does the legwork.</h2>
-      <p class="section-sub" style="max-width:660px;margin-left:auto;margin-right:auto">RenterIQ runs the comparison between your exit and move-in photos in the background. When it spots something that looks different, it asks you — is this a real difference? You confirm, dismiss, or add a note. Nothing goes into your report without your say-so.</p>
+      <div class="section-label">BOND BACK</div>
+      <h2 class="section-h2" style="max-width:560px;margin-left:auto;margin-right:auto">AI does the legwork. You make the call.</h2>
+      <p class="section-sub" style="max-width:600px;margin-left:auto;margin-right:auto;margin-bottom:0">AI spots differences between exit and move-in photos and asks you about each one. You confirm, dismiss, or add context. Nothing enters your report without your approval.</p>
     </div>
     <div class="comparison-mock">
       <div class="cm-header">
@@ -715,12 +743,12 @@ a { text-decoration: none; color: inherit; }
   </div>
 </section>
 
-<!-- Renter Rights Hub -->
-<section class="rights" id="rights">
+<!-- Old Rights Hub (hidden) -->
+<section class="rights">
   <div class="container">
-    <div class="section-label">RENTER RIGHTS HUB</div>
-    <h2 class="section-h2">Free help exists in every state. Most renters don't know where to find it.</h2>
-    <p class="section-sub">Every Australian state and territory has a government tenancy authority offering free advice, dispute resolution, and renter guidance. RenterIQ connects you directly to all of them — because knowing where to go is half the battle.</p>
+    <div class="section-label">RENTER RIGHTS</div>
+    <h2 class="section-h2">Know your rights.</h2>
+    <p class="section-sub">Free government tenancy authorities in every state and territory. RenterIQ links you directly to all eight.</p>
     <div class="rights-grid">
       <!-- NSW -->
       <div class="rights-card">
@@ -813,16 +841,136 @@ a { text-decoration: none; color: inherit; }
     </div>
     <div class="rights-info">
       <span class="ri-icon">💡</span>
-      <p>These services are free, government-backed, and available to every Australian renter — regardless of whether you're in a dispute. If you're unsure of your rights at any point during your tenancy, your state authority is always the right first call. RenterIQ links you directly to each one.</p>
+      <p>All services are free and government-backed. If you're ever unsure of your rights, your state authority is the right first call — RenterIQ links you directly to each one.</p>
     </div>
   </div>
 </section>
 
-<!-- Legal Disclaimer -->
-<section class="legal-bar">
+<!-- Feedback & Reviews -->
+<section class="feedback" id="feedback">
   <div class="container">
-    <span class="lb-icon">⚠️</span>
-    <p>RenterIQ is an organisation and documentation tool — not a legal service. All AI-generated summaries, comparisons, and suggestions are provided for your personal reference only and do not constitute legal advice. Tenancy laws differ by state and territory, and outcomes in any dispute will depend on your individual circumstances. For legal questions, bond disputes, or formal complaints, contact your state or territory tenancy authority or seek independent legal advice. Links to government resources are provided for convenience — RenterIQ is not affiliated with any government body.</p>
+    <div class="section-label">BETA FEEDBACK</div>
+    <h2 class="section-h2">What early users are saying.</h2>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">&ldquo;Finally an app that actually helps with inspections. Walked through my new place and had a full report ready before I even left. Absolute game changer.&rdquo;</p>
+        <div class="review-author">
+          <div class="review-avatar">SK</div>
+          <div><div class="review-name">Sarah K.</div><div class="review-meta">Melbourne, VIC · Beta user</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">&ldquo;The lease review feature explained my entire agreement in plain English. Found two unusual clauses my agent never mentioned. Worth it for that alone.&rdquo;</p>
+        <div class="review-author">
+          <div class="review-avatar">MR</div>
+          <div><div class="review-name">Marcus R.</div><div class="review-meta">Sydney, NSW · Beta user</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">&ldquo;Got my full bond back after using RenterIQ at move-in and exit. The comparison report made it impossible for the agency to dispute anything.&rdquo;</p>
+        <div class="review-author">
+          <div class="review-avatar">JP</div>
+          <div><div class="review-name">Jamie P.</div><div class="review-meta">Brisbane, QLD · Beta user</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="feedback-cta">
+      <h3 style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--blue-dk)">Using RenterIQ in beta?</h3>
+      <p>Your feedback shapes the product. Share your experience — good or bad.</p>
+      <a href="mailto:support@renteriq.com.au?subject=Beta Feedback" class="btn-teal" style="display:inline-flex;align-items:center;gap:8px;font-size:15px;padding:13px 28px">✉️ Send Feedback</a>
+    </div>
+  </div>
+</section>
+
+</div><!-- /end hidden removed sections -->
+
+<!-- Renter Rights Hub -->
+<section class="rights" id="rights">
+  <div class="container">
+    <div class="section-label">RENTER RIGHTS</div>
+    <h2 class="section-h2">Know your rights.</h2>
+    <p class="section-sub">Free government tenancy authorities in every state and territory. RenterIQ links you directly to all eight.</p>
+    <div class="rights-grid">
+      <div class="rights-card">
+        <div class="rc-abbr">NSW</div>
+        <div class="rc-name">New South Wales</div>
+        <div class="rc-links">
+          <a class="rc-link" href="https://www.fairtrading.nsw.gov.au/housing-and-property/renting" target="_blank">NSW Fair Trading — Renting Guide</a>
+          <a class="rc-link" href="https://www.ncat.nsw.gov.au/" target="_blank">NCAT — Tenancy Disputes</a>
+          <a class="rc-link" href="https://www.tenants.org.au/" target="_blank">Tenants' Union of NSW</a>
+        </div>
+      </div>
+      <div class="rights-card">
+        <div class="rc-abbr">VIC</div>
+        <div class="rc-name">Victoria</div>
+        <div class="rc-links">
+          <a class="rc-link" href="https://www.consumer.vic.gov.au/housing/renting" target="_blank">Consumer Affairs Victoria</a>
+          <a class="rc-link" href="https://www.vcat.vic.gov.au/" target="_blank">VCAT — Tenancy Division</a>
+          <a class="rc-link" href="https://tenantsvic.org.au/" target="_blank">Tenants Victoria</a>
+        </div>
+      </div>
+      <div class="rights-card">
+        <div class="rc-abbr">QLD</div>
+        <div class="rc-name">Queensland</div>
+        <div class="rc-links">
+          <a class="rc-link" href="https://www.rta.qld.gov.au/" target="_blank">Residential Tenancies Authority</a>
+          <a class="rc-link" href="https://www.rta.qld.gov.au/renting/ending-a-tenancy/bond-refund" target="_blank">Bond Refund Process</a>
+          <a class="rc-link" href="https://www.qcat.qld.gov.au/" target="_blank">QCAT — Dispute Resolution</a>
+        </div>
+      </div>
+      <div class="rights-card">
+        <div class="rc-abbr">WA</div>
+        <div class="rc-name">Western Australia</div>
+        <div class="rc-links">
+          <a class="rc-link" href="https://www.commerce.wa.gov.au/consumer-protection/renting-home" target="_blank">Consumer Protection WA</a>
+          <a class="rc-link" href="https://www.courts.wa.gov.au/content/courts/magistrates/jurisdiction/civil-matters/residential-tenancies.html" target="_blank">Magistrates Court — Tenancies</a>
+          <a class="rc-link" href="https://www.commerce.wa.gov.au/consumer-protection/renters-guide" target="_blank">Full WA Renters Guide</a>
+        </div>
+      </div>
+      <div class="rights-card">
+        <div class="rc-abbr">SA</div>
+        <div class="rc-name">South Australia</div>
+        <div class="rc-links">
+          <a class="rc-link" href="https://www.cbs.sa.gov.au/renting" target="_blank">CBS SA — Renting Guide</a>
+          <a class="rc-link" href="https://www.sacat.sa.gov.au/" target="_blank">SACAT — Tenancy Disputes</a>
+          <a class="rc-link" href="https://www.cbs.sa.gov.au/renting/bond" target="_blank">Bond Lodgement &amp; Refund</a>
+        </div>
+      </div>
+      <div class="rights-card">
+        <div class="rc-abbr">TAS</div>
+        <div class="rc-name">Tasmania</div>
+        <div class="rc-links">
+          <a class="rc-link" href="https://www.cbos.tas.gov.au/topics/housing/renting" target="_blank">CBOS — Renting in Tasmania</a>
+          <a class="rc-link" href="https://www.justice.tas.gov.au/courts/magistrates-court/magistrates-court-civil-division/residential-tenancy" target="_blank">Tenancy Dispute Resolution</a>
+          <a class="rc-link" href="https://www.cbos.tas.gov.au/topics/housing/renting/bond" target="_blank">Bond Information</a>
+        </div>
+      </div>
+      <div class="rights-card">
+        <div class="rc-abbr">ACT</div>
+        <div class="rc-name">Australian Capital Territory</div>
+        <div class="rc-links">
+          <a class="rc-link" href="https://www.accesscanberra.act.gov.au/renting" target="_blank">Access Canberra — Renting</a>
+          <a class="rc-link" href="https://www.acat.act.gov.au/" target="_blank">ACAT — Tenancy Division</a>
+          <a class="rc-link" href="https://tenantsact.org.au/" target="_blank">Tenants ACT</a>
+        </div>
+      </div>
+      <div class="rights-card">
+        <div class="rc-abbr">NT</div>
+        <div class="rc-name">Northern Territory</div>
+        <div class="rc-links">
+          <a class="rc-link" href="https://consumeraffairs.nt.gov.au/tenants-landlords" target="_blank">NT Consumer Affairs</a>
+          <a class="rc-link" href="https://ntcat.nt.gov.au/" target="_blank">NTCAT — Tenancy Disputes</a>
+          <a class="rc-link" href="https://consumeraffairs.nt.gov.au/tenants-landlords/bonds" target="_blank">Bond Information NT</a>
+        </div>
+      </div>
+    </div>
+    <div class="rights-info">
+      <span class="ri-icon">💡</span>
+      <p>All services are free and government-backed. If you're ever unsure of your rights, your state authority is the right first call.</p>
+    </div>
   </div>
 </section>
 
@@ -830,11 +978,11 @@ a { text-decoration: none; color: inherit; }
 <section class="pwa-install" id="pwa">
   <div class="container">
     <div class="pi-icon"><img src="/assets/logo.svg" alt="RenterIQ App" width="64" height="64"></div>
-    <h2>Install RenterIQ on your device</h2>
-    <p class="pi-sub">Add to your home screen instantly. No app store. Works fully offline.</p>
-    <div class="pwa-btns" style="display:flex; justify-content:center; gap:16px; margin: 24px 0;">
-      <button class="install-btn" style="background: linear-gradient(135deg, var(--blue), var(--teal)); color: #fff; padding: 16px 32px; border-radius: 100px; font-family: 'Sora', sans-serif; font-weight: 700; border: none; font-size:15px; cursor: pointer; box-shadow: var(--shadow-neon);">📲 Download the App</button>
-      <a href="/dashboard" style="background: rgba(255,255,255,0.05); color: var(--text); padding: 16px 32px; border-radius: 100px; font-family: 'Sora', sans-serif; font-weight: 700; border: 1px solid var(--border); font-size:15px; text-decoration: none; display:flex; align-items:center;">Open in Web</a>
+    <h2>Your rental companion. On your phone.</h2>
+    <p class="pi-sub">Add to your home screen in seconds. No app store, no account required. Free for every Australian renter.</p>
+    <div class="pwa-btns">
+      <button class="btn-white install-btn">📲 Get the App — Free</button>
+      <a href="/app/index.html" class="btn-ghost">Open Web App</a>
     </div>
     <div class="pwa-features">
       <span class="pwa-feat">Works offline</span>
@@ -857,25 +1005,19 @@ a { text-decoration: none; color: inherit; }
         <p>The complete renting companion for Australian tenants — from the first search to the final key handover.</p>
       </div>
       <div class="footer-col">
-        <h4>Product</h4>
+        <h4>Quick Links</h4>
         <a href="#how-it-works">How It Works</a>
         <a href="#features">Features</a>
-        <a href="#vault">The Vault</a>
-        <a href="/dashboard" class="install-btn">Get the App</a>
+        <a href="#rights">Renter Rights</a>
+        <a href="#pwa">Get the App</a>
+        <a href="/app/pages/search.html">Search Rentals</a>
       </div>
       <div class="footer-col">
-        <h4>Renter Rights</h4>
-        <a href="#rights">NSW</a>
-        <a href="#rights">VIC</a>
-        <a href="#rights">QLD &amp; WA</a>
-        <a href="#rights">All States →</a>
-      </div>
-      <div class="footer-col">
-        <h4>Company</h4>
+        <h4>Support</h4>
+        <a href="mailto:support@renteriq.com.au">support@renteriq.com.au</a>
+        <a href="mailto:support@renteriq.com.au?subject=Feedback">Send Feedback</a>
+        <a href="mailto:support@renteriq.com.au?subject=Review">Leave a Review</a>
         <a href="#">About RenterIQ</a>
-        <a href="#">Blog</a>
-        <a href="#">Contact</a>
-        <a href="#">Feedback</a>
       </div>
     </div>
     <div class="footer-divider"></div>
@@ -885,7 +1027,7 @@ a { text-decoration: none; color: inherit; }
         <a href="#">Privacy Policy</a>
         <a href="#">Terms of Use</a>
         <a href="#">Disclaimer</a>
-        <a href="/dashboard">App</a>
+        <a href="/app/index.html">App</a>
       </div>
     </div>
   </div>
@@ -902,11 +1044,21 @@ a { text-decoration: none; color: inherit; }
       <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:#0F1C3F"><span style="width:32px;height:32px;border-radius:10px;background:#D8E7FC;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">2</span><span>Scroll down and tap <strong>"Add to Home Screen"</strong></span></div>
       <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:#0F1C3F"><span style="width:32px;height:32px;border-radius:10px;background:#D8E7FC;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">3</span><span>Tap <strong>"Add"</strong> — RenterIQ will appear on your home screen</span></div>
     </div>
-    <button id="iosModalClose" style="background:#1B50C8;color: var(--text);font-family:'Sora',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:100px;padding:14px 32px;cursor:pointer;width:100%">Got It</button>
+    <button id="iosModalClose" style="background:#1B50C8;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:100px;padding:14px 32px;cursor:pointer;width:100%">Got It</button>
   </div>
 </div>
 
 <script>
+// Hero search — routes to app search page with query
+function heroSearch() {
+  var q = document.getElementById('heroSearchInput').value.trim();
+  if (q) {
+    window.location.href = '/app/pages/search.html?q=' + encodeURIComponent(q);
+  } else {
+    window.location.href = '/app/pages/search.html';
+  }
+}
+
 // Smooth scroll for all internal anchor links
 document.querySelectorAll('a[href^="#"]').forEach(function(anchor){
   anchor.addEventListener('click',function(e){
@@ -937,7 +1089,7 @@ document.querySelectorAll('.install-btn').forEach(btn => {
     
     if (isStandalone()) {
       // Already installed - go to app
-      window.location.href = '/dashboard';
+      window.location.href = '/app/index.html';
       return;
     }
     
@@ -957,7 +1109,7 @@ document.querySelectorAll('.install-btn').forEach(btn => {
       btn.textContent = '✓ Opening App...';
       btn.style.background = '#00C896';
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = '/app/index.html';
       }, 500);
     }
   });
@@ -974,7 +1126,7 @@ function isStandalone() {
 
 // Redirect if already installed
 if (isStandalone()) {
-  window.location.href = '/dashboard';
+  window.location.href = '/app/index.html';
 }
 
 function showInstallSuccess() {
@@ -984,7 +1136,7 @@ function showInstallSuccess() {
     btn.style.pointerEvents = 'none';
   });
   setTimeout(() => {
-    window.location.href = '/dashboard';
+    window.location.href = '/app/index.html';
   }, 1500);
 }
 
@@ -1005,83 +1157,6 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/app/sw.js');
   });
 }
-</script>
-
-<!-- Carousel Script -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const screens = ['home', 'search', 'inspect', 'vault'];
-    const badges = [
-      {
-        top: '<div class="fb-icon">👋</div><div><div class="fb-text">Home Dashboard</div><div class="fb-sub">Everything in order</div></div>',
-        bottom: '<div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">📅</div><div><div class="fb-text">Lease Active</div><div class="fb-sub">Rent due in 3 days</div></div>'
-      },
-      {
-        top: '<div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">⚡</div><div><div class="fb-text">Live Search</div><div class="fb-sub">New listing found</div></div>',
-        bottom: '<div class="fb-icon">🏠</div><div><div class="fb-text">Inspection Booked</div><div class="fb-sub">Saturday 10:00 AM</div></div>'
-      },
-      {
-        top: '<div class="fb-icon">📄</div><div><div class="fb-text">AI Report Ready</div><div class="fb-sub">Items flagged securely</div></div>',
-        bottom: '<div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">📸</div><div><div class="fb-text">Timestamped</div><div class="fb-sub">Metadata saved ✓</div></div>'
-      },
-      {
-        top: '<div class="fb-icon">🔒</div><div><div class="fb-text">Bond Protected</div><div class="fb-sub">Evidence stacked ✓</div></div>',
-        bottom: '<div class="fb-icon" style="background:var(--blue-lt);color:var(--blue);">⚖️</div><div><div class="fb-text">AI Lease Review</div><div class="fb-sub">Clauses highlighted</div></div>'
-      }
-    ];
-
-    let currentIndex = 0;
-    
-    function showScreen(index) {
-      screens.forEach((id, i) => {
-        const screenEl = document.getElementById(`screen-${id}`);
-        const tabEl = document.getElementById(`tab-${id}`);
-        if(screenEl) screenEl.style.display = (i === index) ? 'flex' : 'none';
-        if(tabEl) {
-          if(i === index) tabEl.classList.add('active');
-          else tabEl.classList.remove('active');
-        }
-      });
-      
-      const topBadge = document.getElementById('hero-badge-top');
-      const bottomBadge = document.getElementById('hero-badge-bottom');
-      if(topBadge && badges[index]) topBadge.innerHTML = badges[index].top;
-      if(bottomBadge && badges[index]) bottomBadge.innerHTML = badges[index].bottom;
-    }
-    
-    const btnPrev = document.getElementById('c-prev');
-    const btnNext = document.getElementById('c-next');
-    
-    if(btnPrev) {
-      btnPrev.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + screens.length) % screens.length;
-        showScreen(currentIndex);
-      });
-      btnPrev.addEventListener('mouseover', () => { btnPrev.style.background = 'var(--blue)'; btnPrev.style.color = '#fff'; });
-      btnPrev.addEventListener('mouseout', () => { btnPrev.style.background = 'var(--glass-surface-3)'; btnPrev.style.color = 'var(--text)'; });
-    }
-    
-    if(btnNext) {
-      btnNext.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % screens.length;
-        showScreen(currentIndex);
-      });
-      btnNext.addEventListener('mouseover', () => { btnNext.style.background = 'var(--blue)'; btnNext.style.color = '#fff'; });
-      btnNext.addEventListener('mouseout', () => { btnNext.style.background = 'var(--glass-surface-3)'; btnNext.style.color = 'var(--text)'; });
-    }
-    
-    // Add click listeners to phone tabs
-    screens.forEach((id, i) => {
-      const tabEl = document.getElementById(`tab-${id}`);
-      if(tabEl) {
-        tabEl.addEventListener('click', () => {
-          currentIndex = i;
-          showScreen(currentIndex);
-        });
-        tabEl.style.cursor = 'pointer';
-      }
-    });
-  });
 </script>
 </body>
 </html>
