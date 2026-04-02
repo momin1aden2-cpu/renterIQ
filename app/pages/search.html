@@ -546,10 +546,10 @@ var currentPropertyId=null;
 
 // Property Data
 var properties={
-  p1:{price:'$620',addr:'18 Smith Street, Fitzroy VIC 3065',beds:3,baths:1,cars:2,size:180,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-blue">Pet Friendly</span>',insp:true,inspTime:'Sat 10:00am',inspBadge:'<span class="pulse-dot"></span>Inspection Sat 10:00am',agency:'Nelson Alexander — Fitzroy',gradient:'linear-gradient(135deg,#1a3a8f,#2E63E0)',emoji:'🏠'},
-  p2:{price:'$480',addr:'7/92 Bridge Road, Richmond VIC 3121',beds:2,baths:1,cars:1,size:85,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-amber">New Listing</span>',insp:true,inspTime:'Sun 11:30am',inspBadge:'<span class="pulse-dot"></span>Inspection Sun 11:30am',agency:'Jellis Craig — Richmond',gradient:'linear-gradient(135deg,#006B50,#00C896)',emoji:'🏢'},
-  p3:{price:'$545',addr:'44 Gertrude Street, Fitzroy VIC 3065',beds:2,baths:1,cars:0,size:72,tags:'<span class="tag tag-amber">Inspection TBA</span><span class="tag tag-blue">Bills Included</span>',insp:false,inspTime:null,inspBadge:'<span class="amber-dot"></span>No inspection yet',agency:'Ray White — Fitzroy',gradient:'linear-gradient(135deg,#0A2460,#1B50C8)',emoji:'🏡'},
-  p4:{price:'$710',addr:'3/21 Johnston Street, Collingwood VIC 3066',beds:3,baths:2,cars:1,size:145,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-blue">Garage</span>',insp:true,inspTime:'Sat 1:00pm',inspBadge:'<span class="pulse-dot"></span>Inspection Sat 1:00pm',agency:'hockingstuart — Collingwood',gradient:'linear-gradient(135deg,#1A4A6B,#2299CC)',emoji:'🏘'}
+  p1:{price:'$620',addr:'18 Smith Street, Fitzroy VIC 3065',beds:3,baths:1,cars:2,size:180,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-blue">Pet Friendly</span>',insp:true,inspTime:'Sat 10:00am',inspBadge:'<span class="pulse-dot"></span>Inspection Sat 10:00am',agency:'Nelson Alexander — Fitzroy',url:'https://www.domain.com.au/rent/fitzroy-vic-3065/',gradient:'linear-gradient(135deg,#1a3a8f,#2E63E0)',emoji:'🏠'},
+  p2:{price:'$480',addr:'7/92 Bridge Road, Richmond VIC 3121',beds:2,baths:1,cars:1,size:85,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-amber">New Listing</span>',insp:true,inspTime:'Sun 11:30am',inspBadge:'<span class="pulse-dot"></span>Inspection Sun 11:30am',agency:'Jellis Craig — Richmond',url:'https://www.domain.com.au/rent/richmond-vic-3121/',gradient:'linear-gradient(135deg,#006B50,#00C896)',emoji:'🏢'},
+  p3:{price:'$545',addr:'44 Gertrude Street, Fitzroy VIC 3065',beds:2,baths:1,cars:0,size:72,tags:'<span class="tag tag-amber">Inspection TBA</span><span class="tag tag-blue">Bills Included</span>',insp:false,inspTime:null,inspBadge:'<span class="amber-dot"></span>No inspection yet',agency:'Ray White — Fitzroy',url:'https://www.domain.com.au/rent/fitzroy-vic-3065/',gradient:'linear-gradient(135deg,#0A2460,#1B50C8)',emoji:'🏡'},
+  p4:{price:'$710',addr:'3/21 Johnston Street, Collingwood VIC 3066',beds:3,baths:2,cars:1,size:145,tags:'<span class="tag tag-teal">Inspection Available</span><span class="tag tag-blue">Garage</span>',insp:true,inspTime:'Sat 1:00pm',inspBadge:'<span class="pulse-dot"></span>Inspection Sat 1:00pm',agency:'hockingstuart — Collingwood',url:'https://www.domain.com.au/rent/collingwood-vic-3066/',gradient:'linear-gradient(135deg,#1A4A6B,#2299CC)',emoji:'🏘'}
 };
 
 // Search Logic
@@ -658,8 +658,10 @@ function updateSaveBtn(id){
 function bookInspection(id,addr){
   var p=properties[id];
   savedProperties.add(id);updateSaveBtn(id);
-  showToast('Inspection Booked'+(p&&p.inspTime?' — '+p.inspTime:''),'Property saved · Opening agency site','📅');
+  showToast('Opening Listing'+(p&&p.inspTime?' — '+p.inspTime:''),'Property saved · Going to agency site','📅');
   closeProperty();
+  var url=(p&&p.url)?p.url:'https://www.domain.com.au/rent/';
+  setTimeout(function(){window.open(url,'_blank')},400);
 }
 
 function notifyMe(id){

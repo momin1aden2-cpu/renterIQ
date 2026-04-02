@@ -67,26 +67,23 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 .nav-links.show{display:flex;flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);padding:16px 24px 20px;border-bottom:1px solid var(--border-lt);gap:16px;z-index:99}
 
 /* HERO */
-.hero{background:#F4F7FF;padding:70px 0 80px;overflow:hidden}
-.hero .container{display:grid;grid-template-columns:1fr auto;gap:60px;align-items:center}
-.hero-content{max-width:600px}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(27,80,200,.1);border-radius:100px;padding:6px 16px 6px 12px;margin-bottom:24px}
+.hero{background:linear-gradient(170deg,#EBF0FF 0%,#F4F7FF 60%);padding:72px 0 80px;overflow:hidden;text-align:center}
+.hero .container{display:flex;flex-direction:column;align-items:center;max-width:680px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(27,80,200,.1);border-radius:100px;padding:6px 16px 6px 12px;margin-bottom:20px}
 .hero-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse-dot 2s ease-in-out infinite}
 .hero-badge span{font-family:'Sora',sans-serif;font-weight:700;font-size:12.5px;color:var(--blue)}
-.hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(34px,5vw,56px);color:#0A2460;line-height:1.1;margin-bottom:24px}
-.hero h1 .iq{color:#1B50C8}
-.hero-sub{font-size:17px;color:#5A6B8A;line-height:1.8;max-width:520px;margin-bottom:32px}
-.hero-search{display:flex;align-items:center;background:#fff;border-radius:100px;padding:6px 6px 6px 24px;box-shadow:0 6px 30px rgba(27,80,200,.1);margin-bottom:24px;max-width:520px}
+.hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(32px,5.5vw,54px);color:#0A2460;line-height:1.1;margin-bottom:16px}
+.hero-sub{font-size:17px;color:#5A6B8A;line-height:1.7;max-width:480px;margin-bottom:36px}
+.hero-search{display:flex;align-items:center;background:#fff;border-radius:100px;padding:6px 6px 6px 24px;box-shadow:0 8px 40px rgba(27,80,200,.14),0 2px 8px rgba(27,80,200,.06);margin-bottom:20px;width:100%;max-width:580px}
 .hero-search input{flex:1;font-size:15px;color:var(--text);min-width:0}
 .hero-search input::placeholder{color:#9EAEC4}
-.hero-search button{background:var(--blue);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;white-space:nowrap;transition:background .2s}
+.hero-search button{background:var(--blue);color:#fff;font-weight:700;font-size:14px;padding:13px 28px;border-radius:100px;white-space:nowrap;transition:background .2s}
 .hero-search button:hover{background:var(--blue-md)}
-.hero-btns{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--border);font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;transition:all .2s}
+.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--border);font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
 .btn-outline:hover{border-color:var(--blue);background:var(--blue-xl)}
-.btn-teal{background:var(--teal);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;transition:background .2s}
+.btn-teal{background:var(--teal);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:100px;transition:background .2s;display:inline-flex;align-items:center;gap:8px}
 .btn-teal:hover{background:var(--teal-dk)}
-.hero-trust{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:16px}
 .hero-trust-item{display:flex;align-items:center;gap:7px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:#5A6B8A}
 .hero-trust-item::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0}
 
@@ -170,7 +167,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 
 /* HOW IT WORKS */
 .how-it-works{background:#fff;padding:80px 0}
-.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .step-card{background:#fff;border-radius:20px;padding:28px 24px;border:1px solid var(--border-lt);transition:transform .25s,box-shadow .25s;cursor:default}
 .step-card:hover{transform:translateY(-5px);box-shadow:0 12px 40px rgba(27,80,200,.08)}
 .step-num{width:36px;height:36px;border-radius:10px;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
@@ -317,6 +314,9 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 .footer-logo{display:flex;align-items:center;gap:10px}
 .footer-logo .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff}
 
+/* FEATURE TAG */
+.feature-tag{display:inline-block;margin-top:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--teal-dk);background:rgba(0,200,150,.1);border-radius:100px;padding:4px 12px;letter-spacing:.5px}
+
 /* FEEDBACK / REVIEWS */
 .feedback{background:#fff;padding:80px 0}
 .reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
@@ -333,20 +333,14 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 
 /* RESPONSIVE */
 @media(max-width:1024px){
-  .hero .container{grid-template-columns:1fr}
-  .phone-wrap{display:none}
-  .vault .container{grid-template-columns:1fr}
-  .vault-grid{margin-top:40px}
-  .steps-grid{grid-template-columns:repeat(2,1fr)}
-  .features-grid{grid-template-columns:repeat(2,1fr)}
-  .rights-grid{grid-template-columns:repeat(2,1fr)}
+  .steps-grid{grid-template-columns:repeat(3,1fr)}
+  .features-grid{grid-template-columns:repeat(3,1fr)}
   .footer-grid{grid-template-columns:1fr 1fr}
-  .phones-row{justify-content:flex-start;padding:0 24px 16px}
 }
 @media(max-width:768px){
   .nav-links{display:none}
   .nav-mobile-btn{display:block}
-  .steps-grid{grid-template-columns:repeat(2,1fr)}
+  .steps-grid{grid-template-columns:1fr}
   .features-grid{grid-template-columns:1fr}
   .rights-grid{grid-template-columns:1fr}
   .cm-columns{grid-template-columns:1fr 1fr}
@@ -362,7 +356,6 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 }
 @media(max-width:480px){
   .steps-grid{grid-template-columns:1fr}
-  .hero-btns{gap:10px}
   .hero-trust{gap:14px}
 }
 </style>
@@ -380,10 +373,9 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
       </div>
     </a>
     <div class="nav-links">
-      <a href="#app">The App</a>
+      <a href="#how-it-works">How It Works</a>
       <a href="#features">Features</a>
-      <a href="#vault">Vault</a>
-      <a href="#rights">Rights</a>
+      <a href="#pwa">Get the App</a>
     </div>
     <a href="/app/index.html" class="nav-cta install-btn">Get the App</a>
     <button class="nav-mobile-btn" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('show')">
@@ -395,64 +387,18 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 <!-- Hero -->
 <section class="hero" id="hero">
   <div class="container">
-    <div class="hero-content">
-      <div class="hero-badge"><span class="dot"></span><span>Built for Australian Renters</span></div>
-      <h1>Your complete renting companion.<br>From search to bond return.</h1>
-      <p class="hero-sub">Search rentals, document inspections, review your lease, and protect your bond. All in one app — free to start.</p>
-      <div class="hero-search" id="heroSearchForm">
-        <input type="text" id="heroSearchInput" placeholder="Search suburb, postcode or street…" onkeydown="if(event.key==='Enter')heroSearch()">
-        <button onclick="heroSearch()">Search Rentals</button>
-      </div>
-      <div class="hero-btns">
-        <a href="/app/index.html" class="btn-teal install-btn">📱 Get the App — Free</a>
-        <a href="#how-it-works" class="btn-outline">How It Works</a>
-      </div>
-      <div class="hero-trust">
-        <div class="hero-trust-item">All states &amp; territories</div>
-        <div class="hero-trust-item">Search &amp; book free</div>
-        <div class="hero-trust-item">All features free in beta</div>
-      </div>
+    <div class="hero-badge"><span class="dot"></span><span>Free for all Australian renters</span></div>
+    <h1>Find rentals.<br>Book inspections.<br>Protect your bond.</h1>
+    <p class="hero-sub">Search properties across every state, book inspections, and manage your whole tenancy — free.</p>
+    <div class="hero-search" id="heroSearchForm">
+      <input type="text" id="heroSearchInput" placeholder="Search suburb, postcode or address…" onkeydown="if(event.key==='Enter')heroSearch()">
+      <button onclick="heroSearch()">Search Free →</button>
     </div>
-    <div class="phone-wrap">
-      <div class="float-badge float-badge-top">
-        <div class="fb-icon">📄</div>
-        <div><div class="fb-text">AI Report Ready</div><div class="fb-sub">Inspection Complete ✓</div></div>
-      </div>
-      <div class="phone">
-        <div class="phone-header">
-          <div class="ph-brand">RENTERIQ</div>
-          <div class="ph-loc">Melbourne VIC</div>
-          <div class="ph-count">Available Rentals · 42 found</div>
-          <div class="ph-search">Search suburb or address…</div>
-        </div>
-        <div class="phone-cards">
-          <div class="phone-card">
-            <div class="pc-price">$520/wk</div>
-            <div class="pc-addr">14 Church St, Richmond VIC 3121</div>
-            <div class="pc-tags"><span class="pc-tag">2 Bed</span><span class="pc-tag">1 Bath</span><span class="pc-tag teal">Open Sat</span></div>
-          </div>
-          <div class="phone-card">
-            <div class="pc-price">$680/wk</div>
-            <div class="pc-addr">7/88 Flinders Ln, Melbourne VIC 3000</div>
-            <div class="pc-tags"><span class="pc-tag">2 Bed</span><span class="pc-tag">2 Bath</span><span class="pc-tag teal">Inspect</span></div>
-          </div>
-          <div class="phone-card">
-            <div class="pc-price">$445/wk</div>
-            <div class="pc-addr">3 Smith St, Fitzroy VIC 3065</div>
-            <div class="pc-tags"><span class="pc-tag">1 Bed</span><span class="pc-tag">1 Bath</span><span class="pc-tag teal">New</span></div>
-          </div>
-        </div>
-        <div class="phone-tabs">
-          <div class="phone-tab active"><div class="tab-icon">🔍</div>Search</div>
-          <div class="phone-tab"><div class="tab-icon">❤️</div>Saved</div>
-          <div class="phone-tab"><div class="tab-icon">📋</div>Inspect</div>
-          <div class="phone-tab"><div class="tab-icon">🔒</div>Vault</div>
-        </div>
-      </div>
-      <div class="float-badge float-badge-bottom">
-        <div class="fb-icon">🛡️</div>
-        <div><div class="fb-text">Bond Protected</div><div class="fb-sub">Vault Updated ✓</div></div>
-      </div>
+    <a href="/app/index.html" class="btn-outline install-btn">📱 Open the App</a>
+    <div class="hero-trust">
+      <div class="hero-trust-item">All states &amp; territories</div>
+      <div class="hero-trust-item">Search &amp; book free</div>
+      <div class="hero-trust-item">All features free in beta</div>
     </div>
   </div>
 </section>
@@ -478,39 +424,33 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 <section class="how-it-works" id="how-it-works">
   <div class="container">
     <div class="section-label">HOW IT WORKS</div>
-    <h2 class="section-h2">4 steps. Every stage covered.</h2>
-    <p class="section-sub">One app. From first search to bond return.</p>
+    <h2 class="section-h2">Three steps. Total coverage.</h2>
+    <p class="section-sub">From first search to bond return.</p>
     <div class="steps-grid">
       <div class="step-card">
         <div class="step-num">1</div>
         <div class="step-icon">🔍</div>
-        <h3>Search &amp; Inspect</h3>
-        <p>Find rentals, book inspections, and walk through properties with a guided room-by-room checklist. Every photo timestamped, every note saved.</p>
+        <h3>Search &amp; Book</h3>
+        <p>Type your suburb, filter by price and beds. Tap any listing to view inspection times and book — you'll go directly to the agency's site to confirm.</p>
       </div>
       <div class="step-card">
         <div class="step-num">2</div>
-        <div class="step-icon">📄</div>
-        <h3>AI Reports</h3>
-        <p>Tap Complete and RenterIQ's AI compiles your walkthrough into a professional condition report — the same standard as an agency-issued document.</p>
+        <div class="step-icon">�</div>
+        <h3>Document</h3>
+        <p>Walk through the property with a guided room-by-room checklist. Photograph everything. RenterIQ generates a timestamped AI report in under a minute.</p>
       </div>
       <div class="step-card">
         <div class="step-num">3</div>
-        <div class="step-icon">⚖️</div>
-        <h3>Lease Review</h3>
-        <p>Upload your lease and RenterIQ's AI reads every clause, explains them in plain English, and flags anything unusual — before you sign.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">4</div>
         <div class="step-icon">🛡️</div>
-        <h3>Bond Protection</h3>
-        <p>At exit, AI compares your photos against move-in evidence. You review every flag, confirm or dismiss, and own the final report. Your call, every time.</p>
+        <h3>Protect</h3>
+        <p>Store your lease, reports and receipts in your Vault. At exit, AI compares move-in and exit photos so you can dispute any unfair bond deductions with evidence.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- App Showcase -->
-<section class="showcase" id="app">
+<!-- REMOVED App Showcase -->
+<section class="showcase" id="app" style="display:none">
   <div class="container">
     <div class="section-label" style="text-align:center">THE APP</div>
     <h2 class="section-h2" style="text-align:center;margin-left:auto;margin-right:auto">Built for renters. Every screen.</h2>
@@ -675,52 +615,37 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
 </section>
 
-<!-- Core Features -->
+<!-- Features -->
 <section class="features" id="features">
   <div class="container">
     <div class="section-label">FEATURES</div>
-    <h2 class="section-h2">Three tools. Total protection.</h2>
-    <p class="section-sub" style="margin-bottom:40px">For the moments that matter — move-in to bond return.</p>
+    <h2 class="section-h2">More than a search app.</h2>
+    <p class="section-sub" style="margin-bottom:40px">Tools for every stage of your tenancy — free during beta.</p>
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon">📸</div>
         <h3>AI Inspection Reports</h3>
-        <p>Walk through the property, photograph what matters, and RenterIQ's AI produces a professional, timestamped PDF — at any inspection, at any stage of your tenancy.</p>
-        <ul class="feature-check">
-          <li>Room-by-room guided walkthrough</li>
-          <li>Timestamped photo evidence</li>
-          <li>Professional PDF in under 60 seconds</li>
-          <li>Saved permanently to your Vault</li>
-        </ul>
+        <p>Walk through the property, photograph each room, and RenterIQ generates a professional timestamped PDF — the same standard as an agency report.</p>
+        <span class="feature-tag">Free in beta</span>
       </div>
       <div class="feature-card">
         <div class="feature-icon">⚖️</div>
-        <h3>Lease Plain-English Review</h3>
-        <p>Upload your tenancy agreement and RenterIQ's AI translates every clause into plain English — flagging anything unusual before your signature goes on it.</p>
-        <ul class="feature-check">
-          <li>Full clause-by-clause breakdown</li>
-          <li>Flags non-standard terms</li>
-          <li>Covers all Australian states</li>
-          <li>Stored in Vault for reference</li>
-        </ul>
+        <h3>Lease Review</h3>
+        <p>Upload your lease and AI explains every clause in plain English, flagging anything unusual — before you sign.</p>
+        <span class="feature-tag">Free in beta</span>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🛡️</div>
-        <h3>Bond Back Protection</h3>
-        <p>At exit, AI compares your move-in and exit photos. It surfaces differences for your review — you confirm, dismiss, or add context. Nothing enters your report without your approval.</p>
-        <ul class="feature-check">
-          <li>Side-by-side move-in vs exit comparison</li>
-          <li>AI flags differences for your review</li>
-          <li>You control what goes in the report</li>
-          <li>Complete evidence trail, built by you</li>
-        </ul>
+        <h3>Bond Protection</h3>
+        <p>At exit, AI compares your move-in and exit photos side by side. You review every flag and own the final report.</p>
+        <span class="feature-tag">Free in beta</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- The Vault -->
-<section class="vault" id="vault">
+<!-- REMOVED: Vault, Bond Back, Rights, Feedback, Legal sections -->
+<div style="display:none" id="vault">
   <div class="container">
     <div>
       <div class="vault-label">VAULT</div>
@@ -999,19 +924,11 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
         <p>The complete renting companion for Australian tenants — from the first search to the final key handover.</p>
       </div>
       <div class="footer-col">
-        <h4>Product</h4>
+        <h4>Quick Links</h4>
         <a href="#how-it-works">How It Works</a>
-        <a href="#app">The App</a>
         <a href="#features">Features</a>
-        <a href="#vault">The Vault</a>
-        <a href="/app/index.html" class="install-btn">Get the App</a>
-      </div>
-      <div class="footer-col">
-        <h4>Renter Rights</h4>
-        <a href="#rights">NSW</a>
-        <a href="#rights">VIC</a>
-        <a href="#rights">QLD &amp; WA</a>
-        <a href="#rights">All States →</a>
+        <a href="#pwa">Get the App</a>
+        <a href="/app/pages/search.html">Search Rentals</a>
       </div>
       <div class="footer-col">
         <h4>Support</h4>
