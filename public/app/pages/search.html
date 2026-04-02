@@ -447,15 +447,40 @@
         <span class="filter-title">Filter Rentals</span>
         <button class="filter-reset" onclick="resetFilters()">Reset</button>
       </div>
+      <!-- Area / Suburb -->
+      <div class="filter-section">
+        <span class="filter-section-label">Suburb or Area</span>
+        <div class="filter-inputs">
+          <input class="filter-input" type="text" placeholder="e.g. Fitzroy, Richmond, 3065…" id="filterAreaInput" style="flex:1">
+        </div>
+        <div class="filter-group" style="margin-top:8px" id="areaChips">
+          <span class="filter-pill" onclick="setArea('Melbourne CBD')">Melbourne CBD</span>
+          <span class="filter-pill" onclick="setArea('Fitzroy')">Fitzroy</span>
+          <span class="filter-pill" onclick="setArea('Richmond')">Richmond</span>
+          <span class="filter-pill" onclick="setArea('St Kilda')">St Kilda</span>
+          <span class="filter-pill" onclick="setArea('Collingwood')">Collingwood</span>
+          <span class="filter-pill" onclick="setArea('Newtown')">Newtown</span>
+        </div>
+      </div>
       <!-- Bedrooms -->
       <div class="filter-section">
         <span class="filter-section-label">Bedrooms</span>
         <div class="filter-group">
-          <span class="filter-pill">Any</span>
+          <span class="filter-pill active">Any</span>
           <span class="filter-pill">1+</span>
-          <span class="filter-pill active">2+</span>
+          <span class="filter-pill">2+</span>
           <span class="filter-pill">3+</span>
           <span class="filter-pill">4+</span>
+        </div>
+      </div>
+      <!-- Bathrooms -->
+      <div class="filter-section">
+        <span class="filter-section-label">Bathrooms</span>
+        <div class="filter-group">
+          <span class="filter-pill active">Any</span>
+          <span class="filter-pill">1+</span>
+          <span class="filter-pill">2+</span>
+          <span class="filter-pill">3+</span>
         </div>
       </div>
       <!-- Weekly Budget -->
@@ -668,6 +693,14 @@ function notifyMe(id){
   savedProperties.add(id);updateSaveBtn(id);
   showToast('Notification Set ✓','You\'ll be alerted when an inspection is scheduled','🔔');
   closeProperty();
+}
+
+// Area chip helper
+function setArea(name){
+  var input=document.getElementById('filterAreaInput');
+  if(input){input.value=name;}
+  var chips=document.querySelectorAll('#areaChips .filter-pill');
+  chips.forEach(function(c){c.classList.toggle('active',c.textContent===name);});
 }
 
 // Filter Sheet
