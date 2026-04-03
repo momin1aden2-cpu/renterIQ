@@ -1244,13 +1244,16 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 
 <script>
 // ========== FIREBASE INITIALIZATION ==========
+// NOTE: Firebase config should come from .env.local
+// This is a placeholder - Next.js app uses src/lib/firebase.ts
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "renteriq-australia.firebaseapp.com",
-  projectId: "renteriq-australia",
-  storageBucket: "renteriq-australia.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ''
 };
 
 // Initialize Firebase
