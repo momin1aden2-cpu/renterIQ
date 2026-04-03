@@ -22,6 +22,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
 <style>
 /* RESET & BASE */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -1237,6 +1243,176 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 </div>
 
 <script>
+// ========== FIREBASE INITIALIZATION ==========
+const firebaseConfig = {
+  apiKey: "YOUR_FIREBASE_API_KEY",
+  authDomain: "renteriq-australia.firebaseapp.com",
+  projectId: "renteriq-australia",
+  storageBucket: "renteriq-australia.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef123456"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ========== DOMAIN.COM.AU API INTEGRATION ==========
+const DOMAIN_API_BASE = 'https://api.domain.com.au/v1';
+const DOMAIN_CLIENT_ID = 'YOUR_DOMAIN_CLIENT_ID';
+const DOMAIN_CLIENT_SECRET = 'YOUR_DOMAIN_CLIENT_SECRET';
+
+async function searchDomainListings(location, filters = {}) {
+  try {
+    // Get access token
+    const tokenResponse = await fetch(`${DOMAIN_API_BASE}/auth/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${btoa(`${DOMAIN_CLIENT_ID}:${DOMAIN_CLIENT_SECRET}`)}`
+      },
+      body: 'grant_type=client_credentials'
+    });
+    const { access_token } = await tokenResponse.json();
+    
+    // Build search params
+    const params = new URLSearchParams({
+      listingType: 'Rent',
+      pageSize: '20',
+      location: location,
+      ...(filters.minBedrooms && { minBedrooms: filters.beds }),
+      ...(filters.maxPrice && { maxPrice: filters.price }),
+      ...(filters.propertyType && { propertyType: filters.type })
+    });
+    
+    // Search listings
+    const response = await fetch(`${DOMAIN_API_BASE}/listings/residential/search?${params}`, {
+      headers: { 'Authorization': `Bearer ${access_token}` }
+    });
+    
+    if (!response.ok) throw new Error('Domain API Error');
+    return await response.json();
+  } catch (error) {
+    console.error('Domain API Error:', error);
+    return null;
+  }
+}
+
+// ========== GEMINI AI INTEGRATION ==========
+const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+async function analyzeLeaseWithGemini(leaseText, state) {
+  try {
+    const prompt = `Analyze this Australian ${state} residential lease agreement and identify:
+1. Any unfair or unusual clauses
+2. Rent increase terms and frequency
+3. Bond/security deposit requirements
+4. Maintenance responsibilities
+5. Termination notice periods
+6. Any clauses that may conflict with ${state} tenancy laws
+
+Format the response in clear sections with risk ratings (Low/Medium/High) for each clause.
+
+Lease text:
+${leaseText}`;
+
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 2000
+        }
+      })
+    });
+    
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    return 'Unable to analyze lease at this time. Please try again later.';
+  }
+}
+
+async function generateInspectionReport(roomData, photos) {
+  try {
+    const prompt = `Generate a professional rental property inspection report based on the following room-by-room data:
+
+${JSON.stringify(roomData, null, 2)}
+
+Create a detailed report with:
+1. Executive summary
+2. Room-by-room condition assessment
+3. Photos with timestamps
+4. Any maintenance concerns
+5. Overall property condition rating
+6. Recommendations for tenant
+
+Format as a professional PDF-ready document.`;
+
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: 3000
+        }
+      })
+    });
+    
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    return 'Unable to generate report at this time.';
+  }
+}
+
+async function compareBondPhotos(entryPhotos, exitPhotos) {
+  try {
+    const prompt = `Compare these property condition descriptions:
+
+ENTRY CONDITION:
+${JSON.stringify(entryPhotos, null, 2)}
+
+EXIT CONDITION:
+${JSON.stringify(exitPhotos, null, 2)}
+
+Identify:
+1. Any new damage
+2. Wear and tear vs tenant damage
+3. Fair bond deduction recommendations
+4. Evidence for bond dispute
+5. Areas where tenant may be liable
+
+Provide a fair assessment based on Australian tenancy standards.`;
+
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 2000
+        }
+      })
+    });
+    
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    return 'Unable to compare photos at this time.';
+  }
+}
+
 // ========== ENHANCED SEARCH WITH LOCATION AUTOCOMPLETE ==========
 
 // Australian suburbs database (sample - top suburbs per state)
@@ -1349,12 +1525,10 @@ function selectSuburb(name, postcode, state) {
   selectedLocationEl.style.display = 'flex';
   hideAutocomplete();
   
-  // Auto-select state in filters
   const stateSelect = document.getElementById('afState');
   if (stateSelect) stateSelect.value = state;
   searchFilters.state = state;
   
-  // Scroll to results
   performSearch();
 }
 
@@ -1379,8 +1553,6 @@ function toggleAdvancedFilters() {
   const btn = document.getElementById('filterToggleBtn');
   panel.classList.toggle('open');
   btn.classList.toggle('active');
-  
-  // Update active filter count
   updateFilterButtonLabel();
 }
 
@@ -1428,15 +1600,14 @@ function clearAdvancedFilters() {
   updateFilterButtonLabel();
 }
 
-// ========== SEARCH & RESULTS ==========
+// ========== SEARCH & RESULTS WITH DOMAIN API ==========
 
-function performSearch() {
+async function performSearch() {
   const section = document.getElementById('search');
   if (!section) return;
   
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   
-  // Show loading state
   const resultsBar = document.getElementById('lsResultsBar');
   const grid = document.getElementById('lsGrid');
   const noResults = document.getElementById('lsNoResults');
@@ -1450,10 +1621,55 @@ function performSearch() {
   if (noResults) noResults.style.display = 'none';
   section.style.display = 'block';
   
-  // Simulate search delay then show results
-  setTimeout(() => {
-    filterResults();
-  }, 600);
+  // Try Domain API first, fallback to sample data
+  const location = selectedLocation ? `${selectedLocation.name} ${selectedLocation.state}` : 'Melbourne VIC';
+  const domainResults = await searchDomainListings(location, searchFilters);
+  
+  if (domainResults && domainResults.listings) {
+    renderDomainListings(domainResults.listings);
+  } else {
+    // Fallback to sample data
+    setTimeout(() => filterResults(), 600);
+  }
+}
+
+function renderDomainListings(listings) {
+  const grid = document.getElementById('lsGrid');
+  const noResults = document.getElementById('lsNoResults');
+  const countEl = document.getElementById('lsCount');
+  const subEl = document.getElementById('lsSubtitle');
+  
+  if (!listings || listings.length === 0) {
+    if (grid) grid.style.display = 'none';
+    if (noResults) noResults.style.display = 'block';
+    if (countEl) countEl.textContent = '0 properties';
+    return;
+  }
+  
+  if (grid) {
+    grid.innerHTML = listings.map(listing => `
+      <div class="ls-card" data-id="${listing.id}">
+        <div class="ls-card-img-wrap">
+          <img src="${listing.media?.[0]?.url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop'}" alt="${listing.address?.street || 'Property'}" loading="lazy">
+          <span class="ls-card-tag">${listing.inspections?.[0]?.inspectionTime || 'By Appointment'}</span>
+        </div>
+        <div class="ls-card-body">
+          <div class="ls-card-price">$${listing.price?.rentalPrice || 'Contact'}/wk</div>
+          <div class="ls-card-addr">${listing.address?.street}, ${listing.address?.suburb} ${listing.address?.state}</div>
+          <div class="ls-card-meta">${listing.beds || 0} bed · ${listing.baths || 0} bath · ${listing.agency?.name || 'Agent'}</div>
+          <div class="ls-card-actions">
+            <button class="ls-card-btn-primary" onclick="bookInspection('${listing.id}', '${listing.listingUrl}')">Book Inspection</button>
+            <button class="ls-card-btn-ghost" onclick="saveProperty('${listing.id}', ${listing.price?.rentalPrice || 0})">Save</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    grid.style.display = 'grid';
+  }
+  
+  if (noResults) noResults.style.display = 'none';
+  if (countEl) countEl.textContent = listings.length + ' propert' + (listings.length === 1 ? 'y' : 'ies') + ' found';
+  if (subEl) subEl.textContent = selectedLocation ? `in ${selectedLocation.name}` : 'All locations';
 }
 
 function filterResults() {
@@ -1463,7 +1679,6 @@ function filterResults() {
   const countEl = document.getElementById('lsCount');
   const subEl = document.getElementById('lsSubtitle');
   
-  // Filter sample listings
   let filtered = sampleListings.filter(prop => {
     if (searchFilters.state !== 'any' && prop.state !== searchFilters.state) return false;
     if (searchFilters.price === '400' && prop.price >= 400) return false;
@@ -1475,14 +1690,12 @@ function filterResults() {
     return true;
   });
   
-  // If location selected, limit results
   if (selectedLocation) {
     filtered = filtered.slice(0, 4);
   }
   
   const shown = filtered.length;
   
-  // Render listings
   if (grid) {
     if (shown > 0) {
       grid.innerHTML = filtered.map(prop => `
@@ -1515,24 +1728,38 @@ function filterResults() {
   if (subEl) subEl.textContent = selectedLocation ? `in ${selectedLocation.name}${searchFilters.nearby ? ' & nearby' : ''}` : 'All locations';
 }
 
-function bookInspection(address, time) {
-  // Open Domain.com.au booking flow in new tab
-  const searchQuery = encodeURIComponent(address);
-  window.open(`https://www.domain.com.au/search/?q=${searchQuery}`, '_blank');
+function bookInspection(address, listingUrl) {
+  // If listingUrl provided, open it directly
+  if (listingUrl) {
+    window.open(listingUrl, '_blank');
+  } else {
+    const searchQuery = encodeURIComponent(address);
+    window.open(`https://www.domain.com.au/search/?q=${searchQuery}`, '_blank');
+  }
   
-  // Show post-booking modal after delay
   setTimeout(() => {
     showPostBookingModal(address);
   }, 1000);
 }
 
-function saveProperty(address, price) {
-  const user = JSON.parse(localStorage.getItem('renteriq_user') || sessionStorage.getItem('renteriq_user') || 'null');
+async function saveProperty(listingId, price) {
+  const user = auth.currentUser;
   if (!user) {
     showAuth();
     return;
   }
-  alert(`Property saved: ${address}`);
+  
+  try {
+    await db.collection('users').doc(user.uid).collection('savedProperties').doc(listingId).set({
+      listingId,
+      price,
+      savedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert('Property saved to your account!');
+  } catch (error) {
+    console.error('Error saving property:', error);
+    alert('Unable to save property. Please try again.');
+  }
 }
 
 function showPostBookingModal(address) {
@@ -1571,12 +1798,11 @@ function closePostBookingModal() {
   if (modal) modal.remove();
 }
 
-// ========== AUTH MODAL ==========
+// ========== FIREBASE AUTHENTICATION ==========
 
 function showAuth() {
   document.getElementById('authOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-  // Show login form by default
   showAuthForm('login');
 }
 
@@ -1586,13 +1812,11 @@ function closeAuth() {
 }
 
 function showAuthForm(formName) {
-  // Hide all forms
   document.getElementById('loginForm').classList.remove('active');
   document.getElementById('signupForm').classList.remove('active');
   document.getElementById('forgotForm').classList.remove('active');
   document.getElementById('verifyForm').classList.remove('active');
   
-  // Hide tabs for non-login/signup forms
   const tabs = document.querySelector('.auth-tabs');
   const footer = document.querySelector('.auth-footer');
   
@@ -1605,7 +1829,6 @@ function showAuthForm(formName) {
     footer.style.display = 'none';
   }
   
-  // Show requested form
   if (formName === 'login') {
     document.getElementById('loginForm').classList.add('active');
   } else if (formName === 'signup') {
@@ -1640,7 +1863,7 @@ function switchAuthTab(tab) {
   }
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
@@ -1652,27 +1875,27 @@ function handleLogin(e) {
   submitBtn.textContent = 'Signing in...';
   errorEl.classList.remove('show');
   
-  setTimeout(() => {
-    if (email && password.length >= 6) {
-      const user = {email, name: email.split('@')[0], remember};
-      if (remember) {
-        localStorage.setItem('renteriq_user', JSON.stringify(user));
-      } else {
-        sessionStorage.setItem('renteriq_user', JSON.stringify(user));
-      }
-      updateAuthUI();
-      closeAuth();
-      performSearch();
-    } else {
-      errorEl.classList.add('show');
-      document.querySelector('.af-error-text').textContent = 'Invalid email or password';
-    }
+  try {
+    // Set persistence
+    await auth.setPersistence(remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION);
+    
+    // Sign in
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    
+    updateAuthUI();
+    closeAuth();
+    performSearch();
+  } catch (error) {
+    console.error('Login error:', error);
+    errorEl.classList.add('show');
+    document.querySelector('.af-error-text').textContent = getAuthErrorMessage(error.code);
+  } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Sign In';
-  }, 1000);
+  }
 }
 
-function handleSignup(e) {
+async function handleSignup(e) {
   e.preventDefault();
   const name = document.getElementById('signupName').value;
   const email = document.getElementById('signupEmail').value;
@@ -1684,23 +1907,37 @@ function handleSignup(e) {
   submitBtn.textContent = 'Creating account...';
   errorEl.classList.remove('show');
   
-  setTimeout(() => {
-    if (name && email && password.length >= 8) {
-      // Show email verification instead of immediate login
-      document.getElementById('verifyEmail').textContent = email;
-      showAuthForm('verify');
-      // Store pending user
-      localStorage.setItem('renteriq_pending_user', JSON.stringify({email, name, verified: false}));
-    } else {
-      errorEl.classList.add('show');
-      document.querySelector('#signupError .af-error-text').textContent = 'Please check your information';
-    }
+  try {
+    // Create user
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    
+    // Update profile
+    await userCredential.user.updateProfile({ displayName: name });
+    
+    // Send email verification
+    await userCredential.user.sendEmailVerification();
+    
+    // Show verification screen
+    document.getElementById('verifyEmail').textContent = email;
+    showAuthForm('verify');
+    
+    // Store user data in Firestore
+    await db.collection('users').doc(userCredential.user.uid).set({
+      name,
+      email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
+    errorEl.classList.add('show');
+    document.querySelector('#signupError .af-error-text').textContent = getAuthErrorMessage(error.code);
+  } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Create Account';
-  }, 1200);
+  }
 }
 
-function handleForgotPassword(e) {
+async function handleForgotPassword(e) {
   e.preventDefault();
   const email = document.getElementById('forgotEmail').value;
   const successEl = document.getElementById('forgotSuccess');
@@ -1709,71 +1946,115 @@ function handleForgotPassword(e) {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Sending...';
   
-  setTimeout(() => {
+  try {
+    await auth.sendPasswordResetEmail(email);
     successEl.classList.add('show');
-    submitBtn.disabled = false;
     submitBtn.textContent = 'Resend Link';
-  }, 1500);
+  } catch (error) {
+    console.error('Password reset error:', error);
+    alert(getAuthErrorMessage(error.code));
+  } finally {
+    submitBtn.disabled = false;
+  }
 }
 
-function resendVerification() {
+async function resendVerification() {
   const btn = event.target;
   btn.disabled = true;
   btn.textContent = 'Sending...';
   
-  setTimeout(() => {
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      await user.sendEmailVerification();
+      alert('Verification email resent!');
+    }
+  } catch (error) {
+    console.error('Resend error:', error);
+  } finally {
     btn.disabled = false;
     btn.textContent = 'Resend Email';
-    alert('Verification email resent!');
-  }, 1500);
+  }
 }
 
 function showForgotPassword() {
   showAuthForm('forgot');
 }
 
-function socialAuth(provider) {
-  const names = {
-    'google': 'Google User',
-    'apple': 'Apple User',
-    'facebook': 'Facebook User',
-    'microsoft': 'Microsoft User'
-  };
-  const emails = {
-    'google': 'user@gmail.com',
-    'apple': 'user@icloud.com',
-    'facebook': 'user@facebook.com',
-    'microsoft': 'user@outlook.com'
-  };
+// Social Authentication
+async function socialAuth(provider) {
+  let providerObj;
   
-  alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} authentication would open here. For demo, creating mock account.`);
+  switch(provider) {
+    case 'google':
+      providerObj = new firebase.auth.GoogleAuthProvider();
+      break;
+    case 'facebook':
+      providerObj = new firebase.auth.FacebookAuthProvider();
+      break;
+    case 'apple':
+      providerObj = new firebase.auth.OAuthProvider('apple.com');
+      break;
+    case 'microsoft':
+      providerObj = new firebase.auth.OAuthProvider('microsoft.com');
+      break;
+    default:
+      console.error('Unknown provider:', provider);
+      return;
+  }
   
-  const user = {
-    email: emails[provider] || 'demo@renteriq.com.au',
-    name: names[provider] || 'Demo User',
-    provider: provider,
-    social: true
+  try {
+    const result = await auth.signInWithPopup(providerObj);
+    
+    // Store user data in Firestore if new user
+    if (result.additionalUserInfo.isNewUser) {
+      await db.collection('users').doc(result.user.uid).set({
+        name: result.user.displayName || result.user.email.split('@')[0],
+        email: result.user.email,
+        provider: provider,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    
+    updateAuthUI();
+    closeAuth();
+    performSearch();
+  } catch (error) {
+    console.error(`${provider} auth error:`, error);
+    alert(getAuthErrorMessage(error.code));
+  }
+}
+
+function getAuthErrorMessage(code) {
+  const messages = {
+    'auth/user-not-found': 'No account found with this email. Please sign up.',
+    'auth/wrong-password': 'Incorrect password. Please try again.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/weak-password': 'Password should be at least 6 characters.',
+    'auth/email-already-in-use': 'An account already exists with this email.',
+    'auth/popup-closed-by-user': 'Sign-in popup was closed. Please try again.',
+    'auth/cancelled-popup-request': 'Multiple popup requests. Please try again.',
+    'auth/account-exists-with-different-credential': 'An account already exists with this email.',
+    'auth/invalid-credential': 'Invalid login credentials. Please try again.',
+    'auth/operation-not-allowed': 'This sign-in method is not enabled.',
+    'auth/requires-recent-login': 'Please sign out and sign in again.',
+    'auth/too-many-requests': 'Too many attempts. Please try again later.',
+    'auth/network-request-failed': 'Network error. Please check your connection.'
   };
-  
-  localStorage.setItem('renteriq_user', JSON.stringify(user));
-  updateAuthUI();
-  closeAuth();
-  performSearch();
+  return messages[code] || 'An error occurred. Please try again.';
 }
 
 function updateAuthUI() {
-  const user = JSON.parse(localStorage.getItem('renteriq_user') || sessionStorage.getItem('renteriq_user') || 'null');
+  const user = auth.currentUser;
   const navCta = document.querySelector('.nav-cta');
   
   if (navCta) {
     if (user) {
-      navCta.textContent = '👤 ' + user.name;
+      navCta.textContent = '👤 ' + (user.displayName || user.email.split('@')[0]);
       navCta.onclick = (e) => {
         e.preventDefault();
         if (confirm('Sign out?')) {
-          localStorage.removeItem('renteriq_user');
-          sessionStorage.removeItem('renteriq_user');
-          updateAuthUI();
+          auth.signOut();
         }
       };
     } else {
@@ -1785,6 +2066,16 @@ function updateAuthUI() {
     }
   }
 }
+
+// Listen for auth state changes
+auth.onAuthStateChanged((user) => {
+  updateAuthUI();
+  if (user) {
+    console.log('User signed in:', user.email);
+  } else {
+    console.log('User signed out');
+  }
+});
 
 // ========== MOBILE APP BANNER ==========
 
