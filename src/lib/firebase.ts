@@ -1,6 +1,3 @@
-// Firebase Configuration - reads from .env.local
-// Public env vars are prefixed with NEXT_PUBLIC_
-
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
