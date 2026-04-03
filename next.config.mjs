@@ -13,9 +13,9 @@ const nextConfig = {
     return [
       // Landing page
       { source: "/", destination: "/index.html" },
-      // Main dashboard (app homepage)
-      { source: "/dashboard", destination: "/app/index.html" },
+      // Main dashboard (app homepage) - for PWA start_url
       { source: "/app", destination: "/app/index.html" },
+      { source: "/dashboard", destination: "/app/index.html" },
       // Core nav tabs
       { source: "/search", destination: "/app/pages/search.html" },
       { source: "/inspect", destination: "/app/pages/inspection.html" },

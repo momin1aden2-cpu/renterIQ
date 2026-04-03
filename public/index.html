@@ -1025,7 +1025,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
     <h2>Your rental companion. On your phone.</h2>
     <p class="pi-sub">Add to your home screen in seconds. No app store, no account required. Works on iPhone &amp; Android.</p>
     <div class="pwa-btns">
-      <button class="btn-white install-btn">📲 Get the App</button>
+      <button class="btn-white install-btn" id="installApp">📲 Get the App</button>
       <a href="/app/index.html" class="btn-ghost">Open Web App</a>
     </div>
     <div class="pwa-features">
@@ -2066,10 +2066,12 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Service Worker
+// Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/app/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW registration failed'));
   });
 }
 
