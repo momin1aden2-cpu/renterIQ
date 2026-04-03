@@ -222,11 +222,45 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 .af-submit{width:100%;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;padding:14px;border-radius:12px;border:none;cursor:pointer;transition:background .2s;margin-top:8px}
 .af-submit:hover{background:var(--blue-md)}
 .af-submit:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
-.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:13px}
+.af-options{display:flex;align-items:center;justify-content:space-between;margin:-8px 0 16px;font-size:13px}
+.remember-me{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--muted);font-family:'Nunito',sans-serif}
+.remember-me input{display:none}
+.remember-me .checkmark{width:18px;height:18px;border:2px solid var(--border-lt);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.remember-me input:checked + .checkmark{background:var(--blue);border-color:var(--blue)}
+.remember-me input:checked + .checkmark::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.forgot-link{color:var(--blue);font-weight:600;font-size:12px}
+.forgot-link:hover{text-decoration:underline}
+
+.auth-divider{display:flex;align-items:center;margin:20px 0;color:var(--muted);font-size:13px}
+.auth-divider span{padding:0 12px}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border-lt)}
-.social-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1.5px solid var(--border-lt);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);padding:12px;border-radius:12px;cursor:pointer;transition:all .15s;margin-bottom:10px}
-.social-btn:hover{border-color:var(--blue);color:var(--blue)}
-.social-btn svg{width:20px;height:20px}
+
+.social-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+.social-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px 8px;border:1.5px solid var(--border-lt);border-radius:10px;background:#fff;cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;font-size:11px;color:var(--text)}
+.social-btn:hover{border-color:var(--blue);background:#F4F7FF}
+.social-btn svg{width:24px;height:24px}
+.social-text{font-size:11px;font-weight:600}
+
+.af-success{display:none;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:12px 14px;margin-bottom:16px}
+.af-success.show{display:block}
+.af-success-text{font-size:13px;color:#166534}
+
+.verify-content{text-align:center;padding:20px 10px}
+.verify-icon{font-size:48px;margin-bottom:16px}
+.verify-content h3{font-family:'Sora',sans-serif;font-size:18px;color:var(--blue-dk);margin-bottom:12px}
+.verify-content p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:8px}
+.verify-content p strong{color:var(--text)}
+.verify-hint{font-size:13px;color:var(--muted);margin:16px 0 24px}
+
+.auth-footer-link{text-align:center;margin-top:16px;font-size:13px}
+.auth-footer-link a{color:var(--blue);font-weight:600}
+.auth-footer-link a:hover{text-decoration:underline}
+
+@media(max-width:480px){
+  .social-grid{grid-template-columns:repeat(2,1fr)}
+  .social-btn{flex-direction:row;justify-content:center;gap:8px;padding:10px}
+  .social-text{font-size:12px}
+}
 .auth-footer{padding:16px 24px 24px;text-align:center;font-size:13px;color:var(--muted);border-top:1px solid var(--border-lt)}
 .auth-footer a{color:var(--blue);font-weight:700}
 .auth-footer a:hover{text-decoration:underline}
@@ -1099,15 +1133,34 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
           <label>Password</label>
           <input type="password" class="af-input" id="loginPassword" placeholder="Enter your password" required>
         </div>
-        <div class="af-hint" style="text-align:right">
-          <a href="#" onclick="showForgotPassword()" style="color:var(--blue);font-weight:600;font-size:12px">Forgot password?</a>
+        <div class="af-options">
+          <label class="remember-me">
+            <input type="checkbox" id="loginRemember">
+            <span class="checkmark"></span>
+            Remember me
+          </label>
+          <a href="#" onclick="showForgotPassword()" class="forgot-link">Forgot password?</a>
         </div>
         <button type="submit" class="af-submit" id="loginSubmit">Sign In</button>
-        <div class="auth-divider">or continue with</div>
-        <button type="button" class="social-btn" onclick="socialAuth('google')">
-          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Continue with Google
-        </button>
+        <div class="auth-divider"><span>or continue with</span></div>
+        <div class="social-grid">
+          <button type="button" class="social-btn social-google" onclick="socialAuth('google')" title="Google">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            <span class="social-text">Google</span>
+          </button>
+          <button type="button" class="social-btn social-apple" onclick="socialAuth('apple')" title="Apple">
+            <svg viewBox="0 0 24 24" fill="#000"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.97 1.07-3.11-1.05.05-2.31.7-3.06 1.66-.68.86-1.28 2.21-1.12 3.31 1.18.09 2.38-.53 3.11-1.86z"/></svg>
+            <span class="social-text">Apple</span>
+          </button>
+          <button type="button" class="social-btn social-facebook" onclick="socialAuth('facebook')" title="Facebook">
+            <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span class="social-text">Facebook</span>
+          </button>
+          <button type="button" class="social-btn social-microsoft" onclick="socialAuth('microsoft')" title="Microsoft">
+            <svg viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
+            <span class="social-text">Microsoft</span>
+          </button>
+        </div>
       </form>
       <!-- Sign Up Form -->
       <form class="auth-form" id="signupForm" onsubmit="handleSignup(event)">
@@ -1128,12 +1181,54 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
         </div>
         <div class="af-hint">By signing up, you agree to our <a href="/terms.html">Terms</a> and <a href="/privacy.html">Privacy Policy</a></div>
         <button type="submit" class="af-submit" id="signupSubmit">Create Account</button>
-        <div class="auth-divider">or sign up with</div>
-        <button type="button" class="social-btn" onclick="socialAuth('google')">
-          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Continue with Google
-        </button>
+        <div class="auth-divider"><span>or sign up with</span></div>
+        <div class="social-grid">
+          <button type="button" class="social-btn social-google" onclick="socialAuth('google')" title="Google">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            <span class="social-text">Google</span>
+          </button>
+          <button type="button" class="social-btn social-apple" onclick="socialAuth('apple')" title="Apple">
+            <svg viewBox="0 0 24 24" fill="#000"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.97 1.07-3.11-1.05.05-2.31.7-3.06 1.66-.68.86-1.28 2.21-1.12 3.31 1.18.09 2.38-.53 3.11-1.86z"/></svg>
+            <span class="social-text">Apple</span>
+          </button>
+          <button type="button" class="social-btn social-facebook" onclick="socialAuth('facebook')" title="Facebook">
+            <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span class="social-text">Facebook</span>
+          </button>
+          <button type="button" class="social-btn social-microsoft" onclick="socialAuth('microsoft')" title="Microsoft">
+            <svg viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
+            <span class="social-text">Microsoft</span>
+          </button>
+        </div>
       </form>
+      <!-- Forgot Password Form -->
+      <form class="auth-form" id="forgotForm" onsubmit="handleForgotPassword(event)">
+        <div class="af-success" id="forgotSuccess">
+          <span class="af-success-text">Check your email for reset instructions</span>
+        </div>
+        <div class="af-group">
+          <label>Email</label>
+          <input type="email" class="af-input" id="forgotEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="af-hint">Enter your email and we'll send you a link to reset your password.</div>
+        <button type="submit" class="af-submit" id="forgotSubmit">Send Reset Link</button>
+        <div class="auth-footer-link">
+          <a href="#" onclick="showAuthForm('login')">← Back to Sign In</a>
+        </div>
+      </form>
+      <!-- Verify Email Form -->
+      <div class="auth-form" id="verifyForm">
+        <div class="verify-content">
+          <div class="verify-icon">✉️</div>
+          <h3>Verify your email</h3>
+          <p>We've sent a verification link to <strong id="verifyEmail">your@email.com</strong></p>
+          <p class="verify-hint">Click the link in the email to complete your registration.</p>
+          <button type="button" class="af-submit" onclick="resendVerification()">Resend Email</button>
+          <div class="auth-footer-link">
+            <a href="#" onclick="showAuthForm('login')">← Back to Sign In</a>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="auth-footer">
       <span id="authFooterText">Don't have an account? <a href="#" onclick="switchAuthTab('signup')">Sign up</a></span>
@@ -1420,11 +1515,46 @@ function filterResults() {
 function showAuth() {
   document.getElementById('authOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Show login form by default
+  showAuthForm('login');
 }
 
 function closeAuth() {
   document.getElementById('authOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+function showAuthForm(formName) {
+  // Hide all forms
+  document.getElementById('loginForm').classList.remove('active');
+  document.getElementById('signupForm').classList.remove('active');
+  document.getElementById('forgotForm').classList.remove('active');
+  document.getElementById('verifyForm').classList.remove('active');
+  
+  // Hide tabs for non-login/signup forms
+  const tabs = document.querySelector('.auth-tabs');
+  const footer = document.querySelector('.auth-footer');
+  
+  if (formName === 'login' || formName === 'signup') {
+    tabs.style.display = 'flex';
+    footer.style.display = 'block';
+    switchAuthTab(formName);
+  } else {
+    tabs.style.display = 'none';
+    footer.style.display = 'none';
+  }
+  
+  // Show requested form
+  if (formName === 'login') {
+    document.getElementById('loginForm').classList.add('active');
+  } else if (formName === 'signup') {
+    document.getElementById('signupForm').classList.add('active');
+  } else if (formName === 'forgot') {
+    document.getElementById('forgotForm').classList.add('active');
+    document.getElementById('forgotSuccess').classList.remove('show');
+  } else if (formName === 'verify') {
+    document.getElementById('verifyForm').classList.add('active');
+  }
 }
 
 function switchAuthTab(tab) {
@@ -1453,22 +1583,28 @@ function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
+  const remember = document.getElementById('loginRemember').checked;
   const errorEl = document.getElementById('loginError');
   const submitBtn = document.getElementById('loginSubmit');
   
   submitBtn.disabled = true;
   submitBtn.textContent = 'Signing in...';
+  errorEl.classList.remove('show');
   
-  // Simulate API call
   setTimeout(() => {
-    // Mock successful login for demo
     if (email && password.length >= 6) {
-      localStorage.setItem('renteriq_user', JSON.stringify({email, name: email.split('@')[0]}));
+      const user = {email, name: email.split('@')[0], remember};
+      if (remember) {
+        localStorage.setItem('renteriq_user', JSON.stringify(user));
+      } else {
+        sessionStorage.setItem('renteriq_user', JSON.stringify(user));
+      }
       updateAuthUI();
       closeAuth();
       performSearch();
     } else {
       errorEl.classList.add('show');
+      document.querySelector('.af-error-text').textContent = 'Invalid email or password';
     }
     submitBtn.disabled = false;
     submitBtn.textContent = 'Sign In';
@@ -1485,34 +1621,87 @@ function handleSignup(e) {
   
   submitBtn.disabled = true;
   submitBtn.textContent = 'Creating account...';
+  errorEl.classList.remove('show');
   
   setTimeout(() => {
     if (name && email && password.length >= 8) {
-      localStorage.setItem('renteriq_user', JSON.stringify({email, name}));
-      updateAuthUI();
-      closeAuth();
-      performSearch();
+      // Show email verification instead of immediate login
+      document.getElementById('verifyEmail').textContent = email;
+      showAuthForm('verify');
+      // Store pending user
+      localStorage.setItem('renteriq_pending_user', JSON.stringify({email, name, verified: false}));
     } else {
       errorEl.classList.add('show');
+      document.querySelector('#signupError .af-error-text').textContent = 'Please check your information';
     }
     submitBtn.disabled = false;
     submitBtn.textContent = 'Create Account';
   }, 1200);
 }
 
-function socialAuth(provider) {
-  alert(`${provider} authentication would open here. For demo purposes, creating mock account.`);
-  localStorage.setItem('renteriq_user', JSON.stringify({email: 'demo@renteriq.com.au', name: 'Demo User'}));
-  updateAuthUI();
-  closeAuth();
+function handleForgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgotEmail').value;
+  const successEl = document.getElementById('forgotSuccess');
+  const submitBtn = document.getElementById('forgotSubmit');
+  
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending...';
+  
+  setTimeout(() => {
+    successEl.classList.add('show');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Resend Link';
+  }, 1500);
+}
+
+function resendVerification() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = 'Resend Email';
+    alert('Verification email resent!');
+  }, 1500);
 }
 
 function showForgotPassword() {
-  alert('Password reset email would be sent here.');
+  showAuthForm('forgot');
+}
+
+function socialAuth(provider) {
+  const names = {
+    'google': 'Google User',
+    'apple': 'Apple User',
+    'facebook': 'Facebook User',
+    'microsoft': 'Microsoft User'
+  };
+  const emails = {
+    'google': 'user@gmail.com',
+    'apple': 'user@icloud.com',
+    'facebook': 'user@facebook.com',
+    'microsoft': 'user@outlook.com'
+  };
+  
+  alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} authentication would open here. For demo, creating mock account.`);
+  
+  const user = {
+    email: emails[provider] || 'demo@renteriq.com.au',
+    name: names[provider] || 'Demo User',
+    provider: provider,
+    social: true
+  };
+  
+  localStorage.setItem('renteriq_user', JSON.stringify(user));
+  updateAuthUI();
+  closeAuth();
+  performSearch();
 }
 
 function updateAuthUI() {
-  const user = JSON.parse(localStorage.getItem('renteriq_user') || 'null');
+  const user = JSON.parse(localStorage.getItem('renteriq_user') || sessionStorage.getItem('renteriq_user') || 'null');
   const navCta = document.querySelector('.nav-cta');
   
   if (user && navCta) {
@@ -1520,6 +1709,7 @@ function updateAuthUI() {
     navCta.onclick = () => {
       if (confirm('Sign out?')) {
         localStorage.removeItem('renteriq_user');
+        sessionStorage.removeItem('renteriq_user');
         navCta.textContent = 'Get the App';
         navCta.onclick = installApp;
       }
