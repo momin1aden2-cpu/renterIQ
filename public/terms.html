@@ -21,15 +21,8 @@ a{text-decoration:none;color:inherit}
 .nav .container{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1200px;margin:0 auto;padding:0 24px}
 .nav-brand{display:flex;align-items:center;gap:10px}
 .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#0A2460}
-.nav-brand-text{display:flex;flex-direction:column;gap:1px}
-.tagline{font-family:'Sora',sans-serif;font-size:9px;font-weight:700;color:#8AA0C8;letter-spacing:1.5px;text-transform:uppercase;line-height:1}
-.nav-links{display:flex;gap:28px}
-.nav-links a{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);transition:color .2s}
-.nav-links a:hover{color:var(--blue)}
-.nav-cta{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;padding:9px 18px;border-radius:100px;transition:background .18s;white-space:nowrap}
-.nav-cta:hover{background:var(--blue-md)}
-.nav-mobile-btn{display:none;background:none;border:none;cursor:pointer;padding:4px;-webkit-tap-highlight-color:transparent}
-@media(max-width:768px){.nav-links{display:none;position:absolute;top:70px;left:0;right:0;background:#fff;padding:16px 24px;flex-direction:column;gap:16px;border-bottom:1px solid var(--border-lt);box-shadow:0 8px 24px rgba(0,0,0,.06);z-index:99}.nav-links.show{display:flex}.nav-mobile-btn{display:block}}
+.nav-back{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--blue)}
 
 .page-hero{background:linear-gradient(170deg,#0A2460 0%,#1B50C8 100%);padding:64px 0 72px;text-align:center}
 .page-hero .container{max-width:720px;margin:0 auto;padding:0 24px}
@@ -57,30 +50,44 @@ a{text-decoration:none;color:inherit}
 .footer-links a{font-size:13px;color:rgba(255,255,255,.4);transition:color .2s}
 .footer-links a:hover{color:#fff}
 
-@media(max-width:600px){.doc-card{padding:24px 20px}}
+@media(max-width:600px){
+  .nav{height:60px}
+  .nav .container{padding:0 16px}
+  .wordmark{font-size:18px}
+  .nav-back{font-size:12px}
+  
+  .page-hero{padding:48px 0 56px}
+  .page-hero .container{padding:0 16px}
+  .page-hero h1{font-size:26px}
+  .page-hero .updated{font-size:12px}
+  
+  .content-wrap{padding:40px 16px 64px}
+  .doc-card{padding:24px 20px;margin-bottom:24px}
+  .doc-card h2{font-size:17px}
+  .doc-card h3{font-size:14px}
+  .doc-card p,.doc-card ul li{font-size:14px}
+  .highlight,.warn{padding:12px 16px;font-size:14px}
+  
+  .footer{padding:32px 0}
+  .footer .container{padding:0 16px;flex-direction:column;text-align:center;gap:12px}
+  .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
+}
+
+@media(max-width:380px){
+  .page-hero h1{font-size:24px}
+  .doc-card{padding:20px 16px}
+}
 </style>
 </head>
 <body>
 
-<nav class="nav" id="top">
+<nav class="nav">
   <div class="container">
     <a href="/" class="nav-brand">
-      <img src="/assets/logo.svg" alt="RenterIQ" width="36" height="36" style="flex-shrink:0">
-      <div class="nav-brand-text">
-        <span class="wordmark">RenterIQ</span>
-        <span class="tagline">Rent Smart. Stay Protected.</span>
-      </div>
+      <img src="/assets/logo.svg" alt="RenterIQ" width="36" height="36">
+      <span class="wordmark">RenterIQ</span>
     </a>
-    <div class="nav-links">
-      <a href="/#search">Search</a>
-      <a href="/#how-it-works">How It Works</a>
-      <a href="/#features">Features</a>
-      <a href="/#rights">Renter Rights</a>
-    </div>
-    <a href="/app/index.html" class="nav-cta">Get the App</a>
-    <button class="nav-mobile-btn" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('show')">
-      <svg width="24" height="24" fill="none" stroke="#0A2460" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
-    </button>
+    <a href="/" class="nav-back">← Back to Home</a>
   </div>
 </nav>
 
@@ -197,7 +204,7 @@ a{text-decoration:none;color:inherit}
 
 <footer class="footer">
   <div class="container">
-    <span class="footer-copy">© 2025 RenterIQ Pty Ltd · Built in Australia 🇦🇺 · Personal organisation tool only — not a legal service.</span>
+    <span class="footer-copy">© 2025 RenterIQ · Built in Australia 🇦🇺</span>
     <div class="footer-links">
       <a href="/privacy.html">Privacy Policy</a>
       <a href="/terms.html">Terms of Use</a>

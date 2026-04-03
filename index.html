@@ -365,6 +365,76 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   .steps-grid{grid-template-columns:1fr}
   .hero-trust{gap:14px}
 }
+
+/* MOBILE OPTIMIZATION - Elements too big on mobile */
+@media(max-width:640px){
+  .container{padding:0 16px}
+  .hero{padding:32px 0 40px}
+  .hero h1{font-size:clamp(28px,7vw,36px)}
+  .hero-process{font-size:13px;gap:8px 12px;flex-wrap:wrap;justify-content:center}
+  .hero-process .hp-arr{display:none}
+  .hero-process span{background:rgba(255,255,255,.08);padding:6px 12px;border-radius:100px}
+  
+  .hero-sb-wrap{padding:0}
+  .hero-clean-bar{flex-wrap:nowrap;border-radius:12px;padding:8px 12px}
+  .hero-clean-bar input{font-size:15px;padding:8px 0}
+  .hcb-div{display:none}
+  .ls-filters-btn{padding:8px 12px;font-size:12px}
+  .hero-clean-search{padding:10px 16px;font-size:13px}
+  
+  .ls-filter-panel{margin:8px -8px 0;border-radius:16px}
+  .lfp-grid{grid-template-columns:1fr;gap:12px}
+  .lfp-group label{font-size:10px}
+  .lfp-select{padding:10px 12px;font-size:14px}
+  .lfp-feat-chips{gap:6px}
+  .lfp-chip{padding:6px 12px;font-size:11px}
+  
+  .section-label{font-size:11px}
+  .section-h2{font-size:clamp(22px,6vw,28px)}
+  .section-sub{font-size:15px}
+  
+  .how-it-works{padding:48px 0}
+  .step-card{padding:24px 20px}
+  .step-num{width:32px;height:32px;font-size:14px}
+  .step-icon{width:44px;height:44px;font-size:22px}
+  .step-card h3{font-size:16px}
+  .step-card p{font-size:14px}
+  
+  .features{padding:48px 0}
+  .features-grid{grid-template-columns:1fr;gap:16px}
+  .feature-card{padding:22px 20px}
+  .fc-icon-wrap{width:44px;height:44px;font-size:20px}
+  .feature-card h3{font-size:15px}
+  .feature-card p{font-size:13px}
+  .fc-bullets li{font-size:12px}
+  
+  .rights{padding:48px 0}
+  .rights-card{padding:20px}
+  .rc-abbr{font-size:20px}
+  .rc-name{font-size:13px}
+  .rc-link{font-size:12px}
+  
+  .pwa-install{padding:48px 0}
+  .pwa-install h2{font-size:clamp(22px,6vw,28px)}
+  .pwa-install .pi-sub{font-size:14px}
+  .pwa-btns{flex-direction:column;align-items:center}
+  .btn-white,.btn-ghost{width:100%;max-width:280px;padding:12px 24px;font-size:14px}
+  
+  .footer{padding:40px 0 0}
+  .footer-brand p{font-size:13px}
+  .footer-col a{font-size:13px}
+  .fb-copy{font-size:11px}
+}
+
+/* Extra small phones */
+@media(max-width:380px){
+  .hero h1{font-size:26px}
+  .hero-process{font-size:12px}
+  .hero-process span{padding:5px 10px}
+  .section-h2{font-size:24px}
+  .feature-card{padding:18px 16px}
+  .step-card{padding:20px 16px}
+}
 </style>
 </head>
 <body>
