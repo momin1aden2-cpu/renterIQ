@@ -619,7 +619,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
       <a href="#features">Features</a>
       <a href="#rights">Renter Rights</a>
     </div>
-    <a href="/app/index.html" class="nav-cta install-btn">Get the App</a>
+    <a href="#" class="nav-cta" onclick="showAuth();return false;">Sign In</a>
     <button class="nav-mobile-btn" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('show')">
       <svg width="24" height="24" fill="none" stroke="#0A2460" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
     </button>
@@ -1259,6 +1259,16 @@ const australianSuburbs = [
   {name:'Darwin',postcode:'0800',state:'NT',region:'Metro'},{name:'Alice Springs',postcode:'0870',state:'NT',region:'Regional'},{name:'Katherine',postcode:'0850',state:'NT',region:'Regional'},{name:'Palmerston',postcode:'0830',state:'NT',region:'Metro'}
 ];
 
+// Sample property listings for demo
+const sampleListings = [
+  {id:1, addr:'12/45 Collins Street, Melbourne VIC', price:550, beds:2, baths:1, type:'apartment', state:'VIC', img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop', agent:'Jellis Craig', insp:'Sat 2:00pm'},
+  {id:2, addr:'78 Brunswick Road, Brunswick VIC', price:480, beds:1, baths:1, type:'apartment', state:'VIC', img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop', agent:'Nelson Alexander', insp:'Sat 11:00am'},
+  {id:3, addr:'245 St Kilda Road, St Kilda VIC', price:650, beds:2, baths:2, type:'apartment', state:'VIC', img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=300&fit=crop', agent:'Gary Peer', insp:'Sun 10:00am'},
+  {id:4, addr:'89 Richmond Terrace, Richmond VIC', price:720, beds:3, baths:1, type:'house', state:'VIC', img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop', agent:'Biggin Scott', insp:'Sat 1:30pm'},
+  {id:5, addr:'156 Punt Road, Windsor VIC', price:595, beds:2, baths:1, type:'apartment', state:'VIC', img:'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=400&h=300&fit=crop', agent:'Hocking Stuart', insp:'Sun 12:00pm'},
+  {id:6, addr:'42 Park Street, South Yarra VIC', price:850, beds:3, baths:2, type:'townhouse', state:'VIC', img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop', agent:'Marshall White', insp:'Sat 3:00pm'}
+];
+
 let selectedLocation = null;
 let searchFilters = {
   state: 'any',
@@ -1448,66 +1458,117 @@ function performSearch() {
 
 function filterResults() {
   const grid = document.getElementById('lsGrid');
-  const cards = document.querySelectorAll('#lsGrid .ls-card');
   const noResults = document.getElementById('lsNoResults');
   const resultsBar = document.getElementById('lsResultsBar');
   const countEl = document.getElementById('lsCount');
   const subEl = document.getElementById('lsSubtitle');
   
-  if (!cards.length) {
-    // No property cards exist yet - show empty state with sample message
-    if (grid) {
-      grid.innerHTML = `
-        <div style="grid-column:1/-1;text-align:center;padding:60px 20px">
-          <div style="font-size:48px;margin-bottom:20px">🏠</div>
-          <h3 style="font-family:'Sora',sans-serif;font-size:20px;color:var(--blue-dk);margin-bottom:12px">Properties loading...</h3>
-          <p style="color:var(--muted);font-size:15px;max-width:400px;margin:0 auto 24px">Connecting to Domain.com.au and PropTrack for live listings in ${selectedLocation ? selectedLocation.name : 'Australia'}.</p>
-          <button onclick="showAuth()" style="background:var(--blue);color:#fff;padding:12px 28px;border-radius:100px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer">Sign In to View Listings</button>
-        </div>
-      `;
-      grid.style.display = 'block';
-    }
-    if (noResults) noResults.style.display = 'none';
-    if (countEl) countEl.textContent = '0 properties';
-    return;
-  }
-  
-  let shown = 0;
-  cards.forEach(card => {
-    let show = true;
-    
-    // State filter
-    if (searchFilters.state !== 'any') {
-      const cardState = card.dataset.state || '';
-      if (cardState && cardState !== searchFilters.state) show = false;
-    }
-    
-    // Price filter
-    const price = parseInt(card.dataset.price) || 0;
-    if (searchFilters.price === '400' && price >= 400) show = false;
-    if (searchFilters.price === '600' && price >= 600) show = false;
-    if (searchFilters.price === '800' && price >= 800) show = false;
-    if (searchFilters.price === '800+' && price < 800) show = false;
-    
-    // Bedrooms filter
-    const beds = parseInt(card.dataset.beds) || 0;
-    if (searchFilters.beds !== 'any' && beds < parseInt(searchFilters.beds)) show = false;
-    
-    // Type filter
-    if (searchFilters.type !== 'any') {
-      const type = card.dataset.type || '';
-      if (type !== searchFilters.type) show = false;
-    }
-    
-    card.style.display = show ? '' : 'none';
-    if (show) shown++;
+  // Filter sample listings
+  let filtered = sampleListings.filter(prop => {
+    if (searchFilters.state !== 'any' && prop.state !== searchFilters.state) return false;
+    if (searchFilters.price === '400' && prop.price >= 400) return false;
+    if (searchFilters.price === '600' && prop.price >= 600) return false;
+    if (searchFilters.price === '800' && prop.price >= 800) return false;
+    if (searchFilters.price === '800+' && prop.price < 800) return false;
+    if (searchFilters.beds !== 'any' && prop.beds < parseInt(searchFilters.beds)) return false;
+    if (searchFilters.type !== 'any' && prop.type !== searchFilters.type) return false;
+    return true;
   });
   
-  if (grid) grid.style.display = shown > 0 ? 'grid' : 'none';
+  // If location selected, limit results
+  if (selectedLocation) {
+    filtered = filtered.slice(0, 4);
+  }
+  
+  const shown = filtered.length;
+  
+  // Render listings
+  if (grid) {
+    if (shown > 0) {
+      grid.innerHTML = filtered.map(prop => `
+        <div class="ls-card" data-id="${prop.id}" data-state="${prop.state}" data-price="${prop.price}" data-beds="${prop.beds}" data-type="${prop.type}">
+          <div class="ls-card-img-wrap">
+            <img src="${prop.img}" alt="${prop.addr}" loading="lazy">
+            <span class="ls-card-tag">${prop.insp}</span>
+          </div>
+          <div class="ls-card-body">
+            <div class="ls-card-price">$${prop.price}/wk</div>
+            <div class="ls-card-addr">${prop.addr}</div>
+            <div class="ls-card-meta">${prop.beds} bed · ${prop.baths} bath · ${prop.agent}</div>
+            <div class="ls-card-actions">
+              <button class="ls-card-btn-primary" onclick="bookInspection('${prop.addr}', '${prop.insp}')">Book Inspection</button>
+              <button class="ls-card-btn-ghost" onclick="saveProperty('${prop.addr}', ${prop.price})">Save</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      grid.style.display = 'grid';
+    } else {
+      grid.innerHTML = '';
+      grid.style.display = 'none';
+    }
+  }
+  
   if (noResults) noResults.style.display = shown === 0 ? 'block' : 'none';
   if (resultsBar) resultsBar.style.display = 'flex';
   if (countEl) countEl.textContent = shown + ' propert' + (shown === 1 ? 'y' : 'ies') + ' found';
   if (subEl) subEl.textContent = selectedLocation ? `in ${selectedLocation.name}${searchFilters.nearby ? ' & nearby' : ''}` : 'All locations';
+}
+
+function bookInspection(address, time) {
+  // Open Domain.com.au booking flow in new tab
+  const searchQuery = encodeURIComponent(address);
+  window.open(`https://www.domain.com.au/search/?q=${searchQuery}`, '_blank');
+  
+  // Show post-booking modal after delay
+  setTimeout(() => {
+    showPostBookingModal(address);
+  }, 1000);
+}
+
+function saveProperty(address, price) {
+  const user = JSON.parse(localStorage.getItem('renteriq_user') || sessionStorage.getItem('renteriq_user') || 'null');
+  if (!user) {
+    showAuth();
+    return;
+  }
+  alert(`Property saved: ${address}`);
+}
+
+function showPostBookingModal(address) {
+  const overlay = document.createElement('div');
+  overlay.className = 'ls-modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.style.opacity = '1';
+  overlay.id = 'postBookingModal';
+  overlay.innerHTML = `
+    <div class="ls-modal" style="transform:translateY(0)">
+      <div class="ls-modal-icon">🎉</div>
+      <h3>Inspection Booked!</h3>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px">You're viewing <strong>${address}</strong></p>
+      <div style="background:#F4F7FF;border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px"><strong>Next steps:</strong></p>
+        <ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.8">
+          <li>Complete booking on Domain.com.au</li>
+          <li>Download RenterIQ app to prepare</li>
+          <li>Use our inspection checklist</li>
+          <li>Save photos & notes for your records</li>
+        </ul>
+      </div>
+      <div class="ls-modal-btns">
+        <button class="ls-modal-btn-primary" onclick="showAuth();closePostBookingModal();">Sign Up to Track</button>
+        <button class="ls-modal-btn-ghost" onclick="installApp();closePostBookingModal();">Download App</button>
+      </div>
+      <button onclick="closePostBookingModal()" style="background:none;border:none;color:var(--muted);font-size:13px;margin-top:12px;cursor:pointer">Continue browsing</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.onclick = (e) => { if (e.target === overlay) closePostBookingModal(); };
+}
+
+function closePostBookingModal() {
+  const modal = document.getElementById('postBookingModal');
+  if (modal) modal.remove();
 }
 
 // ========== AUTH MODAL ==========
@@ -1704,16 +1765,24 @@ function updateAuthUI() {
   const user = JSON.parse(localStorage.getItem('renteriq_user') || sessionStorage.getItem('renteriq_user') || 'null');
   const navCta = document.querySelector('.nav-cta');
   
-  if (user && navCta) {
-    navCta.textContent = '👤 ' + user.name;
-    navCta.onclick = () => {
-      if (confirm('Sign out?')) {
-        localStorage.removeItem('renteriq_user');
-        sessionStorage.removeItem('renteriq_user');
-        navCta.textContent = 'Get the App';
-        navCta.onclick = installApp;
-      }
-    };
+  if (navCta) {
+    if (user) {
+      navCta.textContent = '👤 ' + user.name;
+      navCta.onclick = (e) => {
+        e.preventDefault();
+        if (confirm('Sign out?')) {
+          localStorage.removeItem('renteriq_user');
+          sessionStorage.removeItem('renteriq_user');
+          updateAuthUI();
+        }
+      };
+    } else {
+      navCta.textContent = 'Sign In';
+      navCta.onclick = (e) => {
+        e.preventDefault();
+        showAuth();
+      };
+    }
   }
 }
 
