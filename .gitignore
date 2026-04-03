@@ -26,7 +26,22 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
+.env.development
+.env.test
+.env.production
+.env*.local
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+firebase-debug.*.log
+
+# Cloudflare (old hosting)
+wrangler.toml
+.wrangler/
 
 # vercel
 .vercel

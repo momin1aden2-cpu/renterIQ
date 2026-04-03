@@ -1259,38 +1259,19 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // ========== DOMAIN.COM.AU API INTEGRATION ==========
-const DOMAIN_API_BASE = 'https://api.domain.com.au/v1';
-const DOMAIN_CLIENT_ID = 'YOUR_DOMAIN_CLIENT_ID';
-const DOMAIN_CLIENT_SECRET = 'YOUR_DOMAIN_CLIENT_SECRET';
+// Keys now stored securely in .env.local and used via API route
+const DOMAIN_API_BASE = '/api/listings';
 
 async function searchDomainListings(location, filters = {}) {
   try {
-    // Get access token
-    const tokenResponse = await fetch(`${DOMAIN_API_BASE}/auth/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${btoa(`${DOMAIN_CLIENT_ID}:${DOMAIN_CLIENT_SECRET}`)}`
-      },
-      body: 'grant_type=client_credentials'
-    });
-    const { access_token } = await tokenResponse.json();
-    
-    // Build search params
     const params = new URLSearchParams({
-      listingType: 'Rent',
-      pageSize: '20',
       location: location,
       ...(filters.minBedrooms && { minBedrooms: filters.beds }),
       ...(filters.maxPrice && { maxPrice: filters.price }),
       ...(filters.propertyType && { propertyType: filters.type })
     });
     
-    // Search listings
-    const response = await fetch(`${DOMAIN_API_BASE}/listings/residential/search?${params}`, {
-      headers: { 'Authorization': `Bearer ${access_token}` }
-    });
-    
+    const response = await fetch(`${DOMAIN_API_BASE}?${params}`);
     if (!response.ok) throw new Error('Domain API Error');
     return await response.json();
   } catch (error) {
@@ -1300,117 +1281,43 @@ async function searchDomainListings(location, filters = {}) {
 }
 
 // ========== GEMINI AI INTEGRATION ==========
-const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+// Note: Gemini API calls are now handled server-side via Server Actions
+// Located in: src/app/actions/ai.ts
+// These client-side functions are kept for reference and call the server
 
-async function analyzeLeaseWithGemini(leaseText, state) {
+const AI_API_BASE = '/api/ai';
+
+async function callServerAction(action, data) {
   try {
-    const prompt = `Analyze this Australian ${state} residential lease agreement and identify:
-1. Any unfair or unusual clauses
-2. Rent increase terms and frequency
-3. Bond/security deposit requirements
-4. Maintenance responsibilities
-5. Termination notice periods
-6. Any clauses that may conflict with ${state} tenancy laws
-
-Format the response in clear sections with risk ratings (Low/Medium/High) for each clause.
-
-Lease text:
-${leaseText}`;
-
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`${AI_API_BASE}/${action}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 2000
-        }
-      })
+      body: JSON.stringify(data)
     });
-    
-    const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+    if (!response.ok) throw new Error('AI API Error');
+    return await response.json();
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    return 'Unable to analyze lease at this time. Please try again later.';
+    console.error('AI API Error:', error);
+    return { error: 'Server-side AI processing unavailable' };
   }
+}
+
+async function analyzeLeaseWithGemini(leaseText, state) {
+  // Calls server-side action securely - API key never exposed to client
+  const result = await callServerAction('analyze-lease', { leaseText, state });
+  return result.text || 'Unable to analyze lease at this time. Please try again later.';
 }
 
 async function generateInspectionReport(roomData, photos) {
-  try {
-    const prompt = `Generate a professional rental property inspection report based on the following room-by-room data:
-
-${JSON.stringify(roomData, null, 2)}
-
-Create a detailed report with:
-1. Executive summary
-2. Room-by-room condition assessment
-3. Photos with timestamps
-4. Any maintenance concerns
-5. Overall property condition rating
-6. Recommendations for tenant
-
-Format as a professional PDF-ready document.`;
-
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.4,
-          maxOutputTokens: 3000
-        }
-      })
-    });
-    
-    const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
-  } catch (error) {
-    console.error('Gemini API Error:', error);
-    return 'Unable to generate report at this time.';
-  }
+  // Calls server-side action securely - API key never exposed to client
+  const result = await callServerAction('generate-report', { roomData, photos });
+  return result.text || 'Unable to generate report at this time.';
 }
 
 async function compareBondPhotos(entryPhotos, exitPhotos) {
-  try {
-    const prompt = `Compare these property condition descriptions:
-
-ENTRY CONDITION:
-${JSON.stringify(entryPhotos, null, 2)}
-
-EXIT CONDITION:
-${JSON.stringify(exitPhotos, null, 2)}
-
-Identify:
-1. Any new damage
-2. Wear and tear vs tenant damage
-3. Fair bond deduction recommendations
-4. Evidence for bond dispute
-5. Areas where tenant may be liable
-
-Provide a fair assessment based on Australian tenancy standards.`;
-
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 2000
-        }
-      })
-    });
-    
-    const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
-  } catch (error) {
-    console.error('Gemini API Error:', error);
-    return 'Unable to compare photos at this time.';
-  }
+  // Calls server-side action securely - API key never exposed to client
+  const result = await callServerAction('compare-bond', { entryPhotos, exitPhotos });
+  return result.text || 'Unable to compare photos at this time.';
 }
 
 // ========== ENHANCED SEARCH WITH LOCATION AUTOCOMPLETE ==========

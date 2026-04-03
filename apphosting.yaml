@@ -1,0 +1,63 @@
+# Firebase App Hosting Configuration
+# Deploy with: firebase deploy --only hosting
+
+# Required: Next.js 15 application settings
+runConfig:
+  # Node.js version for build and runtime
+  nodeVersion: 20
+  
+  # Environment variables (must be set in Firebase Console or .env.local)
+  # These are injected at build time and runtime
+  environmentVariables:
+    NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY}
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+    NEXT_PUBLIC_FIREBASE_APP_ID: ${NEXT_PUBLIC_FIREBASE_APP_ID}
+
+# Hosting configuration
+hosting:
+  # Source directory for the app
+  source: .
+  
+  # Ignore patterns (in addition to .gitignore)
+  ignore:
+    - '**/node_modules/**'
+    - '**/.git/**'
+    - '**/README.md'
+    - '**/env.example'
+    - '**/.env*.local'
+    - '**/wrangler.toml'
+    
+  # Framework settings
+  frameworksBackend:
+    # Region for hosting (closest to Australia)
+    region: asia-southeast1
+    
+  # Rewrites for API routes (handled by Next.js automatically)
+  # No manual rewrites needed for App Router
+
+# Headers for security
+headers:
+  - source: '/**'
+    headers:
+      - key: X-Content-Type-Options
+        value: nosniff
+      - key: X-Frame-Options
+        value: DENY
+      - key: X-XSS-Protection
+        value: 1; mode=block
+      - key: Referrer-Policy
+        value: strict-origin-when-cross-origin
+
+# Pre-deployment checklist:
+# 1. Upgrade to Firebase Blaze Plan (Pay-as-you-go)
+# 2. Set environment variables in Firebase Console:
+#    - DOMAIN_CLIENT_ID
+#    - DOMAIN_CLIENT_SECRET  
+#    - GEMINI_API_KEY
+# 3. Install Firebase CLI: npm install -g firebase-tools
+# 4. Login: firebase login
+# 5. Initialize: firebase init hosting
+# 6. Deploy: firebase deploy --only hosting
