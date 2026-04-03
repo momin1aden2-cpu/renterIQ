@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
   title: "RenterIQ — Smart Renting Assistant",
@@ -40,12 +41,14 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <div className="flex flex-col h-full max-w-[390px] mx-auto relative">
-          <main className="flex-1 scroll-area pb-[100px]">
-            {children}
-          </main>
-          <BottomNav />
-        </div>
+        <AuthProvider>
+          <div className="flex flex-col h-full max-w-[390px] mx-auto relative">
+            <main className="flex-1 scroll-area pb-[100px]">
+              {children}
+            </main>
+            <BottomNav />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

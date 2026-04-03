@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
-<link rel="manifest" href="/app/manifest.json">
+<link rel="manifest" href="/manifest.json?v=2">
 <meta property="og:title" content="RenterIQ — Your Complete Renting Companion">
 <meta property="og:description" content="From property search to bond return. Track inspections, store evidence, know your rights. Built for Australian renters.">
 <meta property="og:image" content="/assets/icons/icon-512.png">
@@ -27,6 +27,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<!-- Firebase config injected from server env vars -->
+<script src="/api/firebase-config"></script>
 
 <style>
 /* RESET & BASE */
@@ -1244,17 +1246,8 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 
 <script>
 // ========== FIREBASE INITIALIZATION ==========
-const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "renteriq-australia.firebaseapp.com",
-  projectId: "renteriq-australia",
-  storageBucket: "renteriq-australia.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Config loaded securely from server via /api/firebase-config
+firebase.initializeApp(window.__FIREBASE_CONFIG__);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -1281,10 +1274,6 @@ async function searchDomainListings(location, filters = {}) {
 }
 
 // ========== GEMINI AI INTEGRATION ==========
-// Note: Gemini API calls are now handled server-side via Server Actions
-// Located in: src/app/actions/ai.ts
-// These client-side functions are kept for reference and call the server
-
 const AI_API_BASE = '/api/ai';
 
 async function callServerAction(action, data) {
@@ -1303,19 +1292,16 @@ async function callServerAction(action, data) {
 }
 
 async function analyzeLeaseWithGemini(leaseText, state) {
-  // Calls server-side action securely - API key never exposed to client
   const result = await callServerAction('analyze-lease', { leaseText, state });
   return result.text || 'Unable to analyze lease at this time. Please try again later.';
 }
 
 async function generateInspectionReport(roomData, photos) {
-  // Calls server-side action securely - API key never exposed to client
   const result = await callServerAction('generate-report', { roomData, photos });
   return result.text || 'Unable to generate report at this time.';
 }
 
 async function compareBondPhotos(entryPhotos, exitPhotos) {
-  // Calls server-side action securely - API key never exposed to client
   const result = await callServerAction('compare-bond', { entryPhotos, exitPhotos });
   return result.text || 'Unable to compare photos at this time.';
 }

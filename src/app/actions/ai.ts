@@ -40,7 +40,7 @@ ${leaseText}`;
   }
 }
 
-export async function generateInspectionReport(roomData: Record<string, any>, photos: string[]) {
+export async function generateInspectionReport(roomData: Record<string, unknown>, photos: string[]) {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error('Gemini API key not configured');
   }
@@ -78,7 +78,7 @@ Format as a professional PDF-ready document.`;
   }
 }
 
-export async function compareBondPhotos(entryPhotos: Record<string, any>, exitPhotos: Record<string, any>) {
+export async function compareBondPhotos(entryPhotos: Record<string, unknown>, exitPhotos: Record<string, unknown>) {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error('Gemini API key not configured');
   }
