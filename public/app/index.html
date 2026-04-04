@@ -394,9 +394,36 @@ function showToast(title, sub, icon) {
 }
 
 function navigate(path) {
+  // Convert file paths to Next.js routes for PWA compatibility
+  const routeMap = {
+    '/app/index.html': '/app',
+    '/app/pages/search.html': '/search',
+    '/app/pages/inspection.html': '/inspect',
+    '/app/pages/routine-inspection.html': '/inspect/routine',
+    '/app/pages/vault.html': '/vault',
+    '/app/pages/profile.html': '/profile',
+    '/app/pages/lease.html': '/lease',
+    '/app/pages/exit.html': '/exit',
+    '/app/pages/rights.html': '/rights',
+    '/app/pages/renewal.html': '/renewal',
+    '/app/pages/notifications.html': '/notifications',
+    '/app/pages/application.html': '/application'
+  };
+  
+  const route = routeMap[path] || path;
+  
   document.body.style.opacity = '0';
   document.body.style.transition = 'opacity .18s';
-  setTimeout(function() { window.location.href = path; }, 180);
+  setTimeout(function() { 
+    // In PWA mode, we need to use the route that Next.js can rewrite
+    if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
+      // PWA mode - use the route directly
+      window.location.href = route;
+    } else {
+      // Browser mode - can use the file path
+      window.location.href = path;
+    }
+  }, 180);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
