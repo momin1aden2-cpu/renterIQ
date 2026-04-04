@@ -446,6 +446,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Check authentication
   auth.onAuthStateChanged((user) => {
+    // In development (localhost), allow access without authentication
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      initializeApp(user || { displayName: 'Dev User', email: 'dev@test.com' });
+      return;
+    }
+    
     if (!user) {
       // Not signed in, redirect to landing page
       window.location.href = '/';
