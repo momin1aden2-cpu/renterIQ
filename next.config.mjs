@@ -1,21 +1,28 @@
-// Disabled next-pwa - using custom service worker for static files
-// const withPWAInit = require("next-pwa");
+import withPWAInit from "next-pwa";
 
-// const withPWA = withPWAInit({
-//   dest: "public",
-//   disable: process.env.NODE_ENV === "development",
-//   register: true,
-//   skipWaiting: true,
-// });
+const withPWA = withPWAInit({
+  dest: "public",
+  disable: false, // Enable in development for testing
+  register: true,
+  skipWaiting: true,
+  // Prevent next-pwa from trying to cache non-existent build files
+  buildExcludes: [
+    /chunks\/.*$/,
+    /app-build-manifest\.json$/,
+    /webpack\/.*$/,
+    /css\/.*\.css$/
+  ]
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
     return [
+      // PWA start URL - ensure it opens the app
+      { source: "/app", destination: "/app/index.html" },
       // Landing page
       { source: "/", destination: "/index.html" },
       // Main dashboard (app homepage) - for PWA start_url
-      { source: "/app", destination: "/app/index.html" },
       { source: "/dashboard", destination: "/app/index.html" },
       // Core nav tabs
       { source: "/search", destination: "/app/pages/search.html" },
@@ -34,4 +41,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
