@@ -15,6 +15,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <title>RenterIQ</title>
 <style>
 /* App Shell */
@@ -427,46 +431,73 @@ function navigate(path) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Fade in
-  document.body.style.opacity = '0';
-  requestAnimationFrame(function() {
-    document.body.style.transition = 'opacity .25s ease';
-    document.body.style.opacity = '1';
+  // Initialize Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzDc8M982iv-ndo2EU3T-5zPvXcRwdvKs",
+    authDomain: "renteriq-e1096.firebaseapp.com",
+    projectId: "renteriq-e1096",
+    storageBucket: "renteriq-e1096.firebasestorage.app",
+    messagingSenderId: "1062935273922",
+    appId: "1:1062935273922:web:3d0d86e03baa4ec09f765b"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  
+  // Check authentication
+  auth.onAuthStateChanged((user) => {
+    if (!user) {
+      // Not signed in, redirect to landing page
+      window.location.href = '/';
+      return;
+    }
+    
+    // User is signed in, proceed with app initialization
+    initializeApp(user);
   });
+  
+  function initializeApp(user) {
+    // Fade in
+    document.body.style.opacity = '0';
+    requestAnimationFrame(function() {
+      document.body.style.transition = 'opacity .25s ease';
+      document.body.style.opacity = '1';
+    });
 
-  // Greeting
-  var greetEl = document.getElementById('greeting');
-  if (greetEl) greetEl.textContent = getGreeting();
+    // Greeting
+    var greetEl = document.getElementById('greeting');
+    if (greetEl) greetEl.textContent = getGreeting();
 
-  // Date
-  var dateEl = document.getElementById('currentDate');
-  if (dateEl) dateEl.textContent = 'Melbourne, VIC · ' + formatDate(new Date());
+    // Date
+    var dateEl = document.getElementById('currentDate');
+    if (dateEl) dateEl.textContent = 'Melbourne, VIC · ' + formatDate(new Date());
 
-  // Animate lease progress bar
-  setTimeout(function() {
-    var bar = document.getElementById('leaseBar');
-    if (bar) bar.style.width = '41%';
-  }, 300);
-
-  // Conditional card display based on appState
-  var renewalCard = document.getElementById('renewalCard');
-  if (renewalCard) renewalCard.style.display = appState.daysUntilLeaseEnd <= 90 ? 'block' : 'none';
-
-  var maintenanceCard = document.getElementById('maintenanceCard');
-  if (maintenanceCard) maintenanceCard.style.display = appState.maintenanceOpen ? 'block' : 'none';
-
-  // Splash screen — only in standalone PWA mode
-  var splash = document.getElementById('splashScreen');
-  if (splash && window.matchMedia('(display-mode: standalone)').matches) {
-    var sbar = document.getElementById('splashBar');
-    if (sbar) { setTimeout(function(){ sbar.style.transition='width 1.3s ease'; sbar.style.width='100%'; }, 100); }
+    // Animate lease progress bar
     setTimeout(function() {
-      splash.style.transition = 'opacity .3s ease';
-      splash.style.opacity = '0';
-      setTimeout(function(){ splash.remove(); }, 300);
-    }, 1500);
-  } else if (splash) {
-    splash.remove();
+      var bar = document.getElementById('leaseBar');
+      if (bar) bar.style.width = '41%';
+    }, 300);
+
+    // Conditional card display based on appState
+    var renewalCard = document.getElementById('renewalCard');
+    if (renewalCard) renewalCard.style.display = appState.daysUntilLeaseEnd <= 90 ? 'block' : 'none';
+
+    var maintenanceCard = document.getElementById('maintenanceCard');
+    if (maintenanceCard) maintenanceCard.style.display = appState.maintenanceOpen ? 'block' : 'none';
+
+    // Splash screen — only in standalone PWA mode
+    var splash = document.getElementById('splashScreen');
+    if (splash && window.matchMedia('(display-mode: standalone)').matches) {
+      var sbar = document.getElementById('splashBar');
+      if (sbar) { setTimeout(function(){ sbar.style.transition='width 1.3s ease'; sbar.style.width='100%'; }, 100); }
+      setTimeout(function() {
+        splash.style.transition = 'opacity .3s ease';
+        splash.style.opacity = '0';
+        setTimeout(function(){ splash.remove(); }, 300);
+      }, 1500);
+    } else if (splash) {
+      splash.remove();
+    }
   }
 });
 

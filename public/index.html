@@ -1748,12 +1748,12 @@ async function handleLogin(e) {
   const errorEl = document.getElementById('loginError');
   const submitBtn = document.getElementById('loginSubmit');
   
+  errorEl.classList.remove('show');
   submitBtn.disabled = true;
   submitBtn.textContent = 'Signing in...';
-  errorEl.classList.remove('show');
   
   try {
-    // Set persistence
+    // Set persistence based on remember checkbox
     await auth.setPersistence(remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION);
     
     // Sign in
@@ -1761,11 +1761,19 @@ async function handleLogin(e) {
     
     updateAuthUI();
     closeAuth();
-    performSearch();
+    
+    // Redirect to web app after successful login
+    if (window.innerWidth <= 768 || isMobileBrowser()) {
+      // Mobile - open app
+      window.location.href = '/app';
+    } else {
+      // Desktop - open app
+      window.location.href = '/app';
+    }
   } catch (error) {
     console.error('Login error:', error);
     errorEl.classList.add('show');
-    document.querySelector('.af-error-text').textContent = getAuthErrorMessage(error.code);
+    document.querySelector('#loginError .af-error-text').textContent = getAuthErrorMessage(error.code);
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Sign In';
@@ -1895,7 +1903,9 @@ async function socialAuth(provider) {
     
     updateAuthUI();
     closeAuth();
-    performSearch();
+    
+    // Redirect to web app after successful social login
+    window.location.href = '/app';
   } catch (error) {
     console.error(`${provider} auth error:`, error);
     alert(getAuthErrorMessage(error.code));

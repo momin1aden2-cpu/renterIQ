@@ -6,6 +6,10 @@
 <meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="/app/css/app.css">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -533,9 +537,9 @@
 <!-- LEGAL LINKS -->
 <div class="sec-label" style="margin-top:20px">Legal</div>
 <div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="showToast('Privacy Policy','renteriq.com.au/privacy','📋')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Privacy Policy</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="showToast('Terms','renteriq.com.au/terms','📋')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms of Service</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Disclaimer</div><div class="settings-sub">RenterIQ is not a legal service</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('/privacy.html', '_blank')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Privacy Policy</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('/terms.html', '_blank')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms of Service</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('/disclaimer.html', '_blank')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Disclaimer</div><div class="settings-sub">RenterIQ is not a legal service</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 </div>
@@ -595,9 +599,9 @@
 
 <!-- CONTACT -->
 <div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="showToast('Website','Opening renteriq.com.au','🌐')"><span class="settings-icon">🌐</span><div style="flex:1"><div class="settings-title">renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="showToast('Email','Opening email client','📧')"><span class="settings-icon">📧</span><div style="flex:1"><div class="settings-title">support@renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="showToast('Feedback','In-app feedback form coming soon','💬')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Send Feedback</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('/about.html', '_blank')"><span class="settings-icon">🌐</span><div style="flex:1"><div class="settings-title">renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('mailto:support@renteriq.com.au', '_blank')"><span class="settings-icon">📧</span><div style="flex:1"><div class="settings-title">support@renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('mailto:feedback@renteriq.com.au', '_blank')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Send Feedback</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 </div>
