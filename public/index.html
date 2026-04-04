@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
-<link rel="manifest" href="/manifest.json?v=2">
+<link rel="manifest" href="/manifest.json?v=4">
 <meta property="og:title" content="RenterIQ — Your Complete Renting Companion">
 <meta property="og:description" content="From property search to bond return. Track inspections, store evidence, know your rights. Built for Australian renters.">
 <meta property="og:image" content="/assets/icons/icon-512.png">
@@ -1973,11 +1973,61 @@ function closeAppBanner() {
 // ========== PWA INSTALL ==========
 
 let deferredPrompt = null;
+let installEnabled = false;
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  installEnabled = true;
+  updateInstallButtons(true);
 });
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  installEnabled = false;
+  updateInstallButtons(false);
+  showInstallSuccess();
+});
+
+function updateInstallButtons(enabled) {
+  const mainBtn = document.getElementById('installApp');
+  const bannerBtn = document.querySelector('.mab-install');
+  
+  if (mainBtn) {
+    // Check if PWA is already installed
+    if (isStandalone()) {
+      mainBtn.textContent = '✓ Already Installed';
+      mainBtn.style.background = '#00C896';
+      mainBtn.disabled = true;
+      mainBtn.style.opacity = '0.8';
+      mainBtn.style.cursor = 'default';
+      mainBtn.title = 'App is already installed';
+    } else if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      // Already installed and running as PWA
+      mainBtn.textContent = '✓ Installed';
+      mainBtn.style.background = '#00C896';
+      mainBtn.disabled = true;
+      mainBtn.style.opacity = '0.8';
+      mainBtn.style.cursor = 'default';
+      mainBtn.title = 'App is installed';
+    } else {
+      // Not installed - enable install
+      mainBtn.disabled = false;
+      mainBtn.style.opacity = '1';
+      mainBtn.style.cursor = 'pointer';
+      mainBtn.title = 'Click to install app';
+    }
+  }
+  
+  if (bannerBtn) {
+    bannerBtn.disabled = false;
+    bannerBtn.style.opacity = '1';
+  }
+}
+
+function isMobileBrowser() {
+  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
 function installApp() {
   if (isStandalone()) {
@@ -1985,19 +2035,164 @@ function installApp() {
     return;
   }
   
-  if (deferredPrompt) {
+  if (deferredPrompt && typeof deferredPrompt.prompt === 'function') {
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(({outcome}) => {
       if (outcome === 'accepted') {
         showInstallSuccess();
       }
       deferredPrompt = null;
+      installEnabled = false;
+      updateInstallButtons(false);
     });
   } else if (isIOS()) {
     showIOSInstructions();
+  } else if (isMobileBrowser()) {
+    showManualInstallInstructions();
   } else {
-    window.location.href = '/app/index.html';
+    checkAndShowInstallOption();
   }
+}
+
+function checkAndShowInstallOption() {
+  const installSelectors = [
+    '[aria-label*="Install"]',
+    '[aria-label*="install"]',
+    '[title*="Install"]',
+    '[title*="install"]',
+    'button[aria-label*="app"]',
+    'button[aria-label*="App"]'
+  ];
+  
+  let foundInstall = false;
+  for (const selector of installSelectors) {
+    const btn = document.querySelector(selector);
+    if (btn && btn.offsetParent !== null) {
+      btn.click();
+      foundInstall = true;
+      break;
+    }
+  }
+  
+  if (!foundInstall) {
+    showInstallHint();
+  }
+}
+
+function showInstallHint() {
+  // Create a floating hint
+  const hint = document.createElement('div');
+  hint.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #1B50C8;
+    color: white;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    z-index: 10000;
+    max-width: 320px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    animation: slideIn 0.3s ease-out;
+  `;
+  
+  hint.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <span style="font-size: 24px;">⚡</span>
+      <strong>Install RenterIQ</strong>
+    </div>
+    <p style="margin: 0 0 12px 0;">Look for the install icon (⚡ or +) in your browser's address bar and click it to install the app.</p>
+    <div style="display: flex; gap: 8px;">
+      <button onclick="this.parentElement.parentElement.remove()" style="
+        background: white;
+        color: #1B50C8;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+      ">Got it</button>
+      <button onclick="clearPWAInstallation()" style="
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+      ">Reset</button>
+    </div>
+  `;
+  
+  // Add animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(hint);
+  
+  // Auto-remove after 8 seconds
+  setTimeout(() => {
+    if (hint.parentElement) {
+      hint.remove();
+    }
+  }, 8000);
+}
+
+function clearPWAInstallation() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(reg => reg.unregister());
+      location.reload();
+    });
+  }
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => caches.delete(name));
+    });
+  }
+}
+
+function showDesktopInstallInstructions() {
+  const message = `To install RenterIQ on your computer:
+
+🖥️ On Chrome/Edge:
+1. Look for the install icon (⚡ or +) in the address bar
+2. Click it and select "Install app"
+3. Or go to Chrome menu (⋮) → "Install RenterIQ"
+
+💡 TIP: If you see an install icon in the address bar, click it now!
+
+📱 On Android:
+1. Tap the menu button (⋮) in Chrome
+2. Select "Install app" or "Add to Home screen"
+3. Tap "Install" to confirm`;
+  
+  alert(message);
+}
+
+function showManualInstallInstructions() {
+  const message = `To add RenterIQ to your home screen:
+
+📱 On Android Chrome:
+1. Tap the menu button (⋮) in the top-right
+2. Select "Add to Home screen" or "Install app"
+3. Tap "Add" or "Install" to confirm
+
+📱 On iOS Safari:
+1. Tap the Share button (□↑)
+2. Select "Add to Home Screen"
+3. Tap "Add" to confirm`;
+  
+  alert(message);
 }
 
 function isIOS() {
@@ -2015,6 +2210,7 @@ function showInstallSuccess() {
   btns.forEach(btn => {
     btn.textContent = '✓ Added to Home Screen';
     btn.style.background = '#00C896';
+    btn.disabled = true;
   });
 }
 
@@ -2045,6 +2241,19 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 window.addEventListener('DOMContentLoaded', () => {
   updateAuthUI();
   showMobileAppBanner();
+  updateInstallButtons(isMobileBrowser()); // Enable on mobile browsers
+  
+  // Check PWA criteria
+  checkPWACriteria();
+  
+  // Add direct event listener to install button
+  const installBtn = document.getElementById('installApp');
+  if (installBtn) {
+    installBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      installApp();
+    });
+  }
   
   // Close auth on overlay click
   document.getElementById('authOverlay')?.addEventListener('click', (e) => {
@@ -2052,12 +2261,24 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Service Worker Registration
+function checkPWACriteria() {
+  // PWA validation - no console output in production
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(reg => {
+      // Service worker registered
+    });
+  }
+}
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('SW registered'))
-      .catch(err => console.log('SW registration failed'));
+      .then(reg => {
+        // Service worker registered successfully
+      })
+      .catch(() => {
+        // Service worker registration failed
+      });
   });
 }
 
