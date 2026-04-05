@@ -211,6 +211,29 @@
 .sg-main{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
 .sg-detail{font-size:11px;color:var(--muted);margin-top:1px}
 .sg-state-pill{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:2px 8px;margin-left:auto;flex-shrink:0}
+
+/* Provider Deeplink Cards */
+.providers-wrap{padding:16px;display:flex;flex-direction:column;gap:10px}
+.providers-label{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.provider-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#fff;border-radius:16px;border:1px solid var(--border-lt);box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer;text-decoration:none;transition:all .18s;-webkit-tap-highlight-color:transparent}
+.provider-card:active{transform:scale(.97)}
+.provider-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.provider-info{flex:1;min-width:0}
+.provider-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.provider-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.provider-arrow{font-size:18px;color:var(--muted)}
+
+/* Tracked Properties */
+.tracked-wrap{padding:0 16px 16px}
+.tracked-empty{text-align:center;padding:24px 16px;background:#fff;border-radius:16px;border:1px solid var(--border-lt)}
+.tracked-empty-icon{font-size:36px;margin-bottom:8px}
+.tracked-empty-text{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--muted)}
+.tracked-card{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border-lt);box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;gap:12px}
+.tracked-icon{width:40px;height:40px;border-radius:10px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.tracked-body{flex:1;min-width:0}
+.tracked-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tracked-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.tracked-del{background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:6px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -271,26 +294,22 @@
       <div class="sec-label">Popular Suburbs · <span id="stateLabelDisplay">VIC</span></div>
       <div class="suburb-grid" id="suburbGrid"></div>
 
-      <!-- 2C. Open Inspections This Weekend -->
+      <!-- 2C. My Tracked Properties -->
+      <div class="sec-label" style="margin-top:8px">My Tracked Properties <span id="trackedBadge" style="background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;margin-left:4px;display:none"></span></div>
+      <div class="tracked-wrap" id="trackedList"></div>
+
+      <!-- 2D. Open Inspections This Weekend -->
       <div id="openInspectionsSection" style="display:none">
         <div class="sec-label">Open Inspections This Weekend</div>
         <div class="oi-scroll" id="openInspectionsList"></div>
       </div>
     </div>
 
-    <!-- 3. RESULTS STATE -->
+    <!-- 3. RESULTS STATE — Provider Deeplinks -->
     <div id="searchResults" style="display:none">
-      <!-- 3A. Results Header -->
-      <div class="results-header">
-        <span class="results-count" id="resultsCount"></span>
-        <span class="results-sort" onclick="showToast('Sort','Sort options coming soon','↕')">Sort: Newest ↕</span>
-      </div>
-      <!-- 3B. Property Cards -->
-      <div class="results-list" id="resultsList"></div>
-      <div id="resultsEmpty" style="text-align:center;padding:48px 24px;color:var(--muted);display:none">
-        <div style="font-size:40px;margin-bottom:12px">🏘</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:6px">No properties found</div>
-        <div style="font-size:13px">Try a different suburb or adjust your filters.</div>
+      <div class="providers-wrap">
+        <div class="providers-label" id="resultsCount">Browse on</div>
+        <div id="providerCards"></div>
       </div>
     </div>
 
@@ -635,7 +654,7 @@ function selectSuggestion(name){
   document.getElementById('searchInput').value=name;
   document.getElementById('searchClear').style.display='flex';
   hideSuggestions();
-  showResults('Searching in '+name+', '+currentState+'…');
+  showDeeplinks(name);
 }
 
 // ─── SEARCH LOGIC ─────────────────────────────────────────
@@ -643,7 +662,7 @@ function handleSearch(value){
   var clear=document.getElementById('searchClear');
   clear.style.display=value.length>0?'flex':'none';
   showSuggestions(value);
-  if(value.length>1){showResults('Searching "'+value+'" in '+currentState);}else{showHome();hideSuggestions();}
+  if(value.length<2){showHome();hideSuggestions();}
 }
 
 function clearSearch(){
@@ -675,7 +694,7 @@ function selectRecent(suburb){
 function selectSuburb(name){
   document.getElementById('searchInput').value=name;
   document.getElementById('searchClear').style.display='flex';
-  showResults('Searching in '+name+'…');
+  showDeeplinks(name);
 }
 
 function clearRecents(){showToast('Cleared','Recent searches removed','✓')}
@@ -806,16 +825,117 @@ document.querySelectorAll('.filter-group').forEach(function(group){
 document.getElementById('propertyOverlay').addEventListener('click',function(e){if(e.target===this)closeProperty()});
 document.getElementById('filterOverlay').addEventListener('click',function(e){if(e.target===this)closeFilterSheet()});
 
+// ─── DEEPLINKS ─────────────────────────────────────────────
+function generateStateUrls(suburb, state) {
+  var s = suburb.toLowerCase().trim().replace(/\s+/g, '-');
+  var stMap = {VIC:'vic',NSW:'nsw',QLD:'qld',SA:'sa',WA:'wa',TAS:'tas',ACT:'act',NT:'nt'};
+  var st = stMap[state] || 'vic';
+  var providers = [
+    { name:'realestate.com.au', icon:'🏠', color:'#0066CC', desc:'Australia\'s #1 property site',
+      url:'https://www.realestate.com.au/rent/in-'+s+',+'+st+'/list-1' },
+    { name:'Domain.com.au', icon:'🔷', color:'#2E3192', desc:'Premium listings & market data',
+      url:'https://www.domain.com.au/rent/'+s+'-'+st+'/' },
+    { name:'Rent.com.au', icon:'🔑', color:'#FF6B35', desc:'Simple rental search',
+      url:'https://www.rent.com.au/rentals/'+s+'-'+st },
+    { name:'Flatmates.com.au', icon:'🤝', color:'#00B4D8', desc:'Share accommodation',
+      url:'https://flatmates.com.au/rooms/'+suburb.toLowerCase().replace(/\s+/g,'-') },
+  ];
+  if (state === 'WA') {
+    providers.splice(2, 0, { name:'REIWA', icon:'🏘️', color:'#E60028', desc:'WA local specialists',
+      url:'https://reiwa.com.au/rental-properties/'+s+'/' });
+  }
+  return providers;
+}
+
+function showDeeplinks(suburb) {
+  document.getElementById('searchHome').style.display = 'none';
+  document.getElementById('searchResults').style.display = 'block';
+  var label = document.getElementById('resultsCount');
+  if (label) label.textContent = 'Search "' + suburb + '" on';
+  var providers = generateStateUrls(suburb, currentState);
+  var cards = document.getElementById('providerCards');
+  if (!cards) return;
+  cards.innerHTML = providers.map(function(p) {
+    return '<a class="provider-card" href="' + p.url + '" target="_blank" rel="noopener">' +
+      '<div class="provider-icon" style="background:' + p.color + '22">' + p.icon + '</div>' +
+      '<div class="provider-info">' +
+        '<div class="provider-name">' + p.name + '</div>' +
+        '<div class="provider-desc">' + p.desc + '</div>' +
+      '</div>' +
+      '<span class="provider-arrow">→</span>' +
+    '</a>';
+  }).join('');
+}
+
+// ─── TRACKED PROPERTIES ────────────────────────────────────
+function renderTrackedProperties() {
+  var list = document.getElementById('trackedList');
+  var badge = document.getElementById('trackedBadge');
+  if (!list) return;
+  var stored = [];
+  try { stored = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]'); } catch(e) {}
+  if (!stored.length) {
+    badge.style.display = 'none';
+    list.innerHTML = '<div class="tracked-empty"><div class="tracked-empty-icon">🏠</div><div class="tracked-empty-text">No properties saved yet<br><span style="font-weight:600;color:var(--muted);font-size:12px">Search a suburb and open a listing to track it</span></div></div>';
+    return;
+  }
+  badge.style.display = 'inline';
+  badge.textContent = stored.length;
+  list.innerHTML = stored.map(function(p, i) {
+    var title = p.address || p.addr || p.url || 'Saved Property';
+    var meta = p.price ? p.price + '/wk · ' : '';
+    meta += p.source || p.savedAt ? (p.source || '') + (p.savedAt ? ' · Saved ' + new Date(p.savedAt).toLocaleDateString('en-AU',{day:'numeric',month:'short'}) : '') : '';
+    return '<div class="tracked-card">' +
+      '<div class="tracked-icon">🏠</div>' +
+      '<div class="tracked-body">' +
+        '<div class="tracked-title">' + title + '</div>' +
+        '<div class="tracked-meta">' + (meta || 'Tracked property') + '</div>' +
+      '</div>' +
+      '<button class="tracked-del" onclick="deleteTracked(' + i + ')" title="Remove">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+function deleteTracked(index) {
+  var stored = [];
+  try { stored = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]'); } catch(e) {}
+  stored.splice(index, 1);
+  localStorage.setItem('renteriq_tracked_properties', JSON.stringify(stored));
+  renderTrackedProperties();
+  showToast('Removed', 'Property removed from tracked list', '✕');
+}
+
+// ─── NAVIGATE HELPER ───────────────────────────────────────
+function navigate(path) {
+  var routeMap = {
+    '/app/index.html': '/app',
+    '/app/pages/search.html': '/search',
+    '/app/pages/inspection.html': '/inspect',
+    '/app/pages/vault.html': '/vault',
+  };
+  var route = routeMap[path] || path;
+  document.body.style.opacity = '0';
+  document.body.style.transition = 'opacity .18s';
+  setTimeout(function() {
+    if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
+      window.location.href = route;
+    } else {
+      window.location.href = path;
+    }
+  }, 180);
+}
+
 // Init
 renderSuburbGrid();
 updateLocationDisplay();
 showHome();
-savedProperties.forEach(function(id){updateSaveBtn(id)});
+renderTrackedProperties();
 
 // Page Fade In
 document.addEventListener('DOMContentLoaded',function(){
   document.body.style.opacity='0';
   requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
+  renderTrackedProperties();
 });
 
 // Service Worker
