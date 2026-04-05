@@ -358,6 +358,7 @@ function openNewMaintenanceSheet(){
 function closeMaintenanceSheet(){var o=document.getElementById('maintenanceOverlay'),s=document.getElementById('maintenanceSheet');if(!o||!s)return;o.style.opacity='0';s.style.transform='translateY(100%)';setTimeout(function(){o.style.display='none'},320)}
 
 var maintPhotos = [];
+var currentMaintPhotoSrc = null;
 function handleMaintPhotos(input){
   if(!input.files || !input.files.length) return;
   var preview = document.getElementById('maintPhotoPreview');
@@ -365,14 +366,24 @@ function handleMaintPhotos(input){
     var file = input.files[i];
     var reader = new FileReader();
     reader.onload = function(e){
-      maintPhotos.push(e.target.result);
+      var photoSrc = e.target.result;
+      maintPhotos.push(photoSrc);
       var imgDiv = document.createElement('div');
+      imgDiv.className = 'maint-photo-thumb';
       imgDiv.style.cssText = 'width:70px;height:70px;border-radius:10px;overflow:hidden;position:relative;flex-shrink:0';
-      imgDiv.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover"><span onclick="this.parentElement.remove();maintPhotos=maintPhotos.filter(function(p){return p!==\''+e.target.result+'\'})" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">×</span>';
+      imgDiv.dataset.photoSrc = photoSrc;
+      imgDiv.innerHTML = '<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover"><span onclick="removeMaintPhoto(this)" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">×</span>';
       preview.appendChild(imgDiv);
     };
     reader.readAsDataURL(file);
   }
+}
+
+function removeMaintPhoto(el){
+  var imgDiv = el.parentElement;
+  var photoSrc = imgDiv.dataset.photoSrc;
+  maintPhotos = maintPhotos.filter(function(p){ return p !== photoSrc; });
+  imgDiv.remove();
 }
 
 function submitMaintenance(){
@@ -433,7 +444,7 @@ function handleReceiptPhoto(input){
   reader.onload = function(e){
     receiptPhoto = e.target.result;
     var preview = document.getElementById('receiptPhotoPreview');
-    preview.innerHTML = '<div style="width:70px;height:70px;border-radius:10px;overflow:hidden;position:relative;flex-shrink:0"><img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover"><span onclick="this.parentElement.parentElement.innerHTML=\'<div style=\\'width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;color:var(--muted);background:var(--blue-xl)\\' onclick=\\'document.getElementById(\\'receiptPhotoInput\\').click()\\'>+</div>\';receiptPhoto=null;" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">×</span></div>';
+    preview.innerHTML = '<div style="width:70px;height:70px;border-radius:10px;overflow:hidden;position:relative;flex-shrink:0"><img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover"><span onclick="clearReceiptPhoto()" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">×</span></div>';
   };
   reader.readAsDataURL(file);
 }
