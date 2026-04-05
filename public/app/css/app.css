@@ -579,7 +579,7 @@ input:focus, textarea:focus, select:focus {
   display: none;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   /* Full-viewport body layout */
   body {
     overflow-y: auto;
@@ -839,7 +839,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* Tablet: narrower sidebar */
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 899px) {
   .app-shell {
     max-width: none !important;
   }
