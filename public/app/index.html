@@ -559,11 +559,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Populate desktop sidebar user info
     var dsName = document.getElementById('dsUserName');
     var dsAvatar = document.getElementById('dsAvatar');
-    if (dsName) dsName.textContent = user.displayName || user.email.split('@')[0];
-    if (dsAvatar) {
-      var initials = (user.displayName || user.email || 'U').split(' ').map(function(n){ return n[0]; }).slice(0,2).join('').toUpperCase();
-      dsAvatar.textContent = initials;
-    }
+    var displayName = user.displayName || user.email.split('@')[0];
+    var initials = (user.displayName || user.email || 'U').split(' ').map(function(n){ return n[0]; }).slice(0,2).join('').toUpperCase();
+    if (dsName) dsName.textContent = displayName;
+    if (dsAvatar) dsAvatar.textContent = initials;
+    // Cache for other pages
+    try { localStorage.setItem('riq-user-name', displayName); localStorage.setItem('riq-user-initials', initials); } catch(e) {}
 
     // Animate lease progress bar
     setTimeout(function() {

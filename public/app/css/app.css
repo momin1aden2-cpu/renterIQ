@@ -589,10 +589,12 @@ input:focus, textarea:focus, select:focus {
   /* App shell: row layout — sidebar left, main right */
   .app-shell {
     max-width: none !important;
-    display: flex;
-    flex-direction: row;
-    min-height: 100vh;
-    background: #EEF3FF;
+    display: flex !important;
+    flex-direction: row !important;
+    min-height: 100vh !important;
+    background: #EEF3FF !important;
+    margin: 0 !important;
+    position: relative !important;
   }
 
   /* Desktop sidebar */

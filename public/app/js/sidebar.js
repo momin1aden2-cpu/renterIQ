@@ -169,26 +169,39 @@
     }
   };
 
-  // Populate user info when Firebase auth is ready
-  function populateSidebarUser(user) {
+  // Populate user info from any source
+  function populateSidebarUser(name, initials) {
     var nameEl = document.getElementById('sidebarUserName');
     var avatarEl = document.getElementById('sidebarAvatar');
-    if (nameEl) nameEl.textContent = user.displayName || user.email.split('@')[0];
-    if (avatarEl) {
-      var initials = (user.displayName || user.email || 'U')
-        .split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
-      avatarEl.textContent = initials;
-    }
+    if (nameEl && name) nameEl.textContent = name;
+    if (avatarEl && initials) avatarEl.textContent = initials;
   }
 
-  // Hook into Firebase auth state if available
+  // Read from localStorage immediately (set by index.html on login)
+  function populateFromCache() {
+    try {
+      var name = localStorage.getItem('riq-user-name');
+      var initials = localStorage.getItem('riq-user-initials');
+      if (name) populateSidebarUser(name, initials || name[0].toUpperCase());
+    } catch(e) {}
+  }
+
+  // Hook into Firebase auth state if available (updates cache too)
   function tryHookAuth() {
-    if (typeof firebase !== 'undefined' && firebase.auth) {
-      firebase.auth().onAuthStateChanged(function(user) {
-        if (user) populateSidebarUser(user);
-      });
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0 && firebase.auth) {
+      try {
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            var name = user.displayName || user.email.split('@')[0];
+            var initials = (user.displayName || user.email || 'U')
+              .split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+            populateSidebarUser(name, initials);
+            try { localStorage.setItem('riq-user-name', name); localStorage.setItem('riq-user-initials', initials); } catch(e) {}
+          }
+        });
+      } catch(e) {}
     } else {
-      setTimeout(tryHookAuth, 200);
+      setTimeout(tryHookAuth, 300);
     }
   }
 
@@ -196,10 +209,12 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       injectSidebar();
+      populateFromCache();
       tryHookAuth();
     });
   } else {
     injectSidebar();
+    populateFromCache();
     tryHookAuth();
   }
 })();
