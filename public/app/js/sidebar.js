@@ -113,42 +113,46 @@
     style.id = 'riq-sidebar-css';
     style.textContent = [
       '@media (min-width:900px){',
-        '.app-shell{',
-          'max-width:none!important;',
-          'display:flex!important;',
-          'flex-direction:row!important;',
-          'margin:0!important;',
-          'background:#EEF3FF!important;',
-          'position:relative!important;',
-          'min-height:100vh!important;',
-        '}',
-        '.desktop-sidebar{',
-          'display:flex!important;',
-          'flex-direction:column!important;',
-          'width:240px!important;',
-          'min-width:240px!important;',
-          'position:fixed!important;',
-          'left:0!important;',
-          'top:0!important;',
-          'bottom:0!important;',
-          'height:100vh!important;',
-          'z-index:100!important;',
-          'overflow-y:auto!important;',
-          'overflow-x:hidden!important;',
-          'background:linear-gradient(180deg,#0A2460 0%,#0D2F74 60%,#091E52 100%)!important;',
-          'box-shadow:2px 0 20px rgba(10,36,96,.25)!important;',
-        '}',
-        '.app-main{',
-          'display:flex!important;',
-          'flex-direction:column!important;',
-          'flex:1!important;',
-          'margin-left:240px!important;',
-          'min-height:100vh!important;',
-          'min-width:0!important;',
-          'width:calc(100% - 240px)!important;',
-          'overflow-x:hidden!important;',
-        '}',
+
+        /* Layout */
+        '.app-shell{max-width:none!important;display:flex!important;flex-direction:row!important;margin:0!important;background:#EEF3FF!important;position:relative!important;min-height:100vh!important;}',
+        '.app-main{display:flex!important;flex-direction:column!important;flex:1!important;margin-left:240px!important;min-height:100vh!important;min-width:0!important;width:calc(100% - 240px)!important;overflow-x:hidden!important;}',
         '.bottom-nav{display:none!important;}',
+
+        /* Sidebar shell */
+        '.desktop-sidebar{display:flex!important;flex-direction:column!important;width:240px!important;min-width:240px!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important;height:100vh!important;z-index:100!important;overflow-y:auto!important;overflow-x:hidden!important;background:linear-gradient(180deg,#0A2460 0%,#0D2F74 60%,#091E52 100%)!important;box-shadow:2px 0 20px rgba(10,36,96,.25)!important;}',
+
+        /* Brand */
+        '.ds-brand{display:flex!important;align-items:center!important;gap:10px!important;padding:24px 20px 20px!important;border-bottom:1px solid rgba(255,255,255,.08)!important;text-decoration:none!important;}',
+        '.ds-brand-text{display:flex!important;flex-direction:column!important;}',
+        '.ds-wordmark{font-family:"Sora",sans-serif!important;font-weight:800!important;font-size:17px!important;color:#fff!important;letter-spacing:.3px!important;}',
+        '.ds-tagline{font-size:10px!important;color:rgba(255,255,255,.45)!important;font-weight:600!important;letter-spacing:.8px!important;text-transform:uppercase!important;margin-top:1px!important;}',
+
+        /* Nav */
+        '.ds-nav{flex:1!important;padding:16px 12px!important;display:flex!important;flex-direction:column!important;gap:4px!important;}',
+        '.ds-section-label{font-family:"Sora",sans-serif!important;font-size:10px!important;font-weight:700!important;letter-spacing:1.5px!important;color:rgba(255,255,255,.3)!important;text-transform:uppercase!important;padding:12px 10px 6px!important;}',
+
+        /* Tabs */
+        '.ds-tab{display:flex!important;align-items:center!important;gap:12px!important;padding:11px 12px!important;border-radius:12px!important;cursor:pointer!important;background:none!important;border:none!important;color:rgba(255,255,255,.65)!important;font-family:"Sora",sans-serif!important;font-weight:700!important;font-size:14px!important;transition:all .18s!important;text-decoration:none!important;width:100%!important;text-align:left!important;}',
+        '.ds-tab:hover{background:rgba(255,255,255,.08)!important;color:#fff!important;}',
+        '.ds-tab.active{background:rgba(255,255,255,.13)!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)!important;}',
+
+        /* Tab icons */
+        '.ds-tab-icon{width:34px!important;height:34px!important;border-radius:10px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:17px!important;flex-shrink:0!important;background:rgba(255,255,255,.06)!important;transition:all .18s!important;}',
+        '.ds-tab.active .ds-tab-icon{background:linear-gradient(135deg,#1B50C8,#2E63E0)!important;box-shadow:0 2px 10px rgba(27,80,200,.4)!important;}',
+
+        /* Footer */
+        '.ds-footer{padding:16px 12px 24px!important;border-top:1px solid rgba(255,255,255,.08)!important;}',
+        '.ds-user{display:flex!important;align-items:center!important;gap:10px!important;padding:10px 12px!important;border-radius:12px!important;margin-bottom:8px!important;background:rgba(255,255,255,.06)!important;}',
+        '.ds-avatar{width:34px!important;height:34px!important;border-radius:50%!important;background:rgba(255,255,255,.18)!important;border:2px solid rgba(255,255,255,.3)!important;display:flex!important;align-items:center!important;justify-content:center!important;font-family:"Sora",sans-serif!important;font-weight:800!important;font-size:13px!important;color:#fff!important;flex-shrink:0!important;}',
+        '.ds-user-info{flex:1!important;min-width:0!important;}',
+        '.ds-user-name{font-family:"Sora",sans-serif!important;font-weight:700!important;font-size:13px!important;color:#fff!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}',
+        '.ds-user-role{font-size:11px!important;color:rgba(255,255,255,.45)!important;margin-top:1px!important;}',
+
+        /* Sign out */
+        '.ds-signout{display:flex!important;align-items:center!important;gap:10px!important;padding:10px 12px!important;border-radius:12px!important;cursor:pointer!important;background:none!important;border:none!important;color:rgba(255,255,255,.45)!important;font-family:"Sora",sans-serif!important;font-weight:700!important;font-size:13px!important;transition:all .18s!important;width:100%!important;text-align:left!important;}',
+        '.ds-signout:hover{background:rgba(232,64,64,.12)!important;color:#F87171!important;}',
+
       '}'
     ].join('');
     document.head.appendChild(style);
