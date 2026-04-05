@@ -142,46 +142,9 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 .autocomplete-postcode{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:#F0F5FF;padding:4px 10px;border-radius:6px}
 .autocomplete-loading,.autocomplete-empty{padding:20px;text-align:center;color:var(--muted);font-size:14px}
 
-/* Search Options Row */
-.search-options{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap;justify-content:center}
-.nearby-toggle{display:flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-size:13px;color:rgba(255,255,255,.85);cursor:pointer;user-select:none}
-.nearby-toggle input{display:none}
-.nearby-toggle .toggle-switch{width:44px;height:24px;background:rgba(255,255,255,.2);border-radius:12px;position:relative;transition:background .2s}
-.nearby-toggle .toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
-.nearby-toggle input:checked + .toggle-switch{background:var(--teal)}
-.nearby-toggle input:checked + .toggle-switch::after{transform:translateX(20px)}
 
-/* Filter Toggle Button */
-.filter-toggle-btn{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#0A2460;background:#F4F7FF;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .15s;flex-shrink:0}
-.filter-toggle-btn:hover{background:#EBF0FF}
-.filter-toggle-btn.active{background:var(--blue);color:#fff}
 
-/* Advanced Filter Panel */
-.advanced-filters{display:none;background:#fff;border-radius:0 0 16px 16px;border:1.5px solid #E5EBF8;border-top:none;padding:24px;box-shadow:0 16px 48px rgba(27,80,200,.14);position:relative;z-index:50;margin-top:-8px}
-.advanced-filters.open{display:block}
-.af-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-lt)}
-.af-title{font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--blue-dk)}
-.af-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px}
-.af-close:hover{color:var(--blue)}
-.af-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
-.af-group label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px}
-.af-select{width:100%;padding:11px 30px 11px 14px;border:1.5px solid var(--border-lt);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%235A6B8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='2 4 6 8 10 4'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;cursor:pointer;transition:border-color .15s}
-.af-select:focus{border-color:var(--blue);outline:none}
-.af-features{grid-column:1/-1;margin-top:8px}
-.af-feat-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-.af-feat-chips{display:flex;flex-wrap:wrap;gap:8px}
-.af-chip{padding:8px 16px;border-radius:100px;border:1.5px solid var(--border-lt);font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;background:#fff}
-.af-chip:hover{border-color:var(--blue);color:var(--blue)}
-.af-chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
-.af-footer{display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid var(--border-lt)}
-.af-clear{background:none;border:1.5px solid var(--border-lt);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);padding:10px 22px;border-radius:100px;cursor:pointer;transition:all .15s}
-.af-clear:hover{border-color:var(--blue);color:var(--blue)}
-.af-apply{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;padding:10px 28px;border-radius:100px;border:none;cursor:pointer;transition:background .15s}
-.af-apply:hover{background:var(--blue-md)}
-.af-results-hint{font-size:13px;color:var(--muted)}
-
-@media(max-width:900px){.af-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){.location-input-wrap{flex-wrap:wrap;padding:10px 12px;border-radius:14px}.location-input-wrap input{order:1;width:100%;height:40px;font-size:14px}.search-options{gap:10px;margin-top:12px}.nearby-toggle{font-size:12px}.selected-location{max-width:140px;font-size:11px}.af-grid{grid-template-columns:1fr}.advanced-filters{padding:20px}}
+@media(max-width:640px){.location-input-wrap{padding:6px 6px 6px 16px;border-radius:14px}.location-input-wrap input{font-size:15px}.selected-location{max-width:150px;font-size:12px}.hero-clean-search{padding:11px 18px;font-size:14px;border-radius:12px}}
 @media(max-width:480px){.autocomplete-item{padding:12px 14px}.autocomplete-name{font-size:13px}.autocomplete-meta{font-size:11px}.autocomplete-postcode{font-size:11px;padding:3px 8px}}
 
 /* MOBILE APP DOWNLOAD BANNER */
@@ -564,7 +527,14 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   .hero-trust{gap:14px}
 }
 
-/* MOBILE OPTIMIZATION - Elements too big on mobile */
+/* MOBILE OPTIMIZATION */
+@media(max-width:768px){
+  .inspection .container{grid-template-columns:1fr;gap:32px}
+  .vault .container{grid-template-columns:1fr;gap:32px}
+  .vault-grid{grid-template-columns:1fr 1fr}
+  .phones-row{display:none}
+}
+
 @media(max-width:640px){
   .container{padding:0 16px}
   .hero{padding:32px 0 40px}
@@ -572,20 +542,8 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   .hero-process{font-size:13px;gap:8px 12px;flex-wrap:wrap;justify-content:center}
   .hero-process .hp-arr{display:none}
   .hero-process span{background:rgba(255,255,255,.08);padding:6px 12px;border-radius:100px}
-  
   .hero-sb-wrap{padding:0}
-  .hero-clean-bar{flex-wrap:nowrap;border-radius:12px;padding:8px 12px}
-  .hero-clean-bar input{font-size:15px;padding:8px 0}
-  .hcb-div{display:none}
-  .ls-filters-btn{padding:8px 12px;font-size:12px}
   .hero-clean-search{padding:10px 16px;font-size:13px}
-  
-  .ls-filter-panel{margin:8px -8px 0;border-radius:16px}
-  .lfp-grid{grid-template-columns:1fr;gap:12px}
-  .lfp-group label{font-size:10px}
-  .lfp-select{padding:10px 12px;font-size:14px}
-  .lfp-feat-chips{gap:6px}
-  .lfp-chip{padding:6px 12px;font-size:11px}
   
   .section-label{font-size:11px}
   .section-h2{font-size:clamp(22px,6vw,28px)}
@@ -612,6 +570,22 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   .rc-name{font-size:13px}
   .rc-link{font-size:12px}
   
+  .inspection{padding:48px 0}
+  .inspection .container{gap:24px}
+  .vault{padding:48px 0}
+  .vault .container{gap:24px}
+  .vault-grid{grid-template-columns:1fr 1fr}
+  .vault-folder{padding:16px 14px}
+  
+  .smart-search-hub{padding:32px 0}
+  .ss-hub-title{font-size:20px}
+  .ss-hub-subtitle{font-size:14px;margin-bottom:24px}
+  .ss-hub-location{font-size:16px}
+  .ss-provider{padding:20px 16px}
+  .ss-provider-icon{width:52px;height:52px;font-size:26px}
+  .ss-provider-name{font-size:14px}
+  .ss-track-box{padding:20px 16px}
+  
   .pwa-install{padding:48px 0}
   .pwa-install h2{font-size:clamp(22px,6vw,28px)}
   .pwa-install .pi-sub{font-size:14px}
@@ -622,6 +596,9 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   .footer-brand p{font-size:13px}
   .footer-col a{font-size:13px}
   .fb-copy{font-size:11px}
+  
+  .ss-track-form{flex-direction:column}
+  .ss-track-btn{width:100%}
 }
 
 /* Extra small phones */
@@ -632,6 +609,8 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   .section-h2{font-size:24px}
   .feature-card{padding:18px 16px}
   .step-card{padding:20px 16px}
+  .vault-grid{grid-template-columns:1fr}
+  .ss-providers{gap:12px}
 }
 </style>
 </head>
@@ -685,98 +664,12 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
             <span class="loc-name" id="locName"></span>
             <span class="loc-clear" onclick="clearLocation()">×</span>
           </div>
-          <button class="filter-toggle-btn" id="filterToggleBtn" onclick="toggleAdvancedFilters()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
-            <span id="filterBtnLabel">Filters</span>
-          </button>
           <button class="hero-clean-search" onclick="performSearch()">Search</button>
         </div>
         
         <!-- Autocomplete Dropdown -->
         <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
         
-        <!-- Search Options -->
-        <div class="search-options">
-          <label class="nearby-toggle">
-            <input type="checkbox" id="nearbyToggle">
-            <span class="toggle-switch"></span>
-            <span>Include nearby areas</span>
-          </label>
-        </div>
-        
-        <!-- Advanced Filters Panel -->
-        <div class="advanced-filters" id="advancedFilters">
-          <div class="af-header">
-            <span class="af-title">Filter Results</span>
-            <button class="af-close" onclick="toggleAdvancedFilters()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-          <div class="af-grid">
-            <div class="af-group">
-              <label>State</label>
-              <select class="af-select" id="afState">
-                <option value="any">All States</option>
-                <option value="VIC">Victoria</option>
-                <option value="NSW">New South Wales</option>
-                <option value="QLD">Queensland</option>
-                <option value="SA">South Australia</option>
-                <option value="WA">Western Australia</option>
-                <option value="TAS">Tasmania</option>
-                <option value="ACT">ACT</option>
-                <option value="NT">Northern Territory</option>
-              </select>
-            </div>
-            <div class="af-group">
-              <label>Weekly Price</label>
-              <select class="af-select" id="afPrice">
-                <option value="any">Any Price</option>
-                <option value="400">Under $400/wk</option>
-                <option value="600">Under $600/wk</option>
-                <option value="800">Under $800/wk</option>
-                <option value="800+">$800+/wk</option>
-              </select>
-            </div>
-            <div class="af-group">
-              <label>Bedrooms</label>
-              <select class="af-select" id="afBeds">
-                <option value="any">Any</option>
-                <option value="1">1+ Bedrooms</option>
-                <option value="2">2+ Bedrooms</option>
-                <option value="3">3+ Bedrooms</option>
-                <option value="4">4+ Bedrooms</option>
-              </select>
-            </div>
-            <div class="af-group">
-              <label>Property Type</label>
-              <select class="af-select" id="afType">
-                <option value="any">Any Type</option>
-                <option value="house">House</option>
-                <option value="apartment">Apartment / Unit</option>
-                <option value="townhouse">Townhouse</option>
-                <option value="studio">Studio</option>
-              </select>
-            </div>
-            <div class="af-features">
-              <div class="af-feat-label">Features</div>
-              <div class="af-feat-chips">
-                <span class="af-chip" onclick="toggleChip(this)" data-value="pet">Pet Friendly</span>
-                <span class="af-chip" onclick="toggleChip(this)" data-value="parking">Parking</span>
-                <span class="af-chip" onclick="toggleChip(this)" data-value="balcony">Balcony</span>
-                <span class="af-chip" onclick="toggleChip(this)" data-value="aircon">Air Con</span>
-                <span class="af-chip" onclick="toggleChip(this)" data-value="garden">Garden</span>
-                <span class="af-chip" onclick="toggleChip(this)" data-value="furnished">Furnished</span>
-                <span class="af-chip" onclick="toggleChip(this)" data-value="dishwasher">Dishwasher</span>
-                <span class="af-chip" onclick="toggleChip(this)" data-value="pool">Pool</span>
-              </div>
-            </div>
-          </div>
-          <div class="af-footer">
-            <button class="af-clear" onclick="clearAdvancedFilters()">Clear All</button>
-            <span class="af-results-hint" id="resultsHint"></span>
-            <button class="af-apply" onclick="applyAdvancedFilters()">Show Results</button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -1320,52 +1213,13 @@ async function compareBondPhotos(entryPhotos, exitPhotos) {
 
 // ========== ENHANCED SEARCH WITH LOCATION AUTOCOMPLETE ==========
 
-// Australian suburbs database (sample - top suburbs per state)
-const australianSuburbs = [
-  // NSW
-  {name:'Sydney',postcode:'2000',state:'NSW',region:'Metro'},{name:'Parramatta',postcode:'2150',state:'NSW',region:'Metro'},{name:'Chatswood',postcode:'2067',state:'NSW',region:'Metro'},{name:'Bondi',postcode:'2026',state:'NSW',region:'Metro'},{name:'Manly',postcode:'2095',state:'NSW',region:'Metro'},{name:'Newcastle',postcode:'2300',state:'NSW',region:'Regional'},{name:'Wollongong',postcode:'2500',state:'NSW',region:'Regional'},{name:'Penrith',postcode:'2750',state:'NSW',region:'Metro'},{name:'Liverpool',postcode:'2170',state:'NSW',region:'Metro'},{name:'Blacktown',postcode:'2148',state:'NSW',region:'Metro'},{name:'Castle Hill',postcode:'2154',state:'NSW',region:'Metro'},{name:'Hornsby',postcode:'2077',state:'NSW',region:'Metro'},{name:'Burwood',postcode:'2134',state:'NSW',region:'Metro'},{name:'Strathfield',postcode:'2135',state:'NSW',region:'Metro'},{name:'Epping',postcode:'2121',state:'NSW',region:'Metro'},
-  // VIC
-  {name:'Melbourne',postcode:'3000',state:'VIC',region:'Metro'},{name:'St Kilda',postcode:'3182',state:'VIC',region:'Metro'},{name:'Richmond',postcode:'3121',state:'VIC',region:'Metro'},{name:'South Yarra',postcode:'3141',state:'VIC',region:'Metro'},{name:'Brunswick',postcode:'3056',state:'VIC',region:'Metro'},{name:'Footscray',postcode:'3011',state:'VIC',region:'Metro'},{name:'Geelong',postcode:'3220',state:'VIC',region:'Regional'},{name:'Ballarat',postcode:'3350',state:'VIC',region:'Regional'},{name:'Bendigo',postcode:'3550',state:'VIC',region:'Regional'},{name:'Box Hill',postcode:'3128',state:'VIC',region:'Metro'},{name:'Chadstone',postcode:'3148',state:'VIC',region:'Metro'},{name:'Doncaster',postcode:'3108',state:'VIC',region:'Metro'},{name:'Frankston',postcode:'3199',state:'VIC',region:'Metro'},{name:'Glen Waverley',postcode:'3150',state:'VIC',region:'Metro'},{name:'Preston',postcode:'3072',state:'VIC',region:'Metro'},
-  // QLD
-  {name:'Brisbane',postcode:'4000',state:'QLD',region:'Metro'},{name:'Gold Coast',postcode:'4217',state:'QLD',region:'Metro'},{name:'Surfers Paradise',postcode:'4217',state:'QLD',region:'Metro'},{name:'Cairns',postcode:'4870',state:'QLD',region:'Regional'},{name:'Townsville',postcode:'4810',state:'QLD',region:'Regional'},{name:'Toowoomba',postcode:'4350',state:'QLD',region:'Regional'},{name:'Sunshine Coast',postcode:'4558',state:'QLD',region:'Regional'},{name:'Fortitude Valley',postcode:'4006',state:'QLD',region:'Metro'},{name:'South Brisbane',postcode:'4101',state:'QLD',region:'Metro'},{name:'New Farm',postcode:'4005',state:'QLD',region:'Metro'},{name:'Chermside',postcode:'4032',state:'QLD',region:'Metro'},{name:'Ipswich',postcode:'4305',state:'QLD',region:'Regional'},{name:'Rockhampton',postcode:'4700',state:'QLD',region:'Regional'},{name:'Mackay',postcode:'4740',state:'QLD',region:'Regional'},
-  // WA
-  {name:'Perth',postcode:'6000',state:'WA',region:'Metro'},{name:'Fremantle',postcode:'6160',state:'WA',region:'Metro'},{name:'Subiaco',postcode:'6008',state:'WA',region:'Metro'},{name:'Scarborough',postcode:'6019',state:'WA',region:'Metro'},{name:'Cottesloe',postcode:'6011',state:'WA',region:'Metro'},{name:'Mandurah',postcode:'6210',state:'WA',region:'Regional'},{name:'Bunbury',postcode:'6230',state:'WA',region:'Regional'},{name:'Geraldton',postcode:'6530',state:'WA',region:'Regional'},{name:'Kalgoorlie',postcode:'6430',state:'WA',region:'Regional'},{name:'Joondalup',postcode:'6027',state:'WA',region:'Metro'},{name:'Midland',postcode:'6056',state:'WA',region:'Metro'},{name:'Armadale',postcode:'6112',state:'WA',region:'Metro'},
-  // SA
-  {name:'Adelaide',postcode:'5000',state:'SA',region:'Metro'},{name:'Glenelg',postcode:'5045',state:'SA',region:'Metro'},{name:'Norwood',postcode:'5067',state:'SA',region:'Metro'},{name:'Prospect',postcode:'5082',state:'SA',region:'Metro'},{name:'Unley',postcode:'5061',state:'SA',region:'Metro'},{name:'Mount Gambier',postcode:'5290',state:'SA',region:'Regional'},{name:'Whyalla',postcode:'5600',state:'SA',region:'Regional'},{name:'Port Lincoln',postcode:'5606',state:'SA',region:'Regional'},{name:'Murray Bridge',postcode:'5253',state:'SA',region:'Regional'},{name:'Port Adelaide',postcode:'5015',state:'SA',region:'Metro'},{name:'Henley Beach',postcode:'5022',state:'SA',region:'Metro'},{name:'Burnside',postcode:'5066',state:'SA',region:'Metro'},
-  // TAS
-  {name:'Hobart',postcode:'7000',state:'TAS',region:'Metro'},{name:'Launceston',postcode:'7250',state:'TAS',region:'Regional'},{name:'Devonport',postcode:'7310',state:'TAS',region:'Regional'},{name:'Burnie',postcode:'7320',state:'TAS',region:'Regional'},{name:'Sandy Bay',postcode:'7005',state:'TAS',region:'Metro'},{name:'New Town',postcode:'7008',state:'TAS',region:'Metro'},
-  // ACT
-  {name:'Canberra',postcode:'2601',state:'ACT',region:'Metro'},{name:'Belconnen',postcode:'2617',state:'ACT',region:'Metro'},{name:'Woden',postcode:'2606',state:'ACT',region:'Metro'},{name:'Tuggeranong',postcode:'2900',state:'ACT',region:'Metro'},{name:'Gungahlin',postcode:'2912',state:'ACT',region:'Metro'},
-  // NT
-  {name:'Darwin',postcode:'0800',state:'NT',region:'Metro'},{name:'Alice Springs',postcode:'0870',state:'NT',region:'Regional'},{name:'Katherine',postcode:'0850',state:'NT',region:'Regional'},{name:'Palmerston',postcode:'0830',state:'NT',region:'Metro'}
-];
-
-// Sample property listings for demo
-const sampleListings = [
-  {id:1, addr:'12/45 Collins Street, Melbourne VIC', price:550, beds:2, baths:1, type:'apartment', state:'VIC', img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop', agent:'Jellis Craig', insp:'Sat 2:00pm'},
-  {id:2, addr:'78 Brunswick Road, Brunswick VIC', price:480, beds:1, baths:1, type:'apartment', state:'VIC', img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop', agent:'Nelson Alexander', insp:'Sat 11:00am'},
-  {id:3, addr:'245 St Kilda Road, St Kilda VIC', price:650, beds:2, baths:2, type:'apartment', state:'VIC', img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=300&fit=crop', agent:'Gary Peer', insp:'Sun 10:00am'},
-  {id:4, addr:'89 Richmond Terrace, Richmond VIC', price:720, beds:3, baths:1, type:'house', state:'VIC', img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop', agent:'Biggin Scott', insp:'Sat 1:30pm'},
-  {id:5, addr:'156 Punt Road, Windsor VIC', price:595, beds:2, baths:1, type:'apartment', state:'VIC', img:'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=400&h=300&fit=crop', agent:'Hocking Stuart', insp:'Sun 12:00pm'},
-  {id:6, addr:'42 Park Street, South Yarra VIC', price:850, beds:3, baths:2, type:'townhouse', state:'VIC', img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop', agent:'Marshall White', insp:'Sat 3:00pm'}
-];
-
 let selectedLocation = null;
-let searchFilters = {
-  state: 'any',
-  price: 'any',
-  beds: 'any',
-  type: 'any',
-  features: [],
-  nearby: false
-};
 
 // Location Input & Autocomplete
 const locationInput = document.getElementById('locationInput');
 const autocompleteDropdown = document.getElementById('autocompleteDropdown');
 const selectedLocationEl = document.getElementById('selectedLocation');
 const locNameEl = document.getElementById('locName');
-const nearbyToggle = document.getElementById('nearbyToggle');
 
 if (locationInput) {
   locationInput.addEventListener('input', handleLocationInput);
@@ -1453,80 +1307,14 @@ function selectSuburb(name, postcode, state) {
   locNameEl.textContent = `${name} ${postcode}`;
   selectedLocationEl.style.display = 'flex';
   hideAutocomplete();
-  
-  const stateSelect = document.getElementById('afState');
-  if (stateSelect) stateSelect.value = state;
-  searchFilters.state = state;
-  
   performSearch();
 }
 
 function clearLocation() {
   selectedLocation = null;
+  locationInput.value = '';
   locationInput.placeholder = 'Search suburb, postcode or area…';
   selectedLocationEl.style.display = 'none';
-  document.getElementById('afState').value = 'any';
-  searchFilters.state = 'any';
-}
-
-if (nearbyToggle) {
-  nearbyToggle.addEventListener('change', (e) => {
-    searchFilters.nearby = e.target.checked;
-  });
-}
-
-// ========== ADVANCED FILTERS ==========
-
-function toggleAdvancedFilters() {
-  const panel = document.getElementById('advancedFilters');
-  const btn = document.getElementById('filterToggleBtn');
-  panel.classList.toggle('open');
-  btn.classList.toggle('active');
-  updateFilterButtonLabel();
-}
-
-function toggleChip(chip) {
-  chip.classList.toggle('sel');
-  const value = chip.dataset.value;
-  if (chip.classList.contains('sel')) {
-    if (!searchFilters.features.includes(value)) searchFilters.features.push(value);
-  } else {
-    searchFilters.features = searchFilters.features.filter(f => f !== value);
-  }
-}
-
-function updateFilterButtonLabel() {
-  const activeFilters = [
-    searchFilters.state !== 'any' ? 1 : 0,
-    searchFilters.price !== 'any' ? 1 : 0,
-    searchFilters.beds !== 'any' ? 1 : 0,
-    searchFilters.type !== 'any' ? 1 : 0,
-    searchFilters.features.length
-  ].reduce((a, b) => a + b, 0);
-  
-  const label = document.getElementById('filterBtnLabel');
-  label.textContent = activeFilters > 0 ? `Filters (${activeFilters})` : 'Filters';
-}
-
-function applyAdvancedFilters() {
-  searchFilters.state = document.getElementById('afState').value;
-  searchFilters.price = document.getElementById('afPrice').value;
-  searchFilters.beds = document.getElementById('afBeds').value;
-  searchFilters.type = document.getElementById('afType').value;
-  
-  updateFilterButtonLabel();
-  toggleAdvancedFilters();
-  performSearch();
-}
-
-function clearAdvancedFilters() {
-  document.getElementById('afState').value = 'any';
-  document.getElementById('afPrice').value = 'any';
-  document.getElementById('afBeds').value = 'any';
-  document.getElementById('afType').value = 'any';
-  document.querySelectorAll('.af-chip').forEach(c => c.classList.remove('sel'));
-  searchFilters = { state: 'any', price: 'any', beds: 'any', type: 'any', features: [], nearby: nearbyToggle?.checked || false };
-  updateFilterButtonLabel();
 }
 
 // ========== SMART SEARCH HUB - PROVIDER SELECTION ==========
