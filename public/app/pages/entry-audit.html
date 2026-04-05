@@ -869,6 +869,20 @@ function generateEntryReport(){
   });
   localStorage.setItem('renteriq_vault_reports',JSON.stringify(vaultReports));
   
+  // Also save to standardized riq_entry_audit_past for Vault integration
+  try {
+    var auditRaw = localStorage.getItem('riq_entry_audit_past') || '[]';
+    var auditList = JSON.parse(auditRaw);
+    auditList.unshift({
+      type: 'entry_audit',
+      address: reportData.propertyAddress || 'Property',
+      date: Date.now(),
+      rooms: reportData.completedRooms,
+      photos: reportData.totalPhotos
+    });
+    localStorage.setItem('riq_entry_audit_past', JSON.stringify(auditList));
+  } catch(e) { console.error('Save to riq_entry_audit_past:', e); }
+  
   // Generate downloadable report (text version for now)
   var reportText=generateTextReport(reportData);
   downloadReport(reportText, 'entry-audit-report.txt');
