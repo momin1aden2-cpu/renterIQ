@@ -107,7 +107,55 @@
     shell.appendChild(main);
   }
 
+  function injectDesktopCSS() {
+    if (document.getElementById('riq-sidebar-css')) return;
+    var style = document.createElement('style');
+    style.id = 'riq-sidebar-css';
+    style.textContent = [
+      '@media (min-width:900px){',
+        '.app-shell{',
+          'max-width:none!important;',
+          'display:flex!important;',
+          'flex-direction:row!important;',
+          'margin:0!important;',
+          'background:#EEF3FF!important;',
+          'position:relative!important;',
+          'min-height:100vh!important;',
+        '}',
+        '.desktop-sidebar{',
+          'display:flex!important;',
+          'flex-direction:column!important;',
+          'width:240px!important;',
+          'min-width:240px!important;',
+          'position:fixed!important;',
+          'left:0!important;',
+          'top:0!important;',
+          'bottom:0!important;',
+          'height:100vh!important;',
+          'z-index:100!important;',
+          'overflow-y:auto!important;',
+          'overflow-x:hidden!important;',
+          'background:linear-gradient(180deg,#0A2460 0%,#0D2F74 60%,#091E52 100%)!important;',
+          'box-shadow:2px 0 20px rgba(10,36,96,.25)!important;',
+        '}',
+        '.app-main{',
+          'display:flex!important;',
+          'flex-direction:column!important;',
+          'flex:1!important;',
+          'margin-left:240px!important;',
+          'min-height:100vh!important;',
+          'min-width:0!important;',
+          'width:calc(100% - 240px)!important;',
+          'overflow-x:hidden!important;',
+        '}',
+        '.bottom-nav{display:none!important;}',
+      '}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
   function injectSidebar() {
+    injectDesktopCSS();
     var shell = document.querySelector('.app-shell');
     if (!shell) return;
     if (shell.querySelector('.desktop-sidebar')) return; // already injected (e.g. index.html)
