@@ -273,19 +273,63 @@
   <div class="maintenance-sheet" id="maintenanceSheet">
     <div class="sheet-handle"></div>
     <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--text);margin-bottom:20px">Log Maintenance Request</div>
-    <div class="sec-label" style="padding:0 0 8px">Issue Type</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:16px;cursor:pointer;min-height:44px" onclick="showToast('Issue Type','Plumbing · Electrical · Heating/Cooling · Structural · Pest · Other','🔧')"><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">Hot Water / Heating</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">Change ›</span></div>
-    <div class="sec-label" style="padding:0 0 8px">Description</div>
-    <textarea style="width:100%;min-height:80px;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);resize:vertical;margin-bottom:16px;box-sizing:border-box" placeholder="Describe the issue in detail…"></textarea>
+    <div class="sec-label" style="padding:0 0 8px">Issue Type *</div>
+    <select id="maintIssueType" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:#fff;margin-bottom:12px;cursor:pointer;min-height:44px;box-sizing:border-box">
+      <option value="">Select or type custom...</option>
+      <option value="Plumbing">Plumbing</option>
+      <option value="Electrical">Electrical</option>
+      <option value="Hot Water / Heating">Hot Water / Heating</option>
+      <option value="Cooling / Air Conditioning">Cooling / Air Conditioning</option>
+      <option value="Structural / Walls">Structural / Walls</option>
+      <option value="Flooring / Carpet">Flooring / Carpet</option>
+      <option value="Windows / Doors">Windows / Doors</option>
+      <option value="Pest Control">Pest Control</option>
+      <option value="Appliance Repair">Appliance Repair</option>
+      <option value="Security / Locks">Security / Locks</option>
+      <option value="Other">Other (specify in description)</option>
+    </select>
+    <input type="text" id="maintCustomType" placeholder="Or type custom issue type..." style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);margin-bottom:16px;box-sizing:border-box;display:none">
+    <div class="sec-label" style="padding:0 0 8px">Description *</div>
+    <textarea id="maintDescription" style="width:100%;min-height:100px;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);resize:vertical;margin-bottom:16px;box-sizing:border-box" placeholder="Describe the issue in detail — what's broken, when it started, any attempts to fix it..."></textarea>
     <div class="sec-label" style="padding:0 0 8px">Priority</div>
     <div style="display:flex;gap:8px;margin-bottom:16px"><button class="priority-pill" onclick="setPriority(this)">Urgent</button><button class="priority-pill active" onclick="setPriority(this)">Non-urgent</button><button class="priority-pill" onclick="setPriority(this)">Cosmetic</button></div>
-    <div class="sec-label" style="padding:0 0 8px">Photos</div>
-    <div style="display:flex;gap:8px;margin-bottom:20px">
-      <div style="width:60px;height:60px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--muted)" onclick="showToast('Photo','Camera access — coming soon','📷')">+</div>
-      <div style="width:60px;height:60px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--muted)" onclick="showToast('Photo','Camera access — coming soon','📷')">+</div>
-      <div style="width:60px;height:60px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--muted)" onclick="showToast('Photo','Camera access — coming soon','📷')">+</div>
+    <div class="sec-label" style="padding:0 0 8px">Photos (optional)</div>
+    <input type="file" id="maintPhotoInput" accept="image/*" multiple style="display:none" onchange="handleMaintPhotos(this)">
+    <div id="maintPhotoPreview" style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <div style="width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;color:var(--muted);background:var(--blue-xl)" onclick="document.getElementById('maintPhotoInput').click()">+</div>
     </div>
     <button class="btn-blue-c btn-full" style="border-radius:12px;margin-top:4px;padding-bottom:32px" onclick="submitMaintenance()">Submit to Agent</button>
+  </div>
+</div>
+
+<!-- RECEIPTS BOTTOM SHEET -->
+<div class="maintenance-overlay" id="receiptsOverlay">
+  <div class="maintenance-sheet" id="receiptsSheet">
+    <div class="sheet-handle"></div>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--text);margin-bottom:20px">Add Receipt</div>
+    <div class="sec-label" style="padding:0 0 8px">Receipt Type *</div>
+    <select id="receiptType" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:#fff;margin-bottom:16px;cursor:pointer;min-height:44px;box-sizing:border-box">
+      <option value="">Select type...</option>
+      <option value="rent">Rent Payment</option>
+      <option value="bond">Bond / Security Deposit</option>
+      <option value="repair">Repair / Maintenance</option>
+      <option value="utility">Utilities (Electricity, Gas, Water)</option>
+      <option value="internet">Internet / Phone</option>
+      <option value="insurance">Insurance</option>
+      <option value="other">Other</option>
+    </select>
+    <div class="sec-label" style="padding:0 0 8px">Description *</div>
+    <input type="text" id="receiptDescription" placeholder="e.g., March 2025 Rent, Bond payment, etc." style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);margin-bottom:16px;box-sizing:border-box">
+    <div class="sec-label" style="padding:0 0 8px">Amount ($)</div>
+    <input type="number" id="receiptAmount" placeholder="0.00" step="0.01" min="0" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);margin-bottom:16px;box-sizing:border-box">
+    <div class="sec-label" style="padding:0 0 8px">Date</div>
+    <input type="date" id="receiptDate" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);margin-bottom:16px;box-sizing:border-box">
+    <div class="sec-label" style="padding:0 0 8px">Photo (optional)</div>
+    <input type="file" id="receiptPhotoInput" accept="image/*" style="display:none" onchange="handleReceiptPhoto(this)">
+    <div id="receiptPhotoPreview" style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <div style="width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;color:var(--muted);background:var(--blue-xl)" onclick="document.getElementById('receiptPhotoInput').click()">+</div>
+    </div>
+    <button class="btn-blue-c btn-full" style="border-radius:12px;margin-top:4px;padding-bottom:32px" onclick="submitReceipt()">Save Receipt</button>
   </div>
 </div>
 
@@ -296,11 +340,46 @@ function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=doc
 var allViews=['A','B','C','D','E','F','G','H'],currentView='A';
 function switchView(id){var c=document.getElementById('view'+currentView),n=document.getElementById('view'+id);if(!n||id===currentView)return;c.style.opacity='0';c.style.pointerEvents='none';setTimeout(function(){c.style.display='none';c.style.opacity='';n.style.display='flex';n.style.flexDirection='column';n.style.minHeight='100vh';requestAnimationFrame(function(){n.style.opacity='0';requestAnimationFrame(function(){n.style.transition='opacity .2s ease';n.style.opacity='1';n.style.pointerEvents=''})});window.scrollTo(0,0)},150);currentView=id}
 
-function openNewMaintenanceSheet(){var o=document.getElementById('maintenanceOverlay'),s=document.getElementById('maintenanceSheet');if(!o||!s)return;o.style.display='flex';requestAnimationFrame(function(){o.style.opacity='1';s.style.transform='translateY(0)'})}
+function openNewMaintenanceSheet(){
+  var o=document.getElementById('maintenanceOverlay'),s=document.getElementById('maintenanceSheet');
+  if(!o||!s)return;
+  // Reset form
+  document.getElementById('maintIssueType').value = '';
+  document.getElementById('maintCustomType').value = '';
+  document.getElementById('maintCustomType').style.display = 'none';
+  document.getElementById('maintDescription').value = '';
+  document.querySelectorAll('.priority-pill').forEach(function(p){p.classList.remove('active')});
+  document.querySelector('.priority-pill:nth-child(2)').classList.add('active');
+  document.getElementById('maintPhotoInput').value = '';
+  document.getElementById('maintPhotoPreview').innerHTML = '<div style="width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;color:var(--muted);background:var(--blue-xl)" onclick="document.getElementById(\'maintPhotoInput\').click()">+</div>';
+  o.style.display='flex';
+  requestAnimationFrame(function(){o.style.opacity='1';s.style.transform='translateY(0)'})
+}
 function closeMaintenanceSheet(){var o=document.getElementById('maintenanceOverlay'),s=document.getElementById('maintenanceSheet');if(!o||!s)return;o.style.opacity='0';s.style.transform='translateY(100%)';setTimeout(function(){o.style.display='none'},320)}
+
+var maintPhotos = [];
+function handleMaintPhotos(input){
+  if(!input.files || !input.files.length) return;
+  var preview = document.getElementById('maintPhotoPreview');
+  for(var i=0;i<input.files.length;i++){
+    var file = input.files[i];
+    var reader = new FileReader();
+    reader.onload = function(e){
+      maintPhotos.push(e.target.result);
+      var imgDiv = document.createElement('div');
+      imgDiv.style.cssText = 'width:70px;height:70px;border-radius:10px;overflow:hidden;position:relative;flex-shrink:0';
+      imgDiv.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover"><span onclick="this.parentElement.remove();maintPhotos=maintPhotos.filter(function(p){return p!==\''+e.target.result+'\'})" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">×</span>';
+      preview.appendChild(imgDiv);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
 function submitMaintenance(){
-  var issueType = document.querySelector('.maintenance-sheet .sec-label + div span').textContent;
-  var description = document.querySelector('.maintenance-sheet textarea').value;
+  var issueTypeSelect = document.getElementById('maintIssueType').value;
+  var customType = document.getElementById('maintCustomType').value.trim();
+  var issueType = issueTypeSelect || customType || 'Other';
+  var description = document.getElementById('maintDescription').value.trim();
   var priority = document.querySelector('.priority-pill.active').textContent;
   if (!description.trim()) {
     showToast('Error', 'Please describe the issue', '❌');
@@ -316,15 +395,96 @@ function submitMaintenance(){
       priority: priority,
       status: 'pending',
       source: 'manual',
-      date: Date.now()
+      date: Date.now(),
+      photos: maintPhotos || []
     });
     localStorage.setItem('riq_maintenance_items', JSON.stringify(items));
+    maintPhotos = [];
     loadMaintenanceItems();
     loadVaultCounts();
+    loadRecentActivity();
   } catch(e) { console.error('submitMaintenance:', e); }
   closeMaintenanceSheet();
-  showToast('Request submitted ✓', 'Sent to agent · Logged in Maintenance', '🔧');
+  showToast('Request submitted ✓', 'Logged in Maintenance Log', '🔧');
 }
+
+// Receipts sheet functions
+function openNewReceiptSheet(){
+  var o=document.getElementById('receiptsOverlay'),s=document.getElementById('receiptsSheet');
+  if(!o||!s)return;
+  // Reset form
+  document.getElementById('receiptType').value = '';
+  document.getElementById('receiptDescription').value = '';
+  document.getElementById('receiptAmount').value = '';
+  document.getElementById('receiptDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('receiptPhotoInput').value = '';
+  document.getElementById('receiptPhotoPreview').innerHTML = '<div style="width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;color:var(--muted);background:var(--blue-xl)" onclick="document.getElementById(\'receiptPhotoInput\').click()">+</div>';
+  receiptPhoto = null;
+  o.style.display='flex';
+  requestAnimationFrame(function(){o.style.opacity='1';s.style.transform='translateY(0)'})
+}
+function closeReceiptsSheet(){var o=document.getElementById('receiptsOverlay'),s=document.getElementById('receiptsSheet');if(!o||!s)return;o.style.opacity='0';s.style.transform='translateY(100%)';setTimeout(function(){o.style.display='none'},320)}
+
+var receiptPhoto = null;
+function handleReceiptPhoto(input){
+  if(!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var reader = new FileReader();
+  reader.onload = function(e){
+    receiptPhoto = e.target.result;
+    var preview = document.getElementById('receiptPhotoPreview');
+    preview.innerHTML = '<div style="width:70px;height:70px;border-radius:10px;overflow:hidden;position:relative;flex-shrink:0"><img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover"><span onclick="this.parentElement.parentElement.innerHTML=\'<div style=\\'width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;color:var(--muted);background:var(--blue-xl)\\' onclick=\\'document.getElementById(\\'receiptPhotoInput\\').click()\\'>+</div>\';receiptPhoto=null;" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">×</span></div>';
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitReceipt(){
+  var type = document.getElementById('receiptType').value;
+  var description = document.getElementById('receiptDescription').value.trim();
+  var amount = document.getElementById('receiptAmount').value;
+  var date = document.getElementById('receiptDate').value;
+  if (!type) {
+    showToast('Error', 'Please select a receipt type', '❌');
+    return;
+  }
+  if (!description) {
+    showToast('Error', 'Please enter a description', '❌');
+    return;
+  }
+  try {
+    var raw = localStorage.getItem('riq_receipts') || '[]';
+    var receipts = JSON.parse(raw);
+    receipts.unshift({
+      id: 'receipt_' + Date.now(),
+      type: type,
+      description: description,
+      amount: amount,
+      date: date ? new Date(date).getTime() : Date.now(),
+      photo: receiptPhoto
+    });
+    localStorage.setItem('riq_receipts', JSON.stringify(receipts));
+    receiptPhoto = null;
+    loadReceipts();
+    loadVaultCounts();
+    loadRecentActivity();
+  } catch(e) { console.error('submitReceipt:', e); }
+  closeReceiptsSheet();
+  showToast('Receipt saved ✓', 'Added to Receipts & Payments', '🧾');
+}
+
+// Show custom type input when "Other" selected
+document.getElementById('maintIssueType')?.addEventListener('change', function(){
+  var customInput = document.getElementById('maintCustomType');
+  if (this.value === '' || this.value === 'Other') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = '';
+  }
+});
+
+document.getElementById('receiptsOverlay')?.addEventListener('click',function(e){if(e.target===this)closeReceiptsSheet()});
 function resolveItem(id){
   try {
     var raw = localStorage.getItem('riq_maintenance_items') || '[]';
@@ -424,7 +584,73 @@ function loadComms(){
 
 function openNewCommsSheet() { showToast('Save Communication', 'Use the Routine Inspection feature to auto-save emails, or manually paste messages here — full feature coming soon', '💬'); }
 
-function openNewReceiptSheet() { showToast('Add Receipt', 'Receipt upload coming soon — for now, keep photos of your receipts in your phone gallery', '🧾'); }
+function openNewReceiptSheet() { 
+  var o=document.getElementById('receiptsOverlay'),s=document.getElementById('receiptsSheet');
+  if(!o||!s)return;
+  document.getElementById('receiptType').value = '';
+  document.getElementById('receiptDescription').value = '';
+  document.getElementById('receiptAmount').value = '';
+  document.getElementById('receiptDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('receiptPhotoInput').value = '';
+  document.getElementById('receiptPhotoPreview').innerHTML = '<div style="width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;color:var(--muted);background:var(--blue-xl)" onclick="document.getElementById(\'receiptPhotoInput\').click()">+</div>';
+  receiptPhoto = null;
+  o.style.display='flex';
+  requestAnimationFrame(function(){o.style.opacity='1';s.style.transform='translateY(0)'});
+}
+
+var receiptPhoto = null;
+function handleReceiptPhoto(input){
+  if(!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var reader = new FileReader();
+  reader.onload = function(e){
+    receiptPhoto = e.target.result;
+    var preview = document.getElementById('receiptPhotoPreview');
+    preview.innerHTML = '<div id="receiptThumb" style="width:70px;height:70px;border-radius:10px;overflow:hidden;position:relative;flex-shrink:0"><img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover"><span onclick="clearReceiptPhoto()" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">×</span></div>';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearReceiptPhoto(){
+  receiptPhoto = null;
+  document.getElementById('receiptPhotoPreview').innerHTML = '<div style="width:70px;height:70px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;color:var(--muted);background:var(--blue-xl)" onclick="document.getElementById(\'receiptPhotoInput\').click()">+</div>';
+}
+
+function submitReceipt(){
+  var type = document.getElementById('receiptType').value;
+  var description = document.getElementById('receiptDescription').value.trim();
+  var amount = document.getElementById('receiptAmount').value;
+  var date = document.getElementById('receiptDate').value;
+  if (!type) {
+    showToast('Error', 'Please select a receipt type', '❌');
+    return;
+  }
+  if (!description) {
+    showToast('Error', 'Please enter a description', '❌');
+    return;
+  }
+  try {
+    var raw = localStorage.getItem('riq_receipts') || '[]';
+    var receipts = JSON.parse(raw);
+    receipts.unshift({
+      id: 'receipt_' + Date.now(),
+      type: type,
+      description: description,
+      amount: amount,
+      date: date ? new Date(date).getTime() : Date.now(),
+      photo: receiptPhoto
+    });
+    localStorage.setItem('riq_receipts', JSON.stringify(receipts));
+    receiptPhoto = null;
+    loadReceipts();
+    loadVaultCounts();
+    loadRecentActivity();
+  } catch(e) { console.error('submitReceipt:', e); }
+  closeReceiptsSheet();
+  showToast('Receipt saved ✓', 'Added to Receipts & Payments', '🧾');
+}
+
+function closeReceiptsSheet(){var o=document.getElementById('receiptsOverlay'),s=document.getElementById('receiptsSheet');if(!o||!s)return;o.style.opacity='0';s.style.transform='translateY(100%)';setTimeout(function(){o.style.display='none'},320)}
 
 function loadReceipts(){
   try {
@@ -438,15 +664,18 @@ function loadReceipts(){
     var html = '';
     receipts.forEach(function(r) {
       var date = new Date(r.date).toLocaleDateString('en-AU', {day: 'numeric', month: 'short', year: 'numeric'});
-      var typeIcon = {rent: '🏠', bond: '🔐', repair: '🔧', other: '🧾'}[r.type] || '🧾';
-      var typeColor = {rent: 'var(--blue)', bond: 'var(--teal)', repair: 'var(--amber)', other: 'var(--muted)'}[r.type] || 'var(--muted)';
-      html += '<div class="folder-card" style="margin-bottom:10px">' +
+      var typeIcon = {rent: '🏠', bond: '🔐', repair: '🔧', utility: '⚡', internet: '📶', insurance: '🛡️', other: '🧾'}[r.type] || '🧾';
+      var typeColor = {rent: 'var(--blue)', bond: 'var(--teal)', repair: 'var(--amber)', utility: '#F59E0B', internet: '#6366F1', insurance: '#10B981', other: 'var(--muted)'}[r.type] || 'var(--muted)';
+      html += '<div class="folder-card" style="margin-bottom:10px;flex-direction:column;align-items:flex-start;gap:10px">' +
         '<div style="display:flex;align-items:center;gap:12px;width:100%">' +
         '<div style="width:44px;height:44px;border-radius:12px;background:' + typeColor.replace(')', '').replace('var(--', 'rgba(') + ',.15);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">' + typeIcon + '</div>' +
         '<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">' + (r.description || 'Receipt') + '</div>' +
         '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">' + date + (r.amount ? ' · $' + r.amount : '') + '</div></div>' +
-        '<span style="font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;color:' + typeColor + ';background:' + typeColor.replace(')', '').replace('var(--', 'rgba(') + ',.1);border-radius:8px;padding:4px 10px;text-transform:capitalize">' + (r.type || 'Other') + '</span></div>' +
-        '</div>';
+        '<span style="font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;color:' + typeColor + ';background:' + typeColor.replace(')', '').replace('var(--', 'rgba(') + ',.1);border-radius:8px;padding:4px 10px;text-transform:capitalize">' + (r.type || 'Other') + '</span></div>';
+      if (r.photo) {
+        html += '<div style="padding-left:56px"><img src="' + r.photo + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="window.open(this.src)"></div>';
+      }
+      html += '</div>';
     });
     list.innerHTML = html;
     var sub = document.getElementById('receiptsSubtitle');
