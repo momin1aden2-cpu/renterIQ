@@ -82,14 +82,7 @@
   <div class="rh-title">Renter Rights Hub</div>
   <div class="rh-sub">Free help in every state and territory</div>
   <div class="pill-row" id="pillRow">
-    <div class="state-pill" id="pill-NSW" onclick="scrollToState('NSW')">NSW</div>
-    <div class="state-pill" id="pill-VIC" onclick="scrollToState('VIC')" style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);color:var(--blue);border:none">VIC</div>
-    <div class="state-pill" id="pill-QLD" onclick="scrollToState('QLD')">QLD</div>
-    <div class="state-pill" id="pill-WA" onclick="scrollToState('WA')">WA</div>
-    <div class="state-pill" id="pill-SA" onclick="scrollToState('SA')">SA</div>
-    <div class="state-pill" id="pill-TAS" onclick="scrollToState('TAS')">TAS</div>
-    <div class="state-pill" id="pill-ACT" onclick="scrollToState('ACT')">ACT</div>
-    <div class="state-pill" id="pill-NT" onclick="scrollToState('NT')">NT</div>
+    <!-- Pills will be dynamically inserted here with user's state first -->
   </div>
   <!-- USER STATE DISPLAY (Sticky with header) -->
   <div class="user-state-bar" id="userStateBar">
@@ -529,10 +522,33 @@ function updateUserStateDisplay(){
   if(displayEl){
     displayEl.innerHTML='You\'re in <strong>'+state+'</strong>';
   }
+  // Render pills with user state first
+  renderPills(state);
   // Set active state to user's state
   updatePills(state);
   // Scroll to user's state section
   setTimeout(function(){scrollToState(state)},500);
+}
+
+function renderPills(userState){
+  var pillRow = document.getElementById('pillRow');
+  if(!pillRow) return;
+  // Clear existing
+  pillRow.innerHTML = '';
+  // Put user state first, then others
+  var orderedStates = [userState];
+  states.forEach(function(s){
+    if(s !== userState) orderedStates.push(s);
+  });
+  // Create pills
+  orderedStates.forEach(function(s){
+    var pill = document.createElement('div');
+    pill.className = 'state-pill';
+    pill.id = 'pill-' + s;
+    pill.textContent = s;
+    pill.onclick = function(){ scrollToState(s); };
+    pillRow.appendChild(pill);
+  });
 }
 
 function changeUserState(){
