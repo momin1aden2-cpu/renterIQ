@@ -5,7 +5,7 @@
 (function () {
   var NAV_ITEMS = [
     { label: 'Home',          icon: '🏠', path: '/app/index.html' },
-    { label: 'Smart Search',  icon: '🔍', path: '/app/pages/smart-search.html' },
+    { label: 'Smart Search',  icon: '🔍', path: '/app/pages/search.html' },
     { label: 'Inspect',       icon: '📋', path: '/app/pages/inspection.html' },
     { label: 'Vault',         icon: '🗂️', path: '/app/pages/vault.html' },
   ];
@@ -23,6 +23,8 @@
   function isActive(itemPath) {
     var p = currentPath();
     if (itemPath === '/app/index.html' && (p === '/app' || p === '/app/')) return true;
+    // Smart Search is active for both search.html and tracked.html
+    if (itemPath === '/app/pages/search.html' && (p.indexOf('/search') !== -1 || p.indexOf('/tracked') !== -1)) return true;
     return p.endsWith(itemPath.replace('/app', '')) || p === itemPath;
   }
 
@@ -182,6 +184,8 @@
       '/app/pages/smart-search.html': '/smart-search',
       '/app/pages/inspection.html': '/inspect',
       '/app/pages/vault.html': '/vault',
+      '/app/pages/search.html': '/search',
+      '/app/pages/tracked.html': '/tracked',
       '/app/pages/lease.html': '/lease',
       '/app/pages/rights.html': '/rights',
       '/app/pages/exit.html': '/exit',
