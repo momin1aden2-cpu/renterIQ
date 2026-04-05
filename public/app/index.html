@@ -61,6 +61,72 @@
 .prop-actions{display:flex;gap:8px}
 .prop-actions .btn{flex:1;border-radius:10px;padding:10px 6px;font-size:12px;min-height:44px}
 
+/* Inline Search Widget */
+.search-card{background:#fff;border-radius:22px;padding:18px 16px;box-shadow:0 2px 8px rgba(27,80,200,.06),0 8px 32px rgba(27,80,200,.12);position:relative;z-index:5}
+.sc-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.sc-input-wrap{position:relative}
+.sc-input-row{display:flex;align-items:center;gap:10px;background:var(--blue-xl);border:1.5px solid var(--border-lt);border-radius:14px;padding:11px 14px;transition:border-color .18s}
+.sc-input-row:focus-within{border-color:var(--blue)}
+.sc-icon{font-size:17px;flex-shrink:0;color:var(--muted)}
+.sc-input{flex:1;border:none;outline:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);min-width:0}
+.sc-input::placeholder{color:var(--muted)}
+.sc-clear{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;display:none;line-height:1}
+.sc-drop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border-radius:14px;border:1.5px solid var(--border-lt);box-shadow:0 8px 32px rgba(27,80,200,.14);z-index:50;overflow:hidden;display:none;max-height:260px;overflow-y:auto}
+.sc-drop.open{display:block;animation:scDrop .14s ease}
+@keyframes scDrop{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+.sc-item{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--border-lt);transition:background .1s}
+.sc-item:last-child{border-bottom:none}
+.sc-item:active,.sc-item:hover{background:var(--blue-xl)}
+.sc-item-icon{width:30px;height:30px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sc-item-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1}
+.sc-item-meta{font-size:11px;color:var(--muted);text-align:right;flex-shrink:0}
+.sc-empty{padding:14px;text-align:center;font-size:13px;color:var(--muted);font-weight:600}
+.sc-providers{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.sc-provider{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--blue-xl);border:1.5px solid var(--border-lt);border-radius:14px;text-decoration:none;transition:all .18s;-webkit-tap-highlight-color:transparent}
+.sc-provider:active{transform:scale(.97)}
+.sc-prov-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sc-prov-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1}
+.sc-prov-desc{font-size:11px;color:var(--muted);margin-top:1px}
+.sc-prov-arrow{color:var(--muted);font-size:16px;flex-shrink:0}
+
+/* Track URL Box */
+.track-url-box{margin-top:12px;padding-top:12px;border-top:1px solid var(--border-lt)}
+.track-url-row{display:flex;gap:8px;margin-top:8px}
+.track-url-input{flex:1;padding:10px 12px;border:1.5px solid var(--border-lt);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);background:var(--blue-xl);outline:none;min-width:0}
+.track-url-input:focus{border-color:var(--blue);background:#fff}
+.track-url-btn{padding:10px 14px;border-radius:10px;border:none;background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s;min-height:44px}
+.track-url-btn:active{background:var(--teal-dk)}
+/* Tracked Property Cards */
+.tracked-card{background:#fff;border-radius:18px;overflow:hidden;transition:all .18s var(--ease-smooth)}
+.tc-header{display:flex;align-items:center;gap:10px;padding:14px 14px 10px}
+.tc-source-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tc-body{flex:1;min-width:0}
+.tc-addr{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-suburb{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.tc-status{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;letter-spacing:.5px;border-radius:100px;padding:4px 10px;white-space:nowrap;flex-shrink:0;text-transform:uppercase}
+.tc-insp-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(27,80,200,.03);border-top:1px solid var(--border-lt)}
+.tc-insp-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue-dk)}
+.tc-insp-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:1px}
+.tc-date-form{padding:12px 14px;border-top:1px solid var(--border-lt);background:var(--blue-xl)}
+.tc-date-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tc-date-input{flex:1;padding:10px 12px;border:1.5px solid var(--border-lt);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);background:#fff;outline:none;min-width:120px}
+.tc-date-input:focus{border-color:var(--blue)}
+.tc-date-save{padding:10px 16px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;flex-shrink:0;min-height:44px}
+.tc-actions{display:flex;gap:8px;padding:0 14px 14px}
+.tc-btn-primary{flex:1;padding:10px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:background .15s;min-height:44px}
+.tc-btn-primary:active{background:var(--blue-md)}
+.tc-btn-ghost{flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border-lt);background:#fff;color:var(--muted);font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;min-height:44px}
+.tc-btn-ghost:active{border-color:var(--blue);color:var(--blue)}
+.tc-link{font-size:11px;color:var(--blue);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:4px;padding:0 14px 12px}
+/* Reminder Banner */
+.reminder-banner{background:linear-gradient(135deg,var(--blue-dk),var(--blue));border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.rb-icon{font-size:22px;flex-shrink:0}
+.rb-body{flex:1;min-width:0}
+.rb-text{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rb-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);margin-top:2px}
+.rb-btn{padding:9px 14px;border-radius:10px;border:none;background:rgba(255,255,255,.2);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;min-height:44px}
+.rb-btn:active{background:rgba(255,255,255,.3)}
+
 /* Section Row */
 .sec-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .sec-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
@@ -190,10 +256,6 @@
         <span class="ds-tab-icon">🏠</span>
         Home
       </button>
-      <button class="ds-tab" onclick="navigate('/app/pages/search.html')">
-        <span class="ds-tab-icon">🔍</span>
-        Smart Search
-      </button>
       <button class="ds-tab" onclick="navigate('/app/pages/inspection.html')">
         <span class="ds-tab-icon">📋</span>
         Inspect
@@ -269,41 +331,71 @@
       </a>
       <div class="hdr-actions">
         <span class="hdr-bell" role="button" aria-label="Notifications" onclick="navigate('/app/pages/notifications.html')">🔔</span>
-        <div class="hdr-avatar" onclick="navigate('/app/pages/profile.html')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       </div>
     </div>
     <div class="hdr-title" id="greeting" style="font-size:24px;font-weight:800;margin-top:10px">Good morning</div>
     <div class="hdr-sub" id="currentDate" style="font-weight:600;margin-top:3px">Ready to rent smart</div>
   </header>
 
-  <!-- Content -->
   <div class="content">
 
-    <!-- Active Property -->
+    <!-- Inline Search Widget -->
     <div style="padding:0 16px;margin-top:-18px;position:relative;z-index:5">
-      <div class="prop-card">
-        <div class="prop-top">
-          <span class="prop-label">ACTIVE PROPERTY</span>
+      <div class="search-card">
+        <div class="sc-label">Find a Rental</div>
+        <div class="sc-input-wrap">
+          <div class="sc-input-row">
+            <span class="sc-icon">🔍</span>
+            <input class="sc-input" id="homeSearchInput" type="text" placeholder="Search suburb, postcode or area…" autocomplete="off" autocorrect="off" spellcheck="false" oninput="homeHandleInput(this.value)">
+            <button class="sc-clear" id="homeSearchClear" onclick="homeClearSearch()">✕</button>
+          </div>
+          <div class="sc-drop" id="homeSearchDrop"></div>
         </div>
-        <div class="prop-addr" style="color:var(--muted);font-size:14px;font-weight:600;margin-top:8px">No active property yet</div>
-        <div class="prop-meta">Search for a rental and save it to get started.</div>
-        <div class="prop-divider"></div>
-        <div class="prop-actions">
-          <button class="btn btn-blue" onclick="navigate('/app/pages/search.html')">� Search Rentals</button>
+        <div id="homeProviders" class="sc-providers" style="display:none"></div>
+        <!-- Track URL Box -->
+        <div id="homeTrackBox" class="track-url-box" style="display:none">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase">🔗 Track a Property</div>
+          <div class="track-url-row">
+            <input class="track-url-input" id="homeTrackUrl" type="url" placeholder="Paste property URL here…">
+            <button class="track-url-btn" onclick="homeTrackProperty()">Save</button>
+          </div>
+          <div id="homeTrackHint" style="font-size:11px;color:var(--muted);margin-top:7px;font-weight:600;line-height:1.55">💡 Open a listing on any site above, copy its URL and paste here to track it in RenterIQ.</div>
         </div>
       </div>
+    </div>
+
+    <!-- Inspection Reminder Banner (shown when inspection is within 24h) -->
+    <div id="reminderBanner" style="padding:0 16px;margin-top:16px;display:none">
+      <div class="reminder-banner">
+        <span class="rb-icon">🔔</span>
+        <div class="rb-body">
+          <div class="rb-text" id="rbText">Inspection soon</div>
+          <div class="rb-sub" id="rbSub"></div>
+        </div>
+        <button class="rb-btn" id="rbBtn">Start Audit →</button>
+      </div>
+    </div>
+
+    <!-- My Tracked Properties -->
+    <div id="trackedSection" style="padding:20px 16px 0;display:none">
+      <div class="sec-row">
+        <span class="sec-title">My Tracked Properties</span>
+        <span id="trackedCount" style="font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--muted)"></span>
+      </div>
+      <div id="trackedList" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
     <!-- Upcoming Inspections -->
     <div style="padding:20px 16px 0">
       <div class="sec-row">
         <span class="sec-title">Upcoming Inspections</span>
-        <span class="sec-link" onclick="navigate('/app/pages/search.html')">Find one →</span>
       </div>
-      <div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:24px 16px;text-align:center;color:var(--muted)">
-        <div style="font-size:32px;margin-bottom:8px">�</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:4px">No inspections booked yet</div>
-        <div style="font-size:12px">Book an inspection from the Search tab to see it here.</div>
+      <div id="upcomingInspContainer">
+        <div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:24px 16px;text-align:center;color:var(--muted)">
+          <div style="font-size:32px;margin-bottom:8px">📅</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:4px">No inspections booked yet</div>
+          <div style="font-size:12px">Track a property above and set an inspection date.</div>
+        </div>
       </div>
     </div>
 
@@ -338,7 +430,7 @@
     <div id="maintenanceCard" style="display:none;padding:16px 16px 0"></div>
 
     <!-- Lease Review -->
-    <div style="margin:12px 16px 12px" onclick="navigate('/app/pages/lease.html')" style="cursor:pointer">
+    <div style="margin:12px 16px 12px" onclick="navigate('/app/pages/lease.html')">
       <div style="background:#fff;border:1.5px solid var(--blue-lt);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(27,80,200,.08);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''" onclick="navigate('/app/pages/lease.html')">
         <div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📑</div>
         <div style="flex:1;min-width:0">
@@ -402,10 +494,6 @@
       <div class="tab-icon">🏠</div>
       <span class="tab-label">Home</span>
     </button>
-    <button class="nav-tab" onclick="navigate('/app/pages/search.html')">
-      <div class="tab-icon">🔍</div>
-      <span class="tab-label">Search</span>
-    </button>
     <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')">
       <div class="tab-icon">📋</div>
       <span class="tab-label">Inspect</span>
@@ -417,10 +505,10 @@
   </nav>
 
   <!-- Update Bar -->
-    <div class="update-bar" id="updateBar">
-      <span>RenterIQ has been updated.</span>
-      <button onclick="applyUpdate()">Reload</button>
-    </div>
+  <div class="update-bar" id="updateBar">
+    <span>RenterIQ has been updated.</span>
+    <button onclick="applyUpdate()">Reload</button>
+  </div>
 
   </div><!-- /app-main -->
 </div><!-- /app-shell -->
@@ -700,6 +788,399 @@ function doAppSignOut() {
     window.location.href = '/';
   }
 }
+
+// ========== INLINE SEARCH WIDGET ==========
+var homeSuburbsData = [];
+var homeSelectedSuburb = null;
+
+var HOME_PROVIDERS = [
+  { key: 'realestate', name: 'realestate.com.au', icon: '🏠', desc: "Australia's largest property site", color: '#0066CC' },
+  { key: 'domain',     name: 'Domain.com.au',     icon: '🔷', desc: 'Premium listings & market data',  color: '#2E3192' },
+  { key: 'reiwa',      name: 'REIWA',             icon: '🏘️', desc: 'WA specialists',                  color: '#E60028', waOnly: true },
+  { key: 'rent',       name: 'Rent.com.au',       icon: '🔑', desc: 'Simple rental search',            color: '#FF6B35' }
+];
+
+async function homeLoadSuburbs() {
+  try {
+    var res = await fetch('/data/suburbs.json');
+    var data = await res.json();
+    var raw = data.suburbs || [];
+    var seen = {};
+    homeSuburbsData = raw.reduce(function(acc, s) {
+      var key = s.name.toLowerCase() + '|' + s.state.toLowerCase();
+      var pc = parseInt(s.postcode, 10) || 0;
+      if (!seen[key]) { seen[key] = { index: acc.length, postcode: pc }; acc.push(s); }
+      else if (pc < seen[key].postcode) { acc[seen[key].index] = s; seen[key].postcode = pc; }
+      return acc;
+    }, []);
+  } catch(e) { homeSuburbsData = []; }
+}
+
+function homeFindSuburbs(q) {
+  if (!homeSuburbsData.length) return [];
+  var ql = q.toLowerCase().trim();
+  var matches = homeSuburbsData.filter(function(s) {
+    return s.name.toLowerCase().includes(ql) || s.postcode.toString().includes(ql);
+  });
+  matches.sort(function(a, b) {
+    var an = a.name.toLowerCase(), bn = b.name.toLowerCase();
+    if (an === ql && bn !== ql) return -1;
+    if (bn === ql && an !== ql) return 1;
+    var as = an.startsWith(ql), bs = bn.startsWith(ql);
+    if (as && !bs) return -1;
+    if (bs && !as) return 1;
+    return an.length - bn.length;
+  });
+  return matches.slice(0, 10);
+}
+
+function homeHandleInput(val) {
+  var drop = document.getElementById('homeSearchDrop');
+  var clear = document.getElementById('homeSearchClear');
+  if (clear) clear.style.display = val.length ? 'block' : 'none';
+  if (val.trim().length < 2) { if (drop) { drop.innerHTML = ''; drop.classList.remove('open'); } return; }
+  var matches = homeFindSuburbs(val);
+  if (!matches.length) {
+    drop.innerHTML = '<div class="sc-empty">No suburbs found — try a different search</div>';
+    drop.classList.add('open');
+    return;
+  }
+  drop.innerHTML = matches.map(function(s) {
+    return '<div class="sc-item" onclick="homeSelectSuburb(\'' + s.name.replace(/'/g,"&#39;") + '\',\'' + s.postcode + '\',\'' + s.state + '\')">' +
+      '<div class="sc-item-icon">📍</div>' +
+      '<span class="sc-item-name">' + s.name + '</span>' +
+      '<span class="sc-item-meta">' + s.state + ' · ' + s.postcode + '</span>' +
+      '</div>';
+  }).join('');
+  drop.classList.add('open');
+}
+
+function homeSelectSuburb(name, postcode, state) {
+  homeSelectedSuburb = { name: name, postcode: postcode, state: state };
+  var inp = document.getElementById('homeSearchInput');
+  if (inp) inp.value = name + ', ' + state + ' ' + postcode;
+  var drop = document.getElementById('homeSearchDrop');
+  if (drop) { drop.innerHTML = ''; drop.classList.remove('open'); }
+  homeShowProviders(name, postcode, state);
+}
+
+function homeGenerateUrls(name, state, postcode) {
+  var slug = name.toLowerCase().replace(/\s+/g, '-');
+  var st = (state || 'wa').toLowerCase();
+  var pc = postcode.toString().trim();
+  return {
+    realestate: 'https://www.realestate.com.au/rent/in-' + slug + ',+' + st + '+' + pc + '/list-1',
+    domain:     'https://www.domain.com.au/rent/' + slug + '-' + st + '-' + pc + '/',
+    reiwa:      state === 'WA' ? 'https://reiwa.com.au/rental-properties/' + slug + '-' + pc + '/' : '',
+    rent:       'https://www.rent.com.au/rentals/' + slug + '-' + st + '-' + pc
+  };
+}
+
+function homeShowProviders(name, postcode, state) {
+  var urls = homeGenerateUrls(name, state, postcode);
+  var box = document.getElementById('homeProviders');
+  if (!box) return;
+  var html = '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;margin-top:4px">Browse listings in ' + name + '</div>';
+  HOME_PROVIDERS.forEach(function(p) {
+    if (p.waOnly && state !== 'WA') return;
+    var url = urls[p.key];
+    if (!url) return;
+    html += '<a href="' + url + '" target="_blank" rel="noopener" class="sc-provider">' +
+      '<div class="sc-prov-icon" style="background:' + p.color + '22">' + p.icon + '</div>' +
+      '<div style="flex:1;min-width:0"><div class="sc-prov-name">' + p.name + '</div><div class="sc-prov-desc">' + p.desc + '</div></div>' +
+      '<span class="sc-prov-arrow">›</span>' +
+      '</a>';
+  });
+  box.innerHTML = html;
+  box.style.display = 'flex';
+  var tb = document.getElementById('homeTrackBox');
+  if (tb) tb.style.display = 'block';
+}
+
+function homeClearSearch() {
+  homeSelectedSuburb = null;
+  var inp = document.getElementById('homeSearchInput');
+  if (inp) { inp.value = ''; inp.focus(); }
+  var drop = document.getElementById('homeSearchDrop');
+  if (drop) { drop.innerHTML = ''; drop.classList.remove('open'); }
+  var box = document.getElementById('homeProviders');
+  if (box) { box.innerHTML = ''; box.style.display = 'none'; }
+  var clear = document.getElementById('homeSearchClear');
+  if (clear) clear.style.display = 'none';
+  var tb = document.getElementById('homeTrackBox');
+  if (tb) tb.style.display = 'none';
+  var tu = document.getElementById('homeTrackUrl');
+  if (tu) tu.value = '';
+  var hint = document.getElementById('homeTrackHint');
+  if (hint) { hint.textContent = '💡 Open a listing on any site above, copy its URL and paste here to track it in RenterIQ.'; hint.style.color = ''; }
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.sc-input-wrap')) {
+    var drop = document.getElementById('homeSearchDrop');
+    if (drop) { drop.classList.remove('open'); }
+  }
+});
+
+homeLoadSuburbs();
+
+// ========== PROPERTY TRACKING ==========
+var TRACKED_KEY = 'renteriq_tracked_properties';
+
+function homeGetTracked() {
+  try { return JSON.parse(localStorage.getItem(TRACKED_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function homeSaveTrackedAll(props) {
+  localStorage.setItem(TRACKED_KEY, JSON.stringify(props));
+}
+
+function homeDetectSource(url) {
+  if (url.includes('realestate.com.au')) return { key:'realestate', name:'realestate.com.au', icon:'🏠', color:'#0066CC' };
+  if (url.includes('domain.com.au'))     return { key:'domain',     name:'Domain.com.au',     icon:'🔷', color:'#2E3192' };
+  if (url.includes('reiwa.com.au'))      return { key:'reiwa',      name:'REIWA',             icon:'🏘️', color:'#E60028' };
+  if (url.includes('rent.com.au'))       return { key:'rent',       name:'Rent.com.au',       icon:'🔑', color:'#FF6B35' };
+  return { key:'other', name:'Property Listing', icon:'🏡', color:'#5A6B8A' };
+}
+
+function homeExtractLabel(url) {
+  try {
+    var parts = new URL(url).pathname.split('/').filter(Boolean);
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var p = parts[i];
+      if (p && p.length > 5 && /[a-z]/i.test(p) && /\d/.test(p)) {
+        return p.replace(/-/g,' ').replace(/\b\w/g,function(l){return l.toUpperCase();});
+      }
+    }
+    for (var j = 0; j < parts.length; j++) {
+      var q = parts[j];
+      if (q && q.length > 5 && /[a-z]/i.test(q)) {
+        return q.replace(/-/g,' ').replace(/\b\w/g,function(l){return l.toUpperCase();});
+      }
+    }
+    return 'Property Listing';
+  } catch(e) { return 'Property Listing'; }
+}
+
+function homeTrackProperty() {
+  var urlEl = document.getElementById('homeTrackUrl');
+  var url = urlEl ? urlEl.value.trim() : '';
+  if (!url) { homeTrackMsg('Please paste a property URL', true); return; }
+  try { new URL(url); } catch(e) { homeTrackMsg('Please enter a valid URL (start with https://)', true); return; }
+  var existing = homeGetTracked();
+  if (existing.some(function(p){ return p.url === url; })) { homeTrackMsg('This property is already tracked', true); return; }
+  var src = homeDetectSource(url);
+  var prop = {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+    url: url,
+    label: homeExtractLabel(url),
+    suburb: homeSelectedSuburb ? homeSelectedSuburb.name    : '',
+    state:  homeSelectedSuburb ? homeSelectedSuburb.state   : '',
+    postcode: homeSelectedSuburb ? homeSelectedSuburb.postcode : '',
+    source: src.key, sourceName: src.name, sourceIcon: src.icon, sourceColor: src.color,
+    savedAt: new Date().toISOString(),
+    status: 'tracked',
+    inspectionDate: '', inspectionTime: ''
+  };
+  existing.push(prop);
+  homeSaveTrackedAll(existing);
+  if (urlEl) urlEl.value = '';
+  homeTrackMsg('✅ Property saved! Set an inspection date on its card below.', false);
+  homeRenderTracked();
+  homeRenderUpcoming();
+}
+
+function homeTrackMsg(msg, isErr) {
+  var hint = document.getElementById('homeTrackHint');
+  if (!hint) return;
+  hint.textContent = msg;
+  hint.style.color = isErr ? '#E84040' : 'var(--teal-dk)';
+  clearTimeout(hint._t);
+  hint._t = setTimeout(function(){
+    hint.textContent = '💡 Open a listing on any site above, copy its URL and paste here to track it in RenterIQ.';
+    hint.style.color = '';
+  }, 4000);
+}
+
+function homeDeleteTracked(id) {
+  homeSaveTrackedAll(homeGetTracked().filter(function(p){ return p.id !== id; }));
+  homeRenderTracked();
+  homeRenderUpcoming();
+}
+
+function homeToggleDateForm(id) {
+  var f = document.getElementById('tc-date-' + id);
+  if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+function homeSaveInspection(id) {
+  var d = document.getElementById('tc-d-' + id);
+  var t = document.getElementById('tc-t-' + id);
+  if (!d || !d.value) return;
+  var props = homeGetTracked().map(function(p) {
+    return p.id === id ? Object.assign({}, p, { inspectionDate: d.value, inspectionTime: t ? t.value : '', status: 'inspection_booked' }) : p;
+  });
+  homeSaveTrackedAll(props);
+  homeRenderTracked();
+  homeRenderUpcoming();
+  homeCheckReminders();
+}
+
+function homeStartAudit(id) {
+  var props = homeGetTracked();
+  var prop = props.filter(function(p){ return p.id === id; })[0];
+  if (prop) {
+    try { localStorage.setItem('riq-active-property', JSON.stringify(prop)); } catch(e) {}
+    homeSaveTrackedAll(props.map(function(p){
+      return p.id === id ? Object.assign({}, p, { status: 'inspecting' }) : p;
+    }));
+  }
+  navigate('/app/pages/inspection.html');
+}
+
+function homeStatusStyle(status) {
+  var s = {
+    tracked:          { label:'Saved',           bg:'rgba(90,107,138,.1)',   color:'var(--muted)' },
+    inspection_booked:{ label:'Inspection Set',  bg:'rgba(27,80,200,.1)',    color:'var(--blue)' },
+    inspecting:       { label:'Inspecting',      bg:'rgba(0,200,150,.1)',    color:'var(--teal-dk)' },
+    leasing:          { label:'Reviewing Lease', bg:'rgba(245,166,35,.1)',   color:'#7A5500' },
+    moved_in:         { label:'Moved In',        bg:'rgba(0,200,150,.15)',   color:'var(--teal-dk)' }
+  };
+  return s[status] || s.tracked;
+}
+
+function homeInspDisplay(date, time) {
+  if (!date) return '';
+  try {
+    var d = new Date(date + (time ? 'T'+time : 'T09:00'));
+    var diff = Math.ceil((d - new Date()) / 864e5);
+    var day = diff === 0 ? 'Today' : diff === 1 ? 'Tomorrow' : diff < 0 ? 'Past' : 'In '+diff+' days';
+    var ts = '';
+    if (time) {
+      var parts = time.split(':'), h = parseInt(parts[0]), m = parts[1];
+      ts = ' at ' + (h%12||12) + ':' + m + (h>=12?'pm':'am');
+    }
+    return day + ts;
+  } catch(e) { return date; }
+}
+
+function homeIsUrgent(date, time) {
+  if (!date) return false;
+  try {
+    var d = new Date(date + (time ? 'T'+time : 'T09:00'));
+    var diff = Math.ceil((d - new Date()) / 864e5);
+    return diff >= 0 && diff <= 1;
+  } catch(e) { return false; }
+}
+
+function homeRenderTracked() {
+  var props = homeGetTracked();
+  var section = document.getElementById('trackedSection');
+  var list    = document.getElementById('trackedList');
+  var count   = document.getElementById('trackedCount');
+  if (!section || !list) return;
+  if (!props.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  if (count) count.textContent = props.length + (props.length === 1 ? ' property' : ' properties');
+  list.innerHTML = props.map(function(p) {
+    var st  = homeStatusStyle(p.status);
+    var urg = homeIsUrgent(p.inspectionDate, p.inspectionTime);
+    var dispDate = p.inspectionDate ? homeInspDisplay(p.inspectionDate, p.inspectionTime) : '';
+    var border = urg ? 'border:1.5px solid var(--blue-lt);box-shadow:0 0 0 3px rgba(27,80,200,.07)' : 'border:1px solid var(--border-lt)';
+    var inspRow = p.inspectionDate
+      ? '<div class="tc-insp-row">' +
+          '<span style="font-size:16px">' + (urg ? '🔔' : '📅') + '</span>' +
+          '<div><div class="tc-insp-text">' + dispDate + '</div>' +
+          '<div class="tc-insp-sub">Inspection ' + (urg ? '— very soon!' : 'booked') + '</div></div>' +
+        '</div>'
+      : '';
+    var dateForm =
+      '<div class="tc-date-form" id="tc-date-' + p.id + '" style="display:none">' +
+        '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:2px">Set Inspection Date & Time</div>' +
+        '<div class="tc-date-row">' +
+          '<input class="tc-date-input" type="date" id="tc-d-' + p.id + '" value="' + (p.inspectionDate||'') + '" min="' + new Date().toISOString().split('T')[0] + '">' +
+          '<input class="tc-date-input" type="time" id="tc-t-' + p.id + '" value="' + (p.inspectionTime||'') + '" style="max-width:130px">' +
+          '<button class="tc-date-save" onclick="homeSaveInspection(\''+p.id+'\')">✓ Save</button>' +
+        '</div>' +
+      '</div>';
+    var primaryBtn = (p.status === 'inspecting')
+      ? '<button class="tc-btn-primary" onclick="homeStartAudit(\''+p.id+'\')">📋 Continue Audit</button>'
+      : '<button class="tc-btn-primary" onclick="homeToggleDateForm(\''+p.id+'\')">' + (p.inspectionDate ? '📅 Change Date' : '📅 Book Inspection') + '</button>';
+    var auditBtn = (p.status !== 'inspecting')
+      ? '<button class="tc-btn-ghost" onclick="homeStartAudit(\''+p.id+'\')">📋 Start Audit</button>'
+      : '';
+    return '<div class="tracked-card" style="' + border + '">' +
+      '<div class="tc-header">' +
+        '<div class="tc-source-icon" style="background:' + p.sourceColor + '22">' + p.sourceIcon + '</div>' +
+        '<div class="tc-body">' +
+          '<div class="tc-addr">' + p.label + '</div>' +
+          '<div class="tc-suburb">' + [p.suburb, p.state, p.postcode].filter(Boolean).join(' · ') + '</div>' +
+        '</div>' +
+        '<span class="tc-status" style="background:'+st.bg+';color:'+st.color+'">' + st.label + '</span>' +
+      '</div>' +
+      inspRow + dateForm +
+      '<div class="tc-actions">' +
+        primaryBtn + auditBtn +
+        '<button class="tc-btn-ghost" style="flex:0;min-width:44px;padding:10px 0" title="Remove" onclick="homeDeleteTracked(\''+p.id+'\')">&#10005;</button>' +
+      '</div>' +
+      '<a href="' + p.url + '" target="_blank" rel="noopener" class="tc-link">' + p.sourceName + ' <span style="font-size:10px">↗</span></a>' +
+    '</div>';
+  }).join('');
+}
+
+function homeRenderUpcoming() {
+  var container = document.getElementById('upcomingInspContainer');
+  if (!container) return;
+  var props = homeGetTracked().filter(function(p){ return p.inspectionDate; });
+  props.sort(function(a,b){ return new Date(a.inspectionDate) - new Date(b.inspectionDate); });
+  if (!props.length) {
+    container.innerHTML =
+      '<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:24px 16px;text-align:center;color:var(--muted)">' +
+        '<div style="font-size:32px;margin-bottom:8px">📅</div>' +
+        '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:4px">No inspections booked yet</div>' +
+        '<div style="font-size:12px">Track a property above and set an inspection date.</div>' +
+      '</div>';
+    return;
+  }
+  container.innerHTML = '<div class="insp-scroll">' + props.map(function(p) {
+    var urg  = homeIsUrgent(p.inspectionDate, p.inspectionTime);
+    var disp = homeInspDisplay(p.inspectionDate, p.inspectionTime);
+    return '<div class="insp-card' + (urg?' today':'') + '">' +
+      '<div class="ic-top">' +
+        '<div class="ic-left"><span class="pulse-dot" style="' + (urg?'':'background:var(--muted)') + '"></span>' +
+          '<span class="ic-label' + (urg?'':' muted') + '">' + (urg?'SOON':'BOOKED') + '</span></div>' +
+        '<span class="ic-time-right' + (urg?'':' muted') + '">' + (p.inspectionTime||'') + '</span>' +
+      '</div>' +
+      '<div class="ic-addr">' + p.label + '</div>' +
+      '<div class="ic-time">' + p.suburb + (p.state?' · '+p.state:'') + '</div>' +
+      '<div class="ic-features"><span>' + disp + '</span></div>' +
+      '<button class="btn btn-blue" style="width:100%;margin-top:10px;border-radius:9px;padding:9px;font-size:12px;min-height:44px" onclick="homeStartAudit(\''+p.id+'\')">📋 Start Audit</button>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function homeCheckReminders() {
+  var urgent = homeGetTracked().filter(function(p){
+    return p.inspectionDate && homeIsUrgent(p.inspectionDate, p.inspectionTime);
+  });
+  var banner = document.getElementById('reminderBanner');
+  if (!banner) return;
+  if (!urgent.length) { banner.style.display = 'none'; return; }
+  var p = urgent[0];
+  var rbText = document.getElementById('rbText');
+  var rbSub  = document.getElementById('rbSub');
+  var rbBtn  = document.getElementById('rbBtn');
+  if (rbText) rbText.textContent = p.label;
+  if (rbSub)  rbSub.textContent  = '📅 ' + homeInspDisplay(p.inspectionDate, p.inspectionTime) + ' — tap to start your audit';
+  if (rbBtn)  rbBtn.onclick = function(){ homeStartAudit(p.id); };
+  banner.style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  homeRenderTracked();
+  homeRenderUpcoming();
+  homeCheckReminders();
+});
 </script>
 <script src="/app/js/sidebar.js"></script>
 </body>
