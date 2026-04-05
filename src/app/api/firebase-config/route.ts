@@ -13,6 +13,7 @@ export async function GET() {
     {
       headers: {
         'Content-Type': 'application/javascript',
+        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
       },
     }
   );

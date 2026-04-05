@@ -92,6 +92,37 @@
   </div>
 </header>
 
+<!-- USER STATE DISPLAY -->
+<div style="background:linear-gradient(135deg,var(--blue),var(--blue-md));margin:16px;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span style="font-size:24px">📍</span>
+    <div>
+      <div id="userStateDisplay" style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff">You're in <strong>VIC</strong></div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.7);margin-top:2px">Tap to change</div>
+    </div>
+  </div>
+  <button onclick="changeUserState()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent">Change</button>
+</div>
+
+<!-- STATE SELECTION MODAL -->
+<div id="stateSelectModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--blue-xl);border-radius:20px;padding:24px;max-width:400px;width:100%">
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:16px">Select Your State</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px">Choose your state to see relevant tenancy information</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <button onclick="saveUserState('NSW')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">NSW</button>
+      <button onclick="saveUserState('VIC')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">VIC</button>
+      <button onclick="saveUserState('QLD')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">QLD</button>
+      <button onclick="saveUserState('WA')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">WA</button>
+      <button onclick="saveUserState('SA')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">SA</button>
+      <button onclick="saveUserState('TAS')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">TAS</button>
+      <button onclick="saveUserState('ACT')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">ACT</button>
+      <button onclick="saveUserState('NT')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">NT</button>
+    </div>
+    <button onclick="closeStateSelect()" style="background:transparent;color:var(--muted);border:none;border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:16px;width:100%">Cancel</button>
+  </div>
+</div>
+
 <!-- INTRO CARD -->
 <div style="margin:16px;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
   <div style="display:flex;gap:12px;align-items:center">
@@ -464,6 +495,67 @@ function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=doc
 // State Selector
 var states=['NSW','VIC','QLD','WA','SA','TAS','ACT','NT'];
 var activeState='VIC';
+var userState=null;
+
+// Detect user state
+function detectUserState(){
+  // Try to get state from localStorage first
+  var savedState=localStorage.getItem('renteriq_user_state');
+  if(savedState && states.indexOf(savedState.toUpperCase())!==-1){
+    userState=savedState.toUpperCase();
+  }else{
+    // Default to browser timezone detection
+    var timezone=Intl.DateTimeFormat().resolvedOptions().timeZone;
+    var stateMap={
+      'Australia/Sydney':'NSW',
+      'Australia/Melbourne':'VIC',
+      'Australia/Brisbane':'QLD',
+      'Australia/Perth':'WA',
+      'Australia/Adelaide':'SA',
+      'Australia/Hobart':'TAS',
+      'Australia/Canberra':'ACT',
+      'Australia/Darwin':'NT'
+    };
+    userState=stateMap[timezone]||'VIC'; // Default to VIC
+    // Save detected state
+    localStorage.setItem('renteriq_user_state',userState);
+  }
+  return userState;
+}
+
+function updateUserStateDisplay(){
+  var state=detectUserState();
+  var displayEl=document.getElementById('userStateDisplay');
+  if(displayEl){
+    displayEl.innerHTML='You\'re in <strong>'+state+'</strong>';
+  }
+  // Set active state to user's state
+  updatePills(state);
+  // Scroll to user's state section
+  setTimeout(function(){scrollToState(state)},500);
+}
+
+function changeUserState(){
+  var stateSelect=document.getElementById('stateSelectModal');
+  if(stateSelect){
+    stateSelect.style.display='flex';
+  }
+}
+
+function saveUserState(state){
+  localStorage.setItem('renteriq_user_state',state);
+  userState=state;
+  updateUserStateDisplay();
+  closeStateSelect();
+  showToast('State updated','Now showing '+state+' information','📍');
+}
+
+function closeStateSelect(){
+  var stateSelect=document.getElementById('stateSelectModal');
+  if(stateSelect){
+    stateSelect.style.display='none';
+  }
+}
 
 function updatePills(stateId){
   states.forEach(function(s){
@@ -526,6 +618,7 @@ document.addEventListener('DOMContentLoaded',function(){
   document.body.style.opacity='0';
   requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
   initScrollSpy();
+  updateUserStateDisplay(); // Initialize with user's state
   var hash=window.location.hash;
   if(hash){
     var state=hash.replace('#','').toUpperCase();

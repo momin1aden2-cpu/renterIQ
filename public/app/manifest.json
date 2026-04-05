@@ -24,14 +24,7 @@
   "screenshots": [],
   "categories": ["lifestyle", "utilities"],
   "shortcuts": [
-    {
-      "name": "Search Rentals",
-      "short_name": "Search",
-      "description": "Find rental properties",
-      "url": "/app/pages/search.html",
-      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
+        {
       "name": "My Inspections",
       "short_name": "Inspect",
       "description": "View upcoming inspections",

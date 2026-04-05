@@ -205,7 +205,6 @@
 
   <nav class="bottom-nav">
     <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-    <button class="nav-tab" onclick="navigate('/app/pages/search.html')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
     <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
     <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
   </nav>
@@ -457,15 +456,42 @@
     <!-- Standard Clauses -->
     <div class="sec-label" style="margin-top:20px">Standard Clauses — No Issues</div>
     <div style="background:#fff;border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt)">
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Term</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Weekly Rent</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond / Security Deposit</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Repairs & Maintenance</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Landlord Entry</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Cleanliness & Condition</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Noise & Nuisance</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Utilities & Services</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Rent Increases</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Term</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Weekly Rent</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond / Security Deposit</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Repairs & Maintenance</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Landlord Entry</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Cleanliness & Condition</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Noise & Nuisance</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Utilities & Services</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Rent Increases</span>
+      </div>
     </div>
 
     <!-- Your Rights Reminder -->
@@ -546,7 +572,6 @@
 
   <nav class="bottom-nav">
     <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-    <button class="nav-tab" onclick="navigate('/app/pages/search.html')"><div class="tab-icon">🔍</div><span class="tab-label">Search</span></button>
     <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
     <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
   </nav>

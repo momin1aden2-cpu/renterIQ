@@ -265,6 +265,10 @@
         Vault
       </button>
       <div class="ds-section-label" style="margin-top:8px">Tools</div>
+      <button class="ds-tab" onclick="navigate('/app/pages/entry-audit.html')">
+        <span class="ds-tab-icon">📸</span>
+        Entry Audit
+      </button>
       <button class="ds-tab" onclick="navigate('/app/pages/lease.html')">
         <span class="ds-tab-icon">📑</span>
         Lease Review
@@ -564,11 +568,10 @@ function navigate(path) {
   // Convert file paths to Next.js routes for PWA compatibility
   const routeMap = {
     '/app/index.html': '/app',
-    '/app/pages/search.html': '/search',
-    '/app/pages/smart-search.html': '/smart-search',
-    '/app/pages/tracked.html': '/tracked',
+            '/app/pages/tracked.html': '/tracked',
     '/app/pages/webview.html': '/webview',
     '/app/pages/inspection.html': '/inspect',
+    '/app/pages/entry-audit.html': '/entry-audit',
     '/app/pages/routine-inspection.html': '/inspect/routine',
     '/app/pages/vault.html': '/vault',
     '/app/pages/profile.html': '/profile',
@@ -736,19 +739,42 @@ installClose.addEventListener('click', function() {
   localStorage.setItem('riq-banner-dismissed', '1');
 });
 
+// Temporarily disabled service worker to fix loading issues
+// if ('serviceWorker' in navigator) {
+//   window.addEventListener('load', function() {
+//     navigator.serviceWorker.register('/app/sw.js').then(function(reg) {
+//       reg.addEventListener('updatefound', function() {
+//         var newWorker = reg.installing;
+//         newWorker.addEventListener('statechange', function() {
+//           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+//             showUpdateToast();
+//           }
+//         });
+//       });
+//     }).catch(function(err) {
+//       console.log('Service Worker registration failed:', err);
+//     });
+//   });
+// }
+
+// Clear existing service worker and caches
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/app/sw.js').then(function(reg) {
-      reg.addEventListener('updatefound', function() {
-        var newWorker = reg.installing;
-        newWorker.addEventListener('statechange', function() {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            showUpdateToast();
-          }
-        });
-      });
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    registrations.forEach(function(registration) {
+      console.log('Unregistering service worker:', registration.scope);
+      registration.unregister();
     });
   });
+  
+  // Clear caches
+  if ('caches' in window) {
+    caches.keys().then(function(cacheNames) {
+      cacheNames.forEach(function(cacheName) {
+        console.log('Deleting cache:', cacheName);
+        caches.delete(cacheName);
+      });
+    });
+  }
 }
 
 function showUpdateToast() {

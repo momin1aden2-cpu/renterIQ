@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/app/css/app.css">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Entry Audit — RenterIQ</title>
+<style>
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
+.view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
+.sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.sh-row{display:flex;align-items:center;justify-content:space-between}
+.sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
+.sh-back-arrow{font-size:22px;color:rgba(255,255,255,.8);font-weight:700}
+.sh-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px;text-transform:uppercase}
+.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
+.sh-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.property-card{background:linear-gradient(135deg,var(--blue),var(--blue-md));border-radius:18px;padding:20px;margin:16px;color:#fff}
+.property-address{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px}
+.property-sub{font-weight:600;font-size:13px;opacity:.8}
+.room-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px}
+.room-card{background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
+.room-card:active{transform:scale(.97)}
+.room-card.completed{background:rgba(0,200,150,.05);border-color:var(--teal)}
+.room-emoji{font-size:28px;margin-bottom:8px;display:block}
+.room-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px}
+.room-status{font-weight:600;font-size:11px;color:var(--muted)}
+.room-card.completed .room-status{color:var(--teal)}
+.add-room-btn{background:var(--blue-xl);border:2px dashed var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.add-room-btn:active{border-color:var(--blue);background:var(--blue-lt)}
+.add-room-icon{font-size:32px}
+.add-room-text{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.photo-cell{aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;cursor:pointer}
+.photo-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--blue-xl)}
+.photo-ts{position:absolute;bottom:5px;left:5px;background:rgba(0,0,0,.5);border-radius:6px;padding:2px 6px;font-family:'Sora',sans-serif;font-size:9px;font-weight:700;color:#fff}
+.add-photo{aspect-ratio:1;border:2px dashed var(--border);background:var(--blue-xl);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.add-photo:active{border-color:var(--blue);background:var(--blue-lt)}
+.add-photo-icon{font-size:24px}
+.add-photo-label{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted)}
+.notes-field{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;min-height:80px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);line-height:1.6;resize:none;outline:none;box-sizing:border-box}
+.notes-field:focus{border-color:var(--blue)}
+.notes-field::placeholder{color:var(--muted)}
+.qn-chip{background:var(--blue-xl);border:1px solid var(--border);border-radius:100px;padding:7px 13px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;display:inline-block;margin:4px}
+.chip-active{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important}
+.cond-btn{flex:1;border-radius:14px;padding:14px 8px;border:2px solid var(--border);background:#fff;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+.cond-good-active{border-color:var(--teal)!important;background:rgba(0,200,150,.06)!important}
+.cond-fair-active{border-color:var(--amber)!important;background:rgba(245,166,35,.06)!important}
+.cond-poor-active{border-color:var(--red)!important;background:rgba(232,64,64,.06)!important}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
+.nav-tab:active{transform:scale(.92)}
+.tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
+.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
+.tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
+.nav-tab.active .tab-label{color:var(--blue)}
+.complete-area{position:sticky;bottom:72px;background:linear-gradient(transparent,var(--blue-xl) 30%);padding:24px 16px 12px;z-index:5}
+.complete-hint{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-top:6px}
+.btn-blue-c{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(27,80,200,.2);transition:all .18s var(--ease-smooth)}
+.btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(27,80,200,.15)}
+.btn-full{width:100%}
+.room-header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 0;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.room-emoji{font-size:34px;display:block;margin-top:10px}
+.room-title-big{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:4px}
+.room-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.tab-bar{margin-top:14px;background:rgba(255,255,255,.12);border-radius:10px;padding:3px;display:flex}
+.tab-item{flex:1;text-align:center;border-radius:8px;padding:7px 0;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,.65);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.tab-active{background:#fff!important;color:var(--blue)!important}
+.room-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-content{background:var(--blue-xl);border-radius:20px;padding:24px;max-width:400px;width:100%}
+.modal-title{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:16px}
+.modal-input{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);margin-bottom:16px;outline:none;box-sizing:border-box}
+.modal-input:focus{border-color:var(--blue)}
+.modal-buttons{display:flex;gap:10px}
+.modal-btn{flex:1;border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;border:none}
+.modal-btn-primary{background:var(--blue);color:#fff}
+.modal-btn-secondary{background:var(--glass-surface-1);color:var(--text);border:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- VIEW A — PROPERTY OVERVIEW -->
+<div class="view" id="viewA" style="display:flex;flex-direction:column;min-height:100vh">
+  <header class="sh">
+    <div class="sh-row">
+      <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RENTERIQ</span></button>
+      <span style="font-size:20px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Entry Audit','Document your property condition at move-in with timestamped photos','📸')">?</span>
+    </div>
+    <div class="sh-title">Entry Audit</div>
+    <div class="sh-sub">Move-in condition report</div>
+  </header>
+
+  <div class="property-card">
+    <div class="property-address" id="propertyAddress">Property Address</div>
+    <div class="property-sub" id="propertyDetails">Loading property details...</div>
+    <button onclick="resetPropertySetup()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:8px">Change Property</button>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding-bottom:100px">
+    <div style="padding:0 16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:12px">Document Every Area</div>
+      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Take timestamped photos and notes for each room. This creates your official move-in record.</div>
+    </div>
+
+    <div class="room-grid" id="roomGrid">
+      <!-- Standard rooms will be added here -->
+    </div>
+  </div>
+
+  <div class="complete-area">
+    <button class="btn-blue-c btn-full" id="generateReportBtn" style="border-radius:14px;padding:14px;font-size:15px;opacity:.4;pointer-events:none" onclick="generateEntryReport()">Generate Entry Report →</button>
+    <div class="complete-hint" id="completeHint">Complete all areas to generate report</div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+    <button class="nav-tab active" onclick="navigate('/app/pages/entry-audit.html')"><div class="tab-icon">📸</div><span class="tab-label">Entry Audit</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  </nav>
+</div>
+
+<!-- VIEW B — ROOM DETAIL -->
+<div class="view" id="viewB" style="display:none">
+  <header class="room-header">
+    <div class="sh-row">
+      <button class="sh-back" onclick="backToOverview()"><span class="sh-back-arrow">‹</span><span class="sh-label">OVERVIEW</span></button>
+      <span class="sh-right-text" id="roomProgress">1 / 8</span>
+    </div>
+    <span class="room-emoji" id="roomEmoji">🚪</span>
+    <div class="room-title-big" id="roomTitle">Entry & Hallway</div>
+    <div class="room-sub">Take photos and document condition</div>
+    <div class="tab-bar">
+      <div class="tab-item tab-active" id="tab0" onclick="setTab(0)">📸 Photos</div>
+      <div class="tab-item" id="tab1" onclick="setTab(1)">📝 Notes</div>
+      <div class="tab-item" id="tab2" onclick="setTab(2)">✓ Condition</div>
+    </div>
+  </header>
+
+  <!-- Tab 0 — Photos -->
+  <div id="tabContent0" style="flex:1;overflow-y:auto">
+    <div style="padding:16px">
+      <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Photos</span>
+      <div class="photo-grid" id="photoGrid">
+        <div class="add-photo" onclick="addPhoto()">
+          <span class="add-photo-icon">📷</span>
+          <span class="add-photo-label">Add Photo</span>
+        </div>
+      </div>
+      <div style="font-weight:600;font-size:12px;color:var(--muted);text-align:center">Photos are timestamped automatically · Tap any photo to view</div>
+    </div>
+    <div style="padding:0 16px 16px">
+      <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Quick Notes</span>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px">
+        <span class="qn-chip" onclick="addQuickNote('Clean',this)">✓ Clean</span>
+        <span class="qn-chip" onclick="addQuickNote('Good condition',this)">✓ Good condition</span>
+        <span class="qn-chip" onclick="addQuickNote('Minor wear',this)">Minor wear</span>
+        <span class="qn-chip" onclick="addQuickNote('Mark on wall',this)">Mark on wall</span>
+        <span class="qn-chip" onclick="addQuickNote('Scuff visible',this)">Scuff visible</span>
+        <span class="qn-chip" onclick="addQuickNote('Stain present',this)">Stain present</span>
+        <span class="qn-chip" onclick="addQuickNote('Paint chipped',this)">Paint chipped</span>
+        <span class="qn-chip" onclick="addQuickNote('Needs repair',this)">Needs repair</span>
+      </div>
+      <textarea class="notes-field" id="quickNotes" placeholder="Add any quick notes about this area..."></textarea>
+    </div>
+  </div>
+
+  <!-- Tab 1 — Notes -->
+  <div id="tabContent1" style="flex:1;overflow-y:auto;display:none">
+    <div style="padding:16px">
+      <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Detailed Notes</span>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🧱 Walls & Ceiling</div>
+        <textarea class="notes-field" style="min-height:50px" id="wallsNotes" placeholder="Note any marks, scuffs, paint issues…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🪟 Floors & Carpet</div>
+        <textarea class="notes-field" style="min-height:50px" id="floorsNotes" placeholder="Carpet condition, scratches, stains…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">💡 Fixtures & Fittings</div>
+        <textarea class="notes-field" style="min-height:50px" id="fixturesNotes" placeholder="Lights, switches, door handles…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🚿 Plumbing & Water</div>
+        <textarea class="notes-field" style="min-height:50px" id="plumbingNotes" placeholder="Taps, drains, water pressure…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🔌 Electrical</div>
+        <textarea class="notes-field" style="min-height:50px" id="electricalNotes" placeholder="Power points, switches…"></textarea>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">📝 Other</div>
+        <textarea class="notes-field" id="otherNotes" style="min-height:60px" placeholder="Anything else worth noting…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2 — Condition -->
+  <div id="tabContent2" style="flex:1;overflow-y:auto;display:none">
+    <div style="padding:16px">
+      <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Overall Condition</span>
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <button class="cond-btn" id="cond-good" onclick="selectCondition('good')"><span style="font-size:24px">😊</span>Excellent</button>
+        <button class="cond-btn" id="cond-fair" onclick="selectCondition('fair')"><span style="font-size:24px">😐</span>Good</button>
+        <button class="cond-btn" id="cond-poor" onclick="selectCondition('poor')"><span style="font-size:24px">😟</span>Issues noted</button>
+      </div>
+      
+      <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:10px">💡 Why this matters</div>
+        <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Your condition assessment helps establish the property's state at move-in. This protects you from unfair bond deductions at exit.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="room-footer">
+    <button class="btn-blue-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="backToOverview()">← Back</button>
+    <button class="btn-blue-c flex-1" onclick="saveRoomData()">Save & Continue ✓</button>
+  </div>
+</div>
+
+<!-- PROPERTY SETUP MODAL -->
+<div class="modal-overlay" id="propertySetupModal">
+  <div class="modal-content">
+    <div class="modal-title">Property Setup</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Set up your property for the entry audit</div>
+    
+    <!-- Auto-detected property info -->
+    <div id="detectedProperty" style="display:none;background:var(--blue-lt);border:1px solid var(--blue);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:8px">📋 Detected Property</div>
+      <div id="detectedAddress" style="font-weight:600;font-size:12px;color:var(--text);margin-bottom:4px"></div>
+      <div id="detectedDetails" style="font-size:11px;color:var(--muted)"></div>
+    </div>
+    
+    <!-- Manual entry form -->
+    <div style="margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:8px">Property Address</div>
+      <input type="text" class="modal-input" id="manualAddress" placeholder="e.g. 18 Smith Street, Fitzroy VIC 3065">
+    </div>
+    
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--text);margin-bottom:4px">Bedrooms</div>
+        <select id="bedroomCount" class="modal-input" style="padding:8px">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5+</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--text);margin-bottom:4px">Bathrooms</div>
+        <select id="bathroomCount" class="modal-input" style="padding:8px">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3+</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--text);margin-bottom:4px">Living Areas</div>
+        <select id="livingCount" class="modal-input" style="padding:8px">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3+</option>
+        </select>
+      </div>
+    </div>
+    
+    <div style="margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:8px">Additional Features</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+        <label style="display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--text)">
+          <input type="checkbox" id="hasGarage"> Garage
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--text)">
+          <input type="checkbox" id="hasCarport"> Carport
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--text)">
+          <input type="checkbox" id="hasGarden"> Garden
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--text)">
+          <input type="checkbox" id="hasBalcony"> Balcony
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--text)">
+          <input type="checkbox" id="hasStudy"> Study
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--text)">
+          <input type="checkbox" id="hasLaundry"> Laundry
+        </label>
+      </div>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-secondary" onclick="closePropertySetup()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="setupProperty()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ROOM MODAL -->
+<div class="modal-overlay" id="addRoomModal">
+  <div class="modal-content">
+    <div class="modal-title">Add Custom Room</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Add a room specific to your property</div>
+    <input type="text" class="modal-input" id="newRoomName" placeholder="e.g. Study, Sunroom, Garage" maxlength="30">
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:8px">Choose an emoji:</div>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:8px">
+        <button onclick="selectEmoji('🏠')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:16px;cursor:pointer;">🏠</button>
+        <button onclick="selectEmoji('🪑')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:16px;cursor:pointer;">🪑</button>
+        <button onclick="selectEmoji('🛋️')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:16px;cursor:pointer;">🛋️</button>
+        <button onclick="selectEmoji('🚗')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:16px;cursor:pointer;">🚗</button>
+        <button onclick="selectEmoji('🌿')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:16px;cursor:pointer;">🌿</button>
+        <button onclick="selectEmoji('🏢')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:16px;cursor:pointer;">🏢</button>
+        <button onclick="selectEmoji('📚')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:16px;cursor:pointer;">📚</button>
+        <button onclick="selectEmoji('🎮')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:16px;cursor:pointer;">🎮</button>
+      </div>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-secondary" onclick="closeAddRoom()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="addCustomRoom()">Add Room</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app-shell -->
+
+<script>
+/* RenterIQ — Entry Audit JS */
+
+function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+
+function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:var(--text);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:var(--muted);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
+
+// Room data
+var standardRooms=[
+  {id:'entry',name:'Entry & Hallway',emoji:'🚪'},
+  {id:'living',name:'Living Room',emoji:'🛋'},
+  {id:'kitchen',name:'Kitchen',emoji:'🍳'},
+  {id:'master',name:'Master Bedroom',emoji:'🛏'},
+  {id:'bedroom2',name:'Bedroom 2',emoji:'🛏'},
+  {id:'bathroom',name:'Bathroom',emoji:'🚿'},
+  {id:'laundry',name:'Laundry',emoji:'🧺'},
+  {id:'outdoor',name:'Outdoor & Garden',emoji:'🌿'}
+];
+var customRooms=[];
+var roomData={};
+var currentRoom=null;
+var selectedEmoji='🏠';
+var selectedCondition=null;
+
+// Initialize
+document.addEventListener('DOMContentLoaded',function(){
+  checkPropertySetup();
+});
+
+// Check if property is set up
+function checkPropertySetup(){
+  var setup=localStorage.getItem('renteriq_entry_property_setup');
+  if(!setup){
+    // Show property setup modal
+    showPropertySetup();
+  }else{
+    // Load existing setup
+    loadPropertySetup();
+  }
+}
+
+// Show property setup modal
+function showPropertySetup(){
+  var modal=document.getElementById('propertySetupModal');
+  modal.style.display='flex';
+  
+  // Try to detect property from active property or lease
+  detectPropertyFromSources();
+}
+
+// Detect property from various sources
+function detectPropertyFromSources(){
+  var detected=false;
+  
+  // Check active property (from inspection)
+  var activeProp=localStorage.getItem('riq-active-property');
+  if(activeProp){
+    try{
+      var prop=JSON.parse(activeProp);
+      showDetectedProperty(prop.label, prop.details);
+      document.getElementById('manualAddress').value=prop.label||'';
+      detected=true;
+    }catch(e){}
+  }
+  
+  // Check lease data
+  var leaseData=localStorage.getItem('renteriq_lease_data');
+  if(leaseData && !detected){
+    try{
+      var lease=JSON.parse(leaseData);
+      if(lease.address){
+        showDetectedProperty(lease.address, lease.propertyDetails);
+        document.getElementById('manualAddress').value=lease.address||'';
+        detected=true;
+      }
+    }catch(e){}
+  }
+  
+  // Check tracked properties
+  var tracked=localStorage.getItem('renteriq_tracked_properties');
+  if(tracked && !detected){
+    try{
+      var props=JSON.parse(tracked);
+      if(props.length>0){
+        var latest=props[props.length-1];
+        showDetectedProperty(latest.label, latest.details);
+        document.getElementById('manualAddress').value=latest.label||'';
+        detected=true;
+      }
+    }catch(e){}
+  }
+}
+
+// Show detected property info
+function showDetectedProperty(address, details){
+  var detectedDiv=document.getElementById('detectedProperty');
+  var addressEl=document.getElementById('detectedAddress');
+  var detailsEl=document.getElementById('detectedDetails');
+  
+  detectedDiv.style.display='block';
+  addressEl.textContent=address||'Property detected';
+  detailsEl.textContent=details||'Property details available';
+}
+
+// Close property setup
+function closePropertySetup(){
+  document.getElementById('propertySetupModal').style.display='none';
+}
+
+// Reset property setup
+function resetPropertySetup(){
+  if(confirm('This will reset your property setup and room configuration. Any existing audit data will be preserved. Continue?')){
+    localStorage.removeItem('renteriq_entry_property_setup');
+    showToast('Property setup reset','Configure your property again','🔄');
+    showPropertySetup();
+  }
+}
+
+// Setup property and generate rooms
+function setupProperty(){
+  var address=document.getElementById('manualAddress').value.trim();
+  var bedrooms=parseInt(document.getElementById('bedroomCount').value);
+  var bathrooms=parseInt(document.getElementById('bathroomCount').value);
+  var living=parseInt(document.getElementById('livingCount').value);
+  
+  if(!address){
+    showToast('Address required','Please enter a property address','⚠️');
+    return;
+  }
+  
+  // Save property setup
+  var propertySetup={
+    address:address,
+    bedrooms:bedrooms,
+    bathrooms:bathrooms,
+    living:living,
+    garage:document.getElementById('hasGarage').checked,
+    carport:document.getElementById('hasCarport').checked,
+    garden:document.getElementById('hasGarden').checked,
+    balcony:document.getElementById('hasBalcony').checked,
+    study:document.getElementById('hasStudy').checked,
+    laundry:document.getElementById('hasLaundry').checked
+  };
+  
+  localStorage.setItem('renteriq_entry_property_setup',JSON.stringify(propertySetup));
+  
+  // Generate rooms based on property
+  generateRoomsForProperty(propertySetup);
+  
+  // Update UI
+  updatePropertyDisplay(propertySetup);
+  buildRoomGrid();
+  loadRoomData();
+  
+  // Close modal
+  closePropertySetup();
+  
+  showToast('Property set up',address+' · Rooms configured','✅');
+}
+
+// Generate rooms based on property configuration
+function generateRoomsForProperty(setup){
+  // Clear existing rooms
+  customRooms=[];
+  
+  // Always include standard rooms
+  var baseRooms=[
+    {id:'entry',name:'Entry & Hallway',emoji:'🚪'},
+    {id:'kitchen',name:'Kitchen',emoji:'🍳'}
+  ];
+  
+  // Add bedrooms
+  for(var i=1;i<=setup.bedrooms;i++){
+    var name=i===1?'Master Bedroom':'Bedroom '+i;
+    baseRooms.push({id:'bedroom'+i,name:name,emoji:'🛏'});
+  }
+  
+  // Add bathrooms
+  for(var i=1;i<=setup.bathrooms;i++){
+    var name=i===1?'Main Bathroom':'Bathroom '+i;
+    baseRooms.push({id:'bathroom'+i,name:name,emoji:'🚿'});
+  }
+  
+  // Add living areas
+  for(var i=1;i<=setup.living;i++){
+    var name=i===1?'Living Room':'Living Area '+i;
+    baseRooms.push({id:'living'+i,name:name,emoji:'🛋'});
+  }
+  
+  // Add additional features
+  if(setup.garage){
+    baseRooms.push({id:'garage',name:'Garage',emoji:'🚗'});
+  }
+  if(setup.carport){
+    baseRooms.push({id:'carport',name:'Carport',emoji:'🚙'});
+  }
+  if(setup.garden){
+    baseRooms.push({id:'garden',name:'Garden & Outdoor',emoji:'🌿'});
+  }
+  if(setup.balcony){
+    baseRooms.push({id:'balcony',name:'Balcony',emoji:'🌺'});
+  }
+  if(setup.study && !baseRooms.find(r=>r.name.includes('Study'))){
+    baseRooms.push({id:'study',name:'Study',emoji:'📚'});
+  }
+  if(setup.laundry){
+    baseRooms.push({id:'laundry',name:'Laundry',emoji:'🧺'});
+  }
+  
+  // Update standard rooms
+  standardRooms=baseRooms;
+}
+
+// Update property display
+function updatePropertyDisplay(setup){
+  document.getElementById('propertyAddress').textContent=setup.address;
+  
+  var details=[];
+  if(setup.bedrooms) details.push(setup.bedrooms+' bed');
+  if(setup.bathrooms) details.push(setup.bathrooms+' bath');
+  if(setup.living>1) details.push(setup.living+' living');
+  if(setup.garage) details.push('garage');
+  if(setup.carport) details.push('carport');
+  
+  document.getElementById('propertyDetails').textContent=details.join(' · ')||'Property details';
+}
+
+// Load existing property setup
+function loadPropertySetup(){
+  var setup=localStorage.getItem('renteriq_entry_property_setup');
+  if(setup){
+    try{
+      var propertySetup=JSON.parse(setup);
+      updatePropertyDisplay(propertySetup);
+      generateRoomsForProperty(propertySetup);
+      buildRoomGrid();
+      loadRoomData();
+    }catch(e){
+      // Fallback to default
+      loadPropertyInfo();
+      buildRoomGrid();
+      loadRoomData();
+    }
+  }
+}
+
+// Fallback property info loading
+function loadPropertyInfo(){
+  var activeProp=localStorage.getItem('riq-active-property');
+  if(activeProp){
+    try{
+      var prop=JSON.parse(activeProp);
+      document.getElementById('propertyAddress').textContent=prop.label||'Property Address';
+      document.getElementById('propertyDetails').textContent=prop.details||'Move-in condition report';
+    }catch(e){
+      document.getElementById('propertyAddress').textContent='Property Address';
+      document.getElementById('propertyDetails').textContent='Move-in condition report';
+    }
+  }else{
+    document.getElementById('propertyAddress').textContent='Property Address';
+    document.getElementById('propertyDetails').textContent='Move-in condition report';
+  }
+}
+
+function buildRoomGrid(){
+  var grid=document.getElementById('roomGrid');
+  if(!grid)return;
+  grid.innerHTML='';
+  
+  // Add standard rooms
+  standardRooms.forEach(function(room){
+    var card=createRoomCard(room);
+    grid.appendChild(card);
+  });
+  
+  // Add custom rooms
+  customRooms.forEach(function(room){
+    var card=createRoomCard(room);
+    grid.appendChild(card);
+  });
+  
+  // Add "Add Room" button
+  var addBtn=document.createElement('div');
+  addBtn.className='add-room-btn';
+  addBtn.onclick=openAddRoom;
+  addBtn.innerHTML='<span class="add-room-icon">➕</span><span class="add-room-text">Add Room</span>';
+  grid.appendChild(addBtn);
+}
+
+function createRoomCard(room){
+  var card=document.createElement('div');
+  card.className='room-card';
+  if(roomData[room.id] && roomData[room.id].completed){
+    card.className+=' completed';
+  }
+  card.onclick=function(){openRoom(room)};
+  
+  var status='Not started';
+  if(roomData[room.id]){
+    if(roomData[room.id].completed){
+      status='✓ Completed';
+    }else if(roomData[room.id].photos && roomData[room.id].photos.length>0){
+      status=roomData[room.id].photos.length+' photos';
+    }
+  }
+  
+  card.innerHTML='<span class="room-emoji">'+room.emoji+'</span><div class="room-name">'+room.name+'</div><div class="room-status">'+status+'</div>';
+  return card;
+}
+
+function openRoom(room){
+  currentRoom=room;
+  document.getElementById('roomEmoji').textContent=room.emoji;
+  document.getElementById('roomTitle').textContent=room.name;
+  document.getElementById('roomProgress').textContent=(standardRooms.indexOf(room)+1)+' / '+(standardRooms.length+customRooms.length);
+  
+  // Load existing data
+  var data=roomData[room.id]||{};
+  document.getElementById('quickNotes').value=data.quickNotes||'';
+  document.getElementById('wallsNotes').value=data.wallsNotes||'';
+  document.getElementById('floorsNotes').value=data.floorsNotes||'';
+  document.getElementById('fixturesNotes').value=data.fixturesNotes||'';
+  document.getElementById('plumbingNotes').value=data.plumbingNotes||'';
+  document.getElementById('electricalNotes').value=data.electricalNotes||'';
+  document.getElementById('otherNotes').value=data.otherNotes||'';
+  
+  // Load photos
+  loadPhotos(data.photos||[]);
+  
+  // Reset condition
+  selectedCondition=data.condition||null;
+  updateConditionButtons();
+  
+  // Reset tabs
+  setTab(0);
+  
+  // Switch view
+  switchView('B');
+}
+
+function loadPhotos(photos){
+  var grid=document.getElementById('photoGrid');
+  if(!grid)return;
+  grid.innerHTML='';
+  
+  photos.forEach(function(photo, index){
+    var cell=document.createElement('div');
+    cell.className='photo-cell';
+    cell.onclick=function(){viewPhoto(photo, index)};
+    
+    if(photo.data){
+      // Show actual photo
+      cell.innerHTML='<img src="'+photo.data+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px"><span class="photo-ts">'+photo.time+'</span>';
+    }else{
+      // Show placeholder
+      cell.innerHTML='<div class="photo-inner" style="background:var(--blue-lt)">📸</div><span class="photo-ts">'+photo.time+'</span>';
+    }
+    grid.appendChild(cell);
+  });
+  
+  // Add photo button
+  var addBtn=document.createElement('div');
+  addBtn.className='add-photo';
+  addBtn.onclick=addPhoto;
+  addBtn.innerHTML='<span class="add-photo-icon">📷</span><span class="add-photo-label">Add Photo</span>';
+  grid.appendChild(addBtn);
+}
+
+function viewPhoto(photo, index){
+  // Simple photo viewer - could be enhanced with modal
+  if(photo.data){
+    window.open(photo.data, '_blank');
+  }
+}
+
+function addPhoto(){
+  // Create file input for camera
+  var input=document.createElement('input');
+  input.type='file';
+  input.accept='image/*';
+  input.capture='camera';
+  input.onchange=function(e){
+    var file=e.target.files[0];
+    if(file){
+      var reader=new FileReader();
+      reader.onload=function(event){
+        var now=new Date();
+        var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+        var timestamp=now.toISOString();
+        
+        // Add to room data
+        if(!roomData[currentRoom.id])roomData[currentRoom.id]={};
+        if(!roomData[currentRoom.id].photos)roomData[currentRoom.id].photos=[];
+        roomData[currentRoom.id].photos.push({
+          time:time,
+          timestamp:timestamp,
+          data:event.target.result,
+          fileName:file.name
+        });
+        
+        // Save immediately
+        localStorage.setItem('renteriq_entry_audit',JSON.stringify(roomData));
+        
+        // Update UI
+        loadPhotos(roomData[currentRoom.id].photos);
+        showToast('Photo captured',time+' · Timestamped and saved','📷');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  input.click();
+}
+
+function addQuickNote(text,el){
+  el.classList.toggle('chip-active');
+  var field=document.getElementById('quickNotes');
+  if(el.classList.contains('chip-active')&&field){
+    field.value=field.value?field.value+'\n'+text:text;
+  }
+}
+
+function selectCondition(type){
+  selectedCondition=type;
+  updateConditionButtons();
+}
+
+function updateConditionButtons(){
+  ['good','fair','poor'].forEach(function(c){
+    var btn=document.getElementById('cond-'+c);
+    if(btn){
+      btn.className='cond-btn';
+      if(c===selectedCondition){
+        btn.className+=' cond-'+c+'-active';
+      }
+    }
+  });
+}
+
+function saveRoomData(){
+  if(!currentRoom)return;
+  
+  // Save all data
+  roomData[currentRoom.id]={
+    completed:true,
+    condition:selectedCondition,
+    quickNotes:document.getElementById('quickNotes').value,
+    wallsNotes:document.getElementById('wallsNotes').value,
+    floorsNotes:document.getElementById('floorsNotes').value,
+    fixturesNotes:document.getElementById('fixturesNotes').value,
+    plumbingNotes:document.getElementById('plumbingNotes').value,
+    electricalNotes:document.getElementById('electricalNotes').value,
+    otherNotes:document.getElementById('otherNotes').value,
+    photos:roomData[currentRoom.id] ? roomData[currentRoom.id].photos : []
+  };
+  
+  // Save to localStorage
+  localStorage.setItem('renteriq_entry_audit',JSON.stringify(roomData));
+  
+  // Update UI
+  buildRoomGrid();
+  updateGenerateButton();
+  
+  showToast(currentRoom.name+' saved','All data timestamped and saved','✓');
+  backToOverview();
+}
+
+function loadRoomData(){
+  var saved=localStorage.getItem('renteriq_entry_audit');
+  if(saved){
+    try{
+      roomData=JSON.parse(saved);
+      // Load custom rooms
+      if(roomData._customRooms){
+        customRooms=roomData._customRooms;
+        delete roomData._customRooms;
+      }
+    }catch(e){
+      roomData={};
+    }
+  }
+  updateGenerateButton();
+}
+
+function updateGenerateButton(){
+  var allRooms=[].concat(standardRooms).concat(customRooms);
+  var completed=allRooms.filter(function(r){return roomData[r.id] && roomData[r.id].completed}).length;
+  var btn=document.getElementById('generateReportBtn');
+  var hint=document.getElementById('completeHint');
+  
+  if(completed===allRooms.length){
+    btn.style.opacity='1';
+    btn.style.pointerEvents='auto';
+    hint.textContent='All areas complete ✓';
+    hint.style.color='var(--teal-dk)';
+  }else{
+    btn.style.opacity='.4';
+    btn.style.pointerEvents='none';
+    hint.textContent=(allRooms.length-completed)+' areas remaining';
+    hint.style.color='var(--muted)';
+  }
+}
+
+function generateEntryReport(){
+  showToast('Generating report','Creating your entry condition report...','📄');
+  
+  // Create comprehensive report data
+  var reportData={
+    propertyAddress:document.getElementById('propertyAddress').textContent,
+    propertyDetails:document.getElementById('propertyDetails').textContent,
+    generatedDate:new Date().toISOString(),
+    rooms:[],
+    totalPhotos:0,
+    completedRooms:0
+  };
+  
+  // Collect all room data
+  var allRooms=[].concat(standardRooms).concat(customRooms);
+  allRooms.forEach(function(room){
+    if(roomData[room.id] && roomData[room.id].completed){
+      reportData.completedRooms++;
+      var roomInfo=Object.assign({
+        id:room.id,
+        name:room.name,
+        emoji:room.emoji
+      }, roomData[room.id]);
+      
+      if(roomInfo.photos){
+        reportData.totalPhotos+=roomInfo.photos.length;
+      }
+      reportData.rooms.push(roomInfo);
+    }
+  });
+  
+  // Save report to vault
+  var vaultReports=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+  vaultReports.push({
+    type:'entry-audit',
+    date:new Date().toISOString(),
+    data:reportData
+  });
+  localStorage.setItem('renteriq_vault_reports',JSON.stringify(vaultReports));
+  
+  // Generate downloadable report (text version for now)
+  var reportText=generateTextReport(reportData);
+  downloadReport(reportText, 'entry-audit-report.txt');
+  
+  setTimeout(function(){
+    showToast('Report generated',reportData.totalPhotos+' photos · '+reportData.completedRooms+' rooms documented','✓');
+    navigate('/app/pages/vault.html');
+  },2000);
+}
+
+function generateTextReport(data){
+  var text='RENTERIQ ENTRY CONDITION REPORT\n';
+  text+='=====================================\n\n';
+  text+='Property: '+data.propertyAddress+'\n';
+  text+='Generated: '+new Date(data.generatedDate).toLocaleString()+'\n';
+  text+='Total Rooms: '+data.completedRooms+'\n';
+  text+='Total Photos: '+data.totalPhotos+'\n\n';
+  
+  text+='ROOM-BY-ROOM DOCUMENTATION\n';
+  text+='----------------------------\n\n';
+  
+  data.rooms.forEach(function(room){
+    text+=room.emoji+' '+room.name.toUpperCase()+'\n';
+    text+='Condition: '+room.condition+'\n';
+    
+    if(room.photos && room.photos.length>0){
+      text+='Photos: '+room.photos.length+' taken\n';
+      room.photos.forEach(function(photo){
+        text+='  - '+photo.time+'\n';
+      });
+    }
+    
+    if(room.quickNotes){
+      text+='Quick Notes: '+room.quickNotes+'\n';
+    }
+    
+    if(room.wallsNotes){
+      text+='Walls: '+room.wallsNotes+'\n';
+    }
+    
+    if(room.floorsNotes){
+      text+='Floors: '+room.floorsNotes+'\n';
+    }
+    
+    if(room.fixturesNotes){
+      text+='Fixtures: '+room.fixturesNotes+'\n';
+    }
+    
+    if(room.plumbingNotes){
+      text+='Plumbing: '+room.plumbingNotes+'\n';
+    }
+    
+    if(room.electricalNotes){
+      text+='Electrical: '+room.electricalNotes+'\n';
+    }
+    
+    if(room.otherNotes){
+      text+='Other: '+room.otherNotes+'\n';
+    }
+    
+    text+='\n';
+  });
+  
+  text+='REPORT SUMMARY\n';
+  text+='==============\n';
+  text+='This entry condition report was generated by RenterIQ to document\n';
+  text+='the property condition at move-in. All photos are timestamped and\n';
+  text+='notes are digitally recorded for bond protection purposes.\n\n';
+  text+='Generated on: '+new Date().toLocaleString()+'\n';
+  text+='RenterIQ Entry Audit System\n';
+  
+  return text;
+}
+
+function downloadReport(content, filename){
+  var blob=new Blob([content],{type:'text/plain'});
+  var url=window.URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
+
+function openAddRoom(){
+  document.getElementById('addRoomModal').style.display='flex';
+  document.getElementById('newRoomName').value='';
+  document.getElementById('newRoomName').focus();
+}
+
+function closeAddRoom(){
+  document.getElementById('addRoomModal').style.display='none';
+}
+
+function selectEmoji(emoji){
+  selectedEmoji=emoji;
+  // Update button styles
+  var buttons=document.querySelectorAll('#addRoomModal button[onclick*="selectEmoji"]');
+  buttons.forEach(function(btn){
+    btn.style.background='var(--glass-surface-1)';
+    btn.style.borderColor='var(--border)';
+  });
+  event.target.style.background='var(--blue)';
+  event.target.style.borderColor='var(--blue)';
+}
+
+function addCustomRoom(){
+  var name=document.getElementById('newRoomName').value.trim();
+  if(!name){
+    showToast('Room name required','Please enter a room name','⚠️');
+    return;
+  }
+  
+  var room={
+    id:name.toLowerCase().replace(/\s+/g,'-'),
+    name:name,
+    emoji:selectedEmoji
+  };
+  
+  customRooms.push(room);
+  roomData._customRooms=customRooms;
+  localStorage.setItem('renteriq_entry_audit',JSON.stringify(roomData));
+  
+  buildRoomGrid();
+  closeAddRoom();
+  showToast('Room added',name+' added to your audit','➕');
+}
+
+function backToOverview(){
+  switchView('A');
+}
+
+function switchView(viewId){
+  document.querySelectorAll('.view').forEach(function(v){v.style.display='none'});
+  document.getElementById(viewId).style.display='flex';
+}
+
+function setTab(tabIndex){
+  document.querySelectorAll('.tab-item').forEach(function(t,i){t.classList.toggle('tab-active',i===tabIndex)});
+  document.querySelectorAll('[id^="tabContent"]').forEach(function(c,i){c.style.display=i===tabIndex?'block':'none'});
+}
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+<script src="/app/js/sidebar.js"></script>
+</body>
+</html>

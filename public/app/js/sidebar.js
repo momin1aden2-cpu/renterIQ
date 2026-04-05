@@ -1,19 +1,23 @@
 /**
  * RenterIQ Desktop Sidebar — injects the sidebar nav on all app pages.
  * Loaded by every app page. On mobile it does nothing (CSS hides .desktop-sidebar).
+ * Updated: 2025-04-05 - Entry Audit in Tools section
  */
 (function () {
+  
   var NAV_ITEMS = [
     { label: 'Home',    icon: '🏠', path: '/app/index.html' },
     { label: 'Inspect', icon: '📋', path: '/app/pages/inspection.html' },
-    { label: 'Vault',   icon: '🗂️', path: '/app/pages/vault.html' },
+    { label: 'Vault',   icon: '🗄️', path: '/app/pages/vault.html' },
   ];
 
   var TOOLS = [
+    { label: 'Entry Audit',  icon: '📸', path: '/app/pages/entry-audit.html' },
     { label: 'Lease Review',  icon: '📑', path: '/app/pages/lease.html' },
     { label: 'Renter Rights', icon: '⚖️', path: '/app/pages/rights.html' },
     { label: 'Exit Clean',    icon: '🔑', path: '/app/pages/exit.html' },
   ];
+  
 
   function currentPath() {
     return window.location.pathname;
@@ -37,7 +41,7 @@
 
     var navItems = NAV_ITEMS.map(tabHTML).join('');
     var toolItems = TOOLS.map(tabHTML).join('');
-
+    
     aside.innerHTML =
       '<a href="/" class="ds-brand">' +
         '<img src="/assets/logo.svg" alt="RenterIQ" width="32" height="32" style="flex-shrink:0">' +
@@ -161,7 +165,9 @@
     injectDesktopCSS();
     var shell = document.querySelector('.app-shell');
     if (!shell) return;
-    if (shell.querySelector('.desktop-sidebar')) return; // already injected (e.g. index.html)
+    if (shell.querySelector('.desktop-sidebar')) {
+      return; // already injected (e.g. index.html)
+    }
 
     // Build and prepend sidebar
     var aside = buildSidebar();
@@ -178,11 +184,10 @@
   window.sidebarNavigate = function(path) {
     var routeMap = {
       '/app/index.html': '/app',
-      '/app/pages/smart-search.html': '/smart-search',
-      '/app/pages/inspection.html': '/inspect',
+            '/app/pages/inspection.html': '/inspect',
+      '/app/pages/entry-audit.html': '/entry-audit',
       '/app/pages/vault.html': '/vault',
-      '/app/pages/search.html': '/search',
-      '/app/pages/tracked.html': '/tracked',
+            '/app/pages/tracked.html': '/tracked',
       '/app/pages/lease.html': '/lease',
       '/app/pages/rights.html': '/rights',
       '/app/pages/exit.html': '/exit',

@@ -1,19 +1,3 @@
-import withPWAInit from "next-pwa";
-
-const withPWA = withPWAInit({
-  dest: "public",
-  disable: false, // Enable in development for testing
-  register: true,
-  skipWaiting: true,
-  // Prevent next-pwa from trying to cache non-existent build files
-  buildExcludes: [
-    /chunks\/.*$/,
-    /app-build-manifest\.json$/,
-    /webpack\/.*$/,
-    /css\/.*\.css$/
-  ]
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
@@ -46,4 +30,4 @@ const nextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;
