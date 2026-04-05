@@ -1030,12 +1030,12 @@ function copyResponse() {
 
 function sendResponse() {
   var email = document.getElementById('responseField').value;
-  // Open mailto with the response
   var agencyName = document.getElementById('agencyName').value || '';
   var subject = encodeURIComponent('Routine Inspection Response — ' + new Date().toLocaleDateString('en-AU'));
   var body = encodeURIComponent(email);
   window.open('mailto:?subject=' + subject + '&body=' + body);
-  showToast('Opening email', 'Paste response into your email app', '✉️');
+  saveToCommsVault(email, agencyName);
+  showToast('Opening email', 'Saved to Communications · Paste into email app', '✉️');
   setTimeout(function() { switchView('F'); renderReminders(); }, 1200);
 }
 
@@ -1083,11 +1083,11 @@ function toggleReminder(el) {
 // ── Complete & Save to Vault (View G) ──
 function completeAndSave() {
   if (!analysisData) { switchView('A'); return; }
+  autoCreateMaintenanceItems();
   saveToFirestore(function() {
     renderSummary();
     switchView('G');
     showToast('Saved', 'Inspection saved to Vault', '✅');
-    // Add to past inspections
     addToPastInspections();
   });
 }
@@ -1263,12 +1263,18 @@ function addToPastInspections() {
 
 function savePastInspections() {
   try {
-    var cards = document.querySelectorAll('.ri-card');
-    var inspections = [];
-    cards.forEach(function(c) {
-      inspections.push({ html: c.innerHTML, date: Date.now() });
-    });
-    localStorage.setItem(STORAGE_KEY + '_past', JSON.stringify(inspections));
+    var raw = localStorage.getItem(STORAGE_KEY + '_past') || '[]';
+    var existing = JSON.parse(raw);
+    var summary = analysisData ? (analysisData.summary || {}) : {};
+    var agency = document.getElementById('agencyName').value || '';
+    var record = {
+      summary: summary,
+      agency: agency,
+      date: Date.now(),
+      itemCount: analysisData ? (analysisData.items || []).length : 0
+    };
+    existing.unshift(record);
+    localStorage.setItem(STORAGE_KEY + '_past', JSON.stringify(existing));
   } catch(e) {}
 }
 
@@ -1289,6 +1295,49 @@ function loadPastInspections() {
       list.appendChild(card);
     });
   } catch(e) {}
+}
+
+// ── Auto-save Communications to Vault ──
+function saveToCommsVault(emailText, agency) {
+  try {
+    var raw = localStorage.getItem('riq_communications') || '[]';
+    var comms = JSON.parse(raw);
+    comms.unshift({
+      type: 'routine_inspection_response',
+      to: agency || 'Agent',
+      subject: 'Routine Inspection Response — ' + new Date().toLocaleDateString('en-AU'),
+      body: emailText,
+      date: Date.now(),
+      source: 'routine-inspection'
+    });
+    localStorage.setItem('riq_communications', JSON.stringify(comms));
+  } catch(e) { console.error('saveToCommsVault:', e); }
+}
+
+// ── Auto-create Maintenance Entries from Owner Items ──
+function autoCreateMaintenanceItems() {
+  if (!analysisData) return;
+  var ownerItems = (analysisData.items || []).filter(function(it) { return it.responsibility === 'owner'; });
+  if (!ownerItems.length) return;
+  try {
+    var raw = localStorage.getItem('riq_maintenance_items') || '[]';
+    var items = JSON.parse(raw);
+    ownerItems.forEach(function(it) {
+      items.unshift({
+        description: it.description,
+        action: it.action,
+        priority: it.priority || 'medium',
+        status: 'pending',
+        source: 'routine_inspection',
+        agency: document.getElementById('agencyName').value || '',
+        date: Date.now()
+      });
+    });
+    localStorage.setItem('riq_maintenance_items', JSON.stringify(items));
+    if (ownerItems.length > 0) {
+      showToast(ownerItems.length + ' maintenance item' + (ownerItems.length > 1 ? 's' : '') + ' logged', 'Owner repairs added to Maintenance Log', '🔧');
+    }
+  } catch(e) { console.error('autoCreateMaintenanceItems:', e); }
 }
 
 // ── Utility ──

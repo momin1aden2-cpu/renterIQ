@@ -400,7 +400,30 @@ function toggleQ(i){var row=document.getElementById('q'+i);var wrap=document.get
 function finishWalkthrough(){renderSummary();switchView('E')}
 function renderSummary(){var addr=inspectionData.address||'Property';document.getElementById('sumAddr').textContent=addr;var html='';AREAS.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.condition){html+='<div class="sum-area-row"><div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+area.icon+' '+area.name+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">'+{good:'Good',issues:'Issues',concern:'Concerns'}[d.condition]+'</div></div><span class="verdict-btn v-'+d.condition+'-sel" style="width:80px;cursor:default">'+{good:'✓ Good',issues:'⚠ Issues',concern:'❌ Concerns'}[d.condition]+'</span></div>'}});document.getElementById('sumAreas').innerHTML=html||'<div style="font-weight:600;font-size:13px;color:var(--muted);text-align:center;padding:20px">No areas rated yet</div>';var allFlags=[];AREAS.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.redFlags)allFlags=allFlags.concat(d.redFlags.map(function(f){return{area:area.name,flag:f}}))});if(allFlags.length){var fhtml='';allFlags.forEach(function(f){fhtml+='<div class="sum-area-row"><div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+f.flag+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">'+f.area+'</div></div></div>'});document.getElementById('sumFlags').innerHTML=fhtml;document.getElementById('sumFlagsWrap').style.display='block'}else{document.getElementById('sumFlagsWrap').style.display='none'}}
 function setVerdict(v){['yes','maybe','no'].forEach(function(x){document.getElementById('v'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('v-'+x+'-sel')});document.getElementById('v'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('v-'+v+'-sel');inspectionData.verdict=v}
-function saveAndGoHome(){inspectionData.notes=document.getElementById('sumNotes').value;localStorage.setItem('renteriq_openhome_insp_'+Date.now(),JSON.stringify(inspectionData));showToast('Saved','Your inspection notes are saved to your device','💾');setTimeout(function(){navigate('/app/index.html')},1500)}
+function saveAndGoHome(){
+  inspectionData.notes=document.getElementById('sumNotes').value;
+  var key='renteriq_openhome_insp_'+Date.now();
+  localStorage.setItem(key,JSON.stringify(inspectionData));
+  saveToConditionReportsVault(inspectionData);
+  showToast('Saved','Your inspection notes are saved to your device and Vault','💾');
+  setTimeout(function(){navigate('/app/index.html')},1500)
+}
+
+function saveToConditionReportsVault(data){
+  try{
+    var raw=localStorage.getItem('riq_condition_reports')||'[]';
+    var reports=JSON.parse(raw);
+    reports.unshift({
+      type:'open_home_inspection',
+      address:data.address||'Property',
+      rent:data.rent||'',
+      beds:data.beds||'2',
+      verdict:data.verdict||'',
+      date:Date.now()
+    });
+    localStorage.setItem('riq_condition_reports',JSON.stringify(reports));
+  }catch(e){console.error('saveToConditionReportsVault:',e);}
+}
 function renderInspectionList(){var list=document.getElementById('inspList');if(!list)return;var saved=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('renteriq_openhome_insp_')){try{var data=JSON.parse(localStorage.getItem(key)||'{}');saved.push({key:key,data:data})}catch(e){}}}if(!saved.length){list.innerHTML='<div style="text-align:center;padding:40px 16px"><div style="font-size:44px;margin-bottom:12px">📋</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:6px">No inspections yet</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Start an inspection to document properties you visit.</div></div>';return}list.innerHTML='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">Recent Inspections</div>'+saved.map(function(item){return'<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\''+item.key+'\')"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(item.data.address||'Property')+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds:'')+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:6px">'+new Date(parseInt(item.key.split('_')[2])).toLocaleDateString('en-AU')+'</div></div>'}).join('')}
 function loadSavedInspection(key){try{inspectionData=JSON.parse(localStorage.getItem(key)||'{}');document.getElementById('setupAddress').value=inspectionData.address||'';document.getElementById('setupRent').value=inspectionData.rent||'';document.getElementById('setupBeds').value=inspectionData.beds||'2';switchView('B')}catch(e){showToast('Error','Could not load inspection','❌')}}
 </script>
