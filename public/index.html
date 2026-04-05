@@ -74,7 +74,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 .nav-links.show{display:flex;flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);padding:16px 24px 20px;border-bottom:1px solid var(--border-lt);gap:16px;z-index:99}
 
 /* HERO */
-.hero{background:linear-gradient(150deg,#060F2A 0%,#0A2460 52%,#143a8a 100%);padding:80px 0 72px;overflow:hidden;text-align:center;position:relative}
+.hero{background:linear-gradient(150deg,#060F2A 0%,#0A2460 52%,#143a8a 100%);padding:80px 0 72px;overflow:visible;text-align:center;position:relative}
 .hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:1000px;height:800px;background:radial-gradient(ellipse,rgba(46,99,224,.32) 0%,transparent 65%);pointer-events:none}
 .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent)}
 .hero .container{display:flex;flex-direction:column;align-items:center;max-width:960px;position:relative;z-index:1}
@@ -443,7 +443,32 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 
 
 
-/* LANDING SEARCH SECTION */
+/* SMART SEARCH HUB - Provider Cards */
+.smart-search-hub { background: #fff; padding: 40px 0; }
+.ss-hub-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 24px; color: var(--blue-dk); text-align: center; margin-bottom: 8px; }
+.ss-hub-subtitle { font-size: 15px; color: var(--muted); text-align: center; margin-bottom: 32px; }
+.ss-hub-location { text-align: center; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--blue); margin-bottom: 24px; }
+.ss-providers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 600px; margin: 0 auto 32px; }
+.ss-provider { background: #fff; border-radius: 16px; padding: 24px 20px; border: 2px solid var(--border-lt); cursor: pointer; transition: all 0.2s; text-align: center; }
+.ss-provider:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); border-color: var(--blue-lt); }
+.ss-provider:active { transform: scale(0.98); }
+.ss-provider-icon { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 12px; }
+.ss-provider-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 4px; }
+.ss-provider-desc { font-size: 13px; color: var(--muted); }
+.ss-track-box { max-width: 600px; margin: 0 auto; background: var(--blue-xl); border-radius: 16px; padding: 24px; border: 1.5px solid var(--border-lt); }
+.ss-track-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.ss-track-form { display: flex; gap: 10px; }
+.ss-track-input { flex: 1; padding: 14px 16px; border: 1.5px solid var(--border-lt); border-radius: 12px; font-size: 15px; font-family: 'Nunito', sans-serif; background: #fff; }
+.ss-track-input:focus { border-color: var(--blue); outline: none; }
+.ss-track-btn { background: var(--teal); color: #fff; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; padding: 14px 24px; border-radius: 12px; border: none; cursor: pointer; white-space: nowrap; }
+.ss-track-btn:hover { background: var(--teal-dk); }
+.ss-track-hint { font-size: 13px; color: var(--muted); margin-top: 12px; padding: 12px; background: #E0F2FE; border-radius: 10px; }
+
+@media(max-width: 640px) {
+  .ss-providers { grid-template-columns: 1fr; }
+  .ss-track-form { flex-direction: column; }
+  .ss-track-btn { width: 100%; }
+}
 .ls-section{background:#F4F7FF;padding:40px 0 80px}
 @media(max-width:900px){.ls-filter-bar{flex-wrap:wrap;border-radius:16px}.ls-fb-search{width:100%;border-right:none;border-bottom:1.5px solid var(--border-lt);min-width:unset}.ls-fb-search-btn{flex:1;justify-content:center;border-radius:0 0 14px 14px}.ls-dd-wrap{flex:1}}
 @media(max-width:600px){.ls-dd-btn{padding:0 12px;font-size:12px}.ls-fb-search-btn{padding:0 16px}}
@@ -757,23 +782,26 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
 </section>
 
-<!-- Results Section -->
-<section class="ls-section" id="search" style="display:none">
+<!-- Smart Search Results Section -->
+<section class="smart-search-hub" id="search" style="display:none">
   <div class="container">
-    <!-- Results Bar -->
-    <div class="ls-results-bar" id="lsResultsBar" style="display:none">
-      <div>
-        <div class="ls-results-count" id="lsCount"></div>
-        <div class="ls-results-sub" id="lsSubtitle"></div>
-      </div>
+    <h2 class="ss-hub-title">Browse Properties</h2>
+    <p class="ss-hub-subtitle">Choose a site to search for rentals</p>
+    <div class="ss-hub-location" id="ssLocation">Perth 6000</div>
+    
+    <div class="ss-providers" id="ssProviders">
+      <!-- Providers injected here -->
     </div>
-
-    <!-- Property Grid -->
-    <div class="ls-grid" id="lsGrid" style="display:none"></div>
-    <div id="lsNoResults" class="ls-no-results">
-      <div class="ls-no-icon">🏠</div>
-      <h3>Search for rentals above</h3>
-      <p style="font-size:14px">Enter a suburb or postcode and use the filters to find your next home.</p>
+    
+    <div class="ss-track-box">
+      <div class="ss-track-title">🔗 Track a Property</div>
+      <form class="ss-track-form" onsubmit="trackFromUrl(event)">
+        <input type="url" class="ss-track-input" id="ssPropertyUrl" placeholder="Paste property URL here..." required>
+        <button type="submit" class="ss-track-btn">Track</button>
+      </form>
+      <div class="ss-track-hint">
+        💡 <strong>Tip:</strong> Browse any site above, find a property you like, copy its URL, and paste it here to save it to your tracked properties.
+      </div>
     </div>
   </div>
 </section>
@@ -1373,7 +1401,7 @@ function showAutocomplete(query) {
     <div class="autocomplete-item ${index === 0 ? 'selected' : ''}" data-index="${index}" onclick="selectSuburb('${suburb.name}', '${suburb.postcode}', '${suburb.state}')">
       <div class="autocomplete-main">
         <span class="autocomplete-name">${suburb.name}</span>
-        <span class="autocomplete-meta">${suburb.state} · ${suburb.region}</span>
+        <span class="autocomplete-meta">${suburb.state} · ${suburb.postcode}</span>
       </div>
       <span class="autocomplete-postcode">${suburb.postcode}</span>
     </div>
@@ -1383,11 +1411,35 @@ function showAutocomplete(query) {
 }
 
 function findSuburbs(query) {
-  const q = query.toLowerCase();
-  return australianSuburbs.filter(s => 
+  if (!suburbsData.length) return [];
+  const q = query.toLowerCase().trim();
+  
+  // Filter suburbs that match
+  const matches = suburbsData.filter(s => 
     s.name.toLowerCase().includes(q) || 
-    s.postcode.includes(q)
-  ).slice(0, 8);
+    s.postcode.toString().includes(q)
+  );
+  
+  // Sort by relevance: exact match first, then starts with, then contains
+  matches.sort((a, b) => {
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+    
+    // Exact match gets highest priority
+    if (nameA === q && nameB !== q) return -1;
+    if (nameB === q && nameA !== q) return 1;
+    
+    // Starts with query gets next priority
+    const aStarts = nameA.startsWith(q);
+    const bStarts = nameB.startsWith(q);
+    if (aStarts && !bStarts) return -1;
+    if (bStarts && !aStarts) return 1;
+    
+    // Shorter names come first (more relevant)
+    return nameA.length - nameB.length;
+  });
+  
+  return matches.slice(0, 10);
 }
 
 function hideAutocomplete() {
@@ -1477,37 +1529,221 @@ function clearAdvancedFilters() {
   updateFilterButtonLabel();
 }
 
-// ========== SEARCH & RESULTS WITH DOMAIN API ==========
+// ========== SMART SEARCH HUB - PROVIDER SELECTION ==========
+
+let suburbsData = []; // Will be loaded from JSON
+
+// Load suburbs from JSON file
+async function loadSuburbsData() {
+  try {
+    const response = await fetch('/data/suburbs.json');
+    const data = await response.json();
+    const raw = data.suburbs || [];
+    
+    // Deduplicate by name+state, keeping the lowest postcode (primary residential)
+    const seen = {};
+    suburbsData = raw.reduce((acc, s) => {
+      const key = `${s.name.toLowerCase()}|${s.state.toLowerCase()}`;
+      const pc = parseInt(s.postcode, 10) || 0;
+      if (!seen[key]) {
+        seen[key] = { index: acc.length, postcode: pc };
+        acc.push(s);
+      } else if (pc < seen[key].postcode) {
+        // Replace with lower postcode entry
+        acc[seen[key].index] = s;
+        seen[key].postcode = pc;
+      }
+      return acc;
+    }, []);
+  } catch (error) {
+    console.error('Failed to load suburbs data:', error);
+    suburbsData = [];
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+  loadSuburbsData();
+});
+
+const SS_PROVIDERS = [
+  { key: 'realestate', name: 'realestate.com.au', color: '#0066CC', logo: '🏠', desc: 'Australia\'s largest property site' },
+  { key: 'domain', name: 'Domain.com.au', color: '#2E3192', logo: '🔷', desc: 'Premium listings & market data' },
+  { key: 'reiwa', name: 'REIWA', color: '#E60028', logo: '🏘️', desc: 'WA local specialists', waOnly: true },
+  { key: 'rent', name: 'Rent.com.au', color: '#FF6B35', logo: '🔑', desc: 'Simple rental search' }
+];
+
+function generateSearchUrls(suburb, state, postcode) {
+  // Keep original suburb name with spaces for better matching
+  const formattedSuburb = suburb.toLowerCase().trim().replace(/\s+/g, '-');
+  const cleanPostcode = postcode.trim();
+  const stateLower = (state || 'wa').toLowerCase();
+  
+  return {
+    realestate: `https://www.realestate.com.au/rent/in-${formattedSuburb},+${stateLower}+${cleanPostcode}/list-1`,
+    domain: `https://www.domain.com.au/rent/${formattedSuburb}-${stateLower}-${cleanPostcode}/`,
+    reiwa: state === 'WA' ? `https://reiwa.com.au/rental-properties/${formattedSuburb}-${cleanPostcode}/` : '',
+    rent: `https://www.rent.com.au/rentals/${formattedSuburb}-${stateLower}-${cleanPostcode}`
+  };
+}
 
 async function performSearch() {
   const section = document.getElementById('search');
   if (!section) return;
   
+  // Get search query from location input
+  const query = locationInput?.value?.trim() || '';
+  
+  // If user selected from dropdown, use that data
+  // Otherwise try to parse the query
+  let postcode, suburb, state;
+  
+  if (selectedLocation) {
+    postcode = selectedLocation.postcode;
+    suburb = selectedLocation.name;
+    state = selectedLocation.state;
+  } else {
+    // Try to extract postcode from query (4 digits)
+    const postcodeMatch = query.match(/\d{4}/);
+    postcode = postcodeMatch ? postcodeMatch[0] : '';
+    
+    // Remove postcode from query to get suburb
+    const suburbPart = query.replace(/\d{4}/, '').trim();
+    
+    // Try to find suburb in our data that matches
+    const matchedSuburb = suburbsData.find(s => 
+      s.name.toLowerCase() === suburbPart.toLowerCase() ||
+      suburbPart.toLowerCase().includes(s.name.toLowerCase())
+    );
+    
+    if (matchedSuburb) {
+      suburb = matchedSuburb.name;
+      state = matchedSuburb.state;
+      postcode = matchedSuburb.postcode;
+    } else {
+      suburb = suburbPart || 'Perth';
+      state = 'WA';
+    }
+  }
+  
+  // Validate we have required data
+  if (!postcode || !suburb) {
+    alert('Please select a suburb from the dropdown or type a valid suburb with postcode (e.g., "Morley 6062")');
+    return;
+  }
+  
+  // Scroll to search section
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  
-  const resultsBar = document.getElementById('lsResultsBar');
-  const grid = document.getElementById('lsGrid');
-  const noResults = document.getElementById('lsNoResults');
-  const countEl = document.getElementById('lsCount');
-  const subEl = document.getElementById('lsSubtitle');
-  
-  if (resultsBar) resultsBar.style.display = 'flex';
-  if (countEl) countEl.textContent = 'Searching...';
-  if (subEl) subEl.textContent = selectedLocation ? `Properties in ${selectedLocation.name}` : 'All properties';
-  if (grid) grid.style.display = 'none';
-  if (noResults) noResults.style.display = 'none';
   section.style.display = 'block';
   
-  // Try Domain API first, fallback to sample data
-  const location = selectedLocation ? `${selectedLocation.name} ${selectedLocation.state}` : 'Melbourne VIC';
-  const domainResults = await searchDomainListings(location, searchFilters);
+  // Update location display
+  document.getElementById('ssLocation').textContent = `${suburb}, ${state} ${postcode}`;
   
-  if (domainResults && domainResults.listings) {
-    renderDomainListings(domainResults.listings);
-  } else {
-    // Fallback to sample data
-    setTimeout(() => filterResults(), 600);
+  // Generate provider URLs
+  const urls = generateSearchUrls(suburb, state, postcode);
+  
+  // Render provider cards - hide REIWA if not WA
+  const providersContainer = document.getElementById('ssProviders');
+  const visibleProviders = SS_PROVIDERS.filter(p => !p.waOnly || state === 'WA');
+  
+  providersContainer.innerHTML = visibleProviders.map(p => `
+    <div class="ss-provider" onclick="openProvider('${urls[p.key]}')" style="border-left: 4px solid ${p.color}">
+      <div class="ss-provider-icon" style="background: ${p.color}15">${p.logo}</div>
+      <div class="ss-provider-name">${p.name}</div>
+      <div class="ss-provider-desc">${p.desc}</div>
+    </div>
+  `).join('');
+}
+
+function openProvider(url) {
+  if (!url) {
+    alert('This provider is not available for the selected location.');
+    return;
   }
+  window.open(url, '_blank');
+}
+
+// Track property from URL
+async function trackFromUrl(e) {
+  e.preventDefault();
+  
+  const urlInput = document.getElementById('ssPropertyUrl');
+  const url = urlInput.value.trim();
+  
+  if (!url) return;
+  
+  // Validate it's a property URL
+  const validDomains = ['realestate.com.au', 'domain.com.au', 'reiwa.com.au', 'rent.com.au'];
+  const isValid = validDomains.some(domain => url.includes(domain));
+  
+  if (!isValid) {
+    alert('Please enter a URL from realestate.com.au, Domain, REIWA, or Rent.com.au');
+    return;
+  }
+  
+  // Detect source
+  let source = 'unknown';
+  if (url.includes('realestate.com.au')) source = 'realestate';
+  else if (url.includes('domain.com.au')) source = 'domain';
+  else if (url.includes('reiwa.com.au')) source = 'reiwa';
+  else if (url.includes('rent.com.au')) source = 'rent';
+  
+  // Extract basic info from URL
+  const address = extractAddressFromUrl(url);
+  
+  // Create property object
+  const property = {
+    id: 'prop_' + Date.now(),
+    address: address,
+    price: 'Contact agent',
+    description: 'Property tracked from ' + source,
+    imageUrl: '',
+    sourceSite: source,
+    originalLink: url,
+    savedAt: new Date(),
+    status: 'pending'
+  };
+  
+  // Save to localStorage (using same key as searchService.js)
+  let tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]');
+  tracked.push(property);
+  localStorage.setItem('renteriq_tracked_properties', JSON.stringify(tracked));
+  
+  // Clear input and show success
+  urlInput.value = '';
+  alert('✓ Property tracked! View it in the app at /app/pages/tracked.html');
+}
+
+function extractAddressFromUrl(url) {
+  // Try to extract address from URL path
+  try {
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+    // Remove common URL parts and decode
+    let address = path
+      .replace(/^\/rent\/in-/, '')
+      .replace(/^\/rent\//, '')
+      .replace(/^\/rental-properties\//, '')
+      .replace(/^\/rentals\//, '')
+      .replace(/-/g, ' ')
+      .replace(/_/g, ' ')
+      .replace(/\+/g, ' ')
+      .replace(/list-\d+$/, '')
+      .replace(/\/$/, '');
+    
+    // Decode URL encoding
+    address = decodeURIComponent(address);
+    
+    // Capitalize words
+    return address.replace(/\b\w/g, c => c.toUpperCase()).substring(0, 60) || 'Property Listing';
+  } catch {
+    return 'Property Listing';
+  }
+}
+
+// Legacy filterResults - now uses Smart Search
+function filterResults() {
+  performSearch();
 }
 
 function renderDomainListings(listings) {

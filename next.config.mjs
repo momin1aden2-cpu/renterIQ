@@ -24,7 +24,12 @@ const nextConfig = {
       { source: "/", destination: "/index.html" },
       // Main dashboard (app homepage) - for PWA start_url
       { source: "/dashboard", destination: "/app/index.html" },
-      // Core nav tabs
+      // Smart Search Hub
+      { source: "/smart-search", destination: "/app/pages/smart-search.html" },
+      { source: "/tracked", destination: "/app/pages/tracked.html" },
+      { source: "/webview", destination: "/app/pages/webview.html" },
+      // API routes
+      { source: "/api/extract-metadata", destination: "/api/extract-metadata/route" },
       { source: "/search", destination: "/app/pages/search.html" },
       { source: "/inspect", destination: "/app/pages/inspection.html" },
       { source: "/inspect/routine", destination: "/app/pages/routine-inspection.html" },
