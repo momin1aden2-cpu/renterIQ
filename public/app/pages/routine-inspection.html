@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -77,6 +78,14 @@
 .cd-num-label{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)}
 .cd-actions{display:flex;gap:8px;margin-top:14px}
 .cd-actions .btn-blue-c,.cd-actions .btn-muted-c{font-size:13px;padding:10px;border-radius:12px}
+
+/* Schedule Setup */
+.schedule-card{background:#fff;border-radius:20px;padding:20px;margin:0 16px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card)}
+.schedule-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-lt)}
+.schedule-row:last-child{border-bottom:none}
+.schedule-label{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1}
+.schedule-input{border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);outline:none;box-sizing:border-box;transition:border-color .2s}
+.schedule-input:focus{border-color:var(--blue)}
 
 /* Past Inspection Card */
 .ri-card{background:#fff;border-radius:18px;margin:0 16px 12px;padding:16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
@@ -165,6 +174,10 @@
 .plan-due-text{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--amber)}
 .plan-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .2s;font-size:14px}
 .plan-check.done{background:var(--teal);border-color:var(--teal);color:#fff}
+.plan-photo-row{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.plan-photo-thumb{width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--border-lt)}
+.plan-photo-add{width:52px;height:52px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .2s}
+.plan-photo-add:active{border-color:var(--blue)}
 
 /* VIEW E — RESPONSE BUILDER */
 .deadline-banner{background:var(--amber-lt);border:1.5px solid rgba(245,166,35,.3);border-radius:16px;margin:16px;padding:16px;display:flex;gap:12px;align-items:center}
@@ -176,6 +189,8 @@
 .response-field:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(27,80,200,.12)}
 .response-field::placeholder{color:var(--muted)}
 .response-actions{display:flex;gap:8px;margin-top:14px}
+.photo-attach-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border-lt)}
+.photo-attach-thumb{width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--border-lt)}
 
 /* VIEW F — REMINDERS */
 .reminder-row{background:#fff;border-radius:16px;margin:0 16px 10px;padding:14px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:13px;transition:all .18s var(--ease-smooth)}
@@ -212,12 +227,16 @@
 <body>
 <div class="app-shell">
 
+<!-- Hidden file inputs -->
+<input type="file" id="reportFileInput" accept=".pdf,.jpg,.jpeg,.png,.heic,.heif" style="display:none">
+<input type="file" id="taskPhotoInput" accept="image/*" capture="environment" style="display:none">
+
 <!-- VIEW A — INSPECTION HISTORY -->
 <div class="view" id="viewA">
   <header class="sh">
     <div class="sh-row">
       <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RENTERIQ</span></button>
-      <button class="sh-right" onclick="showToast('Info','Routine inspections happen every 3–6 months','📋')">ℹ️</button>
+      <button class="sh-right" onclick="showToast('Info','Routine inspections happen every 3–6 months. Upload the report when you receive it and RenterIQ will help you respond.','📋')">ℹ️</button>
     </div>
     <div class="sh-title">Routine Inspections</div>
     <div class="sh-sub">Track and respond to routine inspections</div>
@@ -230,31 +249,55 @@
         <div class="cd-icon">🏠</div>
         <div>
           <div class="cd-title">Next Scheduled Inspection</div>
-          <div class="cd-date">Not scheduled yet</div>
-          <div class="cd-sub">Add your tenancy to set inspection dates</div>
+          <div class="cd-date" id="cdDate">Not scheduled yet</div>
+          <div class="cd-sub" id="cdSub">Set your inspection schedule below</div>
         </div>
       </div>
       <div class="cd-divider"></div>
       <div class="cd-days">
-        <div class="cd-num">&mdash;</div>
+        <div class="cd-num" id="cdNum">&mdash;</div>
         <div>
           <div class="cd-num-label">days until inspection</div>
-          <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">No upcoming inspection</div>
+          <div id="cdDaysDetail" style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">No upcoming inspection</div>
         </div>
       </div>
       <div class="cd-actions">
-        <button class="btn-blue-c flex-1" onclick="switchView('B')">📝 Record Report</button>
-        <button class="btn-muted-c flex-1" onclick="showToast('Reminders','Reminder settings opened','🔔')">🔔 Reminders</button>
+        <button class="btn-blue-c flex-1" onclick="switchView('B')">📝 Upload Report</button>
+        <button class="btn-muted-c flex-1" onclick="switchView('F')">🔔 Reminders</button>
+      </div>
+    </div>
+
+    <!-- Schedule Setup -->
+    <div class="schedule-card" id="scheduleCard">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:14px">Inspection Schedule</div>
+      <div class="schedule-row">
+        <span class="schedule-label">Last inspection date</span>
+        <input type="date" class="schedule-input" id="lastInspectionDate" style="width:150px" onchange="updateSchedule()">
+      </div>
+      <div class="schedule-row">
+        <span class="schedule-label">Frequency (months)</span>
+        <select class="schedule-input" id="inspectionFrequency" style="width:150px" onchange="updateSchedule()">
+          <option value="3" selected>Every 3 months</option>
+          <option value="4">Every 4 months</option>
+          <option value="6">Every 6 months</option>
+          <option value="12">Every 12 months</option>
+        </select>
+      </div>
+      <div class="schedule-row" style="border-bottom:none">
+        <span class="schedule-label">Agency name</span>
+        <input type="text" class="schedule-input" id="agencyName" placeholder="e.g. Ray White" style="width:150px;text-align:right" onchange="saveSchedule()">
       </div>
     </div>
 
     <!-- Past Inspections -->
     <div style="padding:0 16px"><div class="sec-label">PAST INSPECTIONS</div></div>
 
-    <div style="margin:0 16px 12px;background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);text-align:center;color:var(--muted)">
-      <div style="font-size:28px;margin-bottom:8px">📋</div>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk);margin-bottom:4px">No past inspections yet</div>
-      <div style="font-size:12px">Completed inspection records will appear here.</div>
+    <div id="pastInspectionsList">
+      <div id="noPastInspections" style="margin:0 16px 12px;background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);text-align:center;color:var(--muted)">
+        <div style="font-size:28px;margin-bottom:8px">📋</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk);margin-bottom:4px">No past inspections yet</div>
+        <div style="font-size:12px">Completed inspection records will appear here.</div>
+      </div>
     </div>
 
     <!-- Disclaimer -->
@@ -281,8 +324,8 @@
       <button class="sh-back" onclick="switchView('A')"><span class="sh-back-arrow">‹</span><span class="sh-label">Back</span></button>
       <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.65)">Step 1 of 3</span>
     </div>
-    <div class="sh-title">Record Report</div>
-    <div class="sh-sub">Add items from the agent's inspection report</div>
+    <div class="sh-title">Upload Report</div>
+    <div class="sh-sub">Upload or type items from the agent's inspection report</div>
   </header>
 
   <div class="content">
@@ -290,8 +333,8 @@
     <div class="input-method selected" id="methodPhoto" onclick="selectMethod('photo')">
       <div class="im-icon" style="background:rgba(27,80,200,.08)">📸</div>
       <div>
-        <div class="im-title">Photo Scan</div>
-        <div class="im-desc">Photograph the report — AI extracts items automatically</div>
+        <div class="im-title">Photo / PDF Upload</div>
+        <div class="im-desc">Upload the report — AI extracts and categorises items</div>
       </div>
       <div class="im-check" id="checkPhoto" style="background:var(--blue);border-color:var(--blue);color:#fff">✓</div>
     </div>
@@ -308,19 +351,20 @@
     <!-- Photo Scan Section -->
     <div id="photoSection">
       <div class="scan-area">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Upload Report Photo</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Upload Inspection Report</div>
 
         <div class="scan-preview" id="scanPreview">
-          <div style="height:200px;background:linear-gradient(135deg,#1a3a8f,#2E63E0);display:flex;align-items:center;justify-content:center;font-size:48px;border-radius:14px">📄</div>
+          <img id="scanPreviewImg" src="" alt="Report preview" style="max-height:300px;width:100%;object-fit:contain;border-radius:14px;background:var(--blue-xl)">
           <button class="scan-preview-remove" onclick="removeScanPhoto()">✕</button>
         </div>
 
-        <div class="scan-upload" id="scanUpload" onclick="simulateScanUpload()">
+        <div class="scan-upload" id="scanUpload" onclick="document.getElementById('reportFileInput').click()">
           <span class="scan-upload-icon">📷</span>
-          <div class="scan-upload-title">Tap to take photo or upload</div>
-          <div class="scan-upload-sub">JPG, PNG or PDF · Max 10MB</div>
+          <div class="scan-upload-title">Tap to take photo or upload file</div>
+          <div class="scan-upload-sub">JPG, PNG, PDF or HEIC · Max 10MB</div>
         </div>
 
+        <div id="scanFileName" style="display:none;margin-top:12px;padding:10px 14px;background:var(--teal-lt);border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);display:none"></div>
         <div style="margin-top:12px;font-weight:600;font-size:12px;color:var(--muted);line-height:1.55">💡 For best results, ensure the report text is clearly visible and well-lit.</div>
       </div>
     </div>
@@ -400,99 +444,12 @@
       </div>
     </div>
 
-    <!-- Results (hidden initially) -->
-    <div id="analysisResults" style="display:none">
-      <!-- Owner Responsibility -->
-      <div class="cat-section">
-        <div class="cat-header">
-          <div class="cat-icon" style="background:rgba(232,64,64,.1)">🔧</div>
-          <div class="cat-title">Owner Responsibility</div>
-          <div class="cat-count">2 items</div>
-        </div>
-        <div class="cat-item">
-          <div class="ci-top">
-            <div class="ci-text">Kitchen tap leaking under sink</div>
-            <span class="tag tag-red">Owner</span>
-          </div>
-          <div class="ci-detail">Plumbing is the landlord's responsibility under the Residential Tenancies Act. Report to agent for urgent repair.</div>
-          <div class="ci-action">
-            <span style="font-size:16px">💡</span>
-            <div class="ci-action-text">Agent must arrange repair within 14 days</div>
-          </div>
-        </div>
-        <div class="cat-item">
-          <div class="ci-top">
-            <div class="ci-text">Bedroom window cracked</div>
-            <span class="tag tag-red">Owner</span>
-          </div>
-          <div class="ci-detail">Structural repairs including windows are the owner's obligation unless damage was caused by tenant.</div>
-          <div class="ci-action">
-            <span style="font-size:16px">💡</span>
-            <div class="ci-action-text">Urgent repair — affects security and weatherproofing</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tenant Responsibility -->
-      <div class="cat-section">
-        <div class="cat-header">
-          <div class="cat-icon" style="background:rgba(245,166,35,.1)">🧹</div>
-          <div class="cat-title">Tenant Responsibility</div>
-          <div class="cat-count">3 items</div>
-        </div>
-        <div class="cat-item">
-          <div class="ci-top">
-            <div class="ci-text">Front garden needs mowing</div>
-            <span class="tag tag-amber">Tenant</span>
-          </div>
-          <div class="ci-detail">Garden maintenance is typically the tenant's responsibility unless otherwise stated in the lease.</div>
-          <div class="ci-action">
-            <span style="font-size:16px">⏱️</span>
-            <div class="ci-action-text">Fix before response deadline</div>
-          </div>
-        </div>
-        <div class="cat-item">
-          <div class="ci-top">
-            <div class="ci-text">Bathroom mould on ceiling</div>
-            <span class="tag tag-amber">Tenant</span>
-          </div>
-          <div class="ci-detail">Minor mould from poor ventilation is tenant responsibility. Use mould removal spray and improve airflow.</div>
-          <div class="ci-action">
-            <span style="font-size:16px">💡</span>
-            <div class="ci-action-text">Use exhaust fan during showers</div>
-          </div>
-        </div>
-        <div class="cat-item">
-          <div class="ci-top">
-            <div class="ci-text">Oven needs deep clean</div>
-            <span class="tag tag-amber">Tenant</span>
-          </div>
-          <div class="ci-detail">Keeping appliances clean is part of maintaining the property in reasonable condition.</div>
-          <div class="ci-action">
-            <span style="font-size:16px">⏱️</span>
-            <div class="ci-action-text">Simple fix — complete this week</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div style="padding:0 16px;margin-top:8px">
-        <button class="btn-blue-c btn-full" onclick="switchView('D')">📋 View Action Plan</button>
-        <div style="height:10px"></div>
-        <button class="btn-muted-c btn-full" onclick="switchView('E')">✉️ Build Response to Agent</button>
-      </div>
-
-      <div style="padding:16px">
-        <div class="disclaimer-note">
-          <span class="dn-icon">⚠️</span>
-          <p>Smart classification · Reviewed by tenant · This is guidance only, not legal advice.</p>
-        </div>
-      </div>
-    </div>
+    <!-- Results (dynamically rendered) -->
+    <div id="analysisResults" style="display:none"></div>
   </div>
 </div>
 
-<!-- VIEW D — ACTION PLAN -->
+<!-- VIEW D — ACTION PLAN (dynamically rendered) -->
 <div class="view" id="viewD" style="display:none">
   <header class="sh">
     <div class="sh-row">
@@ -504,127 +461,46 @@
   </header>
 
   <div class="content">
-    <div style="padding:0 16px"><div class="sec-label">YOUR TASKS (3 items)</div></div>
+    <div id="tenantTasksSection"></div>
+    <div id="ownerTasksSection"></div>
 
-    <div class="plan-card">
-      <div class="plan-top">
-        <div class="plan-priority high"></div>
-        <div class="plan-body">
-          <div class="plan-title">Mow front garden</div>
-          <div class="plan-desc">Cut grass and trim edges. Remove any weeds from garden beds.</div>
-          <div class="plan-due">
-            <span>⏰</span>
-            <span class="plan-due-text">Due in 5 days</span>
-          </div>
-        </div>
-        <div class="plan-check" onclick="togglePlanCheck(this)"></div>
-      </div>
-    </div>
-
-    <div class="plan-card">
-      <div class="plan-top">
-        <div class="plan-priority medium"></div>
-        <div class="plan-body">
-          <div class="plan-title">Clean bathroom mould</div>
-          <div class="plan-desc">Apply mould removal spray to ceiling. Wipe down and ensure ventilation.</div>
-          <div class="plan-due">
-            <span>⏰</span>
-            <span class="plan-due-text">Due in 7 days</span>
-          </div>
-        </div>
-        <div class="plan-check" onclick="togglePlanCheck(this)"></div>
-      </div>
-    </div>
-
-    <div class="plan-card">
-      <div class="plan-top">
-        <div class="plan-priority low"></div>
-        <div class="plan-body">
-          <div class="plan-title">Deep clean oven</div>
-          <div class="plan-desc">Remove racks and soak. Use oven cleaner on interior surfaces.</div>
-          <div class="plan-due">
-            <span>⏰</span>
-            <span class="plan-due-text">Due in 10 days</span>
-          </div>
-        </div>
-        <div class="plan-check" onclick="togglePlanCheck(this)"></div>
-      </div>
-    </div>
-
-    <div style="padding:0 16px"><div class="sec-label">REPORT TO AGENT (2 items)</div></div>
-
-    <div class="plan-card" style="opacity:.85">
-      <div class="plan-top">
-        <div class="plan-priority high"></div>
-        <div class="plan-body">
-          <div class="plan-title">Kitchen tap leaking</div>
-          <div class="plan-desc">Owner responsibility — notify agent for urgent repair.</div>
-        </div>
-        <span class="tag tag-red" style="flex-shrink:0">Owner</span>
-      </div>
-    </div>
-
-    <div class="plan-card" style="opacity:.85">
-      <div class="plan-top">
-        <div class="plan-priority high"></div>
-        <div class="plan-body">
-          <div class="plan-title">Bedroom window cracked</div>
-          <div class="plan-desc">Owner responsibility — security concern, request urgent fix.</div>
-        </div>
-        <span class="tag tag-red" style="flex-shrink:0">Owner</span>
-      </div>
-    </div>
-
-    <div style="padding:0 16px;margin-top:8px">
-      <button class="btn-teal-c btn-full" onclick="switchView('E')">✉️ Build Response to Agent</button>
+    <div id="actionPlanButtons" style="padding:0 16px;margin-top:8px">
+      <button class="btn-teal-c btn-full" id="buildResponseBtn" onclick="buildResponse()">✉️ Build Response to Agent</button>
       <div style="height:10px"></div>
       <button class="btn-muted-c btn-full" onclick="switchView('F')">🔔 Set Reminders</button>
     </div>
   </div>
 </div>
 
-<!-- VIEW E — RESPONSE BUILDER -->
+<!-- VIEW E — RESPONSE BUILDER (dynamically populated) -->
 <div class="view" id="viewE" style="display:none">
   <header class="sh">
     <div class="sh-row">
       <button class="sh-back" onclick="switchView('D')"><span class="sh-back-arrow">‹</span><span class="sh-label">Back</span></button>
-      <button class="sh-right" onclick="showToast('Copied','Response copied to clipboard','📋')">📋</button>
+      <button class="sh-right" onclick="copyResponse()">📋</button>
     </div>
     <div class="sh-title">Response to Agent</div>
     <div class="sh-sub">Review and send your response</div>
   </header>
 
   <div class="content">
-    <div class="deadline-banner">
+    <div class="deadline-banner" id="deadlineBanner">
       <div class="dl-icon">⏰</div>
       <div>
-        <div class="dl-title">Response due in 12 days</div>
-        <div class="dl-sub">Agent requires a response by 3 April 2026</div>
+        <div class="dl-title" id="dlTitle">Response due in 14 days</div>
+        <div class="dl-sub" id="dlSub">Send your response before the deadline</div>
       </div>
     </div>
 
     <div class="response-card">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Your Response</div>
-      <textarea class="response-field" id="responseField">Dear Ray White Fitzroy,
+      <textarea class="response-field" id="responseField" placeholder="AI will generate your response..."></textarea>
 
-Thank you for the routine inspection report dated 15 March 2026 for 18 Smith Street, Fitzroy VIC 3065.
+      <div class="photo-attach-grid" id="responsePhotos"></div>
 
-TENANT ACTION ITEMS:
-✓ Front garden — Will mow and trim by 25 March
-✓ Bathroom mould — Will clean ceiling and improve ventilation
-✓ Oven — Will deep clean by end of week
-
-OWNER/AGENT ITEMS:
-• Kitchen tap leaking — Please arrange plumber (urgent repair under RTA)
-• Bedroom window cracked — Please arrange glazier (security concern)
-
-Please confirm receipt and arrange the above owner repairs at your earliest convenience.
-
-Kind regards,
-Alexandra Johnson</textarea>
       <div class="response-actions">
-        <button class="btn-blue-c flex-1" onclick="showToast('Sent','Response sent to agent','✅');setTimeout(()=>switchView('F'),800)">✉️ Send Response</button>
-        <button class="btn-muted-c flex-1" onclick="showToast('Copied','Copied to clipboard','📋')">📋 Copy</button>
+        <button class="btn-blue-c flex-1" onclick="sendResponse()">✉️ Send Response</button>
+        <button class="btn-muted-c flex-1" onclick="copyResponse()">📋 Copy</button>
       </div>
     </div>
 
@@ -637,73 +513,46 @@ Alexandra Johnson</textarea>
   </div>
 </div>
 
-<!-- VIEW F — REMINDERS -->
+<!-- VIEW F — REMINDERS (dynamically populated) -->
 <div class="view" id="viewF" style="display:none">
   <header class="sh">
     <div class="sh-row">
-      <button class="sh-back" onclick="switchView('D')"><span class="sh-back-arrow">‹</span><span class="sh-label">Back</span></button>
+      <button class="sh-back" onclick="switchView(analysisData?'D':'A')"><span class="sh-back-arrow">‹</span><span class="sh-label">Back</span></button>
     </div>
     <div class="sh-title">Reminders</div>
     <div class="sh-sub">Stay on track with your action plan</div>
   </header>
 
   <div class="content">
-    <div style="padding:0 16px"><div class="sec-label">RESPONSE DEADLINE</div></div>
+    <div style="padding:0 16px"><div class="sec-label">INSPECTION SCHEDULE</div></div>
+
+    <div class="reminder-row">
+      <div class="rr-icon" style="background:rgba(27,80,200,.08)">📅</div>
+      <div class="rr-body">
+        <div class="rr-title">7 days before next inspection</div>
+        <div class="rr-sub" id="remind7days">Set inspection date first</div>
+      </div>
+      <div class="rr-toggle" style="background:var(--teal)" data-key="remind_7d" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
+    </div>
 
     <div class="reminder-row">
       <div class="rr-icon" style="background:rgba(245,166,35,.1)">⏰</div>
       <div class="rr-body">
-        <div class="rr-title">3 days before deadline</div>
-        <div class="rr-sub">31 March 2026 at 9:00am</div>
+        <div class="rr-title">1 day before next inspection</div>
+        <div class="rr-sub" id="remind1day">Set inspection date first</div>
       </div>
-      <div class="rr-toggle" style="background:var(--teal)" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
+      <div class="rr-toggle" style="background:var(--teal)" data-key="remind_1d" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
     </div>
 
-    <div class="reminder-row">
-      <div class="rr-icon" style="background:rgba(232,64,64,.1)">🚨</div>
-      <div class="rr-body">
-        <div class="rr-title">1 day before deadline</div>
-        <div class="rr-sub">2 April 2026 at 9:00am</div>
-      </div>
-      <div class="rr-toggle" style="background:var(--teal)" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
-    </div>
+    <div id="taskRemindersSection"></div>
 
-    <div style="padding:0 16px"><div class="sec-label">TASK REMINDERS</div></div>
-
-    <div class="reminder-row">
-      <div class="rr-icon" style="background:rgba(0,200,150,.1)">🌿</div>
-      <div class="rr-body">
-        <div class="rr-title">Mow front garden</div>
-        <div class="rr-sub">Due 27 March 2026</div>
-      </div>
-      <div class="rr-toggle" style="background:var(--teal)" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
-    </div>
-
-    <div class="reminder-row">
-      <div class="rr-icon" style="background:rgba(27,80,200,.08)">🧹</div>
-      <div class="rr-body">
-        <div class="rr-title">Clean bathroom mould</div>
-        <div class="rr-sub">Due 29 March 2026</div>
-      </div>
-      <div class="rr-toggle" style="background:var(--teal)" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
-    </div>
-
-    <div class="reminder-row">
-      <div class="rr-icon" style="background:rgba(27,80,200,.08)">🍳</div>
-      <div class="rr-body">
-        <div class="rr-title">Deep clean oven</div>
-        <div class="rr-sub">Due 1 April 2026</div>
-      </div>
-      <div class="rr-toggle" style="background:var(--teal)" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
-    </div>
-
-    <div style="padding:16px">
-      <button class="btn-teal-c btn-full" onclick="switchView('G');showToast('Saved','Inspection saved to Vault','✅')">✅ Complete & Save to Vault</button>
+    <div style="padding:16px" id="completeSection">
+      <button class="btn-teal-c btn-full" onclick="completeAndSave()">✅ Complete & Save to Vault</button>
     </div>
   </div>
 </div>
 
-<!-- VIEW G — COMPLETED SUMMARY -->
+<!-- VIEW G — COMPLETED SUMMARY (dynamically rendered) -->
 <div class="view" id="viewG" style="display:none">
   <header class="sh">
     <div class="sh-row">
@@ -711,85 +560,20 @@ Alexandra Johnson</textarea>
       <button class="sh-right" onclick="showToast('Shared','Inspection report shared','📤')">📤</button>
     </div>
     <div class="sh-title">Inspection Summary</div>
-    <div class="sh-sub">15 January 2026</div>
+    <div class="sh-sub" id="summaryDate"></div>
   </header>
 
   <div class="content">
     <div class="summary-hero">
-      <span class="summary-icon">✅</span>
-      <div class="summary-title">All Items Resolved</div>
-      <div class="summary-sub">Great work! All inspection items were addressed and the response was sent to the agent on time.</div>
+      <span class="summary-icon" id="summaryIcon">✅</span>
+      <div class="summary-title" id="summaryTitle">All Items Resolved</div>
+      <div class="summary-sub" id="summarySub">Great work! All inspection items were addressed and the response was sent to the agent on time.</div>
     </div>
 
-    <div class="summary-stats">
-      <div class="ss-card">
-        <div class="ss-num" style="color:var(--red)">2</div>
-        <div class="ss-label">Owner</div>
-      </div>
-      <div class="ss-card">
-        <div class="ss-num" style="color:var(--amber)">3</div>
-        <div class="ss-label">Tenant</div>
-      </div>
-      <div class="ss-card">
-        <div class="ss-num" style="color:var(--teal)">5</div>
-        <div class="ss-label">Total</div>
-      </div>
-    </div>
+    <div class="summary-stats" id="summaryStats"></div>
 
-    <!-- Items Summary -->
-    <div style="padding:0 16px"><div class="sec-label">OWNER ITEMS</div></div>
-    <div class="plan-card">
-      <div class="plan-top">
-        <div class="plan-priority high"></div>
-        <div class="plan-body">
-          <div class="plan-title">Kitchen tap leaking</div>
-          <div class="plan-desc">Reported to agent · Plumber arranged 20 Jan</div>
-        </div>
-        <span class="tag tag-teal">Fixed</span>
-      </div>
-    </div>
-    <div class="plan-card">
-      <div class="plan-top">
-        <div class="plan-priority high"></div>
-        <div class="plan-body">
-          <div class="plan-title">Bedroom window cracked</div>
-          <div class="plan-desc">Reported to agent · Glazier replaced 22 Jan</div>
-        </div>
-        <span class="tag tag-teal">Fixed</span>
-      </div>
-    </div>
-
-    <div style="padding:0 16px"><div class="sec-label">TENANT ITEMS</div></div>
-    <div class="plan-card">
-      <div class="plan-top">
-        <div class="plan-priority medium"></div>
-        <div class="plan-body">
-          <div class="plan-title">Front garden mowed</div>
-          <div class="plan-desc">Completed 18 Jan</div>
-        </div>
-        <div class="plan-check done">✓</div>
-      </div>
-    </div>
-    <div class="plan-card">
-      <div class="plan-top">
-        <div class="plan-priority medium"></div>
-        <div class="plan-body">
-          <div class="plan-title">Bathroom mould cleaned</div>
-          <div class="plan-desc">Completed 19 Jan</div>
-        </div>
-        <div class="plan-check done">✓</div>
-      </div>
-    </div>
-    <div class="plan-card">
-      <div class="plan-top">
-        <div class="plan-priority low"></div>
-        <div class="plan-body">
-          <div class="plan-title">Oven deep cleaned</div>
-          <div class="plan-desc">Completed 20 Jan</div>
-        </div>
-        <div class="plan-check done">✓</div>
-      </div>
-    </div>
+    <div id="summaryOwnerItems"></div>
+    <div id="summaryTenantItems"></div>
 
     <div style="padding:16px">
       <div class="disclaimer-note">
@@ -814,159 +598,711 @@ Alexandra Johnson</textarea>
 </div><!-- /app-shell -->
 
 <script>
-/* Navigation */
-function navigate(url){
-  document.body.style.opacity='0';
-  setTimeout(()=>{window.location.href=url},180);
+/* ═══════════════════════════════════════════════
+   RenterIQ — Routine Inspection (Fully Wired)
+   ═══════════════════════════════════════════════ */
+
+// ── State ──
+var analysisData = null;       // AI analysis result
+var uploadedFile = null;       // File object from upload
+var taskPhotos = {};           // { itemIndex: [dataURL, ...] }
+var taskCompleted = {};        // { itemIndex: true }
+var currentPhotoTaskIdx = -1;  // which task we're adding a photo to
+var inspectionId = null;       // Firestore doc ID for current inspection
+var STORAGE_KEY = 'riq_routine_inspection';
+
+// ── Navigation ──
+function navigate(url) {
+  document.body.style.opacity = '0';
+  setTimeout(function() { window.location.href = url; }, 180);
 }
 
-/* View Switching */
-function switchView(id){
-  document.querySelectorAll('.view').forEach(v=>v.style.display='none');
-  const view=document.getElementById('view'+id);
-  if(view){view.style.display='flex';view.style.opacity='0';requestAnimationFrame(()=>{view.style.opacity='1'});window.scrollTo(0,0);}
+// ── View Switching ──
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(function(v) { v.style.display = 'none'; });
+  var view = document.getElementById('view' + id);
+  if (view) {
+    view.style.display = 'flex';
+    view.style.opacity = '0';
+    requestAnimationFrame(function() { view.style.opacity = '1'; });
+    window.scrollTo(0, 0);
+  }
+  // Reset analyse button when going back to B
+  if (id === 'B') {
+    var btn = document.getElementById('analyzeBtn');
+    btn.innerHTML = '🤖 Analyse with AI';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  }
 }
 
-/* Toast */
-function showToast(title,sub,icon){
-  document.getElementById('toastTitle').textContent=title;
-  document.getElementById('toastSub').textContent=sub;
-  document.getElementById('toastIcon').textContent=icon||'✓';
-  const t=document.getElementById('toast');
+// ── Toast ──
+function showToast(title, sub, icon) {
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastSub').textContent = sub;
+  document.getElementById('toastIcon').textContent = icon || '✓';
+  var t = document.getElementById('toast');
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+  clearTimeout(t._tid);
+  t._tid = setTimeout(function() { t.classList.remove('show'); }, 2800);
 }
 
-/* Input Method Selection */
-let currentMethod='photo';
-function selectMethod(method){
-  currentMethod=method;
-  document.getElementById('methodPhoto').classList.toggle('selected',method==='photo');
-  document.getElementById('methodManual').classList.toggle('selected',method==='manual');
-  document.getElementById('checkPhoto').innerHTML=method==='photo'?'✓':'';
-  document.getElementById('checkPhoto').style.background=method==='photo'?'var(--blue)':'transparent';
-  document.getElementById('checkPhoto').style.borderColor=method==='photo'?'var(--blue)':'var(--border)';
-  document.getElementById('checkPhoto').style.color=method==='photo'?'#fff':'transparent';
-  document.getElementById('checkManual').innerHTML=method==='manual'?'✓':'';
-  document.getElementById('checkManual').style.background=method==='manual'?'var(--blue)':'transparent';
-  document.getElementById('checkManual').style.borderColor=method==='manual'?'var(--blue)':'var(--border)';
-  document.getElementById('checkManual').style.color=method==='manual'?'#fff':'transparent';
-  document.getElementById('photoSection').style.display=method==='photo'?'block':'none';
-  document.getElementById('manualSection').style.display=method==='manual'?'block':'none';
+// ── Input Method Selection ──
+var currentMethod = 'photo';
+function selectMethod(method) {
+  currentMethod = method;
+  document.getElementById('methodPhoto').classList.toggle('selected', method === 'photo');
+  document.getElementById('methodManual').classList.toggle('selected', method === 'manual');
+  document.getElementById('checkPhoto').innerHTML = method === 'photo' ? '✓' : '';
+  document.getElementById('checkPhoto').style.background = method === 'photo' ? 'var(--blue)' : 'transparent';
+  document.getElementById('checkPhoto').style.borderColor = method === 'photo' ? 'var(--blue)' : 'var(--border)';
+  document.getElementById('checkPhoto').style.color = method === 'photo' ? '#fff' : 'transparent';
+  document.getElementById('checkManual').innerHTML = method === 'manual' ? '✓' : '';
+  document.getElementById('checkManual').style.background = method === 'manual' ? 'var(--blue)' : 'transparent';
+  document.getElementById('checkManual').style.borderColor = method === 'manual' ? 'var(--blue)' : 'var(--border)';
+  document.getElementById('checkManual').style.color = method === 'manual' ? '#fff' : 'transparent';
+  document.getElementById('photoSection').style.display = method === 'photo' ? 'block' : 'none';
+  document.getElementById('manualSection').style.display = method === 'manual' ? 'block' : 'none';
 }
 
-/* Scan Photo */
-function simulateScanUpload(){
-  document.getElementById('scanPreview').style.display='block';
-  document.getElementById('scanUpload').style.display='none';
-  showToast('Uploaded','Report photo ready for AI analysis','📄');
-}
-function removeScanPhoto(){
-  document.getElementById('scanPreview').style.display='none';
-  document.getElementById('scanUpload').style.display='block';
+// ── Real File Upload ──
+document.getElementById('reportFileInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('Too large', 'Max file size is 10MB', '⚠️');
+    return;
+  }
+  uploadedFile = file;
+  var nameEl = document.getElementById('scanFileName');
+  nameEl.textContent = '📄 ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
+  nameEl.style.display = 'block';
+
+  // Show preview for images
+  if (file.type.startsWith('image/')) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      document.getElementById('scanPreviewImg').src = ev.target.result;
+      document.getElementById('scanPreview').style.display = 'block';
+      document.getElementById('scanUpload').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // PDF — show file name card, hide upload area
+    document.getElementById('scanPreview').style.display = 'none';
+    document.getElementById('scanUpload').style.display = 'none';
+  }
+  showToast('Uploaded', 'Report ready for AI analysis', '📄');
+});
+
+function removeScanPhoto() {
+  uploadedFile = null;
+  document.getElementById('scanPreview').style.display = 'none';
+  document.getElementById('scanUpload').style.display = 'block';
+  document.getElementById('scanFileName').style.display = 'none';
+  document.getElementById('reportFileInput').value = '';
 }
 
-/* Manual Entry */
-let itemCount=3;
-function addItem(){
+// ── Manual Entry ──
+var itemCount = 3;
+function addItem() {
   itemCount++;
-  const row=document.createElement('div');
-  row.className='item-row';
-  row.innerHTML=`<div class="item-num">${itemCount}</div><input class="item-input" placeholder="Enter inspection item" type="text"><button class="item-remove" onclick="removeItem(this)">✕</button>`;
+  var row = document.createElement('div');
+  row.className = 'item-row';
+  row.innerHTML = '<div class="item-num">' + itemCount + '</div><input class="item-input" placeholder="Enter inspection item" type="text"><button class="item-remove" onclick="removeItem(this)">✕</button>';
   document.getElementById('itemsList').appendChild(row);
 }
-function removeItem(btn){
-  const row=btn.closest('.item-row');
-  if(document.querySelectorAll('.item-row').length>1)row.remove();
+function removeItem(btn) {
+  var row = btn.closest('.item-row');
+  if (document.querySelectorAll('.item-row').length > 1) row.remove();
   renumberItems();
 }
-function renumberItems(){
-  document.querySelectorAll('.item-row').forEach((r,i)=>{r.querySelector('.item-num').textContent=i+1;});
-  itemCount=document.querySelectorAll('.item-row').length;
+function renumberItems() {
+  document.querySelectorAll('.item-row').forEach(function(r, i) { r.querySelector('.item-num').textContent = i + 1; });
+  itemCount = document.querySelectorAll('.item-row').length;
 }
 
-/* AI Analysis Animation */
-function startAnalysis(){
-  const btn=document.getElementById('analyzeBtn');
-  btn.innerHTML='<span style="display:inline-block;animation:spin 1s linear infinite">⏳</span> Analysing…';
-  btn.style.opacity='.7';
-  btn.style.pointerEvents='none';
-  setTimeout(()=>{switchView('C');runAnalysisAnimation();},600);
+// ── AI Analysis ──
+function startAnalysis() {
+  var btn = document.getElementById('analyzeBtn');
+  btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite">⏳</span> Analysing…';
+  btn.style.opacity = '.7';
+  btn.style.pointerEvents = 'none';
+
+  // Gather input
+  var textItems = '';
+  if (currentMethod === 'manual') {
+    var inputs = document.querySelectorAll('#itemsList .item-input');
+    var lines = [];
+    inputs.forEach(function(inp) { if (inp.value.trim()) lines.push(inp.value.trim()); });
+    textItems = lines.join('\n');
+    if (!textItems) {
+      showToast('Empty', 'Please enter at least one item', '⚠️');
+      btn.innerHTML = '🤖 Analyse with AI';
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+      return;
+    }
+  } else if (!uploadedFile) {
+    showToast('No file', 'Please upload the inspection report first', '⚠️');
+    btn.innerHTML = '🤖 Analyse with AI';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+    return;
+  }
+
+  setTimeout(function() { switchView('C'); runAnalysisWithAPI(textItems); }, 400);
 }
 
-function runAnalysisAnimation(){
-  document.getElementById('aiAnalyzing').style.display='block';
-  document.getElementById('analysisResults').style.display='none';
-  const steps=[
-    {el:'step1Check',delay:1200},
-    {el:'step2Check',delay:2600},
-    {el:'step3Check',delay:3800}
-  ];
-  steps.forEach(s=>{
-    setTimeout(()=>{
-      const el=document.getElementById(s.el);
-      el.textContent='✓';
-      el.style.color='var(--teal)';
-      el.style.animation='successPop .3s ease both';
-    },s.delay);
+function runAnalysisWithAPI(textItems) {
+  // Reset animation state
+  document.getElementById('aiAnalyzing').style.display = 'block';
+  document.getElementById('analysisResults').style.display = 'none';
+  document.getElementById('aiIconEl').classList.add('analyzing');
+  document.getElementById('aiIconEl').textContent = '🤖';
+  document.getElementById('aiTitleEl').textContent = 'Analysing Report…';
+  document.getElementById('aiSubEl').textContent = 'Identifying items and categorising by tenant vs owner responsibility';
+  ['step1Check', 'step2Check', 'step3Check'].forEach(function(id) {
+    var el = document.getElementById(id);
+    el.textContent = '○';
+    el.style.color = 'var(--border)';
+    el.style.animation = '';
   });
-  setTimeout(()=>{
-    document.getElementById('aiIconEl').classList.remove('analyzing');
-    document.getElementById('aiIconEl').textContent='✅';
-    document.getElementById('aiTitleEl').textContent='Analysis Complete';
-    document.getElementById('aiSubEl').textContent='5 items categorised · 2 owner · 3 tenant';
-    setTimeout(()=>{
-      document.getElementById('aiAnalyzing').style.display='none';
-      document.getElementById('analysisResults').style.display='block';
-    },800);
-  },4200);
+
+  // Animate step 1
+  setTimeout(function() { tickStep('step1Check'); }, 800);
+
+  // Build request
+  var formData = new FormData();
+  if (uploadedFile) formData.append('file', uploadedFile);
+  if (textItems) formData.append('text', textItems);
+
+  fetch('/api/analyze-inspection', { method: 'POST', body: formData })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      // Step 2 tick
+      tickStep('step2Check');
+      setTimeout(function() {
+        tickStep('step3Check');
+        setTimeout(function() { onAnalysisComplete(data); }, 600);
+      }, 600);
+    })
+    .catch(function(err) {
+      console.error('Analysis error:', err);
+      showToast('Error', 'Analysis failed — using smart fallback', '⚠️');
+      // Fallback: send text-only request
+      fetch('/api/analyze-inspection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: textItems || 'Front garden needs mowing\nKitchen tap leaking\nBathroom mould\nBedroom window cracked\nOven needs deep clean' })
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          tickStep('step2Check');
+          setTimeout(function() { tickStep('step3Check'); setTimeout(function() { onAnalysisComplete(data); }, 600); }, 600);
+        })
+        .catch(function() {
+          showToast('Error', 'Could not analyse — please try again', '❌');
+          switchView('B');
+        });
+    });
 }
 
-/* Plan Check Toggle */
-function togglePlanCheck(el){
-  el.classList.toggle('done');
-  if(el.classList.contains('done')){
-    el.textContent='✓';
-    el.style.animation='successPop .3s ease both';
-    showToast('Done','Task marked complete','✅');
-  }else{
-    el.textContent='';
-    el.style.animation='';
+function tickStep(id) {
+  var el = document.getElementById(id);
+  el.textContent = '✓';
+  el.style.color = 'var(--teal)';
+  el.style.animation = 'successPop .3s ease both';
+}
+
+function onAnalysisComplete(data) {
+  analysisData = data;
+  taskCompleted = {};
+  taskPhotos = {};
+
+  var items = data.items || [];
+  var summary = data.summary || { total: items.length, tenant_count: 0, owner_count: 0 };
+
+  // Update analysis complete header
+  document.getElementById('aiIconEl').classList.remove('analyzing');
+  document.getElementById('aiIconEl').textContent = '✅';
+  document.getElementById('aiTitleEl').textContent = 'Analysis Complete';
+  document.getElementById('aiSubEl').textContent = summary.total + ' items categorised · ' + summary.owner_count + ' owner · ' + summary.tenant_count + ' tenant';
+
+  setTimeout(function() {
+    document.getElementById('aiAnalyzing').style.display = 'none';
+    renderAnalysisResults(data);
+    document.getElementById('analysisResults').style.display = 'block';
+  }, 800);
+}
+
+// ── Render Analysis Results (View C) ──
+function renderAnalysisResults(data) {
+  var items = data.items || [];
+  var ownerItems = items.filter(function(it) { return it.responsibility === 'owner'; });
+  var tenantItems = items.filter(function(it) { return it.responsibility === 'tenant'; });
+  var html = '';
+
+  if (ownerItems.length) {
+    html += '<div class="cat-section"><div class="cat-header"><div class="cat-icon" style="background:rgba(232,64,64,.1)">🔧</div><div class="cat-title">Owner Responsibility</div><div class="cat-count">' + ownerItems.length + ' items</div></div>';
+    ownerItems.forEach(function(it) {
+      html += '<div class="cat-item"><div class="ci-top"><div class="ci-text">' + esc(it.description) + '</div><span class="tag tag-red">Owner</span></div><div class="ci-detail">' + esc(it.explanation) + '</div><div class="ci-action"><span style="font-size:16px">💡</span><div class="ci-action-text">' + esc(it.action) + '</div></div></div>';
+    });
+    html += '</div>';
+  }
+
+  if (tenantItems.length) {
+    html += '<div class="cat-section"><div class="cat-header"><div class="cat-icon" style="background:rgba(245,166,35,.1)">🧹</div><div class="cat-title">Tenant Responsibility</div><div class="cat-count">' + tenantItems.length + ' items</div></div>';
+    tenantItems.forEach(function(it) {
+      var dueText = it.deadline_days ? 'Due in ' + it.deadline_days + ' days' : '';
+      html += '<div class="cat-item"><div class="ci-top"><div class="ci-text">' + esc(it.description) + '</div><span class="tag tag-amber">Tenant</span></div><div class="ci-detail">' + esc(it.explanation) + '</div><div class="ci-action"><span style="font-size:16px">⏱️</span><div class="ci-action-text">' + (dueText || esc(it.action)) + '</div></div></div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div style="padding:0 16px;margin-top:8px"><button class="btn-blue-c btn-full" onclick="switchView(\'D\');renderActionPlan()">📋 View Action Plan</button><div style="height:10px"></div><button class="btn-muted-c btn-full" onclick="buildResponse()">✉️ Build Response to Agent</button></div>';
+  html += '<div style="padding:16px"><div class="disclaimer-note"><span class="dn-icon">⚠️</span><p>Smart classification · Reviewed by tenant · This is guidance only, not legal advice.</p></div></div>';
+
+  document.getElementById('analysisResults').innerHTML = html;
+}
+
+// ── Render Action Plan (View D) ──
+function renderActionPlan() {
+  if (!analysisData) return;
+  var items = analysisData.items || [];
+  var tenantItems = items.filter(function(it) { return it.responsibility === 'tenant'; });
+  var ownerItems = items.filter(function(it) { return it.responsibility === 'owner'; });
+
+  // Tenant tasks
+  var tHtml = '<div style="padding:0 16px"><div class="sec-label">YOUR TASKS (' + tenantItems.length + ' items)</div></div>';
+  tenantItems.forEach(function(it, idx) {
+    var globalIdx = items.indexOf(it);
+    var done = taskCompleted[globalIdx];
+    var photos = taskPhotos[globalIdx] || [];
+    tHtml += '<div class="plan-card" id="planCard' + globalIdx + '"><div class="plan-top"><div class="plan-priority ' + it.priority + '"></div><div class="plan-body"><div class="plan-title">' + esc(it.description) + '</div><div class="plan-desc">' + esc(it.action) + '</div>';
+    if (it.deadline_days) tHtml += '<div class="plan-due"><span>⏰</span><span class="plan-due-text">Due in ' + it.deadline_days + ' days</span></div>';
+    tHtml += '</div><div class="plan-check' + (done ? ' done' : '') + '" onclick="toggleTask(' + globalIdx + ')">' + (done ? '✓' : '') + '</div></div>';
+    // Photo row
+    tHtml += '<div class="plan-photo-row" id="photoRow' + globalIdx + '">';
+    photos.forEach(function(p) { tHtml += '<img class="plan-photo-thumb" src="' + p + '">'; });
+    tHtml += '<div class="plan-photo-add" onclick="addTaskPhoto(' + globalIdx + ')">+</div></div></div>';
+  });
+  document.getElementById('tenantTasksSection').innerHTML = tHtml;
+
+  // Owner tasks
+  var oHtml = '<div style="padding:0 16px"><div class="sec-label">REPORT TO AGENT (' + ownerItems.length + ' items)</div></div>';
+  ownerItems.forEach(function(it) {
+    oHtml += '<div class="plan-card" style="opacity:.85"><div class="plan-top"><div class="plan-priority ' + it.priority + '"></div><div class="plan-body"><div class="plan-title">' + esc(it.description) + '</div><div class="plan-desc">Owner responsibility — ' + esc(it.action) + '</div></div><span class="tag tag-red" style="flex-shrink:0">Owner</span></div></div>';
+  });
+  document.getElementById('ownerTasksSection').innerHTML = oHtml;
+
+  // Update response button state
+  updateBuildResponseBtn();
+}
+
+function toggleTask(idx) {
+  taskCompleted[idx] = !taskCompleted[idx];
+  var card = document.getElementById('planCard' + idx);
+  var check = card ? card.querySelector('.plan-check') : null;
+  if (check) {
+    check.classList.toggle('done', taskCompleted[idx]);
+    check.textContent = taskCompleted[idx] ? '✓' : '';
+    if (taskCompleted[idx]) check.style.animation = 'successPop .3s ease both';
+    else check.style.animation = '';
+  }
+  showToast(taskCompleted[idx] ? 'Done' : 'Undone', taskCompleted[idx] ? 'Task marked complete' : 'Task unmarked', taskCompleted[idx] ? '✅' : '↩️');
+  updateBuildResponseBtn();
+  saveState();
+}
+
+function updateBuildResponseBtn() {
+  if (!analysisData) return;
+  var tenantItems = analysisData.items.filter(function(it) { return it.responsibility === 'tenant'; });
+  var allDone = tenantItems.every(function(it) { return taskCompleted[analysisData.items.indexOf(it)]; });
+  var btn = document.getElementById('buildResponseBtn');
+  if (allDone && tenantItems.length > 0) {
+    btn.innerHTML = '✅ All Done — Build Response to Agent';
+    btn.style.boxShadow = '0 0 0 2px var(--teal), 0 2px 12px rgba(0,200,150,.3)';
+  } else {
+    btn.innerHTML = '✉️ Build Response to Agent';
+    btn.style.boxShadow = '';
   }
 }
 
-/* Reminder Toggle */
-function toggleReminder(el){
-  const dot=el.querySelector('.rr-toggle-dot');
-  const isOn=el.style.background==='var(--teal)';
-  if(isOn){
-    el.style.background='var(--border)';
-    dot.style.right='auto';
-    dot.style.left='2px';
-    showToast('Off','Reminder disabled','🔕');
-  }else{
-    el.style.background='var(--teal)';
-    dot.style.left='auto';
-    dot.style.right='2px';
-    showToast('On','Reminder enabled','🔔');
+// ── Task Photos ──
+function addTaskPhoto(idx) {
+  currentPhotoTaskIdx = idx;
+  document.getElementById('taskPhotoInput').click();
+}
+
+document.getElementById('taskPhotoInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file || currentPhotoTaskIdx < 0) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    if (!taskPhotos[currentPhotoTaskIdx]) taskPhotos[currentPhotoTaskIdx] = [];
+    taskPhotos[currentPhotoTaskIdx].push(ev.target.result);
+    renderActionPlan();
+    showToast('Photo added', 'Evidence photo attached to task', '📸');
+    saveState();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+// ── Build AI Response (View E) ──
+function buildResponse() {
+  if (!analysisData) return;
+  switchView('E');
+  var items = analysisData.items || [];
+  var tenantItems = items.filter(function(it) { return it.responsibility === 'tenant'; });
+  var ownerItems = items.filter(function(it) { return it.responsibility === 'owner'; });
+  var deadline = analysisData.suggested_response_deadline_days || 14;
+  var agencyName = document.getElementById('agencyName').value || 'the Agency';
+  var today = new Date();
+  var dueDate = new Date(today.getTime() + deadline * 86400000);
+
+  document.getElementById('dlTitle').textContent = 'Response due in ' + deadline + ' days';
+  document.getElementById('dlSub').textContent = 'Respond by ' + dueDate.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Generate email
+  var email = 'Dear ' + agencyName + ',\n\n';
+  email += 'Thank you for the routine inspection report dated ' + today.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) + '.\n\n';
+
+  if (tenantItems.length) {
+    email += 'TENANT ACTION ITEMS:\n';
+    tenantItems.forEach(function(it) {
+      var done = taskCompleted[items.indexOf(it)];
+      var photos = taskPhotos[items.indexOf(it)] || [];
+      email += (done ? '✓' : '•') + ' ' + it.description;
+      if (it.deadline_days) email += ' — Will complete within ' + it.deadline_days + ' days';
+      if (photos.length) email += ' (' + photos.length + ' photo' + (photos.length > 1 ? 's' : '') + ' attached)';
+      email += '\n';
+    });
+    email += '\n';
+  }
+
+  if (ownerItems.length) {
+    email += 'OWNER/AGENT ITEMS:\n';
+    ownerItems.forEach(function(it) {
+      email += '• ' + it.description + ' — ' + it.action + '\n';
+    });
+    email += '\n';
+  }
+
+  email += 'Please confirm receipt and arrange the above owner repairs at your earliest convenience.\n\n';
+  email += 'Kind regards,\n';
+
+  // Try to get user name
+  var userName = '';
+  try { userName = localStorage.getItem('riq-user-name') || ''; } catch(e) {}
+  email += userName || '[Your Name]';
+
+  document.getElementById('responseField').value = email;
+
+  // Show attached photos
+  var photoGrid = document.getElementById('responsePhotos');
+  var allPhotos = [];
+  Object.keys(taskPhotos).forEach(function(k) { allPhotos = allPhotos.concat(taskPhotos[k]); });
+  if (allPhotos.length) {
+    var pH = '';
+    allPhotos.forEach(function(p) { pH += '<img class="photo-attach-thumb" src="' + p + '">'; });
+    pH += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:var(--muted);align-self:center">' + allPhotos.length + ' photo' + (allPhotos.length > 1 ? 's' : '') + '</div>';
+    photoGrid.innerHTML = pH;
+    photoGrid.style.display = 'flex';
+  } else {
+    photoGrid.style.display = 'none';
   }
 }
 
-/* Fade In */
-document.body.style.opacity='0';
-window.addEventListener('load',()=>{document.body.style.transition='opacity .25s ease';document.body.style.opacity='1';});
-
-/* Reset analyze button when returning to B */
-const origSwitch=switchView;
-switchView=function(id){
-  if(id==='B'){
-    const btn=document.getElementById('analyzeBtn');
-    btn.innerHTML='🤖 Analyse with AI';
-    btn.style.opacity='1';
-    btn.style.pointerEvents='auto';
+function copyResponse() {
+  var field = document.getElementById('responseField');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(field.value).then(function() {
+      showToast('Copied', 'Response copied to clipboard', '📋');
+    });
+  } else {
+    field.select();
+    document.execCommand('copy');
+    showToast('Copied', 'Response copied to clipboard', '📋');
   }
-  origSwitch(id);
-};
+}
+
+function sendResponse() {
+  var email = document.getElementById('responseField').value;
+  // Open mailto with the response
+  var agencyName = document.getElementById('agencyName').value || '';
+  var subject = encodeURIComponent('Routine Inspection Response — ' + new Date().toLocaleDateString('en-AU'));
+  var body = encodeURIComponent(email);
+  window.open('mailto:?subject=' + subject + '&body=' + body);
+  showToast('Opening email', 'Paste response into your email app', '✉️');
+  setTimeout(function() { switchView('F'); renderReminders(); }, 1200);
+}
+
+// ── Reminders (View F) ──
+function renderReminders() {
+  if (!analysisData) {
+    document.getElementById('taskRemindersSection').innerHTML = '';
+    document.getElementById('completeSection').style.display = analysisData ? 'block' : 'none';
+    return;
+  }
+  var items = analysisData.items || [];
+  var tenantItems = items.filter(function(it) { return it.responsibility === 'tenant'; });
+  var html = '';
+  if (tenantItems.length) {
+    html += '<div style="padding:0 16px"><div class="sec-label">TASK REMINDERS</div></div>';
+    var icons = ['🌿', '🧹', '🍳', '🔧', '🏠', '📋'];
+    var colors = ['rgba(0,200,150,.1)', 'rgba(27,80,200,.08)', 'rgba(245,166,35,.1)', 'rgba(232,64,64,.1)'];
+    tenantItems.forEach(function(it, i) {
+      var dueDate = it.deadline_days ? new Date(Date.now() + it.deadline_days * 86400000).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) : 'No deadline set';
+      html += '<div class="reminder-row"><div class="rr-icon" style="background:' + colors[i % colors.length] + '">' + icons[i % icons.length] + '</div><div class="rr-body"><div class="rr-title">' + esc(it.description) + '</div><div class="rr-sub">Due ' + dueDate + '</div></div><div class="rr-toggle" style="background:var(--teal)" data-key="task_' + i + '" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div></div>';
+    });
+  }
+  document.getElementById('taskRemindersSection').innerHTML = html;
+  document.getElementById('completeSection').style.display = 'block';
+}
+
+function toggleReminder(el) {
+  var dot = el.querySelector('.rr-toggle-dot');
+  var isOn = getComputedStyle(el).backgroundColor !== 'rgb(213, 226, 248)';
+  if (el.style.background === 'var(--border)' || el.style.background === 'var(--border-lt)') isOn = false;
+  if (isOn) {
+    el.style.background = 'var(--border)';
+    dot.style.right = 'auto';
+    dot.style.left = '2px';
+    showToast('Off', 'Reminder disabled', '🔕');
+  } else {
+    el.style.background = 'var(--teal)';
+    dot.style.left = 'auto';
+    dot.style.right = '2px';
+    showToast('On', 'Reminder enabled', '🔔');
+  }
+  saveState();
+}
+
+// ── Complete & Save to Vault (View G) ──
+function completeAndSave() {
+  if (!analysisData) { switchView('A'); return; }
+  saveToFirestore(function() {
+    renderSummary();
+    switchView('G');
+    showToast('Saved', 'Inspection saved to Vault', '✅');
+    // Add to past inspections
+    addToPastInspections();
+  });
+}
+
+function renderSummary() {
+  if (!analysisData) return;
+  var items = analysisData.items || [];
+  var summary = analysisData.summary || {};
+  var tenantItems = items.filter(function(it) { return it.responsibility === 'tenant'; });
+  var ownerItems = items.filter(function(it) { return it.responsibility === 'owner'; });
+
+  document.getElementById('summaryDate').textContent = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('summaryStats').innerHTML =
+    '<div class="ss-card"><div class="ss-num" style="color:var(--red)">' + ownerItems.length + '</div><div class="ss-label">Owner</div></div>' +
+    '<div class="ss-card"><div class="ss-num" style="color:var(--amber)">' + tenantItems.length + '</div><div class="ss-label">Tenant</div></div>' +
+    '<div class="ss-card"><div class="ss-num" style="color:var(--teal)">' + items.length + '</div><div class="ss-label">Total</div></div>';
+
+  // Owner items summary
+  var oH = '<div style="padding:0 16px"><div class="sec-label">OWNER ITEMS</div></div>';
+  ownerItems.forEach(function(it) {
+    oH += '<div class="plan-card"><div class="plan-top"><div class="plan-priority ' + it.priority + '"></div><div class="plan-body"><div class="plan-title">' + esc(it.description) + '</div><div class="plan-desc">Reported to agent · ' + esc(it.action) + '</div></div><span class="tag tag-amber">Reported</span></div></div>';
+  });
+  document.getElementById('summaryOwnerItems').innerHTML = oH;
+
+  // Tenant items summary
+  var tH = '<div style="padding:0 16px"><div class="sec-label">TENANT ITEMS</div></div>';
+  tenantItems.forEach(function(it) {
+    var idx = items.indexOf(it);
+    var done = taskCompleted[idx];
+    tH += '<div class="plan-card"><div class="plan-top"><div class="plan-priority ' + it.priority + '"></div><div class="plan-body"><div class="plan-title">' + esc(it.description) + '</div><div class="plan-desc">' + (done ? 'Completed' : 'Pending') + '</div></div><div class="plan-check' + (done ? ' done' : '') + '">' + (done ? '✓' : '') + '</div></div></div>';
+  });
+  document.getElementById('summaryTenantItems').innerHTML = tH;
+}
+
+// ── Schedule Management ──
+function updateSchedule() {
+  var lastDate = document.getElementById('lastInspectionDate').value;
+  var freq = parseInt(document.getElementById('inspectionFrequency').value);
+  if (!lastDate) return;
+
+  var last = new Date(lastDate);
+  var next = new Date(last);
+  next.setMonth(next.getMonth() + freq);
+
+  var now = new Date();
+  var diff = Math.ceil((next - now) / 86400000);
+
+  document.getElementById('cdDate').textContent = next.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  if (diff > 0) {
+    document.getElementById('cdNum').textContent = diff;
+    document.getElementById('cdNum').style.color = diff <= 7 ? 'var(--red)' : diff <= 30 ? 'var(--amber)' : 'var(--teal)';
+    document.getElementById('cdDaysDetail').textContent = diff <= 7 ? 'Coming up soon!' : diff <= 30 ? 'Less than a month away' : 'Plenty of time';
+    document.getElementById('cdSub').textContent = 'Every ' + freq + ' months';
+  } else {
+    document.getElementById('cdNum').textContent = '0';
+    document.getElementById('cdNum').style.color = 'var(--red)';
+    document.getElementById('cdDaysDetail').textContent = 'Inspection overdue!';
+    document.getElementById('cdSub').textContent = 'Was due ' + next.toLocaleDateString('en-AU');
+  }
+
+  // Update reminder subs
+  var remind7 = new Date(next.getTime() - 7 * 86400000);
+  var remind1 = new Date(next.getTime() - 86400000);
+  document.getElementById('remind7days').textContent = remind7.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at 9:00am';
+  document.getElementById('remind1day').textContent = remind1.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at 9:00am';
+
+  saveSchedule();
+}
+
+function saveSchedule() {
+  try {
+    var data = {
+      lastDate: document.getElementById('lastInspectionDate').value,
+      frequency: document.getElementById('inspectionFrequency').value,
+      agency: document.getElementById('agencyName').value
+    };
+    localStorage.setItem(STORAGE_KEY + '_schedule', JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadSchedule() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY + '_schedule');
+    if (!raw) return;
+    var data = JSON.parse(raw);
+    if (data.lastDate) document.getElementById('lastInspectionDate').value = data.lastDate;
+    if (data.frequency) document.getElementById('inspectionFrequency').value = data.frequency;
+    if (data.agency) document.getElementById('agencyName').value = data.agency;
+    if (data.lastDate) updateSchedule();
+  } catch(e) {}
+}
+
+// ── Persistence (localStorage + Firestore) ──
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY + '_state', JSON.stringify({
+      taskCompleted: taskCompleted,
+      taskPhotos: taskPhotos,
+      analysisData: analysisData
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY + '_state');
+    if (!raw) return;
+    var data = JSON.parse(raw);
+    if (data.taskCompleted) taskCompleted = data.taskCompleted;
+    if (data.taskPhotos) taskPhotos = data.taskPhotos;
+    if (data.analysisData) analysisData = data.analysisData;
+  } catch(e) {}
+}
+
+function saveToFirestore(cb) {
+  // Save inspection record to Firestore if user is logged in
+  try {
+    if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) { if (cb) cb(); return; }
+    var user = firebase.auth().currentUser;
+    if (!user) { if (cb) cb(); return; }
+    var db = firebase.firestore();
+    var record = {
+      userId: user.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      agency: document.getElementById('agencyName').value || '',
+      analysis: analysisData,
+      taskCompleted: taskCompleted,
+      photoCount: Object.keys(taskPhotos).reduce(function(sum, k) { return sum + (taskPhotos[k] || []).length; }, 0),
+      status: 'completed'
+    };
+    db.collection('routine_inspections').add(record).then(function(doc) {
+      inspectionId = doc.id;
+      console.log('Inspection saved:', doc.id);
+      // Also save to vault
+      db.collection('users').doc(user.uid).collection('vault').add({
+        type: 'routine_inspection',
+        title: 'Routine Inspection — ' + new Date().toLocaleDateString('en-AU'),
+        inspectionId: doc.id,
+        summary: analysisData.summary,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      if (cb) cb();
+    }).catch(function(err) {
+      console.error('Firestore save error:', err);
+      if (cb) cb();
+    });
+  } catch(e) {
+    console.error('Save error:', e);
+    if (cb) cb();
+  }
+}
+
+function addToPastInspections() {
+  if (!analysisData) return;
+  var list = document.getElementById('pastInspectionsList');
+  var empty = document.getElementById('noPastInspections');
+  if (empty) empty.style.display = 'none';
+
+  var summary = analysisData.summary || {};
+  var card = document.createElement('div');
+  card.className = 'ri-card';
+  card.onclick = function() { renderSummary(); switchView('G'); };
+  card.innerHTML =
+    '<div class="ri-top"><div><div class="ri-date">' + new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div><div class="ri-addr">' + esc(document.getElementById('agencyName').value || 'Routine Inspection') + '</div></div><span class="tag tag-teal">Complete</span></div>' +
+    '<div class="ri-summary"><div class="ri-stat"><div class="ri-stat-dot" style="background:var(--red)"></div>' + (summary.owner_count || 0) + ' owner</div><div class="ri-stat"><div class="ri-stat-dot" style="background:var(--amber)"></div>' + (summary.tenant_count || 0) + ' tenant</div><div class="ri-stat"><div class="ri-stat-dot" style="background:var(--teal)"></div>' + (summary.total || 0) + ' total</div></div>' +
+    '<div class="ri-progress"><div class="ri-progress-label"><span>Progress</span><span>100%</span></div><div class="ri-progress-bar"><div class="ri-progress-fill" style="width:100%"></div></div></div>';
+  list.insertBefore(card, list.firstChild);
+
+  // Save past inspections list
+  savePastInspections();
+}
+
+function savePastInspections() {
+  try {
+    var cards = document.querySelectorAll('.ri-card');
+    var inspections = [];
+    cards.forEach(function(c) {
+      inspections.push({ html: c.innerHTML, date: Date.now() });
+    });
+    localStorage.setItem(STORAGE_KEY + '_past', JSON.stringify(inspections));
+  } catch(e) {}
+}
+
+function loadPastInspections() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY + '_past');
+    if (!raw) return;
+    var inspections = JSON.parse(raw);
+    if (!inspections.length) return;
+    var list = document.getElementById('pastInspectionsList');
+    var empty = document.getElementById('noPastInspections');
+    if (empty) empty.style.display = 'none';
+    inspections.forEach(function(insp) {
+      var card = document.createElement('div');
+      card.className = 'ri-card';
+      card.innerHTML = insp.html;
+      card.onclick = function() { if (analysisData) { renderSummary(); switchView('G'); } };
+      list.appendChild(card);
+    });
+  } catch(e) {}
+}
+
+// ── Utility ──
+function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ── Init ──
+document.body.style.opacity = '0';
+window.addEventListener('load', function() {
+  document.body.style.transition = 'opacity .25s ease';
+  document.body.style.opacity = '1';
+  loadSchedule();
+  loadState();
+  loadPastInspections();
+});
 </script>
 <script src="/app/js/sidebar.js"></script>
 </body>

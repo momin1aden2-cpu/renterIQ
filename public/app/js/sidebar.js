@@ -14,6 +14,7 @@
   var TOOLS = [
     { label: 'Entry Audit',  icon: '📸', path: '/app/pages/entry-audit.html' },
     { label: 'Lease Review',  icon: '📑', path: '/app/pages/lease.html' },
+    { label: 'Routine Inspect', icon: '🔍', path: '/app/pages/routine-inspection.html' },
     { label: 'Renter Rights', icon: '⚖️', path: '/app/pages/rights.html' },
     { label: 'Exit Clean',    icon: '🔑', path: '/app/pages/exit.html' },
   ];
@@ -189,6 +190,7 @@
       '/app/pages/vault.html': '/vault',
             '/app/pages/tracked.html': '/tracked',
       '/app/pages/lease.html': '/lease',
+      '/app/pages/routine-inspection.html': '/routine-inspection',
       '/app/pages/rights.html': '/rights',
       '/app/pages/exit.html': '/exit',
     };
