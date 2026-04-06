@@ -326,11 +326,30 @@
 </div><!-- /app-shell -->
 <script>
 /* Open Home Inspection — RenterIQ */
-function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+function navigate(p){window.location.href=p}
 function showToast(t,s,i){var el=document.getElementById('appToast');if(!el){el=document.createElement('div');el.id='appToast';el.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';el.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(el)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';el.style.transform='translateY(0)';el.style.opacity='1';clearTimeout(el._timer);el._timer=setTimeout(function(){el.style.transform='translateY(-90px)';el.style.opacity='0'},3200)}
 
 var currentView='A';
-function switchView(v){var cur=document.getElementById('view'+currentView);var nxt=document.getElementById('view'+v);if(!nxt||v===currentView)return;cur.style.opacity='0';cur.style.pointerEvents='none';setTimeout(function(){cur.style.display='none';cur.style.opacity='';nxt.style.display='flex';nxt.style.flexDirection='column';nxt.style.minHeight='100vh';requestAnimationFrame(function(){nxt.style.opacity='0';requestAnimationFrame(function(){nxt.style.transition='opacity .2s ease';nxt.style.opacity='1';nxt.style.pointerEvents=''});});window.scrollTo(0,0);},150);currentView=v}
+function switchView(v){
+  var cur=document.getElementById('view'+currentView);
+  var nxt=document.getElementById('view'+v);
+  if(!nxt||v===currentView)return;
+  cur.style.opacity='0';
+  cur.style.pointerEvents='none';
+  setTimeout(function(){
+    cur.style.display='none';
+    cur.style.opacity='';
+    nxt.style.display='flex';
+    nxt.style.flexDirection='column';
+    nxt.style.minHeight='100vh';
+    requestAnimationFrame(function(){
+      nxt.style.opacity='1';
+      nxt.style.pointerEvents='';
+    });
+    window.scrollTo(0,0);
+  },150);
+  currentView=v;
+}
 
 // Data
 var AREAS=[
@@ -379,7 +398,6 @@ var inspectionData={address:'',rent:'',beds:'',areas:{},questions:{},redFlags:[]
 
 // Init
 document.addEventListener('DOMContentLoaded',function(){
-  document.body.style.opacity='0';requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
   renderInspectionList();
   for(var i=0;i<QUESTIONS.length;i++){var el=document.getElementById('qa'+i);if(el){el.querySelector('textarea').addEventListener('input',function(i){return function(){inspectionData.questions[i]=el.querySelector('textarea').value}}(i))}}
 });

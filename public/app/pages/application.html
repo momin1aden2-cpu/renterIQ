@@ -643,7 +643,7 @@
 /* RenterIQ — Application Preparation JS */
 
 // Utilities
-function navigate(p){document.body.style.opacity='0';document.body.style.transition='opacity .18s';setTimeout(function(){window.location.href=p},180)}
+function navigate(p){window.location.href=p}
 
 function showToast(title,sub,icon){
   var t=document.getElementById('appToast');
@@ -833,12 +833,9 @@ function openAgencyPortal(){
 
 // Init
 document.addEventListener('DOMContentLoaded',function(){
-  document.body.style.opacity='0';
-  requestAnimationFrame(function(){document.body.style.transition='opacity .22s ease';document.body.style.opacity='1'});
   allViews.forEach(function(v){
-    var el=document.getElementById('view'+v);
-    if(el)el.style.display=v==='A'?'flex':'none';
-  });
+    var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
+  setTimeout(updatePreview,100);
   // Lock launch step initially
   var launch=document.getElementById('check-launch');
   if(launch){launch.style.opacity='.45';launch.style.pointerEvents='none'}

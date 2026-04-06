@@ -320,7 +320,7 @@
     <img src="/assets/logo.svg" alt="" width="28" height="28" style="flex-shrink:0">
     <div class="ib-body">
       <div class="ib-title">Add to Home Screen</div>
-      <div class="ib-sub">Works offline · Always free</div>
+      <div class="ib-sub">Works offline</div>
     </div>
     <button class="ib-install" id="installBtn">Add</button>
     <button class="ib-close" id="installClose" aria-label="Dismiss">✕</button>
@@ -568,7 +568,7 @@ function navigate(path) {
   // Convert file paths to Next.js routes for PWA compatibility
   const routeMap = {
     '/app/index.html': '/app',
-            '/app/pages/tracked.html': '/tracked',
+    '/app/pages/tracked.html': '/tracked',
     '/app/pages/webview.html': '/webview',
     '/app/pages/inspection.html': '/inspect',
     '/app/pages/entry-audit.html': '/move-in',
@@ -584,19 +584,7 @@ function navigate(path) {
   };
   
   const route = routeMap[path] || path;
-  
-  document.body.style.opacity = '0';
-  document.body.style.transition = 'opacity .18s';
-  setTimeout(function() { 
-    // In PWA mode, we need to use the route that Next.js can rewrite
-    if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
-      // PWA mode - use the route directly
-      window.location.href = route;
-    } else {
-      // Browser mode - can use the file path
-      window.location.href = path;
-    }
-  }, 180);
+  window.location.href = route;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -632,13 +620,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   function initializeApp(user) {
-    // Fade in
-    document.body.style.opacity = '0';
-    requestAnimationFrame(function() {
-      document.body.style.transition = 'opacity .25s ease';
-      document.body.style.opacity = '1';
-    });
-
     // Greeting
     var greetEl = document.getElementById('greeting');
     if (greetEl) greetEl.textContent = getGreeting() + (user.displayName ? ', ' + user.displayName.split(' ')[0] : '');
@@ -739,42 +720,23 @@ installClose.addEventListener('click', function() {
   localStorage.setItem('riq-banner-dismissed', '1');
 });
 
-// Temporarily disabled service worker to fix loading issues
-// if ('serviceWorker' in navigator) {
-//   window.addEventListener('load', function() {
-//     navigator.serviceWorker.register('/app/sw.js').then(function(reg) {
-//       reg.addEventListener('updatefound', function() {
-//         var newWorker = reg.installing;
-//         newWorker.addEventListener('statechange', function() {
-//           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-//             showUpdateToast();
-//           }
-//         });
-//       });
-//     }).catch(function(err) {
-//       console.log('Service Worker registration failed:', err);
-//     });
-//   });
-// }
-
-// Clear existing service worker and caches
+// Service Worker Registration (proper scope for /app/)
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    registrations.forEach(function(registration) {
-      console.log('Unregistering service worker:', registration.scope);
-      registration.unregister();
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/app/sw.js', {scope: '/app/'}).then(function(reg) {
+      console.log('Service Worker registered:', reg.scope);
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateToast();
+          }
+        });
+      });
+    }).catch(function(err) {
+      console.log('Service Worker registration failed:', err);
     });
   });
-  
-  // Clear caches
-  if ('caches' in window) {
-    caches.keys().then(function(cacheNames) {
-      cacheNames.forEach(function(cacheName) {
-        console.log('Deleting cache:', cacheName);
-        caches.delete(cacheName);
-      });
-    });
-  }
 }
 
 function showUpdateToast() {
