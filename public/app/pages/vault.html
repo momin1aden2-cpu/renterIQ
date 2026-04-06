@@ -16,6 +16,18 @@
 <title>Your Vault — RenterIQ</title>
 <style>
 .app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
+.share-fab{position:fixed;bottom:90px;right:16px;max-width:430px;margin:0 auto;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(27,80,200,.4);z-index:999;-webkit-tap-highlight-color:transparent;transition:all .2s var(--ease-smooth)}
+.share-fab:active{transform:scale(.92)}
+.picker-overlay{position:fixed;inset:0;z-index:300;background:rgba(10,36,96,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .28s ease}
+.picker-sheet{position:relative;width:100%;max-width:430px;background:#fff;border-radius:26px 26px 0 0;max-height:85vh;overflow-y:auto;transform:translateY(100%);transition:transform .32s var(--ease-smooth);padding:20px 20px 40px;box-shadow:0 -8px 40px rgba(0,0,0,.2)}
+.picker-item{display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.picker-item:last-child{border-bottom:none}
+.picker-item.selected{background:var(--blue-xl)}
+.picker-checkbox{width:24px;height:24px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;flex-shrink:0}
+.picker-item.selected .picker-checkbox{background:var(--blue);border-color:var(--blue)}
+.picker-folder-hdr{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:16px 14px 8px;background:var(--blue-xl);margin:0 -20px}
+.email-preview{background:var(--blue-xl);border-radius:16px;padding:16px;margin-top:16px;border:1px solid var(--border-lt)}
+.email-preview textarea{width:100%;min-height:200px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:14px;line-height:1.6;color:var(--text);resize:vertical;outline:none}
 .view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
 .sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
 .sh-row{display:flex;align-items:center;justify-content:space-between}
@@ -126,7 +138,56 @@
       <div style="font-size:12px">Your saved documents and actions will appear here.</div>
     </div>
   </div>
+  <button class="share-fab" onclick="openSharePicker()" title="Share/Compile">📤</button>
   <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab" onclick="navigate('/app/pages/entry-audit.html')"><div class="tab-icon">📸</div><span class="tab-label">Entry Audit</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button></nav>
+</div>
+
+<!-- SHARE PICKER OVERLAY -->
+<div id="sharePickerOverlay" class="picker-overlay" onclick="if(event.target===this)closeSharePicker()">
+  <div class="picker-sheet" id="sharePickerSheet">
+    <div class="sheet-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Select Items to Share</div>
+      <button onclick="closeSharePicker()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer">×</button>
+    </div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:12px">Choose documents from any folder to compile and share</div>
+    <div id="sharePickerContent">
+      <!-- Content loaded dynamically -->
+    </div>
+    <div id="sharePickerActions" style="display:none;margin-top:20px">
+      <div style="display:flex;gap:10px">
+        <button class="btn-blue-c flex-1" onclick="generateEmail()">✉️ Generate Email</button>
+        <button class="btn-muted-c flex-1" onclick="downloadSelected()">⬇️ Download ZIP</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL PREVIEW OVERLAY -->
+<div id="emailPreviewOverlay" class="picker-overlay" style="z-index:400" onclick="if(event.target===this)closeEmailPreview()">
+  <div class="picker-sheet" id="emailPreviewSheet">
+    <div class="sheet-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Review & Edit Email</div>
+      <button onclick="closeEmailPreview()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer">×</button>
+    </div>
+    <div style="background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--border-lt)">
+      <div style="font-family:'Sora',sans-serif;font-size:11px;color:var(--muted);margin-bottom:4px">To</div>
+      <input type="text" id="emailTo" placeholder="agent@property.com" style="width:100%;border:none;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text);outline:none">
+    </div>
+    <div style="background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--border-lt)">
+      <div style="font-family:'Sora',sans-serif;font-size:11px;color:var(--muted);margin-bottom:4px">Subject</div>
+      <input type="text" id="emailSubject" style="width:100%;border:none;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text);outline:none">
+    </div>
+    <div class="email-preview">
+      <textarea id="emailBody" placeholder="Email body will be generated here..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-blue-c flex-1" onclick="sendEmail()">📤 Send Email</button>
+      <button class="btn-muted-c flex-1" onclick="copyEmail()">📋 Copy Text</button>
+    </div>
+    <div id="emailAttachments" style="margin-top:12px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--muted)"></div>
+  </div>
 </div>
 
 <!-- VIEW B — LEASE AGREEMENTS -->
@@ -890,6 +951,209 @@ function loadRecentActivity(){
     list.style.textAlign = 'left';
     list.style.padding = '0';
   } catch(e) { console.error('loadRecentActivity:', e); }
+}
+
+/* ── Share Picker & Email Generation ── */
+var selectedItems = [];
+
+function openSharePicker(){
+  var overlay = document.getElementById('sharePickerOverlay');
+  var sheet = document.getElementById('sharePickerSheet');
+  if(!overlay || !sheet) return;
+  selectedItems = [];
+  renderSharePickerContent();
+  overlay.style.display = 'flex';
+  requestAnimationFrame(function(){overlay.style.opacity = '1'; sheet.style.transform = 'translateY(0)';});
+}
+
+function closeSharePicker(){
+  var overlay = document.getElementById('sharePickerOverlay');
+  var sheet = document.getElementById('sharePickerSheet');
+  if(!overlay || !sheet) return;
+  overlay.style.opacity = '0';
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(function(){overlay.style.display = 'none';}, 280);
+}
+
+function renderSharePickerContent(){
+  var content = document.getElementById('sharePickerContent');
+  var actions = document.getElementById('sharePickerActions');
+  if(!content) return;
+  
+  var html = '';
+  var hasItems = false;
+  
+  // Load from all sources
+  var sources = [
+    {key: 'riq_receipts', label: 'Receipts', icon: '🧾', type: 'receipt'},
+    {key: 'riq_maintenance_items', label: 'Maintenance', icon: '🔧', type: 'maintenance'},
+    {key: 'riq_condition_reports', label: 'Condition Reports', icon: '📸', type: 'condition'},
+    {key: 'riq_communications', label: 'Communications', icon: '💬', type: 'communication'},
+    {key: 'riq_routine_inspection_past', label: 'Routine Inspections', icon: '🔍', type: 'routine'}
+  ];
+  
+  sources.forEach(function(source){
+    var items = [];
+    try{
+      var raw = localStorage.getItem(source.key);
+      if(raw) items = JSON.parse(raw);
+    }catch(e){}
+    
+    if(items && items.length){
+      hasItems = true;
+      html += '<div class="picker-folder-hdr">' + source.icon + ' ' + source.label + '</div>';
+      items.forEach(function(item, idx){
+        var id = source.type + '_' + idx;
+        var title = item.description || item.issueType || item.address || item.subject || 'Item';
+        var date = item.date ? new Date(item.date).toLocaleDateString('en-AU', {day:'numeric', month:'short'}) : '';
+        var isSelected = selectedItems.some(function(s){ return s.id === id; });
+        
+        html += '<div class="picker-item ' + (isSelected ? 'selected' : '') + '" onclick="toggleItem(this, \'' + id + '\', \'' + source.type + '\', ' + idx + ')">' +
+          '<div class="picker-checkbox">' + (isSelected ? '✓' : '') + '</div>' +
+          '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">' + title + '</div>' +
+          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">' + date + '</div></div>' +
+          '</div>';
+      });
+    }
+  });
+  
+  if(!hasItems){
+    html = '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
+      '<div style="font-size:32px;margin-bottom:8px">📂</div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px">No items yet</div>' +
+      '<div style="font-size:12px">Add receipts, maintenance logs, or reports first.</div></div>';
+  }
+  
+  content.innerHTML = html;
+  if(actions) actions.style.display = selectedItems.length ? 'block' : 'none';
+}
+
+function toggleItem(el, id, type, idx){
+  var checkbox = el.querySelector('.picker-checkbox');
+  var existingIndex = selectedItems.findIndex(function(s){ return s.id === id; });
+  
+  if(existingIndex > -1){
+    selectedItems.splice(existingIndex, 1);
+    el.classList.remove('selected');
+    checkbox.textContent = '';
+    checkbox.style.background = 'transparent';
+  }else{
+    selectedItems.push({id: id, type: type, idx: idx});
+    el.classList.add('selected');
+    checkbox.textContent = '✓';
+    checkbox.style.background = 'var(--blue)';
+  }
+  
+  var actions = document.getElementById('sharePickerActions');
+  if(actions) actions.style.display = selectedItems.length ? 'block' : 'none';
+}
+
+function generateEmail(){
+  if(!selectedItems.length){
+    showToast('Select items', 'Choose at least one item to share', '⚠️');
+    return;
+  }
+  
+  closeSharePicker();
+  
+  // Build email content
+  var attachments = [];
+  var bodyLines = ['Dear Sir/Madam,', '', 'I am writing to provide the following documents and evidence:', ''];
+  
+  selectedItems.forEach(function(item){
+    var source = getSourceByType(item.type);
+    if(!source) return;
+    
+    var items = [];
+    try{
+      var raw = localStorage.getItem(source.key);
+      if(raw) items = JSON.parse(raw);
+    }catch(e){}
+    
+    if(items && items[item.idx]){
+      var data = items[item.idx];
+      var title = data.description || data.issueType || data.address || data.subject || 'Document';
+      var date = data.date ? new Date(data.date).toLocaleDateString('en-AU', {day:'numeric', month:'long', year:'numeric'}) : '';
+      
+      bodyLines.push('• ' + title + (date ? ' (' + date + ')' : ''));
+      
+      if(data.photo) attachments.push({name: title + '_photo.jpg', data: data.photo});
+      if(data.photos && data.photos.length){
+        data.photos.forEach(function(p, i){
+          attachments.push({name: title + '_photo_' + (i+1) + '.jpg', data: p});
+        });
+      }
+    }
+  });
+  
+  bodyLines.push('', 'Please find attached the supporting documents.', '', 'Kind regards,', '[Your Name]');
+  
+  // Set email fields
+  document.getElementById('emailSubject').value = 'Tenancy Documents - ' + new Date().toLocaleDateString('en-AU');
+  document.getElementById('emailBody').value = bodyLines.join('\n');
+  
+  var attachDiv = document.getElementById('emailAttachments');
+  if(attachDiv){
+    attachDiv.innerHTML = attachments.length ? '📎 ' + attachments.length + ' photo' + (attachments.length !== 1 ? 's' : '') + ' ready to attach' : '';
+  }
+  
+  // Store attachments for sending
+  window._emailAttachments = attachments;
+  
+  // Show preview
+  var overlay = document.getElementById('emailPreviewOverlay');
+  var sheet = document.getElementById('emailPreviewSheet');
+  if(overlay && sheet){
+    overlay.style.display = 'flex';
+    requestAnimationFrame(function(){overlay.style.opacity = '1'; sheet.style.transform = 'translateY(0)';});
+  }
+}
+
+function getSourceByType(type){
+  var sources = {
+    'receipt': {key: 'riq_receipts'},
+    'maintenance': {key: 'riq_maintenance_items'},
+    'condition': {key: 'riq_condition_reports'},
+    'communication': {key: 'riq_communications'},
+    'routine': {key: 'riq_routine_inspection_past'}
+  };
+  return sources[type];
+}
+
+function closeEmailPreview(){
+  var overlay = document.getElementById('emailPreviewOverlay');
+  var sheet = document.getElementById('emailPreviewSheet');
+  if(!overlay || !sheet) return;
+  overlay.style.opacity = '0';
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(function(){overlay.style.display = 'none';}, 280);
+}
+
+function sendEmail(){
+  var to = document.getElementById('emailTo').value || 'agent@property.com';
+  var subject = document.getElementById('emailSubject').value;
+  var body = document.getElementById('emailBody').value;
+  
+  var mailtoLink = 'mailto:' + encodeURIComponent(to) + 
+    '?subject=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body);
+  
+  window.location.href = mailtoLink;
+  closeEmailPreview();
+  showToast('Email ready', 'Your email app should open with the message', '✉️');
+}
+
+function copyEmail(){
+  var body = document.getElementById('emailBody').value;
+  navigator.clipboard.writeText(body).then(function(){
+    showToast('Copied', 'Email text copied to clipboard', '📋');
+  }).catch(function(){
+    showToast('Error', 'Could not copy text', '❌');
+  });
+}
+
+function downloadSelected(){
+  showToast('Coming soon', 'ZIP download feature in development', '⬇️');
 }
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
