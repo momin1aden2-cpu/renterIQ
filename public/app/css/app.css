@@ -620,6 +620,7 @@ input:focus, textarea:focus, select:focus {
     padding: 24px 24px 48px !important;
     overflow-y: visible !important;
     max-width: 900px;
+    padding-bottom: 48px !important;
   }
 
   .bottom-nav {
@@ -658,5 +659,6 @@ input:focus, textarea:focus, select:focus {
   .content {
     padding-left: 24px;
     padding-right: 24px;
+    padding-bottom: 100px;
   }
 }
