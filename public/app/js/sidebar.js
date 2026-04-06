@@ -65,36 +65,11 @@
         navItems +
         '<div class="ds-section-label" style="margin-top:8px">Tools</div>' +
         toolItems +
-      '</nav>' +
-      '<div class="ds-footer">' +
-        '<button class="ds-signout" onclick="sidebarSignOut()">' +
-          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>' +
-          'Sign Out' +
-        '</button>' +
-      '</div>';
+      '</nav>';
 
     return aside;
   }
 
-  function buildSignOutModal() {
-    var ov = document.createElement('div');
-    ov.id = 'sidebarSoOverlay';
-    ov.style.cssText = 'position:fixed;inset:0;z-index:9900;background:rgba(10,36,96,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s';
-    ov.onclick = function(e) { if (e.target === ov) sidebarHideSo(); };
-    ov.innerHTML =
-      '<div id="sidebarSoModal" style="background:#fff;border-radius:24px;padding:36px 28px 28px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(27,80,200,.22);transform:scale(.94);transition:transform .2s">' +
-        '<div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0A2460,#1B50C8);display:flex;align-items:center;justify-content:center;margin:0 auto 18px">' +
-          '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
-        '</div>' +
-        '<h3 style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:20px;color:#0A2460;margin-bottom:10px">Sign out?</h3>' +
-        '<p style="font-size:14px;color:#4A5D7A;line-height:1.65;margin-bottom:24px">You\'ll need to sign in again to access your RenterIQ account.</p>' +
-        '<div style="display:flex;gap:10px">' +
-          '<button onclick="sidebarHideSo()" style="flex:1;padding:13px;border-radius:12px;border:2px solid #E5EBF8;background:#fff;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:#4A5D7A;cursor:pointer">Cancel</button>' +
-          '<button onclick="sidebarDoSignOut()" style="flex:1;padding:13px;border-radius:12px;border:none;background:#E84040;color:#fff;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;cursor:pointer">Sign Out</button>' +
-        '</div>' +
-      '</div>';
-    return ov;
-  }
 
   function wrapInAppMain(shell) {
     // If already wrapped (index.html), skip
@@ -103,10 +78,10 @@
     var main = document.createElement('div');
     main.className = 'app-main';
 
-    // Move all direct children except desktop-sidebar and signout modal into app-main
+    // Move all direct children except desktop-sidebar into app-main
     var children = Array.from(shell.children);
     children.forEach(function(child) {
-      if (!child.classList.contains('desktop-sidebar') && child.id !== 'sidebarSoOverlay') {
+      if (!child.classList.contains('desktop-sidebar')) {
         main.appendChild(child);
       }
     });
@@ -118,6 +93,8 @@
     var style = document.createElement('style');
     style.id = 'riq-sidebar-css';
     style.textContent = [
+      /* Hide sidebar on mobile */
+      '@media (max-width:899px){.desktop-sidebar{display:none!important;}}',
       '@media (min-width:900px){',
 
         /* Layout */
@@ -152,17 +129,6 @@
         '.ds-tab-icon{width:34px!important;height:34px!important;border-radius:10px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:17px!important;flex-shrink:0!important;background:rgba(255,255,255,.06)!important;transition:all .18s!important;}',
         '.ds-tab.active .ds-tab-icon{background:linear-gradient(135deg,#1B50C8,#2E63E0)!important;box-shadow:0 2px 10px rgba(27,80,200,.4)!important;}',
 
-        /* Footer */
-        '.ds-footer{padding:16px 12px 24px!important;border-top:1px solid rgba(255,255,255,.08)!important;}',
-        '.ds-user{display:flex!important;align-items:center!important;gap:10px!important;padding:10px 12px!important;border-radius:12px!important;margin-bottom:8px!important;background:rgba(255,255,255,.06)!important;}',
-        '.ds-avatar{width:34px!important;height:34px!important;border-radius:50%!important;background:rgba(255,255,255,.18)!important;border:2px solid rgba(255,255,255,.3)!important;display:flex!important;align-items:center!important;justify-content:center!important;font-family:"Sora",sans-serif!important;font-weight:800!important;font-size:13px!important;color:#fff!important;flex-shrink:0!important;}',
-        '.ds-user-info{flex:1!important;min-width:0!important;}',
-        '.ds-user-name{font-family:"Sora",sans-serif!important;font-weight:700!important;font-size:13px!important;color:#fff!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}',
-        '.ds-user-role{font-size:11px!important;color:rgba(255,255,255,.45)!important;margin-top:1px!important;}',
-
-        /* Sign out */
-        '.ds-signout{display:flex!important;align-items:center!important;gap:10px!important;padding:10px 12px!important;border-radius:12px!important;cursor:pointer!important;background:none!important;border:none!important;color:rgba(255,255,255,.45)!important;font-family:"Sora",sans-serif!important;font-weight:700!important;font-size:13px!important;transition:all .18s!important;width:100%!important;text-align:left!important;}',
-        '.ds-signout:hover{background:rgba(232,64,64,.12)!important;color:#F87171!important;}',
 
       '}'
     ].join('');
@@ -184,8 +150,6 @@
     // Wrap content
     wrapInAppMain(shell);
 
-    // Add sign-out modal
-    shell.appendChild(buildSignOutModal());
   }
 
   // Global nav function for sidebar buttons
@@ -213,29 +177,6 @@
         window.location.href = path;
       }
     }, 180);
-  };
-
-  window.sidebarSignOut = function() {
-    var ov = document.getElementById('sidebarSoOverlay');
-    var modal = document.getElementById('sidebarSoModal');
-    if (ov) { ov.style.opacity = '1'; ov.style.pointerEvents = 'auto'; }
-    if (modal) modal.style.transform = 'scale(1)';
-  };
-
-  window.sidebarHideSo = function() {
-    var ov = document.getElementById('sidebarSoOverlay');
-    var modal = document.getElementById('sidebarSoModal');
-    if (ov) { ov.style.opacity = '0'; ov.style.pointerEvents = 'none'; }
-    if (modal) modal.style.transform = 'scale(.94)';
-  };
-
-  window.sidebarDoSignOut = function() {
-    sidebarHideSo();
-    try {
-      firebase.auth().signOut().then(function() { window.location.href = '/'; });
-    } catch (e) {
-      window.location.href = '/';
-    }
   };
 
   // Populate user info from any source
