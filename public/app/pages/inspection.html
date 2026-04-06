@@ -133,6 +133,14 @@
         <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.7);margin-top:2px">At an open home right now? Jump straight in →</div>
       </div>
     </div>
+    
+    <div style="background:linear-gradient(135deg,#10B981,#059669);border-radius:18px;padding:18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="openBookingUpload()">
+      <div style="width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📸</div>
+      <div style="flex:1">
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:#fff">Add from Booking Screenshot</div>
+        <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.7);margin-top:2px">Upload confirmation → AI extracts details automatically</div>
+      </div>
+    </div>
     <div id="inspList"></div>
   </div>
   <nav class="bottom-nav">
@@ -326,13 +334,465 @@
   </div>
 </div>
 
+<!-- Booking Upload Modal -->
+<div class="picker-overlay" id="bookingUploadOverlay" style="display:none">
+  <div class="picker-sheet">
+    <div class="sheet-handle"></div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:6px">📸 Upload Booking Confirmation</div>
+      <div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.5">Take a screenshot of your inspection booking confirmation from any property site</div>
+    </div>
+    
+    <div id="uploadStep1" style="display:block">
+      <div style="border:2px dashed var(--border);border-radius:16px;padding:32px 20px;text-align:center;margin-bottom:20px;background:var(--blue-xl)" id="uploadZone">
+        <div style="font-size:48px;margin-bottom:12px">📱</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Upload Screenshot</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">From Domain, Realestate.com.au, or agent email/SMS</div>
+        <button class="btn-blue" style="margin-bottom:8px" onclick="selectBookingImage()">📷 Choose Image</button>
+        <div style="font-weight:600;font-size:11px;color:var(--muted)">Or drag & drop your screenshot here</div>
+      </div>
+      
+      <div style="margin-bottom:16px">
+        <div class="fsl">Optional Hint</div>
+        <input class="input-f" id="bookingHint" placeholder="e.g. Property address or agent name..." style="font-size:13px">
+        <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Help AI extract details more accurately</div>
+      </div>
+      
+      <div style="display:flex;gap:10px">
+        <button class="btn-outline flex-1" onclick="closeBookingUpload()">Cancel</button>
+        <button class="btn-blue flex-1" id="processBtn" onclick="processBookingImage()" disabled style="opacity:0.5">Process Screenshot</button>
+      </div>
+    </div>
+    
+    <div id="uploadStep2" style="display:none">
+      <div style="text-align:center;padding:20px">
+        <div style="font-size:48px;margin-bottom:12px" id="processIcon">🤖</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px" id="processTitle">Processing Screenshot...</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted)" id="processSubtitle">AI is extracting inspection details</div>
+      </div>
+    </div>
+    
+    <div id="uploadStep3" style="display:none">
+      <div style="margin-bottom:20px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:12px;text-align:center">✅ Extracted Details</div>
+        <div id="extractedDetails" style="background:var(--blue-xl);border-radius:12px;padding:16px;font-size:13px;line-height:1.6"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-outline flex-1" onclick="closeBookingUpload()">Try Again</button>
+        <button class="btn-blue flex-1" onclick="createInspectionFromExtraction()">Create Inspection</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="bookingImageInput" accept="image/*" style="display:none">
+
 </div><!-- /app-shell -->
 <script>
 /* Open Home Inspection — RenterIQ */
 function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
 function showToast(t,s,i){var el=document.getElementById('appToast');if(!el){el=document.createElement('div');el.id='appToast';el.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';el.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(el)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';el.style.transform='translateY(0)';el.style.opacity='1';clearTimeout(el._timer);el._timer=setTimeout(function(){el.style.transform='translateY(-90px)';el.style.opacity='0'},3200)}
 
-var currentView='A';
+// ========== BOOKING UPLOAD FUNCTIONALITY ==========
+var selectedBookingFile = null;
+var extractedBookingData = null;
+
+function openBookingUpload() {
+  var overlay = document.getElementById('bookingUploadOverlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(function() {
+    overlay.style.opacity = '1';
+    overlay.querySelector('.picker-sheet').style.transform = 'translateY(0)';
+  });
+  resetBookingUpload();
+}
+
+function closeBookingUpload() {
+  var overlay = document.getElementById('bookingUploadOverlay');
+  overlay.style.opacity = '0';
+  overlay.querySelector('.picker-sheet').style.transform = 'translateY(100%)';
+  setTimeout(function() {
+    overlay.style.display = 'none';
+    resetBookingUpload();
+  }, 300);
+}
+
+function resetBookingUpload() {
+  selectedBookingFile = null;
+  extractedBookingData = null;
+  document.getElementById('uploadStep1').style.display = 'block';
+  document.getElementById('uploadStep2').style.display = 'none';
+  document.getElementById('uploadStep3').style.display = 'none';
+  document.getElementById('processBtn').disabled = true;
+  document.getElementById('processBtn').style.opacity = '0.5';
+  document.getElementById('bookingHint').value = '';
+}
+
+function selectBookingImage() {
+  document.getElementById('bookingImageInput').click();
+}
+
+// Handle file selection
+document.getElementById('bookingImageInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  
+  if (!file.type.startsWith('image/')) {
+    showToast('Invalid File', 'Please select an image file', '❌');
+    return;
+  }
+  
+  selectedBookingFile = file;
+  document.getElementById('processBtn').disabled = false;
+  document.getElementById('processBtn').style.opacity = '1';
+  
+  // Update upload zone to show selected file
+  var zone = document.getElementById('uploadZone');
+  zone.innerHTML = 
+    '<div style="font-size:48px;margin-bottom:12px">✅</div>' +
+    '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Screenshot Ready</div>' +
+    '<div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">' + file.name + '</div>' +
+    '<button class="btn-outline" style="margin-bottom:8px" onclick="selectBookingImage()">📷 Choose Different Image</button>';
+});
+
+function processBookingImage() {
+  if (!selectedBookingFile) {
+    showToast('No Image', 'Please select a screenshot first', '❌');
+    return;
+  }
+  
+  // Switch to processing view
+  document.getElementById('uploadStep1').style.display = 'none';
+  document.getElementById('uploadStep2').style.display = 'block';
+  
+  // Animate processing
+  var icon = document.getElementById('processIcon');
+  var title = document.getElementById('processTitle');
+  var subtitle = document.getElementById('processSubtitle');
+  
+  icon.style.animation = 'pulse 2s infinite';
+  
+  // Create form data
+  var formData = new FormData();
+  formData.append('file', selectedBookingFile);
+  
+  var hint = document.getElementById('bookingHint').value.trim();
+  if (hint) {
+    formData.append('hint', hint);
+  }
+  
+  // Call extraction API
+  fetch('/api/extract-inspection-details', {
+    method: 'POST',
+    body: formData
+  })
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(data) {
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    icon.style.animation = '';
+    icon.textContent = '✅';
+    title.textContent = 'Extraction Complete!';
+    subtitle.textContent = 'Details found successfully';
+    
+    setTimeout(function() {
+      extractedBookingData = data;
+      showExtractedDetails(data);
+    }, 1000);
+  })
+  .catch(function(error) {
+    console.error('Extraction error:', error);
+    icon.style.animation = '';
+    icon.textContent = '❌';
+    title.textContent = 'Extraction Failed';
+    subtitle.textContent = error.message || 'Could not process screenshot';
+    
+    setTimeout(function() {
+      document.getElementById('uploadStep2').style.display = 'none';
+      document.getElementById('uploadStep1').style.display = 'block';
+      showToast('Processing Failed', 'Please try a clearer screenshot', '❌');
+    }, 2000);
+  });
+}
+
+function showExtractedDetails(data) {
+  var html = '';
+  
+  if (data.address) {
+    html += '<div style="margin-bottom:8px"><strong>📍 Address:</strong><br>' + data.address + '</div>';
+  }
+  
+  if (data.date && data.time_display) {
+    html += '<div style="margin-bottom:8px"><strong>📅 Inspection:</strong><br>' + 
+            formatInspectionDate(data.date) + ' at ' + data.time_display + '</div>';
+  } else if (data.date) {
+    html += '<div style="margin-bottom:8px"><strong>📅 Date:</strong><br>' + formatInspectionDate(data.date) + '</div>';
+  }
+  
+  if (data.agent_name) {
+    html += '<div style="margin-bottom:8px"><strong>👤 Agent:</strong><br>' + data.agent_name + '</div>';
+  }
+  
+  if (data.agent_phone) {
+    html += '<div style="margin-bottom:8px"><strong>📞 Phone:</strong><br>' + data.agent_phone + '</div>';
+  }
+  
+  if (data.property_type || data.bedrooms || data.rent_weekly) {
+    html += '<div style="margin-bottom:8px"><strong>🏠 Property:</strong><br>';
+    var details = [];
+    if (data.bedrooms) details.push(data.bedrooms + ' bed');
+    if (data.property_type && data.property_type !== 'other') details.push(data.property_type);
+    if (data.rent_weekly) details.push(data.rent_weekly + '/week');
+    html += details.join(' • ') + '</div>';
+  }
+  
+  if (data.notes) {
+    html += '<div style="margin-bottom:8px"><strong>📝 Notes:</strong><br>' + data.notes + '</div>';
+  }
+  
+  if (data.confidence) {
+    var confColor = data.confidence === 'high' ? '#10B981' : data.confidence === 'medium' ? '#F59E0B' : '#EF4444';
+    html += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-lt);font-size:11px;color:' + confColor + '">AI Confidence: ' + data.confidence.toUpperCase() + '</div>';
+  }
+  
+  if (!html) {
+    html = '<div style="text-align:center;color:var(--muted)">Could not extract details from screenshot.<br>You can still create the inspection manually.</div>';
+  }
+  
+  document.getElementById('extractedDetails').innerHTML = html;
+  document.getElementById('uploadStep2').style.display = 'none';
+  document.getElementById('uploadStep3').style.display = 'block';
+}
+
+function formatInspectionDate(dateStr) {
+  try {
+    var date = new Date(dateStr);
+    return date.toLocaleDateString('en-AU', { 
+      weekday: 'short', 
+      day: 'numeric', 
+      month: 'short' 
+    });
+  } catch(e) {
+    return dateStr;
+  }
+}
+
+function createInspectionFromExtraction() {
+  if (!extractedBookingData) {
+    showToast('No Data', 'No extracted data available', '❌');
+    return;
+  }
+  
+  // Pre-populate form with extracted data
+  var data = extractedBookingData;
+  
+  if (data.address) {
+    document.getElementById('setupAddress').value = data.address;
+  }
+  
+  if (data.rent_weekly) {
+    // Clean up rent format (remove $ and /week)
+    var rent = data.rent_weekly.replace(/[$\/week]/g, '').trim();
+    document.getElementById('setupRent').value = '$' + rent;
+  }
+  
+  if (data.bedrooms) {
+    var beds = parseInt(data.bedrooms);
+    if (beds >= 1 && beds <= 5) {
+      document.getElementById('setupBeds').value = beds.toString();
+    }
+  }
+  
+  // Store extracted data for later use
+  inspectionData.bookingData = data;
+  
+  // Create scheduled inspection entry
+  createScheduledInspection(data);
+  
+  // Set up reminders if we have date/time
+  if (data.date && data.time) {
+    setupInspectionReminders(data);
+  }
+  
+  // Close modal and go to setup
+  closeBookingUpload();
+  switchView('B');
+  
+  showToast('Inspection Scheduled!', 'Reminders set • Review details before starting', '✅');
+}
+
+function createScheduledInspection(data) {
+  try {
+    // Get existing scheduled inspections
+    var saved = JSON.parse(localStorage.getItem('renteriq_scheduled_inspections') || '[]');
+    
+    // Create new inspection entry
+    var inspection = {
+      id: 'scheduled_' + Date.now(),
+      address: data.address || 'Property',
+      date: data.date,
+      time: data.time,
+      time_display: data.time_display || data.time,
+      agent_name: data.agent_name || '',
+      agent_phone: data.agent_phone || '',
+      agent_email: data.agent_email || '',
+      property_type: data.property_type || '',
+      bedrooms: data.bedrooms || '',
+      rent_weekly: data.rent_weekly || '',
+      parking: data.parking || '',
+      source: data.source || '',
+      notes: data.notes || '',
+      status: 'scheduled',
+      created_at: Date.now(),
+      booking_data: data
+    };
+    
+    // Add to list (newest first)
+    saved.unshift(inspection);
+    
+    // Keep only last 20 scheduled inspections
+    if (saved.length > 20) {
+      saved = saved.slice(0, 20);
+    }
+    
+    localStorage.setItem('renteriq_scheduled_inspections', JSON.stringify(saved));
+    
+    // Refresh the inspection list
+    setTimeout(function() {
+      renderInspectionList();
+    }, 100);
+    
+  } catch(e) {
+    console.error('Error creating scheduled inspection:', e);
+  }
+}
+
+function setupInspectionReminders(data) {
+  if (!data.date || !data.time) return;
+  
+  try {
+    var inspectionDateTime = new Date(data.date + 'T' + data.time);
+    var now = new Date();
+    
+    // Don't set reminders for past inspections
+    if (inspectionDateTime <= now) {
+      return;
+    }
+    
+    // Set reminder for 24 hours before
+    var reminder24h = new Date(inspectionDateTime.getTime() - (24 * 60 * 60 * 1000));
+    if (reminder24h > now) {
+      scheduleLocalReminder('inspection_24h_' + data.address, reminder24h, {
+        title: 'Inspection Tomorrow',
+        body: 'Don\'t forget your inspection at ' + (data.address || 'property') + ' at ' + (data.time_display || data.time),
+        icon: '📋',
+        data: { type: 'inspection_reminder', address: data.address, time: data.time_display }
+      });
+    }
+    
+    // Set reminder for 1 hour before
+    var reminder1h = new Date(inspectionDateTime.getTime() - (60 * 60 * 1000));
+    if (reminder1h > now) {
+      scheduleLocalReminder('inspection_1h_' + data.address, reminder1h, {
+        title: 'Inspection in 1 Hour',
+        body: 'Time to head to ' + (data.address || 'your inspection') + ' - arrives at ' + (data.time_display || data.time),
+        icon: '⏰',
+        data: { type: 'inspection_reminder', address: data.address, time: data.time_display }
+      });
+    }
+    
+  } catch(e) {
+    console.error('Error setting up reminders:', e);
+  }
+}
+
+function scheduleLocalReminder(id, datetime, options) {
+  // Store reminder in localStorage for simple implementation
+  try {
+    var reminders = JSON.parse(localStorage.getItem('renteriq_reminders') || '[]');
+    
+    var reminder = {
+      id: id,
+      datetime: datetime.toISOString(),
+      title: options.title,
+      body: options.body,
+      icon: options.icon,
+      data: options.data,
+      fired: false
+    };
+    
+    reminders.push(reminder);
+    localStorage.setItem('renteriq_reminders', JSON.stringify(reminders));
+    
+    // In a real app, you'd use the Notifications API or service workers
+    // For now, we'll just show a toast when the reminder should fire
+    var delay = datetime.getTime() - Date.now();
+    if (delay > 0 && delay < (7 * 24 * 60 * 60 * 1000)) { // Within 7 days
+      setTimeout(function() {
+        showToast(options.title, options.body, options.icon);
+        // Mark as fired
+        var savedReminders = JSON.parse(localStorage.getItem('renteriq_reminders') || '[]');
+        var reminderIndex = savedReminders.findIndex(r => r.id === id);
+        if (reminderIndex >= 0) {
+          savedReminders[reminderIndex].fired = true;
+          localStorage.setItem('renteriq_reminders', JSON.stringify(savedReminders));
+        }
+      }, delay);
+    }
+    
+  } catch(e) {
+    console.error('Error scheduling reminder:', e);
+  }
+}
+
+// Drag and drop functionality
+document.getElementById('uploadZone').addEventListener('dragover', function(e) {
+  e.preventDefault();
+  this.style.borderColor = 'var(--blue)';
+  this.style.background = 'rgba(27, 80, 200, 0.05)';
+});
+
+document.getElementById('uploadZone').addEventListener('dragleave', function(e) {
+  e.preventDefault();
+  this.style.borderColor = 'var(--border)';
+  this.style.background = 'var(--blue-xl)';
+});
+
+document.getElementById('uploadZone').addEventListener('drop', function(e) {
+  e.preventDefault();
+  this.style.borderColor = 'var(--border)';
+  this.style.background = 'var(--blue-xl)';
+  
+  var files = e.dataTransfer.files;
+  if (files.length > 0 && files[0].type.startsWith('image/')) {
+    selectedBookingFile = files[0];
+    document.getElementById('processBtn').disabled = false;
+    document.getElementById('processBtn').style.opacity = '1';
+    
+    this.innerHTML = 
+      '<div style="font-size:48px;margin-bottom:12px">✅</div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Screenshot Ready</div>' +
+      '<div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">' + files[0].name + '</div>' +
+      '<button class="btn-outline" style="margin-bottom:8px" onclick="selectBookingImage()">📷 Choose Different Image</button>';
+  }
+});
+
+// Add CSS for picker overlay if not already present
+if (!document.querySelector('.picker-overlay')) {
+  var style = document.createElement('style');
+  style.textContent = `
+    .picker-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(10,36,96,.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity .28s ease; }
+    .picker-sheet { position: relative; width: 100%; max-width: 430px; background: #fff; border-radius: 26px 26px 0 0; max-height: 85vh; overflow-y: auto; transform: translateY(100%); transition: transform .32s cubic-bezier(.4,0,.2,1); padding: 20px 20px 40px; box-shadow: 0 -8px 40px rgba(0,0,0,.2); }
+    .sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 100px; margin: 0 auto 20px; }
+    .flex-1 { flex: 1; }
+  `;
+  document.head.appendChild(style);
+}
+
 function switchView(v){
   var cur=document.getElementById('view'+currentView);
   var nxt=document.getElementById('view'+v);
@@ -445,7 +905,145 @@ function saveToConditionReportsVault(data){
     localStorage.setItem('riq_condition_reports',JSON.stringify(reports));
   }catch(e){console.error('saveToConditionReportsVault:',e);}
 }
-function renderInspectionList(){var list=document.getElementById('inspList');if(!list)return;var saved=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('renteriq_openhome_insp_')){try{var data=JSON.parse(localStorage.getItem(key)||'{}');saved.push({key:key,data:data})}catch(e){}}}if(!saved.length){list.innerHTML='<div style="text-align:center;padding:40px 16px"><div style="font-size:44px;margin-bottom:12px">📋</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:6px">No inspections yet</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Start an inspection to document properties you visit.</div></div>';return}list.innerHTML='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">Recent Inspections</div>'+saved.map(function(item){return'<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\''+item.key+'\')"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(item.data.address||'Property')+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds:'')+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:6px">'+new Date(parseInt(item.key.split('_')[2])).toLocaleDateString('en-AU')+'</div></div>'}).join('')}
+function renderInspectionList(){
+  var list=document.getElementById('inspList');
+  if(!list)return;
+  
+  // Get scheduled inspections (from booking uploads)
+  var scheduled=[];
+  try{
+    scheduled=JSON.parse(localStorage.getItem('renteriq_scheduled_inspections')||'[]');
+  }catch(e){}
+  
+  // Get completed inspection reports
+  var saved=[];
+  for(var i=0;i<localStorage.length;i++){
+    var key=localStorage.key(i);
+    if(key&&key.startsWith('renteriq_openhome_insp_')){
+      try{
+        var data=JSON.parse(localStorage.getItem(key)||'{}');
+        saved.push({key:key,data:data,type:'completed'});
+      }catch(e){}
+    }
+  }
+  
+  var html = '';
+  
+  // Show scheduled inspections first
+  if(scheduled.length>0){
+    html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--teal-dk);text-transform:uppercase;margin-bottom:10px">📅 Upcoming Inspections</div>';
+    
+    scheduled.forEach(function(insp){
+      var isToday = isInspectionToday(insp.date);
+      var isTomorrow = isInspectionTomorrow(insp.date);
+      var isPast = isInspectionPast(insp.date, insp.time);
+      
+      var dateLabel = isPast ? 'Past' : isToday ? 'Today' : isTomorrow ? 'Tomorrow' : formatInspectionDate(insp.date);
+      var cardStyle = isPast ? 'opacity:0.6;' : isToday ? 'border-left:4px solid #10B981;' : '';
+      
+      html += '<div class="card" style="margin-bottom:10px;cursor:pointer;'+cardStyle+'" onclick="'+(isPast?'':'loadScheduledInspection(\''+insp.id+'\')')+'">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">';
+      html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(insp.address||'Property')+'</div>';
+      html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:'+(isPast?'var(--muted)':isToday?'#10B981':'var(--blue)')+'">' + dateLabel + '</div>';
+      html += '</div>';
+      
+      if(insp.time_display){
+        html += '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:3px">⏰ ' + insp.time_display + '</div>';
+      }
+      
+      if(insp.agent_name){
+        html += '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:3px">👤 ' + insp.agent_name + '</div>';
+      }
+      
+      var details = [];
+      if(insp.bedrooms) details.push(insp.bedrooms + ' bed');
+      if(insp.rent_weekly) details.push(insp.rent_weekly + '/week');
+      if(details.length > 0){
+        html += '<div style="font-weight:600;font-size:12px;color:var(--muted)">' + details.join(' • ') + '</div>';
+      }
+      
+      html += '</div>';
+    });
+    
+    html += '<div style="margin-bottom:20px"></div>';
+  }
+  
+  // Show completed inspections
+  if(saved.length>0){
+    html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">📋 Completed Reports</div>';
+    html += saved.map(function(item){
+      return '<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\''+item.key+'\')"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(item.data.address||'Property')+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds:'')+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:6px">'+new Date(parseInt(item.key.split('_')[3])).toLocaleDateString('en-AU')+'</div></div>';
+    }).join('');
+  }
+  
+  if(!scheduled.length && !saved.length){
+    html = '<div style="text-align:center;padding:40px 16px"><div style="font-size:44px;margin-bottom:12px">📋</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:6px">No inspections yet</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Upload a booking confirmation or start a quick inspection.</div></div>';
+  }
+  
+  list.innerHTML=html;
+}
+
+function isInspectionToday(dateStr) {
+  try {
+    var inspDate = new Date(dateStr);
+    var today = new Date();
+    return inspDate.toDateString() === today.toDateString();
+  } catch(e) {
+    return false;
+  }
+}
+
+function isInspectionTomorrow(dateStr) {
+  try {
+    var inspDate = new Date(dateStr);
+    var tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return inspDate.toDateString() === tomorrow.toDateString();
+  } catch(e) {
+    return false;
+  }
+}
+
+function isInspectionPast(dateStr, timeStr) {
+  try {
+    var inspDateTime = new Date(dateStr + 'T' + timeStr);
+    return inspDateTime < new Date();
+  } catch(e) {
+    return false;
+  }
+}
+
+function loadScheduledInspection(id) {
+  try {
+    var scheduled = JSON.parse(localStorage.getItem('renteriq_scheduled_inspections') || '[]');
+    var inspection = scheduled.find(function(insp) { return insp.id === id; });
+    
+    if (inspection && inspection.booking_data) {
+      // Pre-populate form with booking data
+      var data = inspection.booking_data;
+      
+      if (data.address) document.getElementById('setupAddress').value = data.address;
+      if (data.rent_weekly) {
+        var rent = data.rent_weekly.replace(/[$\/week]/g, '').trim();
+        document.getElementById('setupRent').value = '$' + rent;
+      }
+      if (data.bedrooms) {
+        var beds = parseInt(data.bedrooms);
+        if (beds >= 1 && beds <= 5) {
+          document.getElementById('setupBeds').value = beds.toString();
+        }
+      }
+      
+      inspectionData.bookingData = data;
+      switchView('B');
+      showToast('Inspection Loaded', 'Details from booking confirmation', '📋');
+    } else {
+      showToast('Error', 'Could not load inspection details', '❌');
+    }
+  } catch(e) {
+    showToast('Error', 'Could not load inspection', '❌');
+  }
+}
 function loadSavedInspection(key){try{inspectionData=JSON.parse(localStorage.getItem(key)||'{}');document.getElementById('setupAddress').value=inspectionData.address||'';document.getElementById('setupRent').value=inspectionData.rent||'';document.getElementById('setupBeds').value=inspectionData.beds||'2';switchView('B')}catch(e){showToast('Error','Could not load inspection','❌')}}
 
 // Load user data from localStorage
