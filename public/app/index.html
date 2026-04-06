@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RenterIQ">
 <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
@@ -12,6 +13,9 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
 <link rel="manifest" href="/manifest.json?v=5">
 <link rel="stylesheet" href="/app/css/app.css">
+<link rel="prefetch" href="/app/pages/tools.html">
+<link rel="prefetch" href="/app/pages/vault.html">
+<link rel="prefetch" href="/app/pages/inspection.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,6 +23,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="/api/firebase-config"></script>
 <title>RenterIQ</title>
 <style>
 /* App Shell */
@@ -223,6 +228,28 @@
 .update-bar.show{transform:translateY(0);opacity:1;pointer-events:auto}
 .update-bar span{font-family:'Sora',sans-serif;font-size:13px;font-weight:700}
 .update-bar button{background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;border:none;border-radius:100px;padding:7px 16px;cursor:pointer;white-space:nowrap}
+
+/* Onboarding Modal */
+.ob-overlay{position:fixed;inset:0;z-index:10000;background:rgba(10,36,96,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .3s ease;pointer-events:none}
+.ob-overlay.show{opacity:1;pointer-events:auto}
+.ob-card{width:100%;max-width:430px;background:#fff;border-radius:24px 24px 0 0;padding:28px 22px env(safe-area-inset-bottom,24px);transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.56,.64,1);max-height:85vh;overflow-y:auto}
+.ob-overlay.show .ob-card{transform:translateY(0)}
+.ob-dots{display:flex;justify-content:center;gap:6px;margin-bottom:20px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .2s}
+.ob-dot.active{width:24px;border-radius:100px;background:var(--blue)}
+.ob-icon{width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 18px}
+.ob-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);text-align:center;line-height:1.3}
+.ob-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted);text-align:center;line-height:1.65;margin-top:10px;max-width:320px;margin-left:auto;margin-right:auto}
+.ob-features{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.ob-feat{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--blue-xl);border-radius:14px}
+.ob-feat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ob-feat-text{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+.ob-feat-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.ob-actions{display:flex;gap:10px;margin-top:22px}
+.ob-btn-next{flex:1;background:var(--blue);color:#fff;border:none;border-radius:14px;padding:16px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .15s;min-height:52px}
+.ob-btn-next:active{transform:scale(.97);background:var(--blue-md)}
+.ob-btn-skip{background:none;border:none;color:var(--muted);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;padding:16px 12px;min-height:52px}
+.ob-btn-skip:active{color:var(--blue)}
 </style>
 </head>
 <body>
@@ -237,6 +264,18 @@
   <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1.5px;margin-top:6px">Rent Smart. Stay Protected.</div>
   <div style="margin-top:32px;width:120px;height:3px;background:rgba(255,255,255,.2);border-radius:100px;overflow:hidden">
     <div id="splashBar" style="height:100%;background:var(--teal);border-radius:100px;width:0%"></div>
+  </div>
+</div>
+
+<!-- Onboarding Modal -->
+<div id="onboardingOverlay" class="ob-overlay">
+  <div class="ob-card">
+    <div class="ob-dots" id="obDots"></div>
+    <div id="obContent"></div>
+    <div class="ob-actions">
+      <button class="ob-btn-skip" id="obSkip" onclick="obSkip()">Skip</button>
+      <button class="ob-btn-next" id="obNext" onclick="obNext()">Next</button>
+    </div>
   </div>
 </div>
 
@@ -500,42 +539,18 @@ function showToast(title, sub, icon) {
 }
 
 function navigate(path) {
-  // Convert file paths to Next.js routes for PWA compatibility
-  const routeMap = {
-    '/app/index.html': '/app',
-    '/app/pages/tracked.html': '/tracked',
-    '/app/pages/webview.html': '/webview',
-    '/app/pages/inspection.html': '/inspect',
-    '/app/pages/entry-audit.html': '/move-in',
-    '/app/pages/routine-inspection.html': '/inspect/routine',
-    '/app/pages/vault.html': '/vault',
-    '/app/pages/profile.html': '/profile',
-    '/app/pages/lease.html': '/lease',
-    '/app/pages/exit.html': '/exit',
-    '/app/pages/rights.html': '/rights',
-    '/app/pages/renewal.html': '/renewal',
-    '/app/pages/notifications.html': '/notifications',
-    '/app/pages/application.html': '/application'
-  };
-  
-  const route = routeMap[path] || path;
-  window.location.href = route;
+  // Instant visual feedback — fade out before navigation
+  document.body.style.transition = 'opacity .12s ease';
+  document.body.style.opacity = '0';
+  setTimeout(function() { window.location.href = path; }, 100);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyBzDc8M982iv-ndo2EU3T-5zPvXcRwdvKs",
-    authDomain: "renteriq-e1096.firebaseapp.com",
-    projectId: "renteriq-e1096",
-    storageBucket: "renteriq-e1096.firebasestorage.app",
-    messagingSenderId: "1062935273922",
-    appId: "1:1062935273922:web:3d0d86e03baa4ec09f765b"
-  };
-  firebase.initializeApp(firebaseConfig);
+  // Firebase config loaded securely from /api/firebase-config (.env.local)
+  firebase.initializeApp(window.__FIREBASE_CONFIG__);
   const auth = firebase.auth();
   const db = firebase.firestore();
-  
+
   // Check authentication
   auth.onAuthStateChanged((user) => {
     // In development (localhost), allow access without authentication
@@ -600,13 +615,128 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() {
         splash.style.transition = 'opacity .3s ease';
         splash.style.opacity = '0';
-        setTimeout(function(){ splash.remove(); }, 300);
+        setTimeout(function(){ splash.remove(); showOnboardingIfNew(); }, 300);
       }, 1500);
     } else if (splash) {
       splash.remove();
+      setTimeout(showOnboardingIfNew, 400);
     }
   }
 });
+
+// ========== ONBOARDING FLOW ==========
+var obStep = 0;
+var obSteps = [
+  {
+    icon: '🛡️', iconBg: 'linear-gradient(135deg,var(--blue),var(--blue-md))',
+    title: 'Welcome to RenterIQ',
+    sub: 'Your personal renting assistant for Australia. We help you rent smarter and stay protected — from search to move-out.',
+    features: [
+      { icon: '🔍', bg: 'var(--blue-lt)', text: 'Search suburbs & compare listings' },
+      { icon: '⚖️', bg: 'rgba(245,166,35,.15)', text: 'AI-powered lease review in plain English' },
+      { icon: '📋', bg: 'var(--teal-lt)', text: 'Inspection reports & condition audits' },
+      { icon: '🗄️', bg: 'rgba(232,64,64,.1)', text: 'Vault — your secure document storage' }
+    ]
+  },
+  {
+    icon: '🔍', iconBg: 'var(--blue-lt)',
+    title: 'Step 1: Find Your Place',
+    sub: 'Search any suburb in Australia. We\'ll link you to all major rental sites and help you track properties you\'re interested in.',
+    features: [
+      { icon: '📍', bg: 'var(--blue-lt)', text: 'Search by suburb or postcode' },
+      { icon: '🏠', bg: 'var(--blue-lt)', text: 'Compare on realestate.com.au, Domain & more' },
+      { icon: '📌', bg: 'var(--teal-lt)', text: 'Track listings you like in one place' }
+    ]
+  },
+  {
+    icon: '⚖️', iconBg: 'rgba(245,166,35,.15)',
+    title: 'Step 2: Review Your Lease',
+    sub: 'Upload your lease and our AI explains every clause in plain English. We flag anything unusual so you know exactly what you\'re signing.',
+    features: [
+      { icon: '📄', bg: 'var(--blue-lt)', text: 'Upload PDF or photo of your lease' },
+      { icon: '🤖', bg: 'var(--teal-lt)', text: 'AI breaks down each clause for you' },
+      { icon: '⚠️', bg: 'rgba(245,166,35,.15)', text: 'Flags non-standard or risky terms' }
+    ]
+  },
+  {
+    icon: '📋', iconBg: 'var(--teal-lt)',
+    title: 'Step 3: Inspect & Protect',
+    sub: 'Document everything when you move in. RenterIQ\'s inspection tools create timestamped evidence that protects your bond.',
+    features: [
+      { icon: '🔑', bg: 'var(--blue-lt)', text: 'Move-in condition audit with photos' },
+      { icon: '🔍', bg: 'var(--teal-lt)', text: 'Routine inspection report analyser' },
+      { icon: '🚪', bg: 'rgba(232,64,64,.1)', text: 'Move-out checklist & exit inspection' }
+    ]
+  }
+];
+
+function showOnboardingIfNew() {
+  try {
+    if (localStorage.getItem('riq-onboarding-done') === '1') return;
+  } catch(e) {}
+  obStep = 0;
+  renderObStep();
+  var overlay = document.getElementById('onboardingOverlay');
+  if (overlay) { requestAnimationFrame(function(){ overlay.classList.add('show'); }); }
+}
+
+function renderObStep() {
+  var step = obSteps[obStep];
+  if (!step) return;
+
+  // Dots
+  var dotsHtml = '';
+  for (var d = 0; d < obSteps.length; d++) {
+    dotsHtml += '<div class="ob-dot' + (d === obStep ? ' active' : '') + '"></div>';
+  }
+  var dotsEl = document.getElementById('obDots');
+  if (dotsEl) dotsEl.innerHTML = dotsHtml;
+
+  // Content
+  var html = '<div class="ob-icon" style="background:' + step.iconBg + '">' + step.icon + '</div>';
+  html += '<div class="ob-title">' + step.title + '</div>';
+  html += '<div class="ob-sub">' + step.sub + '</div>';
+  if (step.features) {
+    html += '<div class="ob-features">';
+    step.features.forEach(function(f) {
+      html += '<div class="ob-feat"><div class="ob-feat-icon" style="background:' + f.bg + '">' + f.icon + '</div><div class="ob-feat-text">' + f.text + '</div></div>';
+    });
+    html += '</div>';
+  }
+  var contentEl = document.getElementById('obContent');
+  if (contentEl) contentEl.innerHTML = html;
+
+  // Buttons
+  var nextBtn = document.getElementById('obNext');
+  var skipBtn = document.getElementById('obSkip');
+  if (obStep === obSteps.length - 1) {
+    if (nextBtn) nextBtn.textContent = 'Get Started';
+    if (skipBtn) skipBtn.style.display = 'none';
+  } else {
+    if (nextBtn) nextBtn.textContent = 'Next';
+    if (skipBtn) skipBtn.style.display = '';
+  }
+}
+
+function obNext() {
+  if (obStep < obSteps.length - 1) {
+    obStep++;
+    renderObStep();
+  } else {
+    obDismiss();
+  }
+}
+
+function obSkip() { obDismiss(); }
+
+function obDismiss() {
+  try { localStorage.setItem('riq-onboarding-done', '1'); } catch(e) {}
+  var overlay = document.getElementById('onboardingOverlay');
+  if (overlay) {
+    overlay.classList.remove('show');
+    setTimeout(function(){ overlay.remove(); }, 350);
+  }
+}
 
 var deferredPrompt = null;
 var banner = document.getElementById('installBanner');
@@ -624,7 +754,6 @@ function shouldShowBanner() {
 
 // Android / Chrome — capture beforeinstallprompt
 window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
   deferredPrompt = e;
   if (shouldShowBanner()) banner.style.display = 'flex';
 });

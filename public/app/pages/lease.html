@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="/app/css/app.css">
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -265,7 +266,7 @@
       <div style="font-weight:700;font-size:12.5px;color:var(--teal-dk);line-height:1.6">✓ You're in control — read each clause at your own pace. Mark it as understood when you're ready. Nothing is confirmed without you.</div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:14px">
+    <div id="clauseContainer" style="display:flex;flex-direction:column;gap:14px">
 
       <!-- Clause 0: Lease Term -->
       <div class="clause-card" id="clause-0">
@@ -427,7 +428,7 @@
         </div>
       </div>
       <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr)">
+      <div id="summaryStats" style="display:grid;grid-template-columns:repeat(3,1fr)">
         <div style="text-align:center;padding:8px 4px"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">12</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Clauses Reviewed</div></div>
         <div style="text-align:center;padding:8px 4px"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">3</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Items Flagged</div></div>
         <div style="text-align:center;padding:8px 4px"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">1</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Action Needed</div></div>
@@ -436,7 +437,7 @@
 
     <!-- Flagged Items -->
     <div class="sec-label">Items Requiring Your Attention</div>
-    <div style="display:flex;flex-direction:column;gap:10px">
+    <div id="summaryFlagged" style="display:flex;flex-direction:column;gap:10px">
       <div style="background:#fff;border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">
         <div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">⚠️</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Pets</span></div><span class="tag-amber">Review</span></div>
         <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6;margin-top:6px">Pet approval required in writing. In Victoria you have the right to request this — it cannot be unreasonably refused.</div>
@@ -456,7 +457,7 @@
 
     <!-- Standard Clauses -->
     <div class="sec-label" style="margin-top:20px">Standard Clauses — No Issues</div>
-    <div style="background:#fff;border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt)">
+    <div id="summaryStandard" style="background:#fff;border-radius:16px;padding:14px 16px;border:1px solid var(--border-lt)">
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)">
         <div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Term</span>
@@ -585,7 +586,7 @@
 /* RenterIQ — Lease Review JS */
 
 // Utilities
-function navigate(p){window.location.href=p}
+function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
 
 function showToast(title,sub,icon){
   var t=document.getElementById('appToast');
@@ -621,16 +622,17 @@ function switchView(id){
 }
 
 // File Upload
+var uploadedFile=null;
 function triggerUpload(){document.getElementById('leaseFile').click()}
 
 function handleFileSelect(input){
   if(!input.files||!input.files[0])return;
-  var file=input.files[0];
+  uploadedFile=input.files[0];
   document.getElementById('dropZone').style.display='none';
   document.getElementById('fileSelected').style.display='block';
-  document.getElementById('fileName').textContent=file.name;
-  var kb=Math.round(file.size/1024);
-  var mb=(file.size/(1024*1024)).toFixed(1);
+  document.getElementById('fileName').textContent=uploadedFile.name;
+  var kb=Math.round(uploadedFile.size/1024);
+  var mb=(uploadedFile.size/(1024*1024)).toFixed(1);
   document.getElementById('fileSize').textContent=(kb>1024?mb+' MB':kb+' KB')+' · Ready to analyse';
   document.getElementById('analyseBtn').style.opacity='1';
   document.getElementById('analyseBtn').style.pointerEvents='auto';
@@ -638,6 +640,7 @@ function handleFileSelect(input){
 }
 
 function loadDemoLease(){
+  uploadedFile=null;
   document.getElementById('dropZone').style.display='none';
   document.getElementById('fileSelected').style.display='block';
   document.getElementById('fileName').textContent='sample_lease.pdf';
@@ -647,29 +650,168 @@ function loadDemoLease(){
   showToast('Demo lease loaded','Tap Analyse to begin','📄');
 }
 
-function startAnalysis(){switchView('B');runAnalysisAnimation()}
+// Analysis — calls /api/analyze-lease (Gemini AI)
+var leaseData=null;
+var totalClauses=12;
+var understood={};
 
-// Analysis Animation
-function runAnalysisAnimation(){
-  var delays=[800,1800,3000,4200,5200];
-  // Start first icon spinning
+function startAnalysis(){
+  switchView('B');
+  understood={};
+
+  // Animate progress steps while API processes
+  var stepDelays=[800,1800,3000,4200];
   var first=document.getElementById('lIcon-0');
   if(first)first.style.animation='spin 1s linear infinite';
-  delays.forEach(function(delay,i){
+  stepDelays.forEach(function(delay,i){
     setTimeout(function(){
       var icon=document.getElementById('lIcon-'+i);
       if(!icon)return;
       icon.textContent='✓';icon.style.background='var(--teal-lt)';icon.style.animation='none';icon.style.color='var(--teal-dk)';icon.style.fontFamily='Sora,sans-serif';icon.style.fontWeight='700';
-      if(i<delays.length-1){var next=document.getElementById('lIcon-'+(i+1));if(next)next.style.animation='spin 1s linear infinite'}
+      if(i<stepDelays.length-1){var next=document.getElementById('lIcon-'+(i+1));if(next)next.style.animation='spin 1s linear infinite'}
     },delay);
   });
-  setTimeout(function(){switchView('C')},5800);
+
+  // Call Gemini-powered lease analysis API
+  var isDemoMode=document.getElementById('fileName').textContent==='sample_lease.pdf';
+  var fetchPromise;
+  if(!isDemoMode&&uploadedFile){
+    var formData=new FormData();
+    formData.append('file',uploadedFile);
+    fetchPromise=fetch('/api/analyze-lease',{method:'POST',body:formData});
+  } else {
+    fetchPromise=fetch('/api/analyze-lease',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:''})
+    });
+  }
+
+  fetchPromise
+    .then(function(r){return r.json()})
+    .then(function(data){
+      leaseData=data;
+      if(data.clauses){
+        totalClauses=data.clauses.length;
+        renderClauses(data);
+        renderSummary(data);
+      }
+      finishAnimation();
+    })
+    .catch(function(err){
+      console.error('Lease analysis error:',err);
+      showToast('Analysis note','Using cached demo analysis','📄');
+      finishAnimation();
+    });
+}
+
+function finishAnimation(){
+  var lastIcon=document.getElementById('lIcon-4');
+  if(lastIcon){
+    lastIcon.textContent='✓';lastIcon.style.background='var(--teal-lt)';lastIcon.style.animation='none';
+    lastIcon.style.color='var(--teal-dk)';lastIcon.style.fontFamily='Sora,sans-serif';lastIcon.style.fontWeight='700';
+  }
+  setTimeout(function(){switchView('C')},600);
+}
+
+// Dynamic clause icon mapping
+function getClauseIcon(title){
+  var t=(title||'').toLowerCase();
+  if(t.includes('rent')&&t.includes('increase'))return '💰';
+  if(t.includes('rent')||t.includes('payment'))return '💰';
+  if(t.includes('lease')||t.includes('term')||t.includes('duration'))return '📅';
+  if(t.includes('bond')||t.includes('deposit')||t.includes('security'))return '🔑';
+  if(t.includes('repair')||t.includes('maintenance'))return '🔧';
+  if(t.includes('pet'))return '🐾';
+  if(t.includes('alter')||t.includes('modif')||t.includes('fixture'))return '🔨';
+  if(t.includes('entry')||t.includes('inspection')||t.includes('access'))return '📋';
+  if(t.includes('break')||t.includes('terminat')||t.includes('early'))return '🚪';
+  if(t.includes('clean')||t.includes('condition'))return '🧹';
+  if(t.includes('noise')||t.includes('nuisance'))return '🔇';
+  if(t.includes('utilit')||t.includes('electric')||t.includes('water')||t.includes('gas'))return '⚡';
+  if(t.includes('garden')||t.includes('lawn'))return '🌿';
+  if(t.includes('sublet'))return '🏠';
+  return '📄';
+}
+
+// Render clause cards from API response
+function renderClauses(data){
+  var container=document.getElementById('clauseContainer');
+  if(!container||!data.clauses)return;
+  var html='';
+  data.clauses.forEach(function(clause,i){
+    var rating=clause.rating||'standard';
+    var headerBg=rating==='standard'?'var(--blue-xl)':rating==='warning'?'rgba(232,64,64,.08)':'rgba(245,166,35,.12)';
+    var tagClass=rating==='standard'?'tag-muted':'tag-amber';
+    var tagText=rating==='standard'?'Standard':rating==='warning'?'Warning':'Review';
+    var icon=getClauseIcon(clause.title);
+    html+='<div class="clause-card" id="clause-'+i+'">';
+    html+='<div class="clause-header" style="background:'+headerBg+'"><div class="clause-left"><span class="clause-icon">'+icon+'</span><span class="clause-name">'+(clause.title||'Clause '+(i+1))+'</span></div><span class="'+tagClass+'">'+tagText+'</span></div>';
+    html+='<div class="plain-english"><span class="plain-english-label">✦ In plain English</span><div class="plain-english-text">'+(clause.explanation||'')+'</div></div>';
+    if(clause.original){
+      html+='<div class="original-toggle" onclick="toggleOriginal('+i+')"><span class="original-label">Original wording</span><span class="original-action" id="origToggle-'+i+'">Show ›</span></div>';
+      html+='<div class="original-content" id="origContent-'+i+'" style="display:none"><div class="original-inner">'+(clause.original||'')+'</div></div>';
+    }
+    if(clause.flag){
+      html+='<div class="flag-box"><span style="font-size:16px;flex-shrink:0">⚠️</span><div>';
+      html+='<div class="flag-text">'+clause.flag+'</div>';
+      if(clause.law_reference)html+='<div style="font-family:Sora,sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">📖 '+clause.law_reference+'</div>';
+      html+='<span style="font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:var(--blue);display:block;margin-top:6px;cursor:pointer" onclick="navigate(\'/app/pages/rights.html\')">Get help with this clause →</span>';
+      html+='</div></div>';
+    }
+    html+='<div class="understood-wrap"><button class="understood-btn" onclick="markUnderstood('+i+')">Mark as Understood ✓</button></div>';
+    html+='</div>';
+  });
+  container.innerHTML=html;
+}
+
+// Render summary from API response
+function renderSummary(data){
+  if(!data.summary||!data.clauses)return;
+  var s=data.summary;
+  var flagged=data.clauses.filter(function(c){return c.rating!=='standard'});
+  var standard=data.clauses.filter(function(c){return c.rating==='standard'});
+
+  var statsEl=document.getElementById('summaryStats');
+  if(statsEl){
+    statsEl.innerHTML=
+      '<div style="text-align:center;padding:8px 4px"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:22px;color:var(--blue)">'+(s.total_clauses||totalClauses)+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Clauses Reviewed</div></div>'+
+      '<div style="text-align:center;padding:8px 4px"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:22px;color:var(--amber)">'+flagged.length+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Items Flagged</div></div>'+
+      '<div style="text-align:center;padding:8px 4px"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:22px;color:var(--red)">'+(s.warning_count||0)+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Action Needed</div></div>';
+  }
+
+  var flaggedEl=document.getElementById('summaryFlagged');
+  if(flaggedEl){
+    if(flagged.length>0){
+      var fhtml='';
+      flagged.forEach(function(c){
+        var bColor=c.rating==='warning'?'var(--red)':'var(--amber)';
+        fhtml+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border-left:3px solid '+bColor+';border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt)">'+
+          '<div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">⚠️</span><span style="font-family:Sora,sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+c.title+'</span></div><span class="tag-amber">'+(c.rating==='warning'?'Warning':'Review')+'</span></div>'+
+          '<div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6;margin-top:6px">'+(c.flag||c.explanation)+'</div>'+
+          '</div>';
+      });
+      flaggedEl.innerHTML=fhtml;
+    } else {
+      flaggedEl.innerHTML='<div style="background:var(--teal-lt);border-radius:14px;padding:16px;text-align:center"><span style="font-family:Sora,sans-serif;font-weight:700;font-size:14px;color:var(--teal-dk)">✓ No flagged items — your lease looks standard</span></div>';
+    }
+  }
+
+  var standardEl=document.getElementById('summaryStandard');
+  if(standardEl){
+    var shtml='';
+    standard.forEach(function(c,i){
+      var border=i<standard.length-1?'border-bottom:1px solid var(--border-lt)':'';
+      shtml+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;'+border+'">'+
+        '<div style="width:20px;height:20px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal-dk);font-weight:700;flex-shrink:0">✓</div>'+
+        '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+c.title+'</span>'+
+        '</div>';
+    });
+    standardEl.innerHTML=shtml;
+  }
 }
 
 // Clause Review
-var totalClauses=12;
-var understood={};
-
 function markUnderstood(n){
   understood[n]=true;
   var card=document.getElementById('clause-'+n);

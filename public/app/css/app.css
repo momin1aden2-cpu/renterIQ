@@ -43,6 +43,7 @@
 
 html {
   scroll-behavior: smooth;
+  background: #F4F7FF;
 }
 
 body {
@@ -54,7 +55,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
+  animation: fadeIn .18s ease both;
 }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 h1, h2, h3, h4, h5, button {
   font-family: 'Sora', sans-serif;
@@ -574,19 +577,15 @@ input:focus, textarea:focus, select:focus {
    DESKTOP / TABLET RESPONSIVE LAYOUT
    ============================================= */
 
-/* Desktop Sidebar — hidden by default (mobile-first) */
-.desktop-sidebar {
-  display: none;
-}
+/* Desktop sidebar styles are injected dynamically via sidebar.js */
+/* This file only keeps essential layout adjustments */
 
 @media (min-width: 900px) {
-  /* Full-viewport body layout */
   body {
     overflow-y: auto;
     overflow-x: hidden;
   }
 
-  /* App shell: row layout — sidebar left, main right */
   .app-shell {
     max-width: none !important;
     display: flex !important;
@@ -597,197 +596,6 @@ input:focus, textarea:focus, select:focus {
     position: relative !important;
   }
 
-  /* Desktop sidebar */
-  .desktop-sidebar {
-    display: flex;
-    flex-direction: column;
-    width: 240px;
-    min-width: 240px;
-    min-height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, var(--blue-dk) 0%, #0D2F74 60%, #091E52 100%);
-    z-index: 100;
-    overflow-y: auto;
-    overflow-x: hidden;
-    box-shadow: 2px 0 20px rgba(10,36,96,.25);
-  }
-
-  .ds-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 24px 20px 20px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-    text-decoration: none;
-  }
-
-  .ds-brand-text {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .ds-wordmark {
-    font-family: 'Sora', sans-serif;
-    font-weight: 800;
-    font-size: 17px;
-    color: #fff;
-    letter-spacing: .3px;
-  }
-
-  .ds-tagline {
-    font-size: 10px;
-    color: rgba(255,255,255,.45);
-    font-weight: 600;
-    letter-spacing: .8px;
-    text-transform: uppercase;
-    margin-top: 1px;
-  }
-
-  .ds-nav {
-    flex: 1;
-    padding: 16px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .ds-section-label {
-    font-family: 'Sora', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    color: rgba(255,255,255,.3);
-    text-transform: uppercase;
-    padding: 12px 10px 6px;
-  }
-
-  .ds-tab {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 12px;
-    border-radius: 12px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: rgba(255,255,255,.65);
-    font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    transition: all .18s;
-    text-decoration: none;
-    width: 100%;
-    text-align: left;
-  }
-
-  .ds-tab:hover {
-    background: rgba(255,255,255,.08);
-    color: #fff;
-  }
-
-  .ds-tab.active {
-    background: rgba(255,255,255,.13);
-    color: #fff;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
-  }
-
-  .ds-tab-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    flex-shrink: 0;
-    background: rgba(255,255,255,.06);
-    transition: all .18s;
-  }
-
-  .ds-tab.active .ds-tab-icon {
-    background: linear-gradient(135deg, var(--blue), var(--blue-md));
-    box-shadow: 0 2px 10px rgba(27,80,200,.4);
-  }
-
-  .ds-footer {
-    padding: 16px 12px 24px;
-    border-top: 1px solid rgba(255,255,255,.08);
-  }
-
-  .ds-user {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    background: rgba(255,255,255,.06);
-  }
-
-  .ds-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.18);
-    border: 2px solid rgba(255,255,255,.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Sora', sans-serif;
-    font-weight: 800;
-    font-size: 13px;
-    color: #fff;
-    flex-shrink: 0;
-  }
-
-  .ds-user-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .ds-user-name {
-    font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .ds-user-role {
-    font-size: 11px;
-    color: rgba(255,255,255,.45);
-    margin-top: 1px;
-  }
-
-  .ds-signout {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: rgba(255,255,255,.45);
-    font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    transition: all .18s;
-    width: 100%;
-    text-align: left;
-  }
-
-  .ds-signout:hover {
-    background: rgba(232,64,64,.12);
-    color: #F87171;
-  }
-
-  /* Main content pushes right of sidebar */
   .app-main {
     margin-left: 240px;
     flex: 1;
@@ -797,7 +605,6 @@ input:focus, textarea:focus, select:focus {
     min-width: 0;
   }
 
-  /* Screen header: no longer sticky on desktop, rounded, with margin */
   .screen-header {
     position: static;
     margin: 24px 24px 0;
@@ -805,25 +612,21 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 4px 24px rgba(10,36,96,.12);
   }
 
-  /* Content area: proper desktop padding */
   .content {
     padding: 24px 24px 48px !important;
     overflow-y: visible !important;
     max-width: 900px;
   }
 
-  /* Hide mobile bottom nav */
   .bottom-nav {
     display: none !important;
   }
 
-  /* Install banner spans full content width */
   .install-banner {
     margin: 16px 24px 0;
     border-radius: 14px;
   }
 
-  /* Update bar: account for sidebar */
   .update-bar {
     left: 240px;
     right: 0;
@@ -832,13 +635,11 @@ input:focus, textarea:focus, select:focus {
     bottom: 16px;
   }
 
-  /* Desktop grid layouts for content */
   .vault-grid {
     grid-template-columns: repeat(4, 1fr) !important;
   }
 }
 
-/* Tablet: narrower sidebar */
 @media (min-width: 768px) and (max-width: 899px) {
   .app-shell {
     max-width: none !important;

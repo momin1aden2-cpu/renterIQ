@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="/app/css/app.css">
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -215,7 +216,7 @@
 <!-- WHAT CHANGED -->
 <div style="background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt);margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Changes from your previous lease</div>
-  <div style="display:flex;flex-direction:column;gap:0">
+  <div id="renewalChangesContainer" style="display:flex;flex-direction:column;gap:0">
     <div class="change-row">
       <div class="change-icon amber-lt">⚠️</div>
       <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Rent increased</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Rent increase proposed. 60 days notice required under VIC law.</div></div>
@@ -368,7 +369,7 @@
 <script>
 /* RenterIQ — Lease Renewal JS */
 
-function navigate(p){window.location.href=p}
+function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
 
 function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
 
@@ -447,7 +448,76 @@ function removeRenewalFile(){
 
 function startRenewalAnalysis(){
   showToast('Analysing new lease…','Comparing to previous agreement','⚖️');
-  setTimeout(function(){switchView('C')},2000);
+
+  var fileInput=document.getElementById('renewalFile');
+  var isDemoMode=!fileInput||!fileInput.files||!fileInput.files[0];
+  var fetchPromise;
+
+  if(!isDemoMode){
+    var formData=new FormData();
+    formData.append('file',fileInput.files[0]);
+    fetchPromise=fetch('/api/analyze-renewal',{method:'POST',body:formData});
+  } else {
+    fetchPromise=fetch('/api/analyze-renewal',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:''})
+    });
+  }
+
+  fetchPromise
+    .then(function(r){return r.json()})
+    .then(function(data){
+      if(data.changes||data.new_clauses)renderRenewalChanges(data);
+      switchView('C');
+    })
+    .catch(function(err){
+      console.error('Renewal analysis error:',err);
+      showToast('Analysis note','Using demo comparison','📄');
+      switchView('C');
+    });
+}
+
+function renderRenewalChanges(data){
+  var container=document.getElementById('renewalChangesContainer');
+  if(!container)return;
+  var html='';
+
+  if(data.changes){
+    data.changes.forEach(function(change){
+      var isNeg=change.impact==='negative';
+      var iconClass=isNeg?'amber-lt':'teal-lt';
+      var icon=isNeg?'⚠️':'✓';
+      html+='<div class="change-row">';
+      html+='<div class="change-icon '+iconClass+'">'+icon+'</div>';
+      html+='<div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+change.title+'</div>';
+      html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">'+change.explanation+'</div>';
+      if(change.action_needed)html+='<div style="font-family:\'Sora\',sans-serif;font-weight:600;font-size:11px;color:var(--blue);margin-top:4px">→ '+change.action_needed+'</div>';
+      html+='</div></div>';
+    });
+  }
+
+  if(data.new_clauses){
+    data.new_clauses.forEach(function(clause){
+      var isWarn=clause.rating==='warning'||clause.rating==='unusual';
+      html+='<div class="change-row">';
+      html+='<div class="change-icon '+(isWarn?'amber-lt':'teal-lt')+'">'+(isWarn?'⚠️':'➕')+'</div>';
+      html+='<div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">New: '+clause.title+'</div>';
+      html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">'+clause.explanation+'</div></div>';
+      html+='</div>';
+    });
+  }
+
+  if(data.summary){
+    var s=data.summary;
+    html+='<div style="margin-top:12px;padding:12px;background:var(--blue-xl);border-radius:12px">';
+    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px">Summary</div>';
+    if(s.rent_change)html+='<div style="font-weight:600;font-size:12px;color:var(--muted);line-height:1.5">Rent: '+s.rent_change+'</div>';
+    if(s.overall_assessment)html+='<div style="font-weight:600;font-size:12px;color:var(--muted);line-height:1.5;margin-top:4px">'+s.overall_assessment+'</div>';
+    html+='</div>';
+  }
+
+  container.innerHTML=html;
 }
 
 // Save to Vault
@@ -478,7 +548,7 @@ function toggleBondCheck(n){
 
 // Init
 document.addEventListener('DOMContentLoaded',function(){
-  views.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
+  rnViews.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
   setTimeout(function(){var bar=document.getElementById('renewalLeaseBar');if(bar)bar.style.width='41%'},400);
 });
 

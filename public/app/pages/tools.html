@@ -7,11 +7,19 @@
 <meta name="description" content="RenterIQ Tools — All your renter tools in one place.">
 <title>Tools — RenterIQ</title>
 <link rel="manifest" href="/app/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="prefetch" href="/app/index.html">
+<link rel="prefetch" href="/app/pages/vault.html">
+<link rel="prefetch" href="/app/pages/lease.html">
+<link rel="prefetch" href="/app/pages/entry-audit.html">
+<link rel="prefetch" href="/app/pages/rights.html">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--blue:#1B50C8;--blue-md:#2E63E0;--blue-lt:#E5EBF8;--blue-xl:#EEF3FF;--blue-dk:#0A2460;--text:#0A2460;--muted:#4A5D7A;--border:#D5E0F5;--border-lt:#E5EBF8;--amber:#F5A623;--teal:#00C896;--red:#E84040}
 *{box-sizing:border-box}
-body{font-family:'Nunito',sans-serif;background:var(--blue-xl);color:var(--text);margin:0;padding:0;-webkit-tap-highlight-color:transparent;min-height:100vh}
+body{font-family:'Nunito',sans-serif;background:var(--blue-xl);color:var(--text);margin:0;padding:0;-webkit-tap-highlight-color:transparent;min-height:100vh;animation:fadeIn .18s ease both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .app-shell{max-width:430px;margin:0 auto;background:var(--blue-xl);min-height:100vh;position:relative}
 
 /* Header */
@@ -113,7 +121,7 @@ body{font-family:'Nunito',sans-serif;background:var(--blue-xl);color:var(--text)
 </div>
 
 <script>
-function navigate(p){window.location.href=p}
+function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
 
 // Load user initials
 function loadUserData() {

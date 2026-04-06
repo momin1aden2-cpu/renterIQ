@@ -1,8 +1,12 @@
-// RenterIQ Service Worker - Cache-first strategy
-const CACHE_NAME = 'renteriq-v2';
-const urlsToCache = [
+// RenterIQ Service Worker v5 — fast page transitions
+const CACHE_NAME = 'renteriq-v5';
+const CDN_CACHE  = 'renteriq-cdn-v1';
+
+const APP_SHELL = [
   '/app/',
   '/app/index.html',
+  '/app/css/app.css',
+  '/app/js/sidebar.js',
   '/app/pages/vault.html',
   '/app/pages/inspection.html',
   '/app/pages/entry-audit.html',
@@ -17,14 +21,28 @@ const urlsToCache = [
   '/app/pages/routine-inspection.html',
   '/app/pages/tracked.html',
   '/app/pages/webview.html',
-  '/app/js/sidebar.js',
   '/assets/logo.svg'
 ];
+
+// CDN origins we want to cache (Firebase SDK, Google Fonts)
+const CDN_ORIGINS = [
+  'https://www.gstatic.com',
+  'https://fonts.googleapis.com',
+  'https://fonts.gstatic.com'
+];
+
+function isCdnRequest(url) {
+  return CDN_ORIGINS.some(function(o) { return url.startsWith(o); });
+}
+
+function isApiRequest(url) {
+  return url.includes('/api/');
+}
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(urlsToCache);
+      return cache.addAll(APP_SHELL);
     })
   );
   self.skipWaiting();
@@ -34,11 +52,9 @@ self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
-        cacheNames.map(function(cacheName) {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames.filter(function(n) {
+          return n !== CACHE_NAME && n !== CDN_CACHE;
+        }).map(function(n) { return caches.delete(n); })
       );
     }).then(function() {
       return self.clients.claim();
@@ -47,12 +63,42 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
+  var url = event.request.url;
+
+  // Never cache API calls
+  if (isApiRequest(url)) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // CDN resources: stale-while-revalidate (instant from cache, update in background)
+  if (isCdnRequest(url)) {
+    event.respondWith(
+      caches.open(CDN_CACHE).then(function(cache) {
+        return cache.match(event.request).then(function(cached) {
+          var fetchPromise = fetch(event.request).then(function(networkResponse) {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          }).catch(function() { return cached; });
+          return cached || fetchPromise;
+        });
+      })
+    );
+    return;
+  }
+
+  // Local assets: cache-first
   event.respondWith(
     caches.match(event.request).then(function(response) {
-      if (response) {
-        return response;
-      }
-      return fetch(event.request);
+      return response || fetch(event.request).then(function(networkResponse) {
+        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+          var clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clone); });
+        }
+        return networkResponse;
+      });
     })
   );
 });
