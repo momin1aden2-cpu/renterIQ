@@ -137,6 +137,10 @@
 
   function injectSidebar() {
     injectDesktopCSS();
+
+    // Only inject sidebar DOM on desktop — skip entirely on mobile/tablet
+    if (!window.matchMedia('(min-width:900px)').matches) return;
+
     var shell = document.querySelector('.app-shell');
     if (!shell) return;
     if (shell.querySelector('.desktop-sidebar')) {

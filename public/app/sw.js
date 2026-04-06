@@ -1,5 +1,5 @@
 // RenterIQ Service Worker - Cache-first strategy
-const CACHE_NAME = 'renteriq-v1';
+const CACHE_NAME = 'renteriq-v2';
 const urlsToCache = [
   '/app/',
   '/app/index.html',
@@ -13,6 +13,10 @@ const urlsToCache = [
   '/app/pages/profile.html',
   '/app/pages/notifications.html',
   '/app/pages/application.html',
+  '/app/pages/tools.html',
+  '/app/pages/routine-inspection.html',
+  '/app/pages/tracked.html',
+  '/app/pages/webview.html',
   '/app/js/sidebar.js',
   '/assets/logo.svg'
 ];
