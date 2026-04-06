@@ -984,8 +984,8 @@ function getAllSources(){
     {key: 'riq_condition_reports', label: 'Condition Reports', icon: '📸', type: 'condition', color: 'var(--blue)', view: 'C'},
     {key: 'riq_routine_inspection_past', label: 'Routine Inspections', icon: '🔍', type: 'routine', color: '#1A6B4A', view: 'H'},
     {key: 'riq_communications', label: 'Communications', icon: '💬', type: 'communication', color: '#1A4A6B', view: 'E'},
-    {key: 'riq_entry_audit_past', label: 'Entry Audits', icon: '📋', type: 'audit', color: 'var(--purple)', view: 'C'},
-    {key: 'renteriq_vault_reports', label: 'Lease & Reports', icon: '📑', type: 'report', color: 'var(--red)', view: 'B'}
+    {key: 'renteriq_vault_reports', label: 'Lease Agreements', icon: '📑', type: 'lease', color: '#7C3AED', view: 'B'},
+    {key: 'riq_exit_reports', label: 'Exit Reports', icon: '🚪', type: 'exit', color: '#4A2299', view: 'G'}
   ];
 }
 
@@ -1212,7 +1212,9 @@ function getSourceByType(type){
     'maintenance': {key: 'riq_maintenance_items'},
     'condition': {key: 'riq_condition_reports'},
     'communication': {key: 'riq_communications'},
-    'routine': {key: 'riq_routine_inspection_past'}
+    'routine': {key: 'riq_routine_inspection_past'},
+    'lease': {key: 'renteriq_vault_reports'},
+    'exit': {key: 'riq_exit_reports'}
   };
   return sources[type];
 }
