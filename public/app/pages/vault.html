@@ -123,11 +123,20 @@
       <div class="folder-card" onclick="switchView('E')"><div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#1A4A6B,#2299CC);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">💬</div><div style="flex:1;min-width:0"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Communications</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Save agent &amp; landlord messages</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="vault-count-e" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:3px 10px">0 saved</span><span style="color:var(--muted);font-size:20px">›</span></div></div>
       <div class="folder-card" onclick="switchView('F')"><div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#006B50,var(--teal));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🧾</div><div style="flex:1;min-width:0"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Receipts &amp; Payments</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Rent, bond &amp; repair receipts</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="vault-count-f" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:3px 10px">0 receipts</span><span style="color:var(--muted);font-size:20px">›</span></div></div>
       <div class="folder-card" onclick="switchView('G')"><div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue-dk),#4A2299);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🚪</div><div style="flex:1;min-width:0"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Exit Reports</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Bond back &amp; exit condition</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:3px 10px">0 reports</span><span style="color:var(--muted);font-size:20px">›</span></div></div>
+      <!-- Custom Folders Container -->
+      <div id="customFoldersContainer"></div>
+      <!-- Add Folder Button -->
+      <div class="folder-card" id="addFolderBtn" onclick="openAddFolderModal()" style="background:var(--blue-xl);border:2px dashed var(--border);justify-content:center">
+        <div style="display:flex;align-items:center;gap:10px;color:var(--muted)">
+          <span style="font-size:24px">➕</span>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px">Add Folder</span>
+        </div>
+      </div>
     </div>
     <div style="padding:20px 16px 10px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Quick Actions</div></div>
     <div class="qa-grid">
       <div class="qa-card" onclick="navigate('/app/pages/lease.html')"><div style="width:36px;height:36px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📝</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Review Lease</div></div>
-      <div class="qa-card" onclick="navigate('/app/pages/entry-audit.html')"><div style="width:36px;height:36px;border-radius:10px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📸</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Entry Audit</div></div>
+      <div class="qa-card" onclick="navigate('/app/pages/entry-audit.html')"><div style="width:36px;height:36px;border-radius:10px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📸</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Move-In Inspector</div></div>
       <div class="qa-card" onclick="navigate('/app/pages/routine-inspection.html')"><div style="width:36px;height:36px;border-radius:10px;background:rgba(0,200,150,.07);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔍</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Routine Inspect</div></div>
       <div class="qa-card" onclick="switchView('D')"><div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔧</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Log Maintenance</div></div>
     </div>
@@ -325,6 +334,38 @@
     </div>
   </div>
   <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab" onclick="navigate('/app/pages/entry-audit.html')"><div class="tab-icon">📸</div><span class="tab-label">Entry Audit</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button></nav>
+</div>
+
+<!-- ADD CUSTOM FOLDER MODAL -->
+<div class="maintenance-overlay" id="addFolderOverlay">
+  <div class="maintenance-sheet" id="addFolderSheet">
+    <div class="sheet-handle"></div>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--text);margin-bottom:8px">Add Custom Folder</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:20px">Create up to 10 custom folders for your documents</div>
+    <div id="folderLimitWarning" style="display:none;background:rgba(232,64,64,.1);border:1px solid var(--red);border-radius:10px;padding:12px;margin-bottom:16px;font-family:'Sora',sans-serif;font-size:12px;color:var(--red)">You've reached the limit of 10 folders. Delete an existing folder to add a new one.</div>
+    <div class="sec-label" style="padding:0 0 8px">Folder Name *</div>
+    <input type="text" id="folderName" placeholder="e.g., Pet Documents, Parking Permit..." maxlength="30" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);margin-bottom:16px;box-sizing:border-box">
+    <div class="sec-label" style="padding:0 0 8px">Choose Icon</div>
+    <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:20px">
+      <button onclick="selectFolderEmoji('📄')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">📄</button>
+      <button onclick="selectFolderEmoji('📁')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">📁</button>
+      <button onclick="selectFolderEmoji('🐕')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">🐕</button>
+      <button onclick="selectFolderEmoji('🐱')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">🐱</button>
+      <button onclick="selectFolderEmoji('🚗')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">🚗</button>
+      <button onclick="selectFolderEmoji('🏍️')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">🏍️</button>
+      <button onclick="selectFolderEmoji('🔧')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">🔧</button>
+      <button onclick="selectFolderEmoji('📱')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">📱</button>
+      <button onclick="selectFolderEmoji('💻')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">💻</button>
+      <button onclick="selectFolderEmoji('📺')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">📺</button>
+      <button onclick="selectFolderEmoji('🔑')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">🔑</button>
+      <button onclick="selectFolderEmoji('🛡️')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">🛡️</button>
+      <button onclick="selectFolderEmoji('📝')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">📝</button>
+      <button onclick="selectFolderEmoji('📸')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">📸</button>
+      <button onclick="selectFolderEmoji('🎵')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">🎵</button>
+      <button onclick="selectFolderEmoji('⚽')" class="folder-emoji-btn" style="background:var(--blue-xl);border:2px solid var(--border);border-radius:10px;padding:10px;font-size:20px;cursor:pointer">⚽</button>
+    </div>
+    <button class="btn-blue-c btn-full" style="border-radius:12px;margin-top:4px;padding-bottom:32px" onclick="submitNewFolder()">Create Folder</button>
+  </div>
 </div>
 
 </div><!-- /app-shell -->
@@ -783,6 +824,7 @@ document.addEventListener('DOMContentLoaded',function(){
   loadReceipts();
   loadVaultCounts();
   loadRecentActivity();
+  renderCustomFolders();
 });
 /* ── Load Routine Inspection Reports from localStorage ── */
 function loadRoutineReports(){
@@ -978,7 +1020,8 @@ function closeSharePicker(){
 }
 
 function getAllSources(){
-  return [
+  // Get default sources
+  var sources = [
     {key: 'riq_receipts', label: 'Receipts & Payments', icon: '🧾', type: 'receipt', color: 'var(--teal)', view: 'F'},
     {key: 'riq_maintenance_items', label: 'Maintenance Log', icon: '🔧', type: 'maintenance', color: 'var(--amber)', view: 'D'},
     {key: 'riq_condition_reports', label: 'Condition Reports', icon: '📸', type: 'condition', color: 'var(--blue)', view: 'C'},
@@ -987,6 +1030,21 @@ function getAllSources(){
     {key: 'renteriq_vault_reports', label: 'Lease Agreements', icon: '📑', type: 'lease', color: '#7C3AED', view: 'B'},
     {key: 'riq_exit_reports', label: 'Exit Reports', icon: '🚪', type: 'exit', color: '#4A2299', view: 'G'}
   ];
+  // Add custom folders
+  var customFolders = getCustomFolders();
+  customFolders.forEach(function(folder){
+    sources.push({
+      key: 'renteriq_vault_custom_folders_' + folder.id,
+      label: folder.name,
+      icon: folder.icon,
+      type: 'custom_' + folder.id,
+      color: 'var(--blue)',
+      view: 'A',
+      isCustom: true,
+      folderId: folder.id
+    });
+  });
+  return sources;
 }
 
 function renderSharePickerFolders(){
@@ -1060,10 +1118,19 @@ function renderFolderItems(folderType){
   if(!source) return;
   
   var items = [];
-  try{
-    var raw = localStorage.getItem(source.key);
-    if(raw) items = JSON.parse(raw);
-  }catch(e){}
+  // Handle custom folders
+  if(source.isCustom){
+    var folders = getCustomFolders();
+    var folder = folders.find(function(f){return f.id === source.folderId;});
+    if(folder && folder.items){
+      items = folder.items;
+    }
+  }else{
+    try{
+      var raw = localStorage.getItem(source.key);
+      if(raw) items = JSON.parse(raw);
+    }catch(e){}
+  }
   
   var html = '';
   
@@ -1077,15 +1144,17 @@ function renderFolderItems(folderType){
     html += '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
       '<div style="font-size:32px;margin-bottom:8px">📂</div>' +
       '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px">This folder is empty</div>' +
-      '<div style="font-size:12px;margin-bottom:16px">Add items to this folder first.</div>' +
-      '<button onclick="closeSharePicker();switchView(\'' + source.view + '\')" style="background:' + source.color + ';color:#fff;border:none;border-radius:12px;padding:12px 20px;font-family:\'Sora\',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Add to ' + source.label + '</button>' +
-      '</div>';
+      '<div style="font-size:12px;margin-bottom:16px">Add items to this folder first.</div>';
+    if(!source.isCustom){
+      html += '<button onclick="closeSharePicker();switchView(\'' + source.view + '\')" style="background:' + source.color + ';color:#fff;border:none;border-radius:12px;padding:12px 20px;font-family:\'Sora\',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Add to ' + source.label + '</button>';
+    }
+    html += '</div>';
   }else{
     html += '<div style="font-family:\'Sora\',sans-serif;font-size:12px;color:var(--muted);margin-bottom:12px">👇 Tap to select multiple items:</div>';
     
     items.forEach(function(item, idx){
       var id = source.type + '_' + idx;
-      var title = item.description || item.issueType || item.address || item.subject || item.agency || 'Item ' + (idx + 1);
+      var title = item.description || item.issueType || item.address || item.subject || item.agency || item.name || 'Item ' + (idx + 1);
       var date = item.date ? new Date(item.date).toLocaleDateString('en-AU', {day:'numeric', month:'short', year:'numeric'}) : '';
       var isSelected = selectedItems.some(function(s){ return s.id === id; });
       
@@ -1138,6 +1207,23 @@ function toggleItem(el, id, type, idx){
 }
 
 function getSourceByType(type){
+  if(type && type.startsWith('custom_')){
+    var folderId = type.replace('custom_', '');
+    var folders = getCustomFolders();
+    var folder = folders.find(function(f){return f.id === folderId;});
+    if(folder){
+      return {
+        key: 'renteriq_vault_custom_folders',
+        label: folder.name,
+        icon: folder.icon,
+        type: type,
+        color: 'var(--blue)',
+        view: 'A',
+        isCustom: true,
+        folderId: folderId
+      };
+    }
+  }
   var sources = getAllSources();
   for(var i = 0; i < sources.length; i++){
     if(sources[i].type === type) return sources[i];
@@ -1254,6 +1340,138 @@ function copyEmail(){
 function downloadSelected(){
   showToast('Coming soon', 'ZIP download feature in development', '⬇️');
 }
+
+/* ── Custom Folders ── */
+var selectedFolderEmoji = '📁';
+var MAX_CUSTOM_FOLDERS = 10;
+
+function openAddFolderModal(){
+  var folders = getCustomFolders();
+  if(folders.length >= MAX_CUSTOM_FOLDERS){
+    document.getElementById('folderLimitWarning').style.display = 'block';
+    document.getElementById('folderName').disabled = true;
+    document.querySelectorAll('.folder-emoji-btn').forEach(function(btn){btn.disabled = true; btn.style.opacity = '0.4';});
+  }else{
+    document.getElementById('folderLimitWarning').style.display = 'none';
+    document.getElementById('folderName').disabled = false;
+    document.querySelectorAll('.folder-emoji-btn').forEach(function(btn){btn.disabled = false; btn.style.opacity = '1';});
+  }
+  document.getElementById('folderName').value = '';
+  selectedFolderEmoji = '📁';
+  updateFolderEmojiSelection();
+  var o = document.getElementById('addFolderOverlay'), s = document.getElementById('addFolderSheet');
+  if(!o || !s) return;
+  o.style.display = 'flex';
+  requestAnimationFrame(function(){o.style.opacity = '1'; s.style.transform = 'translateY(0)';});
+}
+
+function closeAddFolderModal(){
+  var o = document.getElementById('addFolderOverlay'), s = document.getElementById('addFolderSheet');
+  if(!o || !s) return;
+  o.style.opacity = '0';
+  s.style.transform = 'translateY(100%)';
+  setTimeout(function(){o.style.display = 'none';}, 320);
+}
+
+function selectFolderEmoji(emoji){
+  selectedFolderEmoji = emoji;
+  updateFolderEmojiSelection();
+}
+
+function updateFolderEmojiSelection(){
+  document.querySelectorAll('.folder-emoji-btn').forEach(function(btn){
+    if(btn.textContent === selectedFolderEmoji){
+      btn.style.background = 'var(--blue)';
+      btn.style.borderColor = 'var(--blue)';
+      btn.style.color = '#fff';
+    }else{
+      btn.style.background = 'var(--blue-xl)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'inherit';
+    }
+  });
+}
+
+function submitNewFolder(){
+  var name = document.getElementById('folderName').value.trim();
+  if(!name){
+    showToast('Error', 'Please enter a folder name', '❌');
+    return;
+  }
+  var folders = getCustomFolders();
+  if(folders.length >= MAX_CUSTOM_FOLDERS){
+    showToast('Limit reached', 'Maximum 10 custom folders allowed', '⚠️');
+    return;
+  }
+  var newFolder = {
+    id: 'custom_' + Date.now(),
+    name: name,
+    icon: selectedFolderEmoji,
+    createdAt: Date.now(),
+    items: []
+  };
+  folders.push(newFolder);
+  localStorage.setItem('renteriq_vault_custom_folders', JSON.stringify(folders));
+  closeAddFolderModal();
+  renderCustomFolders();
+  showToast('Folder created', name + ' added to your vault', '✅');
+}
+
+function getCustomFolders(){
+  try{
+    var raw = localStorage.getItem('renteriq_vault_custom_folders');
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){return [];}
+}
+
+function renderCustomFolders(){
+  var container = document.getElementById('customFoldersContainer');
+  if(!container) return;
+  var folders = getCustomFolders();
+  if(folders.length === 0){
+    container.innerHTML = '';
+    return;
+  }
+  var html = '';
+  folders.forEach(function(folder){
+    var itemCount = folder.items ? folder.items.length : 0;
+    html += '<div class="folder-card" onclick="openCustomFolder(\'' + folder.id + '\')" style="position:relative">' +
+      '<div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue-xl),var(--blue-lt));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">' + folder.icon + '</div>' +
+      '<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">' + folder.name + '</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">' + (itemCount === 0 ? 'Empty' : itemCount + ' item' + (itemCount !== 1 ? 's' : '')) + '</div></div>' +
+      '<div style="display:flex;gap:8px;align-items:center">' +
+      '<button onclick="event.stopPropagation();deleteCustomFolder(\'' + folder.id + '\')" style="background:var(--red);color:#fff;border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px">×</button>' +
+      '<span style="color:var(--muted);font-size:20px">›</span></div>' +
+      '</div>';
+  });
+  container.innerHTML = html;
+  var addBtn = document.getElementById('addFolderBtn');
+  if(addBtn){
+    if(folders.length >= MAX_CUSTOM_FOLDERS){
+      addBtn.style.opacity = '0.5';
+      addBtn.style.pointerEvents = 'none';
+      addBtn.querySelector('span:last-child').textContent = '10/10 folders';
+    }else{
+      addBtn.style.opacity = '1';
+      addBtn.style.pointerEvents = 'auto';
+      addBtn.querySelector('span:last-child').textContent = 'Add Folder';
+    }
+  }
+}
+
+function deleteCustomFolder(id){
+  if(!confirm('Delete this folder? All items inside will be lost.')) return;
+  var folders = getCustomFolders();
+  folders = folders.filter(function(f){return f.id !== id;});
+  localStorage.setItem('renteriq_vault_custom_folders', JSON.stringify(folders));
+  renderCustomFolders();
+  showToast('Folder deleted', 'Custom folder removed', '🗑️');
+}
+
+function openCustomFolder(id){
+  showToast('Custom Folder', 'Folder view coming soon — you can add items here in the next update', '📁');
+}
+
+document.getElementById('addFolderOverlay')?.addEventListener('click',function(e){if(e.target===this)closeAddFolderModal()});
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>

@@ -1,7 +1,7 @@
 /**
  * RenterIQ Desktop Sidebar — injects the sidebar nav on all app pages.
  * Loaded by every app page. On mobile it does nothing (CSS hides .desktop-sidebar).
- * Updated: 2025-04-05 - Entry Audit in Tools section
+ * Updated: 2025-04-05 - Move-In Inspector in Tools section
  */
 (function () {
   
@@ -12,7 +12,7 @@
   ];
 
   var TOOLS = [
-    { label: 'Entry Audit',  icon: '📸', path: '/app/pages/entry-audit.html' },
+    { label: 'Move-In Inspector',  icon: '📸', path: '/app/pages/entry-audit.html' },
     { label: 'Lease Review',  icon: '📑', path: '/app/pages/lease.html' },
     { label: 'Routine Inspect', icon: '🔍', path: '/app/pages/routine-inspection.html' },
     { label: 'Renter Rights', icon: '⚖️', path: '/app/pages/rights.html' },
@@ -186,7 +186,7 @@
     var routeMap = {
       '/app/index.html': '/app',
             '/app/pages/inspection.html': '/inspect',
-      '/app/pages/entry-audit.html': '/entry-audit',
+      '/app/pages/entry-audit.html': '/move-in',
       '/app/pages/vault.html': '/vault',
             '/app/pages/tracked.html': '/tracked',
       '/app/pages/lease.html': '/lease',

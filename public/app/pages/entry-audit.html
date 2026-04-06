@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-<title>Entry Audit — RenterIQ</title>
+<title>Move-In Inspector — RenterIQ</title>
 <style>
 .app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
 .view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
@@ -95,16 +95,16 @@
   <header class="sh">
     <div class="sh-row">
       <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RENTERIQ</span></button>
-      <span style="font-size:20px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Entry Audit','Document your property condition at move-in with timestamped photos','📸')">?</span>
+      <span style="font-size:20px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Move-In Inspector','Document your property condition at move-in with timestamped photos','📸')">?</span>
     </div>
-    <div class="sh-title">Entry Audit</div>
-    <div class="sh-sub">Move-in condition report</div>
+    <div class="sh-title">Move-In Inspector</div>
+    <div class="sh-sub">Document property condition at move-in</div>
   </header>
 
   <div class="property-card">
     <div class="property-address" id="propertyAddress">Property Address</div>
     <div class="property-sub" id="propertyDetails">Loading property details...</div>
-    <button onclick="resetPropertySetup()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:8px">Change Property</button>
+    <button onclick="showPropertyPicker()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:8px">Change Property</button>
   </div>
 
   <div style="flex:1;overflow-y:auto;padding-bottom:100px">
@@ -126,7 +126,7 @@
   <nav class="bottom-nav">
     <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
     <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-    <button class="nav-tab active" onclick="navigate('/app/pages/entry-audit.html')"><div class="tab-icon">📸</div><span class="tab-label">Entry Audit</span></button>
+    <button class="nav-tab active" onclick="navigate('/app/pages/entry-audit.html')"><div class="tab-icon">📸</div><span class="tab-label">Move-In Inspector</span></button>
     <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
   </nav>
 </div>
@@ -224,7 +224,7 @@
 <div class="modal-overlay" id="propertySetupModal">
   <div class="modal-content">
     <div class="modal-title">Property Setup</div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Set up your property for the entry audit</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Set up your property for move-in inspection</div>
     
     <!-- Auto-detected property info -->
     <div id="detectedProperty" style="display:none;background:var(--blue-lt);border:1px solid var(--blue);border-radius:12px;padding:14px;margin-bottom:16px">
@@ -295,6 +295,46 @@
     <div class="modal-buttons">
       <button class="modal-btn modal-btn-secondary" onclick="closePropertySetup()">Cancel</button>
       <button class="modal-btn modal-btn-primary" onclick="setupProperty()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROPERTY PICKER MODAL -->
+<div class="modal-overlay" id="propertyPickerModal">
+  <div class="modal-content" style="max-height:80vh;overflow-y:auto">
+    <div class="modal-title">Select Property</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Choose a property for your move-in inspection</div>
+    
+    <!-- Inspected Properties Section -->
+    <div id="inspectedPropertiesSection" style="display:none;margin-bottom:20px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <span>📋</span> From Inspections
+      </div>
+      <div id="inspectedPropertiesList" style="display:flex;flex-direction:column;gap:8px">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+    
+    <!-- Recent Properties Section -->
+    <div id="recentPropertiesSection" style="display:none;margin-bottom:20px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <span>🕐</span> Recent Properties
+      </div>
+      <div id="recentPropertiesList" style="display:flex;flex-direction:column;gap:8px">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+    
+    <!-- Manual Entry -->
+    <div style="background:var(--blue-xl);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:8px">✏️ Enter Manually</div>
+      <input type="text" class="modal-input" id="pickerManualAddress" placeholder="e.g. 18 Smith Street, Fitzroy VIC 3065" style="margin-bottom:8px">
+      <button class="modal-btn modal-btn-primary" onclick="selectManualProperty()" style="width:100%">Continue with Manual Entry →</button>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-secondary" onclick="closePropertyPicker()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="showPropertySetup()" style="background:var(--teal)">+ New Property</button>
     </div>
   </div>
 </div>
@@ -443,6 +483,154 @@ function resetPropertySetup(){
     showToast('Property setup reset','Configure your property again','🔄');
     showPropertySetup();
   }
+}
+
+// Show property picker modal
+function showPropertyPicker(){
+  var modal=document.getElementById('propertyPickerModal');
+  modal.style.display='flex';
+  populatePropertyPicker();
+}
+
+// Close property picker
+function closePropertyPicker(){
+  document.getElementById('propertyPickerModal').style.display='none';
+}
+
+// Populate property picker with inspected and recent properties
+function populatePropertyPicker(){
+  var inspectedList=document.getElementById('inspectedPropertiesList');
+  var recentList=document.getElementById('recentPropertiesList');
+  var inspectedSection=document.getElementById('inspectedPropertiesSection');
+  var recentSection=document.getElementById('recentPropertiesSection');
+  
+  inspectedList.innerHTML='';
+  recentList.innerHTML='';
+  
+  var inspectedProps=[];
+  var recentProps=[];
+  
+  // Get inspected properties from inspection history
+  var inspectionHistory=localStorage.getItem('riq_inspection_history');
+  if(inspectionHistory){
+    try{
+      var history=JSON.parse(inspectionHistory);
+      history.forEach(function(item){
+        if(item.address && !inspectedProps.find(function(p){return p.address===item.address})){
+          inspectedProps.push({
+            address:item.address,
+            details:item.details||item.date||'Inspected property',
+            source:'inspection',
+            date:item.date
+          });
+        }
+      });
+    }catch(e){}
+  }
+  
+  // Also check active property
+  var activeProp=localStorage.getItem('riq-active-property');
+  if(activeProp){
+    try{
+      var prop=JSON.parse(activeProp);
+      if(prop.label && !inspectedProps.find(function(p){return p.address===prop.label})){
+        inspectedProps.unshift({
+          address:prop.label,
+          details:prop.details||'Currently inspecting',
+          source:'active',
+          date:'Now'
+        });
+      }
+    }catch(e){}
+  }
+  
+  // Get recent properties from tracked properties
+  var tracked=localStorage.getItem('renteriq_tracked_properties');
+  if(tracked){
+    try{
+      var props=JSON.parse(tracked);
+      props.reverse().forEach(function(item){
+        if(item.label && !inspectedProps.find(function(p){return p.address===item.label}) && !recentProps.find(function(p){return p.address===item.label})){
+          recentProps.push({
+            address:item.label,
+            details:item.details||'Saved property',
+            source:'tracked'
+          });
+        }
+      });
+    }catch(e){}
+  }
+  
+  // Get from lease data
+  var leaseData=localStorage.getItem('renteriq_lease_data');
+  if(leaseData){
+    try{
+      var lease=JSON.parse(leaseData);
+      if(lease.address && !inspectedProps.find(function(p){return p.address===lease.address}) && !recentProps.find(function(p){return p.address===lease.address})){
+        recentProps.unshift({
+          address:lease.address,
+          details:lease.propertyDetails||'From lease agreement',
+          source:'lease'
+        });
+      }
+    }catch(e){}
+  }
+  
+  // Render inspected properties (FIRST priority)
+  if(inspectedProps.length>0){
+    inspectedSection.style.display='block';
+    inspectedProps.forEach(function(prop){
+      var btn=document.createElement('button');
+      btn.className='modal-btn';
+      btn.style.cssText='width:100%;text-align:left;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;cursor:pointer;display:flex;flex-direction:column;gap:4px';
+      btn.innerHTML='<span style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+prop.address+'</span><span style="font-size:11px;color:var(--muted)">'+prop.details+'</span>';
+      btn.onclick=function(){selectPropertyFromPicker(prop.address,prop.details);};
+      inspectedList.appendChild(btn);
+    });
+  }else{
+    inspectedSection.style.display='none';
+  }
+  
+  // Render recent properties (SECOND priority)
+  if(recentProps.length>0){
+    recentSection.style.display='block';
+    recentProps.slice(0,5).forEach(function(prop){// Limit to 5 recent
+      var btn=document.createElement('button');
+      btn.className='modal-btn';
+      btn.style.cssText='width:100%;text-align:left;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;cursor:pointer;display:flex;flex-direction:column;gap:4px';
+      btn.innerHTML='<span style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+prop.address+'</span><span style="font-size:11px;color:var(--muted)">'+prop.details+'</span>';
+      btn.onclick=function(){selectPropertyFromPicker(prop.address,prop.details);};
+      recentList.appendChild(btn);
+    });
+  }else{
+    recentSection.style.display='none';
+  }
+  
+  // If no properties at all, show message
+  if(inspectedProps.length===0 && recentProps.length===0){
+    recentSection.style.display='block';
+    recentList.innerHTML='<div style="padding:12px;color:var(--muted);font-size:13px;text-align:center">No saved properties yet.<br>Enter an address manually or add a new property.</div>';
+  }
+}
+
+// Select property from picker
+function selectPropertyFromPicker(address,details){
+  document.getElementById('manualAddress').value=address;
+  closePropertyPicker();
+  showPropertySetup();
+  showToast('Property selected',address,'📋');
+}
+
+// Select manual property entry from picker
+function selectManualProperty(){
+  var address=document.getElementById('pickerManualAddress').value.trim();
+  if(!address){
+    showToast('Address required','Please enter a property address','⚠️');
+    return;
+  }
+  document.getElementById('manualAddress').value=address;
+  closePropertyPicker();
+  showPropertySetup();
 }
 
 // Setup property and generate rooms
