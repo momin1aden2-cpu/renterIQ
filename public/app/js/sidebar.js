@@ -16,7 +16,7 @@
     { label: 'Lease Review',  icon: '📑', path: '/app/pages/lease.html' },
     { label: 'Routine Inspect', icon: '🔍', path: '/app/pages/routine-inspection.html' },
     { label: 'Renter Rights', icon: '⚖️', path: '/app/pages/rights.html' },
-    { label: 'Exit Clean',    icon: '🔑', path: '/app/pages/exit.html' },
+    { label: 'Move Out Inspector', icon: '🔑', path: '/app/pages/exit.html' },
   ];
   
 
