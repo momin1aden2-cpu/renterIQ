@@ -16,7 +16,7 @@
 <title>Your Vault — RenterIQ</title>
 <style>
 .app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
-.share-fab{position:fixed;bottom:90px;right:16px;max-width:430px;margin:0 auto;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(27,80,200,.4);z-index:999;-webkit-tap-highlight-color:transparent;transition:all .2s var(--ease-smooth)}
+.share-fab{position:fixed;bottom:120px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(27,80,200,.4);z-index:150;-webkit-tap-highlight-color:transparent;transition:all .2s var(--ease-smooth)}
 .share-fab:active{transform:scale(.92)}
 .picker-overlay{position:fixed;inset:0;z-index:300;background:rgba(10,36,96,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .28s ease}
 .picker-sheet{position:relative;width:100%;max-width:430px;background:#fff;border-radius:26px 26px 0 0;max-height:85vh;overflow-y:auto;transform:translateY(100%);transition:transform .32s var(--ease-smooth);padding:20px 20px 40px;box-shadow:0 -8px 40px rgba(0,0,0,.2)}
@@ -955,13 +955,15 @@ function loadRecentActivity(){
 
 /* ── Share Picker & Email Generation ── */
 var selectedItems = [];
+var currentPickerFolder = null;
 
 function openSharePicker(){
   var overlay = document.getElementById('sharePickerOverlay');
   var sheet = document.getElementById('sharePickerSheet');
   if(!overlay || !sheet) return;
   selectedItems = [];
-  renderSharePickerContent();
+  currentPickerFolder = null;
+  renderSharePickerFolders();
   overlay.style.display = 'flex';
   requestAnimationFrame(function(){overlay.style.opacity = '1'; sheet.style.transform = 'translateY(0)';});
 }
@@ -975,22 +977,31 @@ function closeSharePicker(){
   setTimeout(function(){overlay.style.display = 'none';}, 280);
 }
 
-function renderSharePickerContent(){
+function getAllSources(){
+  return [
+    {key: 'riq_receipts', label: 'Receipts & Payments', icon: '🧾', type: 'receipt', color: 'var(--teal)', view: 'F'},
+    {key: 'riq_maintenance_items', label: 'Maintenance Log', icon: '🔧', type: 'maintenance', color: 'var(--amber)', view: 'D'},
+    {key: 'riq_condition_reports', label: 'Condition Reports', icon: '📸', type: 'condition', color: 'var(--blue)', view: 'C'},
+    {key: 'riq_routine_inspection_past', label: 'Routine Inspections', icon: '🔍', type: 'routine', color: '#1A6B4A', view: 'H'},
+    {key: 'riq_communications', label: 'Communications', icon: '💬', type: 'communication', color: '#1A4A6B', view: 'E'},
+    {key: 'riq_entry_audit_past', label: 'Entry Audits', icon: '📋', type: 'audit', color: 'var(--purple)', view: 'C'},
+    {key: 'renteriq_vault_reports', label: 'Lease & Reports', icon: '📑', type: 'report', color: 'var(--red)', view: 'B'}
+  ];
+}
+
+function renderSharePickerFolders(){
   var content = document.getElementById('sharePickerContent');
   var actions = document.getElementById('sharePickerActions');
   if(!content) return;
   
   var html = '';
-  var hasItems = false;
+  var sources = getAllSources();
   
-  // Load from all sources
-  var sources = [
-    {key: 'riq_receipts', label: 'Receipts', icon: '🧾', type: 'receipt'},
-    {key: 'riq_maintenance_items', label: 'Maintenance', icon: '🔧', type: 'maintenance'},
-    {key: 'riq_condition_reports', label: 'Condition Reports', icon: '📸', type: 'condition'},
-    {key: 'riq_communications', label: 'Communications', icon: '💬', type: 'communication'},
-    {key: 'riq_routine_inspection_past', label: 'Routine Inspections', icon: '🔍', type: 'routine'}
-  ];
+  // Header
+  html += '<div style="font-family:\'Sora\',sans-serif;font-size:13px;color:var(--muted);margin-bottom:16px;text-align:center">Select a folder to browse items:</div>';
+  
+  // Show all folders as cards
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
   
   sources.forEach(function(source){
     var items = [];
@@ -998,54 +1009,140 @@ function renderSharePickerContent(){
       var raw = localStorage.getItem(source.key);
       if(raw) items = JSON.parse(raw);
     }catch(e){}
+    var count = items ? items.length : 0;
     
-    if(items && items.length){
-      hasItems = true;
-      html += '<div class="picker-folder-hdr">' + source.icon + ' ' + source.label + '</div>';
-      items.forEach(function(item, idx){
-        var id = source.type + '_' + idx;
-        var title = item.description || item.issueType || item.address || item.subject || 'Item';
-        var date = item.date ? new Date(item.date).toLocaleDateString('en-AU', {day:'numeric', month:'short'}) : '';
-        var isSelected = selectedItems.some(function(s){ return s.id === id; });
-        
-        html += '<div class="picker-item ' + (isSelected ? 'selected' : '') + '" onclick="toggleItem(this, \'' + id + '\', \'' + source.type + '\', ' + idx + ')">' +
-          '<div class="picker-checkbox">' + (isSelected ? '✓' : '') + '</div>' +
-          '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">' + title + '</div>' +
-          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">' + date + '</div></div>' +
-          '</div>';
-      });
-    }
+    html += '<div onclick="openFolderPicker(\'' + source.type + '\')" style="background:#fff;border:2px solid var(--border-lt);border-radius:16px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s">' +
+      '<div style="font-size:28px;margin-bottom:8px">' + source.icon + '</div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:4px">' + source.label + '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:' + (count > 0 ? source.color : 'var(--muted)') + '">' + (count > 0 ? count + ' items' : 'Empty') + '</div>' +
+      '</div>';
   });
   
-  if(!hasItems){
-    html = '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
-      '<div style="font-size:32px;margin-bottom:8px">📂</div>' +
-      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px">No items yet</div>' +
-      '<div style="font-size:12px">Add receipts, maintenance logs, or reports first.</div></div>';
+  html += '</div>';
+  
+  // Selected summary
+  if(selectedItems.length > 0){
+    html += '<div style="margin-top:20px;padding:16px;background:var(--blue-xl);border-radius:12px;border:1px solid var(--border-lt)">' +
+      '<div style="font-family:\'Sora\',sans-serif;font-size:12px;color:var(--muted);margin-bottom:8px">Selected (' + selectedItems.length + '):</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    
+    selectedItems.forEach(function(sel){
+      var source = getSourceByType(sel.type);
+      if(source){
+        html += '<span style="background:#fff;border:1px solid var(--border-lt);border-radius:20px;padding:4px 10px;font-family:\'Sora\',sans-serif;font-size:10px;font-weight:700;color:var(--text)">' + source.icon + ' Item ' + (sel.idx + 1) + '</span>';
+      }
+    });
+    
+    html += '</div></div>';
   }
   
   content.innerHTML = html;
-  if(actions) actions.style.display = selectedItems.length ? 'block' : 'none';
+  if(actions){
+    actions.style.display = selectedItems.length ? 'block' : 'none';
+    actions.innerHTML = '<div style="display:flex;gap:10px">' +
+      '<button class="btn-blue-c flex-1" onclick="generateEmail()">✉️ Generate Email (' + selectedItems.length + ')</button>' +
+      '<button class="btn-muted-c" onclick="renderSharePickerFolders();" style="padding:12px 16px">📁 Folders</button>' +
+      '</div>';
+  }
+}
+
+function openFolderPicker(folderType){
+  currentPickerFolder = folderType;
+  renderFolderItems(folderType);
+}
+
+function renderFolderItems(folderType){
+  var content = document.getElementById('sharePickerContent');
+  var actions = document.getElementById('sharePickerActions');
+  if(!content) return;
+  
+  var source = getSourceByType(folderType);
+  if(!source) return;
+  
+  var items = [];
+  try{
+    var raw = localStorage.getItem(source.key);
+    if(raw) items = JSON.parse(raw);
+  }catch(e){}
+  
+  var html = '';
+  
+  // Header with back button
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
+    '<button onclick="renderSharePickerFolders()" style="background:var(--blue-xl);border:none;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px">‹</button>' +
+    '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:16px;color:var(--text)">' + source.icon + ' ' + source.label + '</div>' +
+    '</div>';
+  
+  if(!items || items.length === 0){
+    html += '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
+      '<div style="font-size:32px;margin-bottom:8px">📂</div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px">This folder is empty</div>' +
+      '<div style="font-size:12px;margin-bottom:16px">Add items to this folder first.</div>' +
+      '<button onclick="closeSharePicker();switchView(\'' + source.view + '\')" style="background:' + source.color + ';color:#fff;border:none;border-radius:12px;padding:12px 20px;font-family:\'Sora\',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Add to ' + source.label + '</button>' +
+      '</div>';
+  }else{
+    html += '<div style="font-family:\'Sora\',sans-serif;font-size:12px;color:var(--muted);margin-bottom:12px">👇 Tap to select multiple items:</div>';
+    
+    items.forEach(function(item, idx){
+      var id = source.type + '_' + idx;
+      var title = item.description || item.issueType || item.address || item.subject || item.agency || 'Item ' + (idx + 1);
+      var date = item.date ? new Date(item.date).toLocaleDateString('en-AU', {day:'numeric', month:'short', year:'numeric'}) : '';
+      var isSelected = selectedItems.some(function(s){ return s.id === id; });
+      
+      html += '<div class="picker-item ' + (isSelected ? 'selected' : '') + '" onclick="toggleItem(this, \'' + id + '\', \'' + source.type + '\', ' + idx + ')" style="border:2px solid ' + (isSelected ? source.color : 'transparent') + ';border-radius:12px;margin-bottom:8px;padding:12px">' +
+        '<div class="picker-checkbox">' + (isSelected ? '✓' : '') + '</div>' +
+        '<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + title + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">' + date + '</div></div>' +
+        '</div>';
+    });
+  }
+  
+  content.innerHTML = html;
+  if(actions){
+    actions.style.display = selectedItems.length ? 'block' : 'none';
+    actions.innerHTML = '<div style="display:flex;gap:10px">' +
+      '<button class="btn-blue-c flex-1" onclick="generateEmail()">✉️ Generate Email (' + selectedItems.length + ')</button>' +
+      '<button class="btn-muted-c" onclick="renderSharePickerFolders()" style="padding:12px 16px">📁 Folders</button>' +
+      '</div>';
+  }
 }
 
 function toggleItem(el, id, type, idx){
   var checkbox = el.querySelector('.picker-checkbox');
   var existingIndex = selectedItems.findIndex(function(s){ return s.id === id; });
+  var source = getSourceByType(type);
   
   if(existingIndex > -1){
     selectedItems.splice(existingIndex, 1);
     el.classList.remove('selected');
+    el.style.borderColor = 'transparent';
     checkbox.textContent = '';
     checkbox.style.background = 'transparent';
   }else{
     selectedItems.push({id: id, type: type, idx: idx});
     el.classList.add('selected');
+    el.style.borderColor = source ? source.color : 'var(--blue)';
     checkbox.textContent = '✓';
     checkbox.style.background = 'var(--blue)';
   }
   
+  // Refresh actions
   var actions = document.getElementById('sharePickerActions');
-  if(actions) actions.style.display = selectedItems.length ? 'block' : 'none';
+  if(actions){
+    actions.style.display = selectedItems.length ? 'block' : 'none';
+    actions.innerHTML = '<div style="display:flex;gap:10px">' +
+      '<button class="btn-blue-c flex-1" onclick="generateEmail()">✉️ Generate Email (' + selectedItems.length + ')</button>' +
+      '<button class="btn-muted-c" onclick="renderSharePickerFolders()" style="padding:12px 16px">📁 Folders</button>' +
+      '</div>';
+  }
+}
+
+function getSourceByType(type){
+  var sources = getAllSources();
+  for(var i = 0; i < sources.length; i++){
+    if(sources[i].type === type) return sources[i];
+  }
+  return null;
 }
 
 function generateEmail(){
