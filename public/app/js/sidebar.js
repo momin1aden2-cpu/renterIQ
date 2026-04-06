@@ -51,6 +51,15 @@
           '<span class="ds-tagline">Rent Smart. Stay Protected.</span>' +
         '</div>' +
       '</a>' +
+      '<!-- Profile Card (Top) -->' +
+      '<div class="ds-profile-card" id="sidebarUserCard" onclick="sidebarNavigate(\'/app/pages/profile.html\')">' +
+        '<div class="ds-avatar" id="sidebarAvatar">?</div>' +
+        '<div class="ds-user-info">' +
+          '<div class="ds-user-name" id="sidebarUserName">Loading...</div>' +
+          '<div class="ds-user-role">Renter</div>' +
+        '</div>' +
+        '<span style="margin-left:auto;font-size:18px;color:rgba(255,255,255,.5)">›</span>' +
+      '</div>' +
       '<nav class="ds-nav">' +
         '<div class="ds-section-label">Navigation</div>' +
         navItems +
@@ -58,13 +67,6 @@
         toolItems +
       '</nav>' +
       '<div class="ds-footer">' +
-        '<div class="ds-user" id="sidebarUserCard">' +
-          '<div class="ds-avatar" id="sidebarAvatar">?</div>' +
-          '<div class="ds-user-info">' +
-            '<div class="ds-user-name" id="sidebarUserName">Loading...</div>' +
-            '<div class="ds-user-role">Renter</div>' +
-          '</div>' +
-        '</div>' +
         '<button class="ds-signout" onclick="sidebarSignOut()">' +
           '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>' +
           'Sign Out' +
@@ -122,15 +124,20 @@
         '.app-shell{max-width:none!important;display:flex!important;flex-direction:row!important;margin:0!important;background:#EEF3FF!important;position:relative!important;min-height:100vh!important;}',
         '.app-main{display:flex!important;flex-direction:column!important;flex:1!important;margin-left:240px!important;min-height:100vh!important;min-width:0!important;width:calc(100% - 240px)!important;overflow-x:hidden!important;}',
         '.bottom-nav{display:none!important;}',
+        '#hdrAvatar{display:none!important;}',
 
         /* Sidebar shell */
         '.desktop-sidebar{display:flex!important;flex-direction:column!important;width:240px!important;min-width:240px!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important;height:100vh!important;z-index:100!important;overflow-y:auto!important;overflow-x:hidden!important;background:linear-gradient(180deg,#0A2460 0%,#0D2F74 60%,#091E52 100%)!important;box-shadow:2px 0 20px rgba(10,36,96,.25)!important;}',
 
+        /* Profile Card (Top) */
+        '.ds-profile-card{display:flex!important;align-items:center!important;gap:12px!important;padding:14px 14px!important;margin:12px 12px 8px!important;border-radius:14px!important;background:rgba(255,255,255,.1)!important;border:1px solid rgba(255,255,255,.15)!important;cursor:pointer!important;transition:all .2s!important;}' +
+        '.ds-profile-card:hover{background:rgba(255,255,255,.15)!important;border-color:rgba(255,255,255,.25)!important;}' +
+
         /* Brand */
-        '.ds-brand{display:flex!important;align-items:center!important;gap:10px!important;padding:24px 20px 20px!important;border-bottom:1px solid rgba(255,255,255,.08)!important;text-decoration:none!important;}',
-        '.ds-brand-text{display:flex!important;flex-direction:column!important;}',
-        '.ds-wordmark{font-family:"Sora",sans-serif!important;font-weight:800!important;font-size:17px!important;color:#fff!important;letter-spacing:.3px!important;}',
-        '.ds-tagline{font-size:10px!important;color:rgba(255,255,255,.45)!important;font-weight:600!important;letter-spacing:.8px!important;text-transform:uppercase!important;margin-top:1px!important;}',
+        '.ds-brand{display:flex!important;align-items:center!important;gap:10px!important;padding:24px 20px 12px!important;text-decoration:none!important;}' +
+        '.ds-brand-text{display:flex!important;flex-direction:column!important;}' +
+        '.ds-wordmark{font-family:"Sora",sans-serif!important;font-weight:800!important;font-size:17px!important;color:#fff!important;letter-spacing:.3px!important;}' +
+        '.ds-tagline{font-size:10px!important;color:rgba(255,255,255,.45)!important;font-weight:600!important;letter-spacing:.8px!important;text-transform:uppercase!important;margin-top:1px!important;}' +
 
         /* Nav */
         '.ds-nav{flex:1!important;padding:16px 12px!important;display:flex!important;flex-direction:column!important;gap:4px!important;}',
@@ -185,14 +192,16 @@
   window.sidebarNavigate = function(path) {
     var routeMap = {
       '/app/index.html': '/app',
-            '/app/pages/inspection.html': '/inspect',
+      '/app/pages/inspection.html': '/inspect',
       '/app/pages/entry-audit.html': '/move-in',
       '/app/pages/vault.html': '/vault',
-            '/app/pages/tracked.html': '/tracked',
+      '/app/pages/tracked.html': '/tracked',
       '/app/pages/lease.html': '/lease',
       '/app/pages/routine-inspection.html': '/routine-inspection',
       '/app/pages/rights.html': '/rights',
       '/app/pages/exit.html': '/exit',
+      '/app/pages/profile.html': '/profile',
+      '/app/pages/tools.html': '/tools',
     };
     var route = routeMap[path] || path;
     document.body.style.opacity = '0';

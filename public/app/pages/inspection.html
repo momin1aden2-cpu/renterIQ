@@ -119,7 +119,7 @@
   <header class="sh">
     <div class="sh-row">
       <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RENTERIQ</span></button>
-      <div id="hdrAvatar" onclick="openProfileDrawer()" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)">?</div>
+      <div id="hdrAvatar" onclick="navigate('/app/pages/profile.html')" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)">?</div>
     </div>
     <div class="sh-title">Open Home Inspections</div>
     <div class="sh-sub" id="inspSubtitle">Your upcoming open homes</div>
@@ -138,6 +138,7 @@
     <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
     <button class="nav-tab active"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
     <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+    <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
   </nav>
 </div>
 
@@ -446,116 +447,16 @@ function saveToConditionReportsVault(data){
 function renderInspectionList(){var list=document.getElementById('inspList');if(!list)return;var saved=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('renteriq_openhome_insp_')){try{var data=JSON.parse(localStorage.getItem(key)||'{}');saved.push({key:key,data:data})}catch(e){}}}if(!saved.length){list.innerHTML='<div style="text-align:center;padding:40px 16px"><div style="font-size:44px;margin-bottom:12px">📋</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:6px">No inspections yet</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Start an inspection to document properties you visit.</div></div>';return}list.innerHTML='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">Recent Inspections</div>'+saved.map(function(item){return'<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\''+item.key+'\')"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(item.data.address||'Property')+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds:'')+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:6px">'+new Date(parseInt(item.key.split('_')[2])).toLocaleDateString('en-AU')+'</div></div>'}).join('')}
 function loadSavedInspection(key){try{inspectionData=JSON.parse(localStorage.getItem(key)||'{}');document.getElementById('setupAddress').value=inspectionData.address||'';document.getElementById('setupRent').value=inspectionData.rent||'';document.getElementById('setupBeds').value=inspectionData.beds||'2';switchView('B')}catch(e){showToast('Error','Could not load inspection','❌')}}
 
-// Profile Drawer Functions
-function openProfileDrawer() {
-  var drawer = document.getElementById('profileDrawer');
-  if (drawer) {
-    drawer.style.opacity = '1';
-    drawer.style.pointerEvents = 'auto';
-    drawer.querySelector('.pd-sheet').style.transform = 'translateY(0)';
-  }
-}
-
-function closeProfileDrawer() {
-  var drawer = document.getElementById('profileDrawer');
-  if (drawer) {
-    drawer.style.opacity = '0';
-    drawer.style.pointerEvents = 'none';
-    drawer.querySelector('.pd-sheet').style.transform = 'translateY(100%)';
-  }
-}
-
 // Load user data from localStorage
 function loadUserData() {
-  var name = localStorage.getItem('riq-user-name') || 'User';
-  var initials = localStorage.getItem('riq-user-initials') || 'U';
+  var initials = localStorage.getItem('riq-user-initials') || '?';
   var hdrAvatar = document.getElementById('hdrAvatar');
-  var pdAvatar = document.getElementById('pdAvatar');
-  var pdName = document.getElementById('pdName');
   if (hdrAvatar) hdrAvatar.textContent = initials;
-  if (pdAvatar) pdAvatar.textContent = initials;
-  if (pdName) pdName.textContent = name;
 }
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', loadUserData);
 </script>
-
-<!-- Profile Drawer -->
-<div id="profileDrawer" style="position:fixed;inset:0;z-index:10000;background:rgba(10,36,96,.55);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .25s;display:flex;align-items:flex-end" onclick="closeProfileDrawer()">
-  <div class="pd-sheet" style="width:100%;max-width:430px;margin:0 auto;background:#fff;border-radius:24px 24px 0 0;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:85vh;overflow:auto" onclick="event.stopPropagation()">
-    
-    <!-- Handle -->
-    <div style="padding:12px;display:flex;justify-content:center">
-      <div style="width:40px;height:4px;background:var(--border);border-radius:100px"></div>
-    </div>
-    
-    <!-- Profile Card -->
-    <div style="padding:20px 24px;border-bottom:1px solid var(--border-lt)">
-      <div style="display:flex;align-items:center;gap:16px">
-        <div id="pdAvatar" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:#fff;border:3px solid rgba(27,80,200,.15)">?</div>
-        <div style="flex:1">
-          <div id="pdName" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Loading...</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:2px">Renter</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px">Australia</div>
-        </div>
-        <span style="font-size:22px;color:var(--muted);cursor:pointer" onclick="navigate('/app/pages/profile.html');closeProfileDrawer()">›</span>
-      </div>
-    </div>
-    
-    <!-- Tools Grid -->
-    <div style="padding:20px 24px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px">Tools</div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
-        
-        <div style="background:var(--blue-xl);border-radius:14px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/entry-audit.html');closeProfileDrawer()">
-          <div style="font-size:24px;margin-bottom:8px">📸</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Move-In Inspector</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Photo audit</div>
-        </div>
-        
-        <div style="background:var(--blue-xl);border-radius:14px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/lease.html');closeProfileDrawer()">
-          <div style="font-size:24px;margin-bottom:8px">📑</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Review</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">AI analysis</div>
-        </div>
-        
-        <div style="background:var(--blue-xl);border-radius:14px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/rights.html');closeProfileDrawer()">
-          <div style="font-size:24px;margin-bottom:8px">⚖️</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Renter Rights</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">By state</div>
-        </div>
-        
-        <div style="background:var(--blue-xl);border-radius:14px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/exit.html');closeProfileDrawer()">
-          <div style="font-size:24px;margin-bottom:8px">🔑</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit Clean</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Bond back</div>
-        </div>
-        
-      </div>
-    </div>
-    
-    <!-- Settings & Actions -->
-    <div style="padding:0 24px 24px">
-      <div style="background:#fff;border-radius:14px;border:1px solid var(--border-lt);overflow:hidden">
-        <div style="padding:14px 16px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="navigate('/app/pages/profile.html#notifications');closeProfileDrawer()">
-          <span style="font-size:18px">🔔</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Notifications</span>
-          <span style="font-size:18px;color:var(--muted)">›</span>
-        </div>
-        <div style="padding:14px 16px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="navigate('/app/index.html');closeProfileDrawer()">
-          <span style="font-size:18px">🏠</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Home</span>
-        </div>
-        <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="closeProfileDrawer()">
-          <span style="font-size:18px;color:#E84040">❌</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#E84040;flex:1">Close</span>
-        </div>
-      </div>
-    </div>
-    
-  </div>
-</div>
 
 <script src="/app/js/sidebar.js"></script>
 </body>

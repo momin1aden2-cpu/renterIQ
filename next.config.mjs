@@ -26,6 +26,9 @@ const nextConfig = {
       { source: "/renewal", destination: "/app/pages/renewal.html" },
       { source: "/notifications", destination: "/app/pages/notifications.html" },
       { source: "/application", destination: "/app/pages/application.html" },
+      { source: "/tools", destination: "/app/pages/tools.html" },
+      { source: "/move-in", destination: "/app/pages/entry-audit.html" },
+      { source: "/routine-inspection", destination: "/app/pages/routine-inspection.html" },
     ];
   },
 };

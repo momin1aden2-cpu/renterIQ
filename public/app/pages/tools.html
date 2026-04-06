@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0A2460">
+<meta name="description" content="RenterIQ Tools — All your renter tools in one place.">
+<title>Tools — RenterIQ</title>
+<link rel="manifest" href="/app/manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1B50C8;--blue-md:#2E63E0;--blue-lt:#E5EBF8;--blue-xl:#EEF3FF;--blue-dk:#0A2460;--text:#0A2460;--muted:#4A5D7A;--border:#D5E0F5;--border-lt:#E5EBF8;--amber:#F5A623;--teal:#00C896;--red:#E84040}
+*{box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--blue-xl);color:var(--text);margin:0;padding:0;-webkit-tap-highlight-color:transparent;min-height:100vh}
+.app-shell{max-width:430px;margin:0 auto;background:var(--blue-xl);min-height:100vh;position:relative}
+
+/* Header */
+.sh{background:linear-gradient(180deg,#0A2460 0%,#143388 100%);padding:16px 20px 24px;color:#fff}
+.sh-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sh-back{background:none;border:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0}
+.sh-back-arrow{font-size:20px}
+.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;margin-bottom:4px}
+.sh-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.7)}
+
+/* Mobile Header Avatar - hidden on PC */
+.hdr-avatar-mobile{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)}
+@media (min-width:900px){.hdr-avatar-mobile{display:none!important}}
+
+/* Content */
+.content{padding:16px;padding-bottom:100px}
+
+/* Tool Cards */
+.tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tool-card{background:#fff;border-radius:16px;padding:20px 16px;border:1.5px solid var(--border-lt);cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
+.tool-card:hover{transform:translateY(-2px);border-color:var(--blue-lt);box-shadow:0 4px 20px rgba(27,80,200,.1)}
+.tool-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px}
+.tool-icon.movein{background:linear-gradient(135deg,var(--teal),#00E5A8)}
+.tool-icon.lease{background:linear-gradient(135deg,var(--blue),var(--blue-md))}
+.tool-icon.routine{background:linear-gradient(135deg,#1A6B4A,#00C896)}
+.tool-icon.rights{background:linear-gradient(135deg,#6B4A1A,#C89600)}
+.tool-icon.exit{background:linear-gradient(135deg,var(--blue-dk),#4A2299)}
+.tool-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.tool-desc{font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);line-height:1.4}
+
+/* Bottom Nav - 4 tabs */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:rgba(255,255,255,.95);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s}
+.nav-tab:active{transform:scale(.92)}
+.tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
+.tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);transition:all .2s}
+.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.35);color:#fff}
+.nav-tab.active .tab-label{color:var(--blue)}
+
+/* PC: hide bottom nav */
+@media (min-width:900px){.bottom-nav{display:none!important}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<header class="sh">
+  <div class="sh-row">
+    <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">Back</span></button>
+    <div class="hdr-avatar-mobile" id="hdrAvatar" onclick="navigate('/app/pages/profile.html')">?</div>
+  </div>
+  <div class="sh-title">Tools</div>
+  <div class="sh-sub">All your renter tools in one place</div>
+</header>
+
+<div class="content">
+  <div class="tools-grid">
+    <div class="tool-card" onclick="navigate('/app/pages/entry-audit.html')">
+      <div class="tool-icon movein">📸</div>
+      <div class="tool-name">Move-In Inspector</div>
+      <div class="tool-desc">Photo audit & condition reports</div>
+    </div>
+    
+    <div class="tool-card" onclick="navigate('/app/pages/lease.html')">
+      <div class="tool-icon lease">📑</div>
+      <div class="tool-name">Lease Review</div>
+      <div class="tool-desc">AI analysis of your lease</div>
+    </div>
+    
+    <div class="tool-card" onclick="navigate('/app/pages/routine-inspection.html')">
+      <div class="tool-icon routine">🔍</div>
+      <div class="tool-name">Routine Inspection</div>
+      <div class="tool-desc">Agency inspection reports</div>
+    </div>
+    
+    <div class="tool-card" onclick="navigate('/app/pages/rights.html')">
+      <div class="tool-icon rights">⚖️</div>
+      <div class="tool-name">Renter Rights</div>
+      <div class="tool-desc">Know your rights by state</div>
+    </div>
+    
+    <div class="tool-card" onclick="navigate('/app/pages/exit.html')" style="grid-column:1 / -1;flex-direction:row;text-align:left;padding:16px 20px">
+      <div class="tool-icon exit" style="flex-shrink:0">🔑</div>
+      <div>
+        <div class="tool-name">Exit Clean</div>
+        <div class="tool-desc">Bond back & exit inspection guide</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab active"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+</nav>
+
+</div>
+
+<script>
+function navigate(p){window.location.href=p}
+
+// Load user initials
+function loadUserData() {
+  var initials = localStorage.getItem('riq-user-initials') || '?';
+  var hdrAvatar = document.getElementById('hdrAvatar');
+  if (hdrAvatar) hdrAvatar.textContent = initials;
+}
+
+document.addEventListener('DOMContentLoaded', loadUserData);
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+<script src="/app/js/sidebar.js"></script>
+</body>
+</html>

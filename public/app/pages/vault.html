@@ -97,7 +97,7 @@
       <div style="display:flex;gap:14px;align-items:center">
         <span style="font-size:20px;color:rgba(255,255,255,.8);cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Search','Document search coming soon','🔍')">🔍</span>
         <span style="font-size:20px;color:rgba(255,255,255,.8);cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Options','Export all documents as ZIP — coming soon','📦')">···</span>
-        <div id="hdrAvatar" onclick="openProfileDrawer()" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)">?</div>
+        <div id="hdrAvatar" onclick="navigate('/app/pages/profile.html')" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)">?</div>
       </div>
     </div>
     <div class="sh-title">Your Vault</div>
@@ -149,7 +149,7 @@
     </div>
   </div>
   <button class="share-fab" onclick="openSharePicker()" title="Share/Compile">📤</button>
-  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab" onclick="navigate('/app/pages/entry-audit.html')"><div class="tab-icon">📸</div><span class="tab-label">Entry Audit</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button></nav>
+  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button><button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button></nav>
 </div>
 
 <!-- SHARE PICKER OVERLAY -->
@@ -211,7 +211,7 @@
       <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/lease.html')">📑 Review My Lease</button>
     </div>
   </div>
-  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button></nav>
+  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button><button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button></nav>
 </div>
 
 <!-- VIEW C — CONDITION REPORTS -->
@@ -229,7 +229,7 @@
       </div>
     </div>
   </div>
-  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button></nav>
+  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button><button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button></nav>
 </div>
 
 <!-- VIEW D — MAINTENANCE LOG -->
@@ -246,7 +246,7 @@
       </div>
     </div>
   </div>
-  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">�️</div><span class="tab-label">Vault</span></button></nav>
+  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button><button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button></nav>
 </div>
 
 <!-- VIEW E — COMMUNICATIONS -->
@@ -263,7 +263,7 @@
       </div>
     </div>
   </div>
-  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">�️</div><span class="tab-label">Vault</span></button></nav>
+  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button><button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button></nav>
 </div>
 
 <!-- VIEW F — RECEIPTS & PAYMENTS -->
@@ -280,7 +280,7 @@
       </div>
     </div>
   </div>
-  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">�️</div><span class="tab-label">Vault</span></button></nav>
+  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button><button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button></nav>
 </div>
 
 <!-- VIEW G — EXIT REPORTS -->
@@ -316,7 +316,7 @@
       <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--teal);margin-top:10px;display:block">Begin Exit Inspection →</span>
     </div>
   </div>
-  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab" onclick="navigate('/app/pages/entry-audit.html')"><div class="tab-icon">📸</div><span class="tab-label">Entry Audit</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button></nav>
+  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button><button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button></nav>
 </div>
 
 <!-- VIEW H — ROUTINE INSPECTION REPORTS -->
@@ -334,7 +334,7 @@
       </div>
     </div>
   </div>
-  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab" onclick="navigate('/app/pages/entry-audit.html')"><div class="tab-icon">📸</div><span class="tab-label">Entry Audit</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button></nav>
+  <nav class="bottom-nav"><button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button><button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button><button class="nav-tab active" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button><button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button></nav>
 </div>
 
 <!-- ADD CUSTOM FOLDER MODAL -->
@@ -1472,35 +1472,11 @@ function openCustomFolder(id){
 
 document.getElementById('addFolderOverlay')?.addEventListener('click',function(e){if(e.target===this)closeAddFolderModal()});
 
-// Profile Drawer Functions
-function openProfileDrawer() {
-  var drawer = document.getElementById('profileDrawer');
-  if (drawer) {
-    drawer.style.opacity = '1';
-    drawer.style.pointerEvents = 'auto';
-    drawer.querySelector('.pd-sheet').style.transform = 'translateY(0)';
-  }
-}
-
-function closeProfileDrawer() {
-  var drawer = document.getElementById('profileDrawer');
-  if (drawer) {
-    drawer.style.opacity = '0';
-    drawer.style.pointerEvents = 'none';
-    drawer.querySelector('.pd-sheet').style.transform = 'translateY(100%)';
-  }
-}
-
 // Load user data from localStorage
 function loadUserData() {
-  var name = localStorage.getItem('riq-user-name') || 'User';
-  var initials = localStorage.getItem('riq-user-initials') || 'U';
+  var initials = localStorage.getItem('riq-user-initials') || '?';
   var hdrAvatar = document.getElementById('hdrAvatar');
-  var pdAvatar = document.getElementById('pdAvatar');
-  var pdName = document.getElementById('pdName');
   if (hdrAvatar) hdrAvatar.textContent = initials;
-  if (pdAvatar) pdAvatar.textContent = initials;
-  if (pdName) pdName.textContent = name;
 }
 
 // Initialize on load
@@ -1508,82 +1484,6 @@ document.addEventListener('DOMContentLoaded', loadUserData);
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>
-
-<!-- Profile Drawer -->
-<div id="profileDrawer" style="position:fixed;inset:0;z-index:10000;background:rgba(10,36,96,.55);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .25s;display:flex;align-items:flex-end" onclick="closeProfileDrawer()">
-  <div class="pd-sheet" style="width:100%;max-width:430px;margin:0 auto;background:#fff;border-radius:24px 24px 0 0;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:85vh;overflow:auto" onclick="event.stopPropagation()">
-    
-    <!-- Handle -->
-    <div style="padding:12px;display:flex;justify-content:center">
-      <div style="width:40px;height:4px;background:var(--border);border-radius:100px"></div>
-    </div>
-    
-    <!-- Profile Card -->
-    <div style="padding:20px 24px;border-bottom:1px solid var(--border-lt)">
-      <div style="display:flex;align-items:center;gap:16px">
-        <div id="pdAvatar" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:#fff;border:3px solid rgba(27,80,200,.15)">?</div>
-        <div style="flex:1">
-          <div id="pdName" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Loading...</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:2px">Renter</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px">Australia</div>
-        </div>
-        <span style="font-size:22px;color:var(--muted);cursor:pointer" onclick="navigate('/app/pages/profile.html');closeProfileDrawer()">›</span>
-      </div>
-    </div>
-    
-    <!-- Tools Grid -->
-    <div style="padding:20px 24px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px">Tools</div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
-        
-        <div style="background:var(--blue-xl);border-radius:14px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/entry-audit.html');closeProfileDrawer()">
-          <div style="font-size:24px;margin-bottom:8px">📸</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Move-In Inspector</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Photo audit</div>
-        </div>
-        
-        <div style="background:var(--blue-xl);border-radius:14px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/lease.html');closeProfileDrawer()">
-          <div style="font-size:24px;margin-bottom:8px">📑</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Review</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">AI analysis</div>
-        </div>
-        
-        <div style="background:var(--blue-xl);border-radius:14px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/rights.html');closeProfileDrawer()">
-          <div style="font-size:24px;margin-bottom:8px">⚖️</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Renter Rights</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">By state</div>
-        </div>
-        
-        <div style="background:var(--blue-xl);border-radius:14px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/exit.html');closeProfileDrawer()">
-          <div style="font-size:24px;margin-bottom:8px">🔑</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit Clean</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Bond back</div>
-        </div>
-        
-      </div>
-    </div>
-    
-    <!-- Settings & Actions -->
-    <div style="padding:0 24px 24px">
-      <div style="background:#fff;border-radius:14px;border:1px solid var(--border-lt);overflow:hidden">
-        <div style="padding:14px 16px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="navigate('/app/pages/profile.html#notifications');closeProfileDrawer()">
-          <span style="font-size:18px">🔔</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Notifications</span>
-          <span style="font-size:18px;color:var(--muted)">›</span>
-        </div>
-        <div style="padding:14px 16px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="navigate('/app/index.html');closeProfileDrawer()">
-          <span style="font-size:18px">🏠</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Home</span>
-        </div>
-        <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="closeProfileDrawer()">
-          <span style="font-size:18px;color:#E84040">❌</span>
-          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#E84040;flex:1">Close</span>
-        </div>
-      </div>
-    </div>
-    
-  </div>
-</div>
 
 <script src="/app/js/sidebar.js"></script>
 </body>
