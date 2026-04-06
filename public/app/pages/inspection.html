@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -134,7 +137,7 @@
       </div>
     </div>
     
-    <div style="background:linear-gradient(135deg,#10B981,#059669);border-radius:18px;padding:18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="openBookingUpload()">
+    <div style="background:linear-gradient(135deg,#00C896,#00A87E);border-radius:18px;padding:18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="openBookingUpload()">
       <div style="width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📸</div>
       <div style="flex:1">
         <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:#fff">Add from Booking Screenshot</div>
@@ -781,17 +784,30 @@ document.getElementById('uploadZone').addEventListener('drop', function(e) {
   }
 });
 
-// Add CSS for picker overlay if not already present
-if (!document.querySelector('.picker-overlay')) {
-  var style = document.createElement('style');
-  style.textContent = `
-    .picker-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(10,36,96,.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity .28s ease; }
-    .picker-sheet { position: relative; width: 100%; max-width: 430px; background: #fff; border-radius: 26px 26px 0 0; max-height: 85vh; overflow-y: auto; transform: translateY(100%); transition: transform .32s cubic-bezier(.4,0,.2,1); padding: 20px 20px 40px; box-shadow: 0 -8px 40px rgba(0,0,0,.2); }
-    .sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 100px; margin: 0 auto 20px; }
-    .flex-1 { flex: 1; }
-  `;
-  document.head.appendChild(style);
-}
+// Add CSS for picker overlay styles
+(function() {
+  if (!document.getElementById('bookingOverlayStyles')) {
+    var style = document.createElement('style');
+    style.id = 'bookingOverlayStyles';
+    style.textContent = `
+      #bookingUploadOverlay { position: fixed; inset: 0; z-index: 300; background: rgba(10,36,96,.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity .28s ease; }
+      #bookingUploadOverlay .picker-sheet { position: relative; width: 100%; max-width: 430px; background: #fff; border-radius: 26px 26px 0 0; max-height: 85vh; overflow-y: auto; transform: translateY(100%); transition: transform .32s cubic-bezier(.4,0,.2,1); padding: 20px 20px 40px; box-shadow: 0 -8px 40px rgba(0,0,0,.2); }
+      #bookingUploadOverlay .sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 100px; margin: 0 auto 20px; }
+      .flex-1 { flex: 1; }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    `;
+    document.head.appendChild(style);
+  }
+})();
+
+var currentView='A';
+
+// Force reload on page show (for back/forward navigation)
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) {
+    window.location.reload();
+  }
+});
 
 function switchView(v){
   var cur=document.getElementById('view'+currentView);
