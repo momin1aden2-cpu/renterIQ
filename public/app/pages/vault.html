@@ -1237,14 +1237,12 @@ function generateEmail(){
     return;
   }
   
-  closeSharePicker();
+  showToast('Generating email...', 'AI is drafting your professional email', '✉️');
   
-  // Build email content
-  var attachments = [];
-  var bodyLines = ['Dear Sir/Madam,', '', 'I am writing to provide the following documents and evidence:', ''];
-  
-  selectedItems.forEach(function(item){
-    var source = getSourceByType(item.type);
+  // Build items data for API
+  var apiItems = [];
+  selectedItems.forEach(function(sel){
+    var source = getSourceByType(sel.type);
     if(!source) return;
     
     var items = [];
@@ -1253,37 +1251,93 @@ function generateEmail(){
       if(raw) items = JSON.parse(raw);
     }catch(e){}
     
-    if(items && items[item.idx]){
-      var data = items[item.idx];
-      var title = data.description || data.issueType || data.address || data.subject || 'Document';
-      var date = data.date ? new Date(data.date).toLocaleDateString('en-AU', {day:'numeric', month:'long', year:'numeric'}) : '';
-      
-      bodyLines.push('• ' + title + (date ? ' (' + date + ')' : ''));
-      
-      if(data.photo) attachments.push({name: title + '_photo.jpg', data: data.photo});
-      if(data.photos && data.photos.length){
-        data.photos.forEach(function(p, i){
-          attachments.push({name: title + '_photo_' + (i+1) + '.jpg', data: p});
-        });
-      }
+    if(items && items[sel.idx]){
+      var data = items[sel.idx];
+      apiItems.push({
+        type: sel.type,
+        name: data.description || data.issueType || data.address || data.subject || data.agency || 'Document',
+        date: data.date || data.inspectionDate || data.requestDate || '',
+        details: data.notes || data.description || data.issueDescription || ''
+      });
     }
   });
   
-  bodyLines.push('', 'Please find attached the supporting documents.', '', 'Kind regards,', '[Your Name]');
+  // Call AI API
+  fetch('/api/generate-email', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      items: apiItems,
+      recipient: 'Property Manager',
+      purpose: 'general',
+      state: 'VIC'
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    closeSharePicker();
+    
+    // Populate email fields
+    document.getElementById('emailSubject').value = data.subject || 'Tenancy Documents';
+    document.getElementById('emailBody').value = data.body || 'Email content unavailable';
+    
+    var attachDiv = document.getElementById('emailAttachments');
+    if(attachDiv){
+      attachDiv.innerHTML = apiItems.length ? '📎 ' + apiItems.length + ' item' + (apiItems.length !== 1 ? 's' : '') + ' referenced' : '';
+    }
+    
+    // Show preview
+    var overlay = document.getElementById('emailPreviewOverlay');
+    var sheet = document.getElementById('emailPreviewSheet');
+    if(overlay && sheet){
+      overlay.style.display = 'flex';
+      requestAnimationFrame(function(){overlay.style.opacity = '1'; sheet.style.transform = 'translateY(0)';});
+    }
+    
+    showToast('Email ready', 'AI has drafted your email - review and send!', '✅');
+  })
+  .catch(function(err){
+    console.error('Email generation error:', err);
+    // Fallback to simple template
+    generateEmailFallback();
+  });
+}
+
+function generateEmailFallback(){
+  if(!selectedItems.length) return;
   
-  // Set email fields
+  closeSharePicker();
+  
+  var bodyLines = ['Dear Sir/Madam,', '', 'I am writing to provide the following tenancy documents and records:', ''];
+  
+  selectedItems.forEach(function(sel){
+    var source = getSourceByType(sel.type);
+    if(!source) return;
+    
+    var items = [];
+    try{
+      var raw = localStorage.getItem(source.key);
+      if(raw) items = JSON.parse(raw);
+    }catch(e){}
+    
+    if(items && items[sel.idx]){
+      var data = items[sel.idx];
+      var title = data.description || data.issueType || data.address || data.subject || 'Document';
+      var date = data.date ? new Date(data.date).toLocaleDateString('en-AU', {day:'numeric', month:'long', year:'numeric'}) : '';
+      bodyLines.push('• ' + title + (date ? ' (' + date + ')' : ''));
+    }
+  });
+  
+  bodyLines.push('', 'Please find the attached supporting documentation.', '', 'Kind regards,', '[Your Name]');
+  
   document.getElementById('emailSubject').value = 'Tenancy Documents - ' + new Date().toLocaleDateString('en-AU');
   document.getElementById('emailBody').value = bodyLines.join('\n');
   
   var attachDiv = document.getElementById('emailAttachments');
   if(attachDiv){
-    attachDiv.innerHTML = attachments.length ? '📎 ' + attachments.length + ' photo' + (attachments.length !== 1 ? 's' : '') + ' ready to attach' : '';
+    attachDiv.innerHTML = '📎 ' + selectedItems.length + ' items referenced';
   }
   
-  // Store attachments for sending
-  window._emailAttachments = attachments;
-  
-  // Show preview
   var overlay = document.getElementById('emailPreviewOverlay');
   var sheet = document.getElementById('emailPreviewSheet');
   if(overlay && sheet){
@@ -1338,7 +1392,87 @@ function copyEmail(){
 }
 
 function downloadSelected(){
-  showToast('Coming soon', 'ZIP download feature in development', '⬇️');
+  if(!selectedItems.length){
+    showToast('Select items', 'Choose items to download first', '⚠️');
+    return;
+  }
+  
+  showToast('Preparing ZIP...', 'Compiling your documents', '📦');
+  
+  // Collect all data URLs and metadata
+  var filesToZip = [];
+  
+  selectedItems.forEach(function(sel){
+    var source = getSourceByType(sel.type);
+    if(!source) return;
+    
+    var items = [];
+    try{
+      var raw = localStorage.getItem(source.key);
+      if(raw) items = JSON.parse(raw);
+    }catch(e){}
+    
+    if(items && items[sel.idx]){
+      var data = items[sel.idx];
+      var baseName = (data.description || data.issueType || data.address || 'item').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+      
+      // Add JSON metadata
+      filesToZip.push({
+        name: baseName + '_data.json',
+        content: JSON.stringify(data, null, 2),
+        type: 'application/json'
+      });
+      
+      // Add photos
+      if(data.photo){
+        filesToZip.push({
+          name: baseName + '_photo.jpg',
+          content: data.photo,
+          type: 'image/jpeg',
+          isDataUrl: true
+        });
+      }
+      if(data.photos && data.photos.length){
+        data.photos.forEach(function(p, i){
+          filesToZip.push({
+            name: baseName + '_photo_' + (i+1) + '.jpg',
+            content: p,
+            type: 'image/jpeg',
+            isDataUrl: true
+          });
+        });
+      }
+    }
+  });
+  
+  if(filesToZip.length === 0){
+    showToast('No files', 'Selected items have no downloadable content', '⚠️');
+    return;
+  }
+  
+  // Create ZIP using JSZip
+  createZipFile(filesToZip, 'RenterIQ_Documents_' + new Date().toISOString().split('T')[0] + '.zip');
+}
+
+function createZipFile(files, zipName){
+  // Simple ZIP implementation using Data URIs and base64
+  // For production, you'd use JSZip library
+  
+  // For now, download files individually in a folder-like structure
+  files.forEach(function(file, idx){
+    setTimeout(function(){
+      var link = document.createElement('a');
+      if(file.isDataUrl){
+        link.href = file.content;
+      }else{
+        link.href = 'data:' + file.type + ';charset=utf-8,' + encodeURIComponent(file.content);
+      }
+      link.download = file.name;
+      link.click();
+    }, idx * 200);
+  });
+  
+  showToast('Downloading', files.length + ' files downloading individually (ZIP requires JSZip library)', '⬇️');
 }
 
 /* ── Custom Folders ── */
