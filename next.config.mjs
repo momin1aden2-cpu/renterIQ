@@ -1,9 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async headers() {
+    return [
+      {
+        // Ensure manifest.json is served with correct PWA MIME type
+        source: '/:path*manifest.json',
+        headers: [
+          { key: 'Content-Type', value: 'application/manifest+json' },
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     return [
-      // PWA start URL - ensure it opens the app
+      // PWA start URL - ensure it opens the app (both with and without trailing slash)
       { source: "/app", destination: "/app/index.html" },
+      { source: "/app/", destination: "/app/index.html" },
       // Landing page
       { source: "/", destination: "/index.html" },
       // Main dashboard (app homepage) - for PWA start_url

@@ -1,5 +1,5 @@
-// RenterIQ Service Worker v7 — PWA manifest fixed for true standalone install
-const CACHE_NAME = 'renteriq-v7';
+// RenterIQ Service Worker v8 — manifest links fixed to /manifest.json (root scope)
+const CACHE_NAME = 'renteriq-v8';
 const CDN_CACHE  = 'renteriq-cdn-v1';
 
 const APP_SHELL = [
