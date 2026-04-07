@@ -27,11 +27,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<!-- Firebase config injected from server env vars -->
 <script src="/api/firebase-config"></script>
 
 <style>
-/* RESET & BASE */
+/* ========== RESET & BASE ========== */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth;overflow-x:hidden}
 body{font-family:'Nunito',sans-serif;font-weight:400;color:#0F1C3F;background:#F4F7FF;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
@@ -40,701 +39,589 @@ a{text-decoration:none;color:inherit}
 img{max-width:100%;display:block}
 ul{list-style:none}
 button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
-input{font-family:'Nunito',sans-serif;border:none;outline:none}
+input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 
-/* VARIABLES */
+/* ========== DESIGN TOKENS ========== */
 :root{
-  --blue:#1B50C8;--blue-dk:#0A2460;--blue-md:#2E63E0;--blue-lt:#D8E7FC;--blue-xl:#F4F7FF;
-  --teal:#00C896;--teal-dk:#009E78;
-  --text:#0F1C3F;--muted:#5A6B8A;--border:#D5E2F8;--border-lt:#EDF3FC;
+  --blue:#1B50C8;
+  --blue-dk:#0A2460;
+  --blue-navy:#060F2A;
+  --blue-md:#2E63E0;
+  --blue-lt:#D8E7FC;
+  --blue-xl:#F4F7FF;
+  --teal:#00C896;
+  --teal-dk:#009E78;
+  --gold:#F5A623;
+  --text:#0F1C3F;
+  --muted:#5A6B8A;
+  --border:#D5E2F8;
+  --border-lt:#EDF3FC;
+  --shadow-card:0 2px 24px rgba(27,80,200,0.08);
+  --shadow-lg:0 12px 40px rgba(27,80,200,0.12);
+  --radius-card:20px;
+  --radius-btn:100px;
+  --ease:cubic-bezier(.4,0,.2,1);
 }
 
-/* UTILITIES */
+/* ========== UTILITIES ========== */
 .container{max-width:1200px;margin:0 auto;padding:0 24px}
-.section-label{font-family:'Sora',sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
-.section-h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(26px,4vw,42px);color:var(--blue-dk);line-height:1.15;margin-bottom:16px}
-.section-sub{font-size:16.5px;color:var(--muted);line-height:1.75;max-width:720px;margin-bottom:40px}
+.section-eyebrow{font-family:'Sora',sans-serif;font-weight:800;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;display:block}
+.section-h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(26px,3.8vw,42px);color:var(--blue-dk);line-height:1.12;margin-bottom:14px}
+.section-sub{font-size:16px;color:var(--muted);line-height:1.75;max-width:680px}
+.text-center{text-align:center}
+.text-center .section-sub{margin-left:auto;margin-right:auto}
 
-/* ANIMATIONS */
-@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.35}}
-
-/* STICKY NAV */
-.nav{position:sticky;top:0;z-index:100;height:70px;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #EDF3FC;display:flex;align-items:center}
+/* ========== STICKY NAV ========== */
+.nav{position:sticky;top:0;z-index:200;height:68px;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-lt);display:flex;align-items:center}
 .nav .container{display:flex;align-items:center;justify-content:space-between;width:100%}
-.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .nav-brand-text{display:flex;flex-direction:column}
-.nav-brand-text .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#0A2460;line-height:1.1}
-.nav-brand-text .tagline{font-family:'Nunito',sans-serif;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#5A6B8A;line-height:1}
-.nav-links{display:flex;align-items:center;gap:28px}
-.nav-links a{font-family:'Sora',sans-serif;font-weight:600;font-size:14px;color:#5A6B8A;transition:color .2s}
-.nav-links a:hover{color:#1B50C8}
-.nav-cta{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:10px 24px;border-radius:100px;transition:background .2s}
-.nav-cta:hover{background:var(--blue-md)}
-.nav-mobile-btn{display:none;background:none;padding:8px}
-.nav-links.show{display:flex;flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);padding:16px 24px 20px;border-bottom:1px solid var(--border-lt);gap:16px;z-index:99}
+.nav-brand-text .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:19px;color:var(--blue-dk);line-height:1.1}
+.nav-brand-text .tagline{font-family:'Nunito',sans-serif;font-weight:700;font-size:9.5px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);line-height:1}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-links a{font-family:'Sora',sans-serif;font-weight:600;font-size:13.5px;color:var(--muted);transition:color .2s;white-space:nowrap}
+.nav-links a:hover{color:var(--blue)}
+.nav-cta-wrap{position:relative;flex-shrink:0}
+.nav-cta{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;padding:10px 22px;border-radius:var(--radius-btn);transition:all .2s;display:inline-block;box-shadow:0 2px 12px rgba(27,80,200,.3)}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(27,80,200,.4)}
+.nav-cta.signed-in{padding:9px 18px 9px 14px}
+.nav-cta.signed-in::before{content:'👤';margin-right:6px;font-size:13px}
 
-/* HERO */
-.hero{background:linear-gradient(150deg,#060F2A 0%,#0A2460 52%,#143a8a 100%);padding:80px 0 72px;overflow:visible;text-align:center;position:relative}
-.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:1000px;height:800px;background:radial-gradient(ellipse,rgba(46,99,224,.32) 0%,transparent 65%);pointer-events:none}
-.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent)}
-.hero .container{display:flex;flex-direction:column;align-items:center;max-width:960px;position:relative;z-index:1}
-/* HERO PROCESS & CLEAN SEARCH */
-.hero-process{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:28px}
-.hero-process>span{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)}
-.hp-arr{color:rgba(255,255,255,.2);font-size:12px;font-weight:400}
-.hero-sb-wrap{width:100%;max-width:680px}
-.hero-clean-bar{display:flex;align-items:center;background:#fff;border-radius:16px;padding:7px 7px 7px 20px;box-shadow:0 20px 60px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.12);gap:8px}
-.hero-clean-bar input{flex:1;font-size:15px;font-family:'Nunito',sans-serif;font-weight:600;color:#0F1C3F;min-width:0;background:none;border:none;outline:none;height:44px}
-.hero-clean-bar input::placeholder{color:#B0BDD4}
-.hcb-div{width:1px;height:26px;background:#E5EBF8;flex-shrink:0}
-.ls-filters-btn{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#0A2460;background:#F4F7FF;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .15s;flex-shrink:0;white-space:nowrap}
-.ls-filters-btn:hover{background:#EBF0FF}
-.ls-filters-btn.active{background:var(--blue);color:#fff}
-.hero-clean-search{background:linear-gradient(135deg,#1B50C8,#2E63E0);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:12px 28px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;flex-shrink:0;box-shadow:0 2px 14px rgba(27,80,200,.4)}
-.hero-clean-search:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(27,80,200,.55)}
-.ls-filter-panel{display:none;background:#fff;border-radius:0 0 16px 16px;border:1.5px solid #E5EBF8;border-top:none;padding:20px 22px 16px;box-shadow:0 16px 48px rgba(27,80,200,.14);position:relative;z-index:50}
-.ls-filter-panel.open{display:block}
-.lfp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
-.lfp-group label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px}
-.lfp-select{width:100%;padding:9px 30px 9px 12px;border:1.5px solid var(--border-lt);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%235A6B8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='2 4 6 8 10 4'/%3E%3C/svg%3E") no-repeat right 10px center;appearance:none;cursor:pointer;transition:border-color .15s}
-.lfp-select:focus{border-color:var(--blue);outline:none}
-.lfp-features{grid-column:1/-1}
-.lfp-feat-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px}
-.lfp-feat-chips{display:flex;flex-wrap:wrap;gap:8px}
-.lfp-chip{padding:7px 15px;border-radius:100px;border:1.5px solid var(--border-lt);font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none}
-.lfp-chip:hover{border-color:var(--blue);color:var(--blue)}
-.lfp-chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
-.lfp-footer{display:flex;justify-content:flex-end;gap:10px;padding-top:14px;border-top:1px solid var(--border-lt)}
-.lfp-clear{background:none;border:1.5px solid var(--border-lt);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);padding:9px 20px;border-radius:100px;cursor:pointer;transition:all .15s}
-.lfp-clear:hover{border-color:var(--blue);color:var(--blue)}
-.lfp-apply{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;padding:9px 24px;border-radius:100px;border:none;cursor:pointer;transition:background .15s}
-.lfp-apply:hover{background:var(--blue-md)}
-@media(max-width:760px){.lfp-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:640px){.hp-arr{display:none}.hero-process{gap:8px}.hero-process>span{font-size:12px}.hero-clean-bar{flex-wrap:wrap;border-radius:14px;padding:10px}.hero-clean-bar input{width:100%;order:1}.hcb-div{display:none}.ls-filters-btn{order:2;flex:1;justify-content:center}.hero-clean-search{order:3;flex:1;text-align:center}.ls-filter-panel{border-radius:14px;margin-top:8px;border-top:1.5px solid #E5EBF8}}
-@media(max-width:480px){.lfp-grid{grid-template-columns:1fr}}
-.hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(36px,6vw,60px);color:#fff;line-height:1.06;margin-bottom:20px}
-.hero h1 em{font-style:normal;background:linear-gradient(135deg,#00C896 10%,#2BE8B0 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* Mobile hamburger */
+.nav-mobile-btn{display:none;background:none;padding:8px;color:var(--blue-dk);border-radius:8px;transition:background .15s}
+.nav-mobile-btn:hover{background:var(--blue-xl)}
 
-
-/* ENHANCED SEARCH WITH LOCATION AUTOCOMPLETE */
-.location-search-wrap{position:relative;width:100%}
-.location-input-wrap{display:flex;align-items:center;background:#fff;border-radius:16px;padding:7px 7px 7px 20px;box-shadow:0 20px 60px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.12);gap:8px;position:relative}
-.location-input-wrap:focus-within{box-shadow:0 20px 60px rgba(0,0,0,.35),0 0 0 3px rgba(27,80,200,.15)}
-#locationInput{flex:1;font-size:15px;font-family:'Nunito',sans-serif;font-weight:600;color:#0F1C3F;min-width:0;background:none;border:none;outline:none;height:44px}
-#locationInput::placeholder{color:#B0BDD4}
-.location-icon{color:#9EAEC4;flex-shrink:0}
-.selected-location{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:#F0F5FF;border:1.5px solid var(--blue-lt);border-radius:8px;padding:6px 10px;white-space:nowrap;max-width:180px}
-.selected-location .loc-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.selected-location .loc-clear{width:16px;height:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:color .15s}
-.selected-location .loc-clear:hover{color:var(--blue)}
-
-/* Autocomplete Dropdown */
-.autocomplete-dropdown{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border-radius:14px;border:1.5px solid var(--border-lt);box-shadow:0 12px 48px rgba(27,80,200,.18);max-height:320px;overflow-y:auto;z-index:100}
-.autocomplete-dropdown.open{display:block}
-.autocomplete-item{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;border-bottom:1px solid var(--border-lt);transition:background .15s}
-.autocomplete-item:last-child{border-bottom:none;border-radius:0 0 12px 12px}
-.autocomplete-item:first-child{border-radius:12px 12px 0 0}
-.autocomplete-item:hover{background:#F4F7FF}
-.autocomplete-item.selected{background:var(--blue-xl)}
-.autocomplete-main{display:flex;flex-direction:column;gap:2px}
-.autocomplete-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk)}
-.autocomplete-meta{font-size:12px;color:var(--muted)}
-.autocomplete-postcode{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:#F0F5FF;padding:4px 10px;border-radius:6px}
-.autocomplete-loading,.autocomplete-empty{padding:20px;text-align:center;color:var(--muted);font-size:14px}
-
-
-
-@media(max-width:640px){.location-input-wrap{padding:6px 6px 6px 16px;border-radius:14px}.location-input-wrap input{font-size:15px}.selected-location{max-width:150px;font-size:12px}.hero-clean-search{padding:11px 18px;font-size:14px;border-radius:12px}}
-@media(max-width:480px){.autocomplete-item{padding:12px 14px}.autocomplete-name{font-size:13px}.autocomplete-meta{font-size:11px}.autocomplete-postcode{font-size:11px;padding:3px 8px}}
-
-/* MOBILE APP DOWNLOAD BANNER */
-.mobile-app-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.1);z-index:200;align-items:center;gap:12px}
-.mab-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.mab-icon img{width:32px;height:32px}
-.mab-info{flex:1;min-width:0}
-.mab-title{font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue-dk);margin-bottom:2px}
-.mab-subtitle{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mab-close{background:none;border:none;padding:8px;cursor:pointer;color:var(--muted);margin-right:-8px}
-.mab-close:hover{color:var(--blue)}
-.mab-install{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;padding:10px 18px;border-radius:100px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.mab-install:hover{background:var(--blue-md)}
-
-@media(max-width:768px){
-  .mobile-app-banner.show{display:flex}
-  body{padding-bottom:80px}
-}
-
-/* AUTH MODAL */
-.auth-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(10,36,96,.65);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
-.auth-overlay.open{display:flex}
-.auth-modal{background:#fff;border-radius:24px;width:100%;max-width:420px;max-height:90vh;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3);position:relative}
-.auth-header{padding:24px 24px 0;display:flex;align-items:center;justify-content:space-between}
-.auth-logo{display:flex;align-items:center;gap:10px}
-.auth-logo img{width:36px;height:36px}
-.auth-logo span{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--blue-dk)}
-.auth-close{background:none;border:none;padding:8px;cursor:pointer;color:var(--muted);border-radius:8px;transition:all .15s}
-.auth-close:hover{background:var(--border-lt);color:var(--blue)}
-.auth-tabs{display:flex;gap:0;border-bottom:1px solid var(--border-lt);margin:0 24px}
-.auth-tab{flex:1;background:none;border:none;padding:16px 0;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;position:relative;transition:color .2s}
-.auth-tab.active{color:var(--blue)}
-.auth-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--blue)}
-.auth-body{padding:24px;overflow-y:auto;max-height:60vh}
-.auth-form{display:none}
-.auth-form.active{display:block}
-.af-group{margin-bottom:16px}
-.af-group label{display:block;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
-.af-input{width:100%;padding:14px 16px;border:1.5px solid var(--border-lt);border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;color:var(--text);background:#fff;transition:border-color .15s,box-shadow .15s}
-.af-input:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 3px rgba(27,80,200,.1)}
-.af-input::placeholder{color:#B0BDD4}
-.af-hint{font-size:12px;color:var(--muted);margin-top:4px}
-.af-error{background:#FFF5F5;border:1px solid #FC8181;border-radius:8px;padding:12px 14px;margin-bottom:16px;display:none}
-.af-error.show{display:block}
-.af-error-text{font-size:13px;color:#C53030}
-.af-submit{width:100%;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;padding:14px;border-radius:12px;border:none;cursor:pointer;transition:background .2s;margin-top:8px}
-.af-submit:hover{background:var(--blue-md)}
-.af-submit:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
-.af-options{display:flex;align-items:center;justify-content:space-between;margin:-8px 0 16px;font-size:13px}
-.remember-me{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--muted);font-family:'Nunito',sans-serif}
-.remember-me input{display:none}
-.remember-me .checkmark{width:18px;height:18px;border:2px solid var(--border-lt);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.remember-me input:checked + .checkmark{background:var(--blue);border-color:var(--blue)}
-.remember-me input:checked + .checkmark::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
-.forgot-link{color:var(--blue);font-weight:600;font-size:12px}
-.forgot-link:hover{text-decoration:underline}
-
-.auth-divider{display:flex;align-items:center;margin:20px 0;color:var(--muted);font-size:13px}
-.auth-divider span{padding:0 12px}
-.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border-lt)}
-
-.social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px;max-width:280px;margin-left:auto;margin-right:auto}
-.social-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px 8px;border:1.5px solid var(--border-lt);border-radius:10px;background:#fff;cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;font-size:11px;color:var(--text)}
-.social-btn:hover{border-color:var(--blue);background:#F4F7FF}
-.social-btn svg{width:24px;height:24px}
-.social-text{font-size:11px;font-weight:600}
-
-.af-success{display:none;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:12px 14px;margin-bottom:16px}
-.af-success.show{display:block}
-.af-success-text{font-size:13px;color:#166534}
-
-.verify-content{text-align:center;padding:20px 10px}
-.verify-icon{font-size:48px;margin-bottom:16px}
-.verify-content h3{font-family:'Sora',sans-serif;font-size:18px;color:var(--blue-dk);margin-bottom:12px}
-.verify-content p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:8px}
-.verify-content p strong{color:var(--text)}
-.verify-hint{font-size:13px;color:var(--muted);margin:16px 0 24px}
-
-.auth-footer-link{text-align:center;margin-top:16px;font-size:13px}
-.auth-footer-link a{color:var(--blue);font-weight:600}
-.auth-footer-link a:hover{text-decoration:underline}
-
-@media(max-width:480px){
-  .social-grid{grid-template-columns:repeat(2,1fr)}
-  .social-btn{flex-direction:row;justify-content:center;gap:8px;padding:10px}
-  .social-text{font-size:12px}
-}
-.auth-footer{padding:16px 24px 24px;text-align:center;font-size:13px;color:var(--muted);border-top:1px solid var(--border-lt)}
-.auth-footer a{color:var(--blue);font-weight:700}
-.auth-footer a:hover{text-decoration:underline}
-
-@media(max-width:480px){
-  .auth-overlay{padding:16px}
-  .auth-modal{border-radius:20px}
-  .auth-header{padding:20px 20px 0}
-  .auth-tabs{margin:0 20px}
-  .auth-body{padding:20px}
-  .auth-footer{padding:16px 20px 20px}
-}
-
-.how-it-works{background:linear-gradient(180deg,#fff 0%,#F4F7FF 100%);padding:88px 0}
-.steps-header{text-align:center;margin-bottom:52px}
-.steps-wrap{position:relative}
-.steps-wrap::before{content:'';position:absolute;top:42px;left:calc(10% + 22px);right:calc(10% + 22px);height:2px;background:linear-gradient(90deg,rgba(27,80,200,.12),rgba(27,80,200,.35),rgba(27,80,200,.12));pointer-events:none;z-index:0}
-.steps-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;position:relative;z-index:1}
-.step-card{background:#fff;border-radius:20px;padding:28px 18px 24px;border:1.5px solid #E8EFFE;text-align:center;transition:transform .22s,box-shadow .22s,border-color .22s;cursor:default}
-.step-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(27,80,200,.1);border-color:rgba(27,80,200,.2)}
-.step-num{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1B50C8 0%,#2E63E0 100%);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 14px rgba(27,80,200,.32)}
-.step-icon{font-size:30px;margin-bottom:12px;line-height:1}
-.step-card h3{font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue-dk);margin-bottom:8px}
-.step-card p{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:14px}
-.step-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
-.step-tag{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);background:#EEF3FF;border-radius:100px;padding:4px 10px;white-space:nowrap}
-
-/* CORE FEATURES */
-.features{background:#fff;padding:88px 0}
-.features-header{text-align:center;margin-bottom:52px}
-.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.feature-card{background:#F8FAFF;border-radius:20px;padding:28px 24px;border:1.5px solid #E8EFFE;position:relative;transition:transform .22s,box-shadow .22s,border-color .22s}
-.feature-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(27,80,200,.1);border-color:rgba(27,80,200,.2)}
-.fc-icon-wrap{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px;flex-shrink:0}
-.fc-icon-wrap.blue{background:linear-gradient(135deg,rgba(27,80,200,.12),rgba(46,99,224,.05))}
-.fc-icon-wrap.teal{background:linear-gradient(135deg,rgba(0,200,150,.14),rgba(43,232,176,.05))}
-.fc-badge{position:absolute;top:20px;right:20px;font-family:'Sora',sans-serif;font-weight:800;font-size:10px;padding:3px 10px;border-radius:100px;letter-spacing:.6px}
-.fc-badge.free{background:#D0F5EC;color:#007A5E}
-.fc-badge.pro{background:linear-gradient(135deg,#1B50C8,#2E63E0);color:#fff}
-.feature-card h3{font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--blue-dk);margin-bottom:8px}
-.feature-card>p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px}
-.fc-bullets{display:flex;flex-direction:column;gap:8px;list-style:none;padding:0;margin:0}
-.fc-bullets li{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text);font-weight:600;line-height:1.45}
-.fc-bullets li::before{content:'✓';color:var(--teal);font-weight:800;flex-shrink:0;font-size:11px;margin-top:2px}
-
-/* INSPECTION DETAIL */
-.inspection{background:#fff;padding:80px 0}
-.inspection .container{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
-.inspection-steps{display:flex;flex-direction:column;gap:20px;margin-top:8px}
-.inspection-step{display:flex;gap:14px;align-items:flex-start}
-.inspection-step .is-num{width:32px;height:32px;border-radius:10px;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.inspection-step p{font-size:14px;color:var(--muted);line-height:1.7}
-.inspection-step p strong{color:var(--text);font-weight:700}
-
-/* Report mockup */
-.report-mock{background:#fff;border-radius:20px;border:1px solid var(--border-lt);box-shadow:0 8px 40px rgba(27,80,200,.08);overflow:hidden}
-.report-header{background:var(--blue);padding:20px 22px;color:#fff}
-.report-header .rh-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px}
-.report-header .rh-sub{font-size:11.5px;opacity:.7}
-.report-rooms{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
-.report-room{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#F8FAFF;border-radius:12px}
-.report-room .rr-left{display:flex;align-items:center;gap:10px}
-.report-room .rr-name{font-family:'Sora',sans-serif;font-weight:700;font-size:12.5px;color:var(--blue-dk)}
-.report-room .rr-photos{display:flex;gap:3px}
-.report-room .rr-photo{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px}
-.report-room .rr-badge{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;padding:4px 10px;border-radius:100px}
-.rr-badge.satisfactory{background:#D6F5EC;color:var(--teal-dk)}
-.rr-badge.noted{background:var(--blue-lt);color:var(--blue)}
-.report-ai{margin:0 18px 18px;background:#EDFAF5;border:1px solid #B4E8D8;border-radius:14px;padding:16px}
-.report-ai .ra-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--teal-dk);margin-bottom:8px}
-.report-ai p{font-size:12px;color:var(--muted);line-height:1.7}
-
-/* VAULT */
-.vault{background:#0A2460;padding:80px 0}
-.vault .container{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
-.vault-label{font-family:'Sora',sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
-.vault h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(26px,4vw,38px);color:#fff;line-height:1.15;margin-bottom:16px}
-.vault-desc{font-size:16px;color:rgba(255,255,255,.7);line-height:1.75;margin-bottom:32px;max-width:500px}
-.vault-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.vault-folder{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px 18px;transition:transform .25s,background .25s}
-.vault-folder:hover{transform:translateY(-5px);background:rgba(255,255,255,.11)}
-.vault-folder .vf-icon{width:40px;height:40px;border-radius:12px;background:rgba(0,200,150,.15);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
-.vault-folder h4{font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:#fff;margin-bottom:4px}
-.vault-folder p{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.5}
-
-/* EXIT COMPARISON */
-.exit-compare{background:#F4F7FF;padding:80px 0}
-.comparison-mock{max-width:680px;margin:0 auto;background:#fff;border-radius:20px;border:1px solid var(--border-lt);box-shadow:0 8px 40px rgba(27,80,200,.08);overflow:hidden}
-.cm-header{background:#0A2460;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.cm-header .cm-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff}
-.cm-header .cm-badge{background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:10.5px;padding:4px 12px;border-radius:100px}
-.cm-columns{display:grid;grid-template-columns:1fr 1fr;text-align:center;padding:14px 22px 8px;gap:12px}
-.cm-col-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border-lt)}
-.cm-rows{padding:0 22px 16px}
-.cm-row{display:grid;grid-template-columns:1fr 30px 1fr;align-items:center;padding:12px 0;border-bottom:1px solid #F4F7FF;gap:8px}
-.cm-row:last-child{border-bottom:none}
-.cm-cell{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text)}
-.cm-cell:last-child{justify-content:flex-end}
-.cm-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.cm-icon.pass{background:#D6F5EC;color:var(--teal)}
-.cm-icon.flag{background:#FFF3D6;color:#A6700A}
-.cm-status{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
-.cm-status.pass{background:#D6F5EC;color:var(--teal);font-size:14px;font-weight:800}
-.cm-status.flag{background:#FFF3D6;color:#A6700A;font-size:14px;font-weight:800}
-
-.cm-question{margin:0 22px 16px;background:#F0F4FF;border-radius:14px;padding:18px;border:1px solid var(--blue-lt)}
-.cm-question p{font-size:13px;color:var(--text);line-height:1.7;margin-bottom:14px}
-.cm-question .cmq-btns{display:flex;gap:10px;flex-wrap:wrap}
-.cm-question .cmq-btn{padding:10px 18px;border-radius:100px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;transition:all .2s}
-.cmq-btn.blue{background:var(--blue);color:#fff}
-.cmq-btn.blue:hover{background:var(--blue-md)}
-.cmq-btn.outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}
-.cmq-btn.outline:hover{border-color:var(--blue)}
-
-.cm-fix{margin:0 22px 22px;background:#EDFAF5;border:1px solid #B4E8D8;border-radius:14px;padding:16px}
-.cm-fix .cf-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--teal-dk);margin-bottom:8px}
-.cm-fix p{font-size:12.5px;color:var(--muted);line-height:1.7}
-
-.exit-disclaimer{text-align:center;max-width:640px;margin:24px auto 0;font-size:12.5px;color:var(--muted);line-height:1.7;font-style:italic}
-
-/* RENTER RIGHTS */
-.rights{background:#fff;padding:80px 0}
-.rights-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.rights-card{background:#F4F7FF;border-radius:16px;padding:24px 20px;border:2px solid transparent;transition:all .25s}
-.rights-card:hover{background:#fff;border-color:var(--blue);transform:translateY(-5px);box-shadow:0 8px 30px rgba(27,80,200,.07)}
-.rights-card .rc-abbr{font-family:'Sora',sans-serif;font-weight:800;font-size:28px;color:var(--blue);margin-bottom:2px}
-.rights-card .rc-name{font-size:12px;color:var(--muted);margin-bottom:14px}
-.rights-card .rc-links{display:flex;flex-direction:column;gap:8px}
-.rights-card .rc-link{font-size:12.5px;color:var(--blue);font-weight:600;line-height:1.4;transition:color .2s}
-.rights-card .rc-link:hover{color:var(--blue-md);text-decoration:underline}
-.rights-info{margin-top:32px;background:#F0F4FF;border-radius:16px;padding:22px 28px;display:flex;gap:14px;align-items:flex-start}
-.rights-info .ri-icon{font-size:22px;flex-shrink:0;margin-top:2px}
-.rights-info p{font-size:14px;color:var(--text);line-height:1.7}
-
-/* LEGAL DISCLAIMER */
-.legal-bar{background:#FFFDF0;border-top:1px solid #FFE090;border-bottom:1px solid #FFE090;padding:22px 0}
-.legal-bar .container{display:flex;gap:14px;align-items:flex-start}
-.legal-bar .lb-icon{font-size:22px;flex-shrink:0;margin-top:2px}
-.legal-bar p{font-size:12.5px;color:#7A6200;line-height:1.75}
-
-/* PWA INSTALL */
-.pwa-install{background:#1B50C8;padding:80px 0;text-align:center}
-.pwa-install .pi-icon{width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 24px}
-.pwa-install h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(24px,4vw,36px);color:#fff;line-height:1.2;margin-bottom:16px;max-width:560px;margin-left:auto;margin-right:auto}
-.pwa-install .pi-sub{font-size:16px;color:rgba(255,255,255,.75);line-height:1.75;max-width:560px;margin:0 auto 32px}
-.pwa-btns{display:flex;gap:12px;justify-content:center;margin-bottom:32px;flex-wrap:wrap}
-.btn-white{background:#fff;color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:14px 28px;border-radius:100px;transition:all .2s}
-.btn-white:hover{background:#F4F7FF}
-.btn-ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:14px 28px;border-radius:100px;transition:all .2s}
-.btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.1)}
-.pwa-features{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
-.pwa-feat{display:flex;align-items:center;gap:8px;font-size:13.5px;color:rgba(255,255,255,.6)}
-.pwa-feat::before{content:'✓';color:var(--teal);font-weight:800}
-
-/* FOOTER */
-.footer{background:#0A2460;padding:60px 0 0}
-.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
-.footer-brand p{font-size:13.5px;color:rgba(255,255,255,.45);line-height:1.7;margin-top:16px;max-width:280px}
-.footer-col h4{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,.7);margin-bottom:16px}
-.footer-col a{display:block;font-size:13.5px;color:rgba(255,255,255,.45);margin-bottom:10px;transition:color .2s}
-.footer-col a:hover{color:#fff}
-.footer-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:20px}
-.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-bottom:24px;flex-wrap:wrap;gap:12px}
-.footer-bottom .fb-copy{font-size:12px;color:rgba(255,255,255,.35)}
-.footer-bottom .fb-links{display:flex;gap:20px}
-.footer-bottom .fb-links a{font-size:12px;color:rgba(255,255,255,.35);transition:color .2s}
-.footer-bottom .fb-links a:hover{color:#fff}
-
-/* Logo in footer */
-.footer-logo{display:flex;align-items:center;gap:10px}
-.footer-logo .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff}
-
-
-
-/* SMART SEARCH HUB - Provider Cards */
-.smart-search-hub { background: #fff; padding: 40px 0; }
-.ss-hub-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 24px; color: var(--blue-dk); text-align: center; margin-bottom: 8px; }
-.ss-hub-subtitle { font-size: 15px; color: var(--muted); text-align: center; margin-bottom: 32px; }
-.ss-hub-location { text-align: center; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--blue); margin-bottom: 24px; }
-.ss-providers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 600px; margin: 0 auto 32px; }
-.ss-provider { background: #fff; border-radius: 16px; padding: 24px 20px; border: 2px solid var(--border-lt); cursor: pointer; transition: all 0.2s; text-align: center; }
-.ss-provider:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); border-color: var(--blue-lt); }
-.ss-provider:active { transform: scale(0.98); }
-.ss-provider-icon { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 12px; }
-.ss-provider-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 4px; }
-.ss-provider-desc { font-size: 13px; color: var(--muted); }
-.ss-track-box { max-width: 600px; margin: 0 auto; background: var(--blue-xl); border-radius: 16px; padding: 24px; border: 1.5px solid var(--border-lt); }
-.ss-track-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.ss-track-form { display: flex; gap: 10px; }
-.ss-track-input { flex: 1; padding: 14px 16px; border: 1.5px solid var(--border-lt); border-radius: 12px; font-size: 15px; font-family: 'Nunito', sans-serif; background: #fff; }
-.ss-track-input:focus { border-color: var(--blue); outline: none; }
-.ss-track-btn { background: var(--teal); color: #fff; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; padding: 14px 24px; border-radius: 12px; border: none; cursor: pointer; white-space: nowrap; }
-.ss-track-btn:hover { background: var(--teal-dk); }
-.ss-track-hint { font-size: 13px; color: var(--muted); margin-top: 12px; padding: 12px; background: #E0F2FE; border-radius: 10px; }
-
-@media(max-width: 640px) {
-  .ss-providers { grid-template-columns: 1fr; }
-  .ss-track-form { flex-direction: column; }
-  .ss-track-btn { width: 100%; }
-}
-.ls-section{background:#F4F7FF;padding:40px 0 80px}
-@media(max-width:900px){.ls-filter-bar{flex-wrap:wrap;border-radius:16px}.ls-fb-search{width:100%;border-right:none;border-bottom:1.5px solid var(--border-lt);min-width:unset}.ls-fb-search-btn{flex:1;justify-content:center;border-radius:0 0 14px 14px}.ls-dd-wrap{flex:1}}
-@media(max-width:600px){.ls-dd-btn{padding:0 12px;font-size:12px}.ls-fb-search-btn{padding:0 16px}}
-.ls-results-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-.ls-results-count{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk)}
-.ls-results-sub{font-size:13px;color:var(--muted);margin-top:2px}
-.ls-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.ls-card{background:#fff;border-radius:20px;overflow:hidden;border:1px solid var(--border-lt);box-shadow:0 4px 20px rgba(27,80,200,.06);transition:transform .22s,box-shadow .22s}
-.ls-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(27,80,200,.11)}
-.ls-card-image{height:170px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.ls-card-image .ls-emoji{font-size:56px}
-.ls-card-badge{position:absolute;bottom:10px;left:12px;background:rgba(0,0,0,.52);backdrop-filter:blur(8px);border-radius:100px;padding:4px 11px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px}
-.ls-card-save{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.ls-card-save.saved{background:rgba(27,80,200,.1)}
-.ls-card-body{padding:16px}
-.ls-card-price{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)}
-.ls-card-price span{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)}
-.ls-card-addr{font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--text);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ls-card-feats{display:flex;gap:12px;margin-top:8px}
-.ls-card-feat{font-weight:700;font-size:12px;color:var(--muted)}
-.ls-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-.ls-card-btns{display:flex;gap:8px;margin-top:12px}
-.ls-btn-book{flex:1;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:11px 10px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:background .18s;display:flex;align-items:center;justify-content:center;gap:5px}
-.ls-btn-book:hover{background:var(--blue-md)}
-.ls-btn-save{width:42px;background:var(--blue-xl);border:1.5px solid var(--border-lt);border-radius:10px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.ls-btn-save:hover{border-color:var(--blue)}
-.ls-btn-save.saved{background:rgba(27,80,200,.08);border-color:var(--blue)}
-.ls-no-results{text-align:center;padding:60px 24px;color:var(--muted)}
-.ls-no-results .ls-no-icon{font-size:48px;margin-bottom:16px}
-.ls-no-results h3{font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--blue-dk);margin-bottom:8px}
-
-/* SAVE IN APP MODAL */
-.ls-modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(10,36,96,.5);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .25s}
-.ls-modal-overlay.open{display:flex}
-.ls-modal{background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:480px;padding:32px 28px 40px;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 40px rgba(0,0,0,.14)}
-.ls-modal-handle{width:40px;height:4px;background:var(--border-lt);border-radius:100px;margin:0 auto 24px}
-.ls-modal-icon{font-size:48px;text-align:center;margin-bottom:14px}
-.ls-modal h3{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue-dk);text-align:center;margin-bottom:10px}
-.ls-modal p{font-size:15px;color:var(--muted);text-align:center;line-height:1.75;margin-bottom:24px}
-.ls-modal-prop{background:var(--blue-xl);border-radius:14px;padding:14px 18px;margin-bottom:24px;border:1px solid var(--border-lt)}
-.ls-modal-prop .lmp-addr{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk)}
-.ls-modal-prop .lmp-price{font-size:13px;color:var(--muted);margin-top:3px}
-.ls-modal-btns{display:flex;flex-direction:column;gap:10px}
-.ls-modal-btn-primary{background:var(--blue);color:#fff;border:none;border-radius:100px;padding:15px;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;cursor:pointer;width:100%;transition:background .18s}
-.ls-modal-btn-primary:hover{background:var(--blue-md)}
-.ls-modal-btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border-lt);border-radius:100px;padding:13px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;width:100%;transition:all .18s}
-.ls-modal-btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
-
-@keyframes lspulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
-@media(max-width:960px){.ls-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.ls-grid{grid-template-columns:1fr}.ls-filter-bar{flex-direction:column;align-items:stretch}.ls-input-wrap{min-width:unset}}
-
-/* FEEDBACK / REVIEWS */
-.feedback{background:#fff;padding:80px 0}
-.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
-.review-card{background:var(--blue-xl);border-radius:20px;padding:28px 24px;border:1px solid var(--border-lt)}
-.review-stars{color:#F5A623;font-size:16px;letter-spacing:2px;margin-bottom:14px}
-.review-text{font-size:14.5px;color:var(--blue-dk);line-height:1.75;margin-bottom:20px}
-.review-author{display:flex;align-items:center;gap:10px}
-.review-avatar{width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.review-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk)}
-.review-meta{font-size:12px;color:var(--muted);margin-top:2px}
-.feedback-cta{margin-top:40px;text-align:center;padding:32px;background:var(--blue-xl);border-radius:20px;border:1px solid var(--border-lt)}
-.feedback-cta p{font-size:15px;color:var(--muted);margin-top:8px;margin-bottom:20px}
-@media(max-width:768px){.reviews-grid{grid-template-columns:1fr}}
-
-/* RESPONSIVE */
-@media(max-width:1024px){
-  .steps-grid{grid-template-columns:repeat(3,1fr)}
-  .steps-wrap::before{display:none}
-  .features-grid{grid-template-columns:repeat(3,1fr)}
-}
-@media(max-width:768px){
-  .nav-links{display:none}
-  .nav-mobile-btn{display:block}
-  .steps-grid{grid-template-columns:1fr 1fr}
-  .steps-wrap::before{display:none}
-  .features-grid{grid-template-columns:1fr 1fr}
-  .rights-grid{grid-template-columns:1fr}
-  .cm-columns{grid-template-columns:1fr 1fr}
-  .cm-row{grid-template-columns:1fr 24px 1fr;font-size:12px}
-  .footer-grid{grid-template-columns:1fr}
-  .footer-bottom{flex-direction:column;text-align:center}
-  .hero{padding:44px 0 56px}
-  .trust-states{gap:12px}
-  .trust-motto{display:none}
-  .pwa-features{flex-direction:column;align-items:center;gap:14px}
-  .phones-row{gap:12px;padding:0 16px 16px}
-  .sp-phone{width:170px}
-}
-@media(max-width:480px){
-  .steps-grid{grid-template-columns:1fr}
-  .hero-trust{gap:14px}
-}
-
-/* MOBILE OPTIMIZATION */
-@media(max-width:768px){
-  .inspection .container{grid-template-columns:1fr;gap:32px}
-  .vault .container{grid-template-columns:1fr;gap:32px}
-  .vault-grid{grid-template-columns:1fr 1fr}
-  .phones-row{display:none}
-}
-
-@media(max-width:640px){
-  .container{padding:0 16px}
-  .hero{padding:32px 0 40px}
-  .hero h1{font-size:clamp(28px,7vw,36px)}
-  .hero-process{font-size:13px;gap:8px 12px;flex-wrap:wrap;justify-content:center}
-  .hero-process .hp-arr{display:none}
-  .hero-process span{background:rgba(255,255,255,.08);padding:6px 12px;border-radius:100px}
-  .hero-sb-wrap{padding:0}
-  .hero-clean-search{padding:10px 16px;font-size:13px}
-  
-  .section-label{font-size:11px}
-  .section-h2{font-size:clamp(22px,6vw,28px)}
-  .section-sub{font-size:15px}
-  
-  .how-it-works{padding:48px 0}
-  .step-card{padding:24px 20px}
-  .step-num{width:32px;height:32px;font-size:14px}
-  .step-icon{width:44px;height:44px;font-size:22px}
-  .step-card h3{font-size:16px}
-  .step-card p{font-size:14px}
-  
-  .features{padding:48px 0}
-  .features-grid{grid-template-columns:1fr;gap:16px}
-  .feature-card{padding:22px 20px}
-  .fc-icon-wrap{width:44px;height:44px;font-size:20px}
-  .feature-card h3{font-size:15px}
-  .feature-card p{font-size:13px}
-  .fc-bullets li{font-size:12px}
-  
-  .rights{padding:48px 0}
-  .rights-card{padding:20px}
-  .rc-abbr{font-size:20px}
-  .rc-name{font-size:13px}
-  .rc-link{font-size:12px}
-  
-  .inspection{padding:48px 0}
-  .inspection .container{gap:24px}
-  .vault{padding:48px 0}
-  .vault .container{gap:24px}
-  .vault-grid{grid-template-columns:1fr 1fr}
-  .vault-folder{padding:16px 14px}
-  
-  .smart-search-hub{padding:32px 0}
-  .ss-hub-title{font-size:20px}
-  .ss-hub-subtitle{font-size:14px;margin-bottom:24px}
-  .ss-hub-location{font-size:16px}
-  .ss-provider{padding:20px 16px}
-  .ss-provider-icon{width:52px;height:52px;font-size:26px}
-  .ss-provider-name{font-size:14px}
-  .ss-track-box{padding:20px 16px}
-  
-  .pwa-install{padding:48px 0}
-  .pwa-install h2{font-size:clamp(22px,6vw,28px)}
-  .pwa-install .pi-sub{font-size:14px}
-  .pwa-btns{flex-direction:column;align-items:center}
-  .btn-white,.btn-ghost{width:100%;max-width:280px;padding:12px 24px;font-size:14px}
-  
-  .footer{padding:40px 0 0}
-  .footer-brand p{font-size:13px}
-  .footer-col a{font-size:13px}
-  .fb-copy{font-size:11px}
-  
-  .ss-track-form{flex-direction:column}
-  .ss-track-btn{width:100%}
-}
+/* Mobile Nav Dropdown */
+.nav-links.mobile-open{display:flex;flex-direction:column;position:fixed;top:68px;left:0;right:0;background:rgba(255,255,255,.99);backdrop-filter:blur(20px);padding:16px 20px 24px;border-bottom:1px solid var(--border-lt);gap:0;z-index:199;box-shadow:0 8px 32px rgba(0,0,0,.1)}
+.nav-links.mobile-open a{padding:14px 0;border-bottom:1px solid var(--border-lt);font-size:15px;color:var(--text)}
+.nav-links.mobile-open a:last-child{border-bottom:none}
 
 /* Profile Dropdown */
-.nav-cta-wrap{position:relative}
-.nav-cta.signed-in{background:var(--blue);color:#fff;padding:9px 18px 9px 14px}
-.nav-cta.signed-in::before{content:'👤';margin-right:6px;font-size:13px}
-.profile-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(27,80,200,.18),0 2px 8px rgba(0,0,0,.08);border:1px solid #E8F0FE;min-width:180px;overflow:hidden;opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;transition:opacity .18s var(--ease),transform .18s var(--ease);z-index:200}
+.profile-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(27,80,200,.18),0 2px 8px rgba(0,0,0,.08);border:1px solid var(--border-lt);min-width:180px;overflow:hidden;opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;transition:opacity .18s var(--ease),transform .18s var(--ease);z-index:300}
 .profile-dropdown.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-.pd-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#0A2460;background:none;border:none;cursor:pointer;width:100%;text-align:left;transition:background .12s;text-decoration:none}
-.pd-item:hover{background:#F4F7FF}
+.pd-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk);background:none;border:none;cursor:pointer;width:100%;text-align:left;transition:background .12s;text-decoration:none}
+.pd-item:hover{background:var(--blue-xl)}
 .pd-item svg{flex-shrink:0;color:var(--blue)}
-.pd-divider{height:1px;background:#EDF3FC;margin:0}
+.pd-divider{height:1px;background:var(--border-lt)}
 .pd-signout{color:#E84040}
 .pd-signout:hover{background:#FFF4F4}
 .pd-signout svg{color:#E84040}
 
 /* Sign Out Modal */
-.so-overlay{position:fixed;inset:0;z-index:9000;background:rgba(10,36,96,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s}
+.so-overlay{position:fixed;inset:0;z-index:9000;background:rgba(6,15,42,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s}
 .so-overlay.open{opacity:1;pointer-events:auto}
 .so-modal{background:#fff;border-radius:24px;padding:36px 28px 28px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(27,80,200,.2);transform:scale(.94);transition:transform .2s var(--ease)}
 .so-overlay.open .so-modal{transform:scale(1)}
-.so-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#0A2460,#1B50C8);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
-.so-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#0A2460;margin-bottom:10px}
-.so-sub{font-size:14px;color:#4A5D7A;line-height:1.65;margin-bottom:28px}
+.so-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue-dk),var(--blue));display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.so-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue-dk);margin-bottom:10px}
+.so-sub{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:28px}
 .so-btns{display:flex;gap:10px}
-.so-btn-cancel{flex:1;padding:14px;border-radius:12px;border:2px solid #E5EBF8;background:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#4A5D7A;cursor:pointer;transition:all .15s}
-.so-btn-cancel:hover{border-color:#1B50C8;color:#1B50C8}
+.so-btn-cancel{flex:1;padding:14px;border-radius:12px;border:2px solid var(--border-lt);background:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;transition:all .15s}
+.so-btn-cancel:hover{border-color:var(--blue);color:var(--blue)}
 .so-btn-confirm{flex:1;padding:14px;border-radius:12px;border:none;background:#E84040;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s}
 .so-btn-confirm:hover{background:#C93030}
 
-/* Extra small phones */
-@media(max-width:380px){
-  .hero h1{font-size:26px}
-  .hero-process{font-size:12px}
-  .hero-process span{padding:5px 10px}
-  .section-h2{font-size:24px}
-  .feature-card{padding:18px 16px}
-  .step-card{padding:20px 16px}
+/* ========== HERO ========== */
+.hero{background:linear-gradient(150deg,var(--blue-navy) 0%,#0A2460 55%,#122E7A 100%);padding:72px 0 64px;overflow:hidden;text-align:center;position:relative}
+
+/* Geometric dot grid overlay */
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;
+  z-index:0;
+}
+/* Radial glow */
+.hero::after{
+  content:'';
+  position:absolute;
+  top:-40%;left:50%;
+  transform:translateX(-50%);
+  width:900px;height:900px;
+  background:radial-gradient(ellipse,rgba(46,99,224,.28) 0%,transparent 65%);
+  pointer-events:none;
+  z-index:0;
+}
+.hero .container{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;max-width:880px}
+
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius-btn);padding:7px 16px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:rgba(255,255,255,.75);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse-dot 2s ease-in-out infinite}
+
+.hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(34px,6vw,62px);color:#fff;line-height:1.05;margin-bottom:20px;letter-spacing:-0.5px}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,#00C896 10%,#2BE8B0 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.hero-sub{font-size:clamp(15px,2vw,17.5px);color:rgba(255,255,255,.65);line-height:1.75;max-width:560px;margin-bottom:36px}
+
+/* Search Wrapper */
+.hero-search-wrap{width:100%;max-width:660px;margin-bottom:28px}
+.location-search-wrap{position:relative;width:100%}
+.location-input-row{display:flex;align-items:center;background:#fff;border-radius:16px;padding:8px 8px 8px 18px;box-shadow:0 20px 60px rgba(0,0,0,.35),0 4px 16px rgba(0,0,0,.14);gap:8px;position:relative}
+.location-input-row:focus-within{box-shadow:0 20px 60px rgba(0,0,0,.38),0 0 0 3px rgba(27,80,200,.2)}
+.loc-search-icon{color:#9EAEC4;flex-shrink:0;display:flex;align-items:center}
+#locationInput{flex:1;font-size:15px;font-family:'Nunito',sans-serif;font-weight:600;color:var(--text);min-width:0;background:none;border:none;outline:none;height:44px}
+#locationInput::placeholder{color:#B0BDD4}
+.selected-location{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:#F0F5FF;border:1.5px solid var(--blue-lt);border-radius:8px;padding:6px 10px;white-space:nowrap;max-width:170px;flex-shrink:0}
+.selected-location .loc-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.selected-location .loc-clear{width:16px;height:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:color .15s;flex-shrink:0}
+.selected-location .loc-clear:hover{color:var(--blue)}
+.hero-search-btn{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:12px 28px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap;box-shadow:0 2px 14px rgba(27,80,200,.4)}
+.hero-search-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(27,80,200,.55)}
+
+/* Autocomplete Dropdown */
+.autocomplete-dropdown{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border-radius:14px;border:1.5px solid var(--border-lt);box-shadow:0 12px 48px rgba(27,80,200,.18);max-height:300px;overflow-y:auto;z-index:100}
+.autocomplete-dropdown.open{display:block}
+.autocomplete-item{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;border-bottom:1px solid var(--border-lt);transition:background .15s}
+.autocomplete-item:last-child{border-bottom:none}
+.autocomplete-item:hover,.autocomplete-item.selected{background:var(--blue-xl)}
+.autocomplete-main{display:flex;flex-direction:column;gap:2px}
+.autocomplete-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--blue-dk)}
+.autocomplete-meta{font-size:11.5px;color:var(--muted)}
+.autocomplete-postcode{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);background:#F0F5FF;padding:4px 10px;border-radius:6px}
+.autocomplete-empty{padding:20px;text-align:center;color:var(--muted);font-size:14px}
+
+/* Hero Trust Pills */
+.hero-trust{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+.hero-trust-item{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:rgba(255,255,255,.6);white-space:nowrap}
+.hero-trust-item::before{content:'✓';color:var(--teal);font-size:11px}
+.hero-trust-sep{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.2)}
+
+/* ========== SMART SEARCH HUB ========== */
+.smart-search-hub{background:#fff;padding:40px 0;border-bottom:1px solid var(--border-lt)}
+.ss-hub-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue-dk);text-align:center;margin-bottom:6px}
+.ss-hub-subtitle{font-size:14.5px;color:var(--muted);text-align:center;margin-bottom:28px}
+.ss-hub-location{text-align:center;font-family:'Sora',sans-serif;font-weight:700;font-size:17px;color:var(--blue);margin-bottom:22px}
+.ss-providers{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:580px;margin:0 auto 28px}
+.ss-provider{background:#fff;border-radius:16px;padding:22px 18px;border:2px solid var(--border-lt);cursor:pointer;transition:all .2s;text-align:center}
+.ss-provider:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--blue-lt)}
+.ss-provider-icon{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 10px}
+.ss-provider-name{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:3px}
+.ss-provider-desc{font-size:12.5px;color:var(--muted)}
+.ss-track-box{max-width:580px;margin:0 auto;background:var(--blue-xl);border-radius:16px;padding:22px;border:1.5px solid var(--border-lt)}
+.ss-track-title{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ss-track-form{display:flex;gap:10px}
+.ss-track-input{flex:1;padding:13px 16px;border:1.5px solid var(--border-lt);border-radius:12px;font-size:14px;font-family:'Nunito',sans-serif;background:#fff;color:var(--text)}
+.ss-track-input:focus{border-color:var(--blue);outline:none}
+.ss-track-btn{background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;padding:13px 22px;border-radius:12px;border:none;cursor:pointer;white-space:nowrap;transition:background .15s}
+.ss-track-btn:hover{background:var(--teal-dk)}
+.ss-track-hint{font-size:12.5px;color:var(--muted);margin-top:10px;padding:10px 14px;background:#E0F2FE;border-radius:10px}
+
+/* ========== TRUST STATS BAR ========== */
+.trust-bar{background:var(--blue-dk);padding:22px 0}
+.trust-bar .container{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.trust-stat{display:flex;flex-direction:column;align-items:center;padding:0 36px;border-right:1px solid rgba(255,255,255,.12);text-align:center}
+.trust-stat:last-child{border-right:none}
+.trust-stat-num{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#fff;line-height:1}
+.trust-stat-label{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:600}
+
+/* ========== HOW IT WORKS ========== */
+.how-it-works{background:linear-gradient(180deg,#fff 0%,var(--blue-xl) 100%);padding:88px 0}
+.steps-header{text-align:center;margin-bottom:56px}
+.steps-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;position:relative}
+.steps-connector{position:absolute;top:38px;left:calc(10% + 16px);right:calc(10% + 16px);height:1.5px;background:linear-gradient(90deg,transparent,rgba(27,80,200,.25) 20%,rgba(27,80,200,.4) 50%,rgba(27,80,200,.25) 80%,transparent);pointer-events:none;z-index:0}
+.step-card{background:#fff;border-radius:var(--radius-card);padding:28px 18px 24px;border:1.5px solid var(--border-lt);text-align:center;position:relative;z-index:1;transition:transform .22s,box-shadow .22s,border-color .22s;cursor:default}
+.step-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:rgba(27,80,200,.25)}
+.step-num{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-md) 100%);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 4px 14px rgba(27,80,200,.35)}
+.step-emoji{font-size:28px;margin-bottom:12px;line-height:1}
+.step-card h3{font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue-dk);margin-bottom:8px}
+.step-card p{font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.step-tags{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.step-tag{font-family:'Sora',sans-serif;font-weight:700;font-size:10.5px;color:var(--blue);background:#EEF3FF;border-radius:var(--radius-btn);padding:3px 9px;white-space:nowrap}
+
+/* ========== FEATURES ========== */
+.features{background:#fff;padding:88px 0}
+.features-header{text-align:center;margin-bottom:52px}
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+
+/* Big 2-in-1 feature cards */
+.feat-card{background:var(--blue-xl);border-radius:24px;padding:32px 28px;border:1.5px solid var(--border-lt);transition:transform .22s,box-shadow .22s,border-color .22s}
+.feat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:rgba(27,80,200,.2);background:#fff}
+.feat-card-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.feat-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;background:linear-gradient(135deg,rgba(27,80,200,.1),rgba(46,99,224,.04))}
+.feat-icon.teal{background:linear-gradient(135deg,rgba(0,200,150,.14),rgba(43,232,176,.04))}
+.feat-card-header h3{font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--blue-dk);line-height:1.2}
+.feat-card-header p{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+.feat-divider{height:1px;background:var(--border-lt);margin:18px 0}
+.feat-sub-list{display:flex;flex-direction:column;gap:14px}
+.feat-sub{display:flex;align-items:flex-start;gap:12px}
+.feat-sub-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:linear-gradient(135deg,rgba(27,80,200,.08),rgba(46,99,224,.03))}
+.feat-sub-icon.teal{background:linear-gradient(135deg,rgba(0,200,150,.12),rgba(43,232,176,.03))}
+
+.feat-sub-body strong{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk);display:block;margin-bottom:2px}
+.feat-sub-body span{font-size:12px;color:var(--muted);line-height:1.6}
+.feat-bullets li{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--text);font-weight:600;line-height:1.4}
+.feat-bullets li::before{content:'✓';color:var(--teal);font-weight:800;flex-shrink:0;font-size:10px;margin-top:2px}
+
+/* ========== VAULT SPOTLIGHT ========== */
+.vault-section{background:linear-gradient(160deg,var(--blue-dk) 0%,#0D1E50 100%);padding:88px 0;position:relative;overflow:hidden}
+.vault-section::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
+.vault-section .container{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:1}
+.vault-eyebrow{font-family:'Sora',sans-serif;font-weight:800;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:12px;display:block}
+.vault-section h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(24px,3.5vw,36px);color:#fff;line-height:1.15;margin-bottom:16px}
+.vault-desc{font-size:15.5px;color:rgba(255,255,255,.65);line-height:1.8;margin-bottom:36px;max-width:460px}
+.vault-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vault-folder{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:16px;padding:18px 16px;transition:transform .25s,background .25s}
+.vault-folder:hover{transform:translateY(-4px);background:rgba(255,255,255,.11)}
+.vault-folder .vf-icon{width:38px;height:38px;border-radius:11px;background:rgba(0,200,150,.15);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
+.vault-folder h4{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:3px}
+.vault-folder p{font-size:11px;color:rgba(255,255,255,.45);line-height:1.5}
+.vault-cta{display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:13px 28px;border-radius:var(--radius-btn);transition:all .2s;box-shadow:0 4px 16px rgba(0,200,150,.35)}
+.vault-cta:hover{background:#00AD84;transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,200,150,.45)}
+
+/* ========== EXIT COMPARE ========== */
+.exit-section{background:var(--blue-xl);padding:88px 0}
+.exit-section .container{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.exit-mock{background:#fff;border-radius:var(--radius-card);border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden}
+.exit-mock-hdr{background:var(--blue-dk);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.exit-mock-hdr .em-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff}
+.exit-mock-hdr .em-badge{background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:10px;padding:4px 11px;border-radius:var(--radius-btn)}
+.exit-mock-cols{display:grid;grid-template-columns:1fr 1fr;text-align:center;padding:12px 20px 6px;gap:10px}
+.exit-col-lbl{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border-lt)}
+.exit-mock-rows{padding:0 20px 14px}
+.exit-row{display:grid;grid-template-columns:1fr 26px 1fr;align-items:center;padding:10px 0;border-bottom:1px solid var(--blue-xl);gap:6px}
+.exit-row:last-child{border-bottom:none}
+.exit-cell{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--text)}
+.exit-cell:last-child{justify-content:flex-end}
+.exit-ci{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.exit-ci.pass{background:#D6F5EC;color:var(--teal)}
+.exit-ci.flag{background:#FFF3D6;color:#A6700A}
+.exit-st{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:13px;font-weight:800}
+.exit-st.pass{background:#D6F5EC;color:var(--teal)}
+.exit-st.flag{background:#FFF3D6;color:#A6700A}
+.exit-ai-note{margin:0 20px 18px;background:#EDFAF5;border:1px solid #B4E8D8;border-radius:12px;padding:13px}
+.exit-ai-note .ea-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--teal-dk);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.exit-ai-note p{font-size:11.5px;color:var(--muted);line-height:1.65}
+
+/* ========== RENTER RIGHTS ========== */
+.rights-section{background:#fff;padding:88px 0}
+.rights-header{text-align:center;margin-bottom:48px}
+.rights-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.rights-card{background:var(--blue-xl);border-radius:16px;padding:22px 18px;border:2px solid transparent;transition:all .25s;cursor:default}
+.rights-card:hover{background:#fff;border-color:var(--blue);transform:translateY(-4px);box-shadow:0 8px 30px rgba(27,80,200,.08)}
+.rc-abbr{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:var(--blue);margin-bottom:2px}
+.rc-name{font-size:11.5px;color:var(--muted);margin-bottom:12px}
+.rc-links{display:flex;flex-direction:column;gap:6px}
+.rc-link{font-size:12px;color:var(--blue);font-weight:600;line-height:1.4;transition:color .2s}
+.rc-link:hover{color:var(--blue-md);text-decoration:underline}
+.rights-info{margin-top:28px;background:#F0F4FF;border-radius:14px;padding:20px 24px;display:flex;gap:12px;align-items:flex-start}
+.rights-info .ri-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.rights-info p{font-size:13.5px;color:var(--text);line-height:1.7}
+
+/* ========== LEGAL BAR ========== */
+.legal-bar{background:#FFFDF0;border-top:1px solid #FFE090;border-bottom:1px solid #FFE090;padding:20px 0}
+.legal-bar .container{display:flex;gap:12px;align-items:flex-start}
+.legal-bar .lb-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.legal-bar p{font-size:12px;color:#7A6200;line-height:1.75}
+
+/* ========== PWA INSTALL ========== */
+.pwa-section{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-md) 100%);padding:88px 0;text-align:center;position:relative;overflow:hidden}
+.pwa-section::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
+.pwa-section .container{position:relative;z-index:1}
+.pwa-icon{width:68px;height:68px;border-radius:20px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 24px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.pwa-section h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(24px,4vw,38px);color:#fff;line-height:1.15;margin-bottom:14px;max-width:560px;margin-left:auto;margin-right:auto}
+.pwa-sub{font-size:15.5px;color:rgba(255,255,255,.75);line-height:1.75;max-width:520px;margin:0 auto 36px}
+.pwa-btns{display:flex;gap:12px;justify-content:center;margin-bottom:32px;flex-wrap:wrap}
+.btn-white{background:#fff;color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:14px 28px;border-radius:var(--radius-btn);transition:all .2s;border:none;cursor:pointer}
+.btn-white:hover{background:var(--blue-xl);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:13px 28px;border-radius:var(--radius-btn);transition:all .2s;display:inline-block}
+.btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.1)}
+.pwa-feats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.pwa-feat{display:flex;align-items:center;gap:7px;font-size:13px;color:rgba(255,255,255,.6)}
+.pwa-feat::before{content:'✓';color:var(--teal);font-weight:800}
+
+/* ========== FOOTER ========== */
+.footer{background:var(--blue-dk);padding:64px 0 0}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;margin-bottom:44px}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;margin-top:14px;max-width:260px}
+.footer-logo{display:flex;align-items:center;gap:10px}
+.footer-logo .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff}
+.footer-col h4{font-family:'Sora',sans-serif;font-weight:700;font-size:12.5px;color:rgba(255,255,255,.65);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px}
+.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.4);margin-bottom:9px;transition:color .2s}
+.footer-col a:hover{color:#fff}
+.footer-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:20px}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-bottom:28px;flex-wrap:wrap;gap:12px}
+.footer-bottom .fb-copy{font-size:11.5px;color:rgba(255,255,255,.3)}
+.footer-bottom .fb-links{display:flex;gap:18px}
+.footer-bottom .fb-links a{font-size:11.5px;color:rgba(255,255,255,.3);transition:color .2s}
+.footer-bottom .fb-links a:hover{color:#fff}
+
+/* ========== AUTH MODAL ========== */
+.auth-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(6,15,42,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px}
+.auth-overlay.open{display:flex}
+.auth-modal{background:#fff;border-radius:24px;width:100%;max-width:400px;max-height:92dvh;max-height:92vh;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3);position:relative;display:flex;flex-direction:column}
+.auth-header{padding:22px 22px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.auth-logo{display:flex;align-items:center;gap:10px}
+.auth-logo img{width:34px;height:34px;border-radius:8px}
+.auth-logo span{font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--blue-dk)}
+.auth-close{background:none;border:none;padding:8px;cursor:pointer;color:var(--muted);border-radius:8px;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.auth-close:hover{background:var(--border-lt);color:var(--blue)}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border-lt);margin:0 22px;flex-shrink:0}
+.auth-tab{flex:1;background:none;border:none;padding:14px 0;font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--muted);cursor:pointer;position:relative;transition:color .2s}
+.auth-tab.active{color:var(--blue)}
+.auth-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--blue);border-radius:2px 2px 0 0}
+.auth-body{padding:20px 22px;overflow-y:auto;flex:1}
+.auth-form{display:none}
+.auth-form.active{display:block}
+.af-group{margin-bottom:14px}
+.af-group label{display:block;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.af-input{width:100%;padding:13px 15px;border:1.5px solid var(--border-lt);border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;color:var(--text);background:#fff;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+.af-input:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 3px rgba(27,80,200,.1)}
+.af-input::placeholder{color:#B0BDD4}
+.af-hint{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.af-hint a{color:var(--blue);font-weight:600}
+.af-error{background:#FFF5F5;border:1px solid #FC8181;border-radius:8px;padding:11px 13px;margin-bottom:14px;display:none}
+.af-error.show{display:block}
+.af-error-text{font-size:12.5px;color:#C53030}
+.af-success{display:none;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:11px 13px;margin-bottom:14px}
+.af-success.show{display:block}
+.af-success-text{font-size:12.5px;color:#166534}
+.af-submit{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;padding:14px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;margin-top:6px;box-shadow:0 2px 12px rgba(27,80,200,.3)}
+.af-submit:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(27,80,200,.4)}
+.af-submit:disabled{background:var(--border-lt);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
+.af-options{display:flex;align-items:center;justify-content:space-between;margin:-6px 0 14px;font-size:12.5px}
+.remember-me{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--muted);font-family:'Nunito',sans-serif}
+.remember-me input{display:none}
+.remember-me .checkmark{width:18px;height:18px;border:2px solid var(--border-lt);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.remember-me input:checked+.checkmark{background:var(--blue);border-color:var(--blue)}
+.remember-me input:checked+.checkmark::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+.forgot-link{color:var(--blue);font-weight:600;font-size:12px}
+.forgot-link:hover{text-decoration:underline}
+.auth-divider{display:flex;align-items:center;margin:16px 0;color:var(--muted);font-size:12px}
+.auth-divider span{padding:0 12px;white-space:nowrap}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border-lt)}
+.social-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:1.5px solid var(--border-lt);border-radius:10px;background:#fff;cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
+.social-btn:hover{border-color:var(--blue);background:var(--blue-xl)}
+.social-btn svg{width:20px;height:20px;flex-shrink:0}
+.verify-content{text-align:center;padding:16px 8px}
+.verify-icon{font-size:44px;margin-bottom:14px}
+.verify-content h3{font-family:'Sora',sans-serif;font-size:17px;color:var(--blue-dk);margin-bottom:10px}
+.verify-content p{color:var(--muted);font-size:13.5px;line-height:1.6;margin-bottom:6px}
+.verify-hint{font-size:12.5px;color:var(--muted);margin:14px 0 20px}
+.auth-footer-link{text-align:center;margin-top:14px;font-size:12.5px}
+.auth-footer-link a{color:var(--blue);font-weight:600}
+.auth-footer{padding:14px 22px 20px;text-align:center;font-size:12.5px;color:var(--muted);border-top:1px solid var(--border-lt);flex-shrink:0}
+.auth-footer a{color:var(--blue);font-weight:700}
+
+/* ========== MOBILE APP BANNER ========== */
+.mobile-app-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.1);z-index:199;align-items:center;gap:12px}
+.mab-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mab-icon img{width:30px;height:30px}
+.mab-info{flex:1;min-width:0}
+.mab-title{font-family:'Sora',sans-serif;font-weight:800;font-size:13.5px;color:var(--blue-dk);margin-bottom:1px}
+.mab-subtitle{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mab-close{background:none;border:none;padding:8px;cursor:pointer;color:var(--muted);margin-right:-8px;display:flex;align-items:center;justify-content:center}
+.mab-install{background:var(--blue);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:12.5px;padding:9px 16px;border-radius:var(--radius-btn);border:none;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* ========== SAVE IN APP MODAL ========== */
+.ls-modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(6,15,42,.55);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .25s}
+.ls-modal-overlay.open{display:flex}
+.ls-modal{background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:480px;padding:28px 24px 40px;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 40px rgba(0,0,0,.14)}
+.ls-modal-handle{width:36px;height:4px;background:var(--border-lt);border-radius:var(--radius-btn);margin:0 auto 20px}
+.ls-modal-icon{font-size:44px;text-align:center;margin-bottom:12px}
+.ls-modal h3{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:var(--blue-dk);text-align:center;margin-bottom:8px}
+.ls-modal p{font-size:14px;color:var(--muted);text-align:center;line-height:1.75;margin-bottom:20px}
+.ls-modal-prop{background:var(--blue-xl);border-radius:12px;padding:13px 16px;margin-bottom:20px;border:1px solid var(--border-lt)}
+.ls-modal-prop .lmp-addr{font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--blue-dk)}
+.ls-modal-prop .lmp-price{font-size:12.5px;color:var(--muted);margin-top:2px}
+.ls-modal-btns{display:flex;flex-direction:column;gap:10px}
+.ls-modal-btn-primary{background:var(--blue);color:#fff;border:none;border-radius:var(--radius-btn);padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14.5px;cursor:pointer;width:100%;transition:background .18s}
+.ls-modal-btn-primary:hover{background:var(--blue-md)}
+.ls-modal-btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border-lt);border-radius:var(--radius-btn);padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;width:100%;transition:all .18s}
+.ls-modal-btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ========== ANIMATIONS ========== */
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.85)}}
+
+/* ========== RESPONSIVE — TABLET ========== */
+@media(max-width:1024px){
+  .steps-grid{grid-template-columns:repeat(3,1fr)}
+  .steps-connector{display:none}
+  .features-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .footer-grid .footer-brand{grid-column:1/-1}
+}
+@media(max-width:900px){
+  .vault-section .container{grid-template-columns:1fr;gap:40px}
+  .exit-section .container{grid-template-columns:1fr;gap:40px}
+  .rights-grid{grid-template-columns:repeat(2,1fr)}
+  .ss-providers{grid-template-columns:1fr 1fr}
+}
+
+/* ========== RESPONSIVE — MOBILE ========== */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-mobile-btn{display:flex;align-items:center;justify-content:center}
+  
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .trust-stat{padding:0 20px}
+  .trust-stat-num{font-size:22px}
+  .mobile-app-banner.show{display:flex}
+  body.banner-open{padding-bottom:78px}
+}
+
+@media(max-width:640px){
+  .container{padding:0 16px}
+  
+  /* Hero */
+  .hero{padding:48px 0 40px}
+  .hero h1{font-size:clamp(30px,8vw,40px)}
+  .hero-sub{font-size:14.5px;margin-bottom:28px}
+  .hero-eyebrow{font-size:10px;padding:6px 13px}
+  
+  /* Search bar — mobile-first stacked layout */
+  .location-input-row{flex-wrap:wrap;border-radius:14px;padding:0;background:#fff;box-shadow:0 16px 48px rgba(0,0,0,.3)}
+  .loc-search-icon{padding:14px 0 14px 16px}
+  #locationInput{padding:14px 8px;height:48px;font-size:16px}
+  .selected-location{max-width:140px;margin:0 8px 0 0;font-size:11px}
+  .hero-search-btn{width:100%;border-radius:0 0 13px 13px;padding:13px 20px;justify-content:center;display:flex;margin-top:0;border-top:1px solid var(--border-lt)}
+  .hero-trust{gap:6px}
+  .hero-trust-item{font-size:10.5px}
+  
+  /* Sections */
+  .how-it-works,.features,.vault-section,.exit-section,.rights-section,.pwa-section{padding:56px 0}
+  .steps-grid{grid-template-columns:1fr;gap:12px}
+  .features-grid{grid-template-columns:1fr;gap:14px}
+  .rights-grid{grid-template-columns:1fr}
+  .vault-grid{grid-template-columns:1fr 1fr}
+  
+  .trust-bar .container{gap:0}
+  .trust-stat{padding:10px 18px;border-right:none;border-bottom:1px solid rgba(255,255,255,.1);width:50%}
+  .trust-stat:nth-child(odd){border-right:1px solid rgba(255,255,255,.1)}
+  .trust-stat:nth-last-child(-n+2){border-bottom:none}
+  
+  .footer-grid{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;text-align:center;gap:10px}
+  .fb-links{flex-wrap:wrap;justify-content:center}
+  
+  .pwa-btns{flex-direction:column;align-items:center}
+  .btn-white,.btn-ghost{width:100%;max-width:280px;text-align:center;display:flex;align-items:center;justify-content:center}
+  .pwa-feats{flex-direction:column;align-items:center;gap:10px}
+  
+  .ss-providers{grid-template-columns:1fr}
+  .ss-track-form{flex-direction:column}
+  .ss-track-btn{width:100%}
+}
+
+@media(max-width:480px){
+  .auth-overlay{padding:0;align-items:flex-end}
+  .auth-modal{max-height:94dvh;max-height:94vh;border-radius:24px 24px 0 0;max-width:100%}
+  .features-grid{grid-template-columns:1fr}
   .vault-grid{grid-template-columns:1fr}
-  .ss-providers{gap:12px}
+  .hero-trust-sep{display:none}
+}
+
+@media(max-width:380px){
+  .hero h1{font-size:28px}
+  .trust-stat-num{font-size:20px}
+  .trust-stat-label{font-size:10px}
 }
 </style>
 </head>
 <body>
 
-<!-- Sticky Nav -->
+<!-- ========== STICKY NAV ========== -->
 <nav class="nav" id="top">
   <div class="container">
     <a href="#top" class="nav-brand">
-      <img src="/assets/logo.svg" alt="RenterIQ" width="40" height="40" style="flex-shrink:0">
+      <img src="/assets/logo.svg" alt="RenterIQ" width="38" height="38" style="flex-shrink:0;border-radius:10px">
       <div class="nav-brand-text">
         <span class="wordmark">RenterIQ</span>
         <span class="tagline">Rent Smart. Stay Protected.</span>
       </div>
     </a>
-    <div class="nav-links">
+
+    <div class="nav-links" id="navLinks">
       <a href="#how-it-works">How It Works</a>
       <a href="#features">Features</a>
       <a href="#rights">Renter Rights</a>
+      <a href="/about.html">About</a>
     </div>
+
     <div class="nav-cta-wrap" id="navCtaWrap">
       <a href="#" class="nav-cta" id="navCta" onclick="showAuth();return false;">Sign In</a>
       <div class="profile-dropdown" id="profileDropdown">
         <a href="/app" class="pd-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10.5z"/><path d="M9 22V12h6v10"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10.5z"/><path d="M9 22V12h6v10"/></svg>
           Open App
         </a>
         <div class="pd-divider"></div>
         <button class="pd-item pd-signout" onclick="showSignOutModal()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Sign Out
         </button>
       </div>
     </div>
-    <button class="nav-mobile-btn" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('show')">
-      <svg width="24" height="24" fill="none" stroke="#0A2460" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+
+    <button class="nav-mobile-btn" aria-label="Menu" onclick="toggleMobileNav()">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="19" y2="6"/><line x1="3" y1="12" x2="19" y2="12"/><line x1="3" y1="18" x2="19" y2="18"/>
+      </svg>
     </button>
   </div>
 </nav>
 
-<!-- Hero -->
+<!-- ========== HERO ========== -->
 <section class="hero" id="hero">
   <div class="container">
-    <h1>Find your next rental.<br>Protect your <em>bond.</em></h1>
 
-    <div class="hero-process">
-      <span>🔍 Search</span>
-      <span class="hp-arr">→</span>
-      <span>📸 Inspect</span>
-      <span class="hp-arr">→</span>
-      <span>⚖️ Review Lease</span>
-      <span class="hp-arr">→</span>
-      <span>🛡️ Track Issues</span>
-      <span class="hp-arr">→</span>
-      <span>🔑 Exit Clean</span>
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      Australian Renters Platform — Free to Use
     </div>
 
-    <div class="hero-sb-wrap">
+    <h1>Find your next rental.<br>Protect your <em>bond.</em></h1>
+
+    <p class="hero-sub">From first search to final key handover — AI inspection reports, lease review, document vault, and bond protection. Built for Australian renters.</p>
+
+    <!-- Location Search -->
+    <div class="hero-search-wrap">
       <div class="location-search-wrap">
-        <div class="location-input-wrap">
-          <svg class="location-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9EAEC4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <div class="location-input-row">
+          <span class="loc-search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9EAEC4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </span>
           <input type="text" id="locationInput" placeholder="Search suburb, postcode or area…" autocomplete="off">
           <div class="selected-location" id="selectedLocation" style="display:none">
             <span class="loc-name" id="locName"></span>
             <span class="loc-clear" onclick="clearLocation()">×</span>
           </div>
-          <button class="hero-clean-search" onclick="performSearch()">Search</button>
+          <button class="hero-search-btn" onclick="performSearch()">Search →</button>
         </div>
-        
-        <!-- Autocomplete Dropdown -->
         <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
-        
       </div>
     </div>
+
+    <div class="hero-trust">
+      <span class="hero-trust-item">No app store needed</span>
+      <span class="hero-trust-sep"></span>
+      <span class="hero-trust-item">Works on iPhone &amp; Android</span>
+      <span class="hero-trust-sep"></span>
+      <span class="hero-trust-item">All 8 states &amp; territories</span>
+      <span class="hero-trust-sep"></span>
+      <span class="hero-trust-item">Free to start</span>
+    </div>
+
   </div>
 </section>
 
-<!-- Smart Search Results Section -->
+<!-- Smart Search Hub (shown after search) -->
 <section class="smart-search-hub" id="search" style="display:none">
   <div class="container">
     <h2 class="ss-hub-title">Browse Properties</h2>
-    <p class="ss-hub-subtitle">Choose a site to search for rentals</p>
+    <p class="ss-hub-subtitle">Choose a platform to search rentals in your area</p>
     <div class="ss-hub-location" id="ssLocation">Perth 6000</div>
-    
-    <div class="ss-providers" id="ssProviders">
-      <!-- Providers injected here -->
-    </div>
-    
+    <div class="ss-providers" id="ssProviders"></div>
     <div class="ss-track-box">
       <div class="ss-track-title">🔗 Track a Property</div>
       <form class="ss-track-form" onsubmit="trackFromUrl(event)">
-        <input type="url" class="ss-track-input" id="ssPropertyUrl" placeholder="Paste property URL here..." required>
-        <button type="submit" class="ss-track-btn">Track</button>
+        <input type="url" class="ss-track-input" id="ssPropertyUrl" placeholder="Paste a property URL here…" required>
+        <button type="submit" class="ss-track-btn">Track It</button>
       </form>
       <div class="ss-track-hint">
-        💡 <strong>Tip:</strong> Browse any site above, find a property you like, copy its URL, and paste it here to save it to your tracked properties.
+        💡 <strong>Tip:</strong> Find a property you love, copy its URL, and paste it here to save it to your Property Tracker.
       </div>
     </div>
   </div>
@@ -745,7 +632,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
     <div class="ls-modal-handle"></div>
     <div class="ls-modal-icon">📱</div>
     <h3>Save this property in the app</h3>
-    <p>Your saved properties, inspection notes, and documents are all stored in the RenterIQ App — free to use.</p>
+    <p>Your saved properties, inspection notes, and documents live in the RenterIQ App — free to use.</p>
     <div class="ls-modal-prop">
       <div class="lmp-addr" id="lsModalAddr"></div>
       <div class="lmp-price" id="lsModalPrice"></div>
@@ -757,148 +644,365 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
 </div>
 
-<!-- How It Works -->
+<!-- ========== TRUST STATS ========== -->
+<div class="trust-bar">
+  <div class="container">
+    <div class="trust-stat">
+      <div class="trust-stat-num">14+</div>
+      <div class="trust-stat-label">App Features</div>
+    </div>
+    <div class="trust-stat">
+      <div class="trust-stat-num">8</div>
+      <div class="trust-stat-label">States & Territories</div>
+    </div>
+    <div class="trust-stat">
+      <div class="trust-stat-num">AI</div>
+      <div class="trust-stat-label">Powered Reports</div>
+    </div>
+    <div class="trust-stat">
+      <div class="trust-stat-num">Free</div>
+      <div class="trust-stat-label">To Start</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== HOW IT WORKS ========== -->
 <section class="how-it-works" id="how-it-works">
   <div class="container">
     <div class="steps-header">
-      <div class="section-label">HOW IT WORKS</div>
+      <span class="section-eyebrow">How It Works</span>
       <h2 class="section-h2">Your full rental journey.<br>Covered at every step.</h2>
-      <p class="section-sub">From the first search to getting your bond back — RenterIQ has every stage covered.</p>
+      <p class="section-sub text-center" style="margin:0 auto">From the first search to getting your bond back — RenterIQ covers every stage.</p>
     </div>
-    <div class="steps-wrap">
-      <div class="steps-grid">
+    <div class="steps-grid">
+      <div class="steps-connector"></div>
 
-        <div class="step-card">
-          <div class="step-num">1</div>
-          <div class="step-icon">🔍</div>
-          <h3>Search</h3>
-          <p>Filter by suburb, price, beds and type. View inspection times and book directly from any listing.</p>
-          <div class="step-tags"><span class="step-tag">Live listings</span><span class="step-tag">All states</span></div>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">2</div>
-          <div class="step-icon">📸</div>
-          <h3>Inspect</h3>
-          <p>Walk through with a guided room-by-room checklist. Photograph every detail — RenterIQ timestamps everything.</p>
-          <div class="step-tags"><span class="step-tag">Photo evidence</span><span class="step-tag">AI report</span></div>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">3</div>
-          <div class="step-icon">⚖️</div>
-          <h3>Review Lease</h3>
-          <p>Upload your lease and AI explains every clause in plain English, flagging anything risky before you sign.</p>
-          <div class="step-tags"><span class="step-tag">AI-powered</span><span class="step-tag">State rules</span></div>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">4</div>
-          <div class="step-icon">🛡️</div>
-          <h3>Track Issues</h3>
-          <p>Log maintenance requests with photos and dates. Build a documented timeline your landlord can't ignore.</p>
-          <div class="step-tags"><span class="step-tag">Evidence trail</span><span class="step-tag">Vault storage</span></div>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">5</div>
-          <div class="step-icon">🔑</div>
-          <h3>Exit Clean</h3>
-          <p>At move-out, AI compares your entry and exit photos side by side. Dispute any unfair bond deduction with a professional report.</p>
-          <div class="step-tags"><span class="step-tag">Bond protection</span><span class="step-tag">PDF export</span></div>
-        </div>
-
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-emoji">🔍</div>
+        <h3>Search</h3>
+        <p>Filter by suburb, price, beds and type. View inspection times and book directly from any listing.</p>
+        <div class="step-tags"><span class="step-tag">Live listings</span><span class="step-tag">All states</span></div>
       </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-emoji">📸</div>
+        <h3>Inspect</h3>
+        <p>Walk through with a guided room-by-room checklist. Photograph every detail — timestamped automatically.</p>
+        <div class="step-tags"><span class="step-tag">Photo evidence</span><span class="step-tag">AI report</span></div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-emoji">⚖️</div>
+        <h3>Review Lease</h3>
+        <p>Upload your lease and AI explains every clause in plain English, flagging anything risky before you sign.</p>
+        <div class="step-tags"><span class="step-tag">AI-powered</span><span class="step-tag">State rules</span></div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-emoji">🛡️</div>
+        <h3>Track &amp; Store</h3>
+        <p>Log maintenance requests with photos and dates. Store every lease, receipt and report in your secure Vault.</p>
+        <div class="step-tags"><span class="step-tag">Evidence trail</span><span class="step-tag">Vault storage</span></div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">5</div>
+        <div class="step-emoji">🔑</div>
+        <h3>Exit Clean</h3>
+        <p>At move-out, AI compares your entry and exit photos side by side. Dispute any unfair bond deduction.</p>
+        <div class="step-tags"><span class="step-tag">Bond protection</span><span class="step-tag">PDF export</span></div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- Features -->
+<!-- ========== FEATURES ========== -->
 <section class="features" id="features">
   <div class="container">
     <div class="features-header">
-      <div class="section-label">FEATURES</div>
-      <h2 class="section-h2">More than a search app.</h2>
-      <p class="section-sub">Every tool a renter needs — from first search to bond return.</p>
+      <span class="section-eyebrow">Features</span>
+      <h2 class="section-h2">Every tool a renter needs.</h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center">From the first search to bond return — all 14 features in one place, free to start.</p>
     </div>
     <div class="features-grid">
 
-      <div class="feature-card">
-        <div class="fc-icon-wrap teal">🔍</div>
-        <h3>Smart Search</h3>
-        <p>Find rentals by suburb, price and beds. See how asking rent compares to the suburb median before you visit.</p>
-        <ul class="fc-bullets">
-          <li>Live listings across all states &amp; territories</li>
-          <li>Fair price indicator vs suburb median</li>
-          <li>View inspection times &amp; book</li>
-        </ul>
+      <!-- CARD 1: Find & Track -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon teal">🔍</div>
+          <div>
+            <h3>Find &amp; Track Properties</h3>
+            <p>Search every platform. Track every lead.</p>
+          </div>
+        </div>
+        <div class="feat-divider"></div>
+        <div class="feat-sub-list">
+          <div class="feat-sub">
+            <div class="feat-sub-icon teal">🔍</div>
+            <div class="feat-sub-body">
+              <strong>Smart Property Search</strong>
+              <span>Browse realestate.com.au, Domain, REIWA &amp; Rent.com.au — all states, filtered by suburb, price and beds.</span>
+            </div>
+          </div>
+          <div class="feat-sub">
+            <div class="feat-sub-icon teal">🔗</div>
+            <div class="feat-sub-body">
+              <strong>Property Tracker</strong>
+              <span>Save and compare your shortlist from any platform. Track price changes, status and booked inspections in one place.</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="feature-card">
-        <div class="fc-icon-wrap blue">📸</div>
-        <h3>AI Inspection Reports</h3>
-        <p>Guided room-by-room checklist with photos. RenterIQ generates a timestamped PDF in under a minute.</p>
-        <ul class="fc-bullets">
-          <li>Room-by-room photo checklist</li>
-          <li>Timestamped condition evidence</li>
-          <li>Professional-grade PDF report</li>
-        </ul>
+      <!-- CARD 2: Inspect -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon">🏠</div>
+          <div>
+            <h3>Inspect with Confidence</h3>
+            <p>Before you sign — and while you're in.</p>
+          </div>
+        </div>
+        <div class="feat-divider"></div>
+        <div class="feat-sub-list">
+          <div class="feat-sub">
+            <div class="feat-sub-icon">🏠</div>
+            <div class="feat-sub-body">
+              <strong>Open Home Auditor</strong>
+              <span>Room-by-room guided checklist with photo capture and AI-generated audit summary — before you commit to applying.</span>
+            </div>
+          </div>
+          <div class="feat-sub">
+            <div class="feat-sub-icon">📋</div>
+            <div class="feat-sub-body">
+              <strong>Routine Inspection Helper</strong>
+              <span>Prepare for landlord inspections, document what was checked, and store agent notes and outcomes automatically.</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="feature-card">
-        <div class="fc-icon-wrap blue">⚖️</div>
-        <h3>Lease AI Translator</h3>
-        <p>Upload your lease and AI explains every clause in plain English, flagging risks based on your state's tenancy laws.</p>
-        <ul class="fc-bullets">
-          <li>Plain-English clause breakdown</li>
-          <li>State-specific risk flagging</li>
-          <li>Export annotated PDF</li>
-        </ul>
+      <!-- CARD 3: Move-In & Move-Out -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon">📸</div>
+          <div>
+            <h3>Move-In &amp; Move-Out</h3>
+            <p>Your entry report protects your bond from day one.</p>
+          </div>
+        </div>
+        <div class="feat-divider"></div>
+        <div class="feat-sub-list">
+          <div class="feat-sub">
+            <div class="feat-sub-icon">📸</div>
+            <div class="feat-sub-body">
+              <strong>Move-In Inspector</strong>
+              <span>GPS-tagged, timestamped photos of every room and fitting. Professional PDF entry condition report your landlord can't dispute.</span>
+            </div>
+          </div>
+          <div class="feat-sub">
+            <div class="feat-sub-icon">🚪</div>
+            <div class="feat-sub-body">
+              <strong>Exit Inspection Report</strong>
+              <span>AI compares your entry and exit photos side by side. Generate a dispute-ready bond report with one tap.</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="feature-card">
-        <div class="fc-icon-wrap blue">🛠️</div>
-        <h3>Maintenance Tracker</h3>
-        <p>Log every issue with photos and dates. Build a documented timeline that shows exactly when you reported what.</p>
-        <ul class="fc-bullets">
-          <li>Issue log with photos &amp; dates</li>
-          <li>Open / in-progress / resolved status</li>
-          <li>Exportable evidence trail</li>
-        </ul>
+      <!-- CARD 4: Lease Intelligence -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon">⚖️</div>
+          <div>
+            <h3>Lease Intelligence</h3>
+            <p>Understand every clause. Negotiate every renewal.</p>
+          </div>
+        </div>
+        <div class="feat-divider"></div>
+        <div class="feat-sub-list">
+          <div class="feat-sub">
+            <div class="feat-sub-icon">⚖️</div>
+            <div class="feat-sub-body">
+              <strong>Lease AI Translator</strong>
+              <span>Upload your tenancy agreement — AI reads every clause, explains it in plain English and flags state-specific risks.</span>
+            </div>
+          </div>
+          <div class="feat-sub">
+            <div class="feat-sub-icon">🔄</div>
+            <div class="feat-sub-body">
+              <strong>Renewal Advisor</strong>
+              <span>AI analyses your proposed renewal against market rates and gives you negotiation guidance and state rights.</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="feature-card">
-        <div class="fc-icon-wrap blue">🔒</div>
-        <h3>Document Vault</h3>
-        <p>Every lease, report, receipt and communication stored in one place — searchable long after the tenancy ends.</p>
-        <ul class="fc-bullets">
-          <li>Unlimited document storage</li>
-          <li>Leases, reports &amp; receipts</li>
-          <li>Accessible from any device</li>
-        </ul>
+      <!-- CARD 5: Apply & Maintain -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon teal">📋</div>
+          <div>
+            <h3>Apply &amp; Maintain</h3>
+            <p>Win the application. Document every issue.</p>
+          </div>
+        </div>
+        <div class="feat-divider"></div>
+        <div class="feat-sub-list">
+          <div class="feat-sub">
+            <div class="feat-sub-icon teal">📋</div>
+            <div class="feat-sub-body">
+              <strong>Rental Application Builder</strong>
+              <span>Professional application templates with pre-attached references and payslips — reusable across every property.</span>
+            </div>
+          </div>
+          <div class="feat-sub">
+            <div class="feat-sub-icon">🛠️</div>
+            <div class="feat-sub-body">
+              <strong>Maintenance Tracker</strong>
+              <span>Log every repair request with photo evidence and dates. Build a documented timeline no landlord or tribunal can dismiss.</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="feature-card">
-        <div class="fc-icon-wrap teal">🔑</div>
-        <h3>Bond Exit Report</h3>
-        <p>At move-out, AI compares your entry and exit photos. Dispute any unfair bond deduction with a professional report.</p>
-        <ul class="fc-bullets">
-          <li>AI photo comparison</li>
-          <li>Dispute-ready PDF report</li>
-          <li>Bond rights guide by state</li>
-        </ul>
+      <!-- CARD 6: Vault & Rights -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon teal">🔒</div>
+          <div>
+            <h3>Vault &amp; Rights</h3>
+            <p>Every document safe. Every right known.</p>
+          </div>
+        </div>
+        <div class="feat-divider"></div>
+        <div class="feat-sub-list">
+          <div class="feat-sub">
+            <div class="feat-sub-icon">🔒</div>
+            <div class="feat-sub-body">
+              <strong>Document Vault</strong>
+              <span>Every lease, report, receipt and photo in one secure place — organised by tenancy, accessible from any device, forever.</span>
+            </div>
+          </div>
+          <div class="feat-sub">
+            <div class="feat-sub-icon teal">🛡️</div>
+            <div class="feat-sub-body">
+              <strong>Renter Rights Hub</strong>
+              <span>Direct links to every tenancy authority, tribunal and renter support service across all 8 states and territories.</span>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
   </div>
 </section>
 
-<!-- Renter Rights Hub -->
-<section class="rights" id="rights">
+<!-- ========== VAULT SPOTLIGHT ========== -->
+<section class="vault-section" id="vault">
   <div class="container">
-    <div class="section-label">RENTER RIGHTS</div>
-    <h2 class="section-h2">Know your rights.</h2>
-    <p class="section-sub">Free government tenancy authorities in every state and territory. RenterIQ links you directly to all eight.</p>
+    <div>
+      <span class="vault-eyebrow">Document Vault</span>
+      <h2>Everything, organised. Always.</h2>
+      <p class="vault-desc">Your lease, inspection reports, maintenance logs, receipts and photos — all in one secure vault. Stored beyond the tenancy, so if a dispute arrives weeks after you've left, your evidence is still there.</p>
+      <a href="/app/index.html" class="vault-cta">Open Your Vault →</a>
+    </div>
+    <div>
+      <div class="vault-grid">
+        <div class="vault-folder">
+          <div class="vf-icon">📄</div>
+          <h4>Leases &amp; Renewals</h4>
+          <p>Signed agreements, addendums and renewal terms</p>
+        </div>
+        <div class="vault-folder">
+          <div class="vf-icon">📸</div>
+          <h4>Inspection Reports</h4>
+          <p>Move-in, routine and exit photo reports</p>
+        </div>
+        <div class="vault-folder">
+          <div class="vf-icon">🛠️</div>
+          <h4>Maintenance Logs</h4>
+          <p>Issue reports, photos and resolution history</p>
+        </div>
+        <div class="vault-folder">
+          <div class="vf-icon">💬</div>
+          <h4>Communications</h4>
+          <p>Emails, notices and key correspondence</p>
+        </div>
+        <div class="vault-folder">
+          <div class="vf-icon">🧾</div>
+          <h4>Receipts &amp; Payments</h4>
+          <p>Bond lodgement, rent and repair receipts</p>
+        </div>
+        <div class="vault-folder">
+          <div class="vf-icon">📋</div>
+          <h4>Applications</h4>
+          <p>Rental applications and reference letters</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== EXIT COMPARISON ========== -->
+<section class="exit-section" id="exit">
+  <div class="container">
+    <div>
+      <span class="section-eyebrow">Bond Protection</span>
+      <h2 class="section-h2">Exit with evidence.<br>Get your bond back.</h2>
+      <p class="section-sub" style="margin-bottom:28px">At move-out, RenterIQ's AI compares your entry and exit photos side by side. You review every flag — nothing enters the report without your approval.</p>
+      <a href="/app/index.html" class="vault-cta" style="background:var(--blue);box-shadow:0 4px 16px rgba(27,80,200,.35)">Start Exit Report →</a>
+    </div>
+    <div>
+      <div class="exit-mock">
+        <div class="exit-mock-hdr">
+          <span class="em-title">Exit Comparison Report</span>
+          <span class="em-badge">AI Analysis</span>
+        </div>
+        <div class="exit-mock-cols">
+          <div class="exit-col-lbl">Move-In</div>
+          <div class="exit-col-lbl">Move-Out</div>
+        </div>
+        <div class="exit-mock-rows">
+          <div class="exit-row">
+            <div class="exit-cell"><div class="exit-ci pass">🛋️</div>Living Room</div>
+            <div class="exit-st pass">✓</div>
+            <div class="exit-cell" style="justify-content:flex-end">Clean<div class="exit-ci pass" style="margin-left:7px">🛋️</div></div>
+          </div>
+          <div class="exit-row">
+            <div class="exit-cell"><div class="exit-ci pass">🛏️</div>Main Bedroom</div>
+            <div class="exit-st pass">✓</div>
+            <div class="exit-cell" style="justify-content:flex-end">Clean<div class="exit-ci pass" style="margin-left:7px">🛏️</div></div>
+          </div>
+          <div class="exit-row">
+            <div class="exit-cell"><div class="exit-ci flag">🚿</div>Bathroom</div>
+            <div class="exit-st flag">!</div>
+            <div class="exit-cell" style="justify-content:flex-end">Review<div class="exit-ci flag" style="margin-left:7px">🚿</div></div>
+          </div>
+        </div>
+        <div class="exit-ai-note">
+          <div class="ea-label">AI Note</div>
+          <p>Bathroom: Minor water staining noted on tile grout — pre-existing condition documented in entry report. Recommend reviewing photos 3 &amp; 4 from move-in.</p>
+        </div>
+      </div>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px;font-style:italic;line-height:1.6">Nothing enters your report without your review. RenterIQ is a documentation tool — not legal advice.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== RENTER RIGHTS ========== -->
+<section class="rights-section" id="rights">
+  <div class="container">
+    <div class="rights-header">
+      <span class="section-eyebrow">Renter Rights</span>
+      <h2 class="section-h2">Know your rights.<br>In every state.</h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center">Free government tenancy authorities in all 8 states and territories. RenterIQ links you directly.</p>
+    </div>
     <div class="rights-grid">
       <div class="rights-card">
         <div class="rc-abbr">NSW</div>
@@ -980,32 +1084,43 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
 </section>
 
-<!-- PWA Install -->
-<section class="pwa-install" id="pwa">
+<!-- ========== LEGAL DISCLAIMER ========== -->
+<div class="legal-bar">
   <div class="container">
-    <div class="pi-icon"><img src="/assets/logo.svg" alt="RenterIQ App" width="64" height="64"></div>
-    <h2>Your rental companion. On your phone.</h2>
-    <p class="pi-sub">Add to your home screen in seconds. No app store, no account required. Works on iPhone &amp; Android.</p>
-    <div class="pwa-btns">
-      <button class="btn-white install-btn" id="installApp">📲 Get the App</button>
-      <a href="/app/index.html" class="btn-ghost">Open Web App</a>
+    <span class="lb-icon">⚠️</span>
+    <p><strong>Disclaimer:</strong> RenterIQ is a personal organisation tool — not a legal service. All AI-generated content is for informational purposes only and should not be relied upon as legal advice. Always verify information with a qualified professional or your state tenancy authority.</p>
+  </div>
+</div>
+
+<!-- ========== PWA INSTALL ========== -->
+<section class="pwa-section" id="pwa">
+  <div class="container">
+    <div class="pwa-icon">
+      <img src="/assets/logo.svg" alt="RenterIQ App" width="40" height="40">
     </div>
-    <div class="pwa-features">
+    <h2>Your rental companion.<br>On your phone.</h2>
+    <p class="pwa-sub">Add to your home screen in seconds. No app store, no account required. Works on iPhone &amp; Android — all features free to start.</p>
+    <div class="pwa-btns">
+      <button class="btn-white install-btn" id="installApp">📲 Get the App — Free</button>
+      <a href="/app/index.html" class="btn-ghost">Open Web App →</a>
+    </div>
+    <div class="pwa-feats">
       <span class="pwa-feat">Works offline</span>
       <span class="pwa-feat">No app store needed</span>
       <span class="pwa-feat">iPhone &amp; Android</span>
       <span class="pwa-feat">Free to start</span>
+      <span class="pwa-feat">Built in Australia 🇦🇺</span>
     </div>
   </div>
 </section>
 
-<!-- Footer -->
+<!-- ========== FOOTER ========== -->
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="footer-logo">
-          <img src="/assets/logo.svg" alt="RenterIQ" width="32" height="32">
+          <img src="/assets/logo.svg" alt="RenterIQ" width="30" height="30" style="border-radius:8px">
           <span class="wordmark">RenterIQ</span>
         </div>
         <p>The complete renting companion for Australian tenants — from the first search to the final key handover.</p>
@@ -1021,11 +1136,10 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
         <h4>Support</h4>
         <a href="mailto:support@renteriq.com.au">support@renteriq.com.au</a>
         <a href="mailto:support@renteriq.com.au?subject=Feedback">Send Feedback</a>
-        <a href="mailto:support@renteriq.com.au?subject=Review">Leave a Review</a>
+        <a href="/about.html">About RenterIQ</a>
       </div>
       <div class="footer-col">
         <h4>Legal</h4>
-        <a href="/about.html">About RenterIQ</a>
         <a href="/privacy.html">Privacy Policy</a>
         <a href="/terms.html">Terms of Use</a>
         <a href="/disclaimer.html">Disclaimer</a>
@@ -1036,25 +1150,26 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
       <span class="fb-copy">© 2025 RenterIQ Pty Ltd · Built in Australia 🇦🇺 · Personal organisation tool only — not a legal service.</span>
       <div class="fb-links">
         <a href="/about.html">About</a>
-        <a href="/privacy.html">Privacy Policy</a>
-        <a href="/terms.html">Terms of Use</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
         <a href="/disclaimer.html">Disclaimer</a>
       </div>
     </div>
   </div>
 </footer>
 
-<div id="iosModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,36,96,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;padding:32px 24px 40px;max-width:400px;width:100%;text-align:center">
-    <div style="margin-bottom:16px"><img src="/assets/logo.svg" alt="RenterIQ" width="64" height="64" style="display:inline-block"></div>
-    <h3 style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#0A2460;margin-bottom:8px">Add RenterIQ to Home Screen</h3>
-    <p style="font-size:15px;color:#5A6B8A;line-height:1.7;margin-bottom:24px">To install this app on your iPhone or iPad:</p>
-    <div style="display:flex;flex-direction:column;gap:14px;text-align:left;margin-bottom:28px">
-      <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:#0F1C3F"><span style="width:32px;height:32px;border-radius:10px;background:#D8E7FC;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">1</span><span>Tap the <strong>Share</strong> button <span style="font-size:18px;vertical-align:middle">⬆️</span> in Safari</span></div>
-      <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:#0F1C3F"><span style="width:32px;height:32px;border-radius:10px;background:#D8E7FC;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">2</span><span>Scroll down and tap <strong>"Add to Home Screen"</strong></span></div>
-      <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:#0F1C3F"><span style="width:32px;height:32px;border-radius:10px;background:#D8E7FC;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">3</span><span>Tap <strong>"Add"</strong> — RenterIQ will appear on your home screen</span></div>
+<!-- iOS Install Modal -->
+<div id="iosModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(6,15,42,.65);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 44px;max-width:400px;width:100%;text-align:center">
+    <div style="margin-bottom:16px"><img src="/assets/logo.svg" alt="RenterIQ" width="60" height="60" style="display:inline-block;border-radius:14px"></div>
+    <h3 style="font-family:'Sora',sans-serif;font-weight:800;font-size:19px;color:#0A2460;margin-bottom:8px">Add RenterIQ to Home Screen</h3>
+    <p style="font-size:14px;color:#5A6B8A;line-height:1.7;margin-bottom:22px">To install on your iPhone or iPad:</p>
+    <div style="display:flex;flex-direction:column;gap:13px;text-align:left;margin-bottom:26px">
+      <div style="display:flex;align-items:center;gap:12px;font-size:13.5px;color:#0F1C3F"><span style="width:30px;height:30px;border-radius:9px;background:#D8E7FC;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;font-family:'Sora',sans-serif;font-weight:700;color:#1B50C8">1</span><span>Tap the <strong>Share</strong> button ⬆️ in Safari</span></div>
+      <div style="display:flex;align-items:center;gap:12px;font-size:13.5px;color:#0F1C3F"><span style="width:30px;height:30px;border-radius:9px;background:#D8E7FC;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;font-family:'Sora',sans-serif;font-weight:700;color:#1B50C8">2</span><span>Tap <strong>"Add to Home Screen"</strong></span></div>
+      <div style="display:flex;align-items:center;gap:12px;font-size:13.5px;color:#0F1C3F"><span style="width:30px;height:30px;border-radius:9px;background:#D8E7FC;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;font-family:'Sora',sans-serif;font-weight:700;color:#1B50C8">3</span><span>Tap <strong>"Add"</strong> — done!</span></div>
     </div>
-    <button id="iosModalClose" style="background:#1B50C8;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:100px;padding:14px 32px;cursor:pointer;width:100%">Got It</button>
+    <button id="iosModalClose" style="background:var(--blue,#1B50C8);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:100px;padding:14px 32px;cursor:pointer;width:100%;background:linear-gradient(135deg,#1B50C8,#2E63E0)">Got It</button>
   </div>
 </div>
 
@@ -1065,24 +1180,24 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
   <div class="mab-info">
     <div class="mab-title">RenterIQ App</div>
-    <div class="mab-subtitle">Save properties, track inspections & get alerts</div>
+    <div class="mab-subtitle">Inspections, lease review &amp; bond protection</div>
   </div>
   <button class="mab-install install-btn" onclick="installApp()">Get App</button>
-  <button class="mab-close" onclick="closeAppBanner()">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  <button class="mab-close" onclick="closeAppBanner()" aria-label="Close">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
 </div>
 
-<!-- Auth Modal -->
+<!-- ========== AUTH MODAL ========== -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-modal">
     <div class="auth-header">
       <div class="auth-logo">
-        <img src="/assets/logo.svg" alt="RenterIQ">
+        <img src="/assets/logo.svg" alt="RenterIQ" style="border-radius:8px">
         <span>RenterIQ</span>
       </div>
-      <button class="auth-close" onclick="closeAuth()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button class="auth-close" onclick="closeAuth()" aria-label="Close">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="auth-tabs">
@@ -1097,11 +1212,11 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
         </div>
         <div class="af-group">
           <label>Email</label>
-          <input type="email" class="af-input" id="loginEmail" placeholder="your@email.com" required>
+          <input type="email" class="af-input" id="loginEmail" placeholder="your@email.com" required autocomplete="email">
         </div>
         <div class="af-group">
           <label>Password</label>
-          <input type="password" class="af-input" id="loginPassword" placeholder="Enter your password" required>
+          <input type="password" class="af-input" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
         </div>
         <div class="af-options">
           <label class="remember-me">
@@ -1114,16 +1229,17 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
         <button type="submit" class="af-submit" id="loginSubmit">Sign In</button>
         <div class="auth-divider"><span>or continue with</span></div>
         <div class="social-grid">
-          <button type="button" class="social-btn social-google" onclick="socialAuth('google')" title="Google">
+          <button type="button" class="social-btn" onclick="socialAuth('google')" title="Google">
             <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-            <span class="social-text">Google</span>
+            Google
           </button>
-          <button type="button" class="social-btn social-apple" onclick="socialAuth('apple')" title="Apple">
+          <button type="button" class="social-btn" onclick="socialAuth('apple')" title="Apple">
             <svg viewBox="0 0 24 24" fill="#000"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.97 1.07-3.11-1.05.05-2.31.7-3.06 1.66-.68.86-1.28 2.21-1.12 3.31 1.18.09 2.38-.53 3.11-1.86z"/></svg>
-            <span class="social-text">Apple</span>
+            Apple
           </button>
         </div>
       </form>
+
       <!-- Sign Up Form -->
       <form class="auth-form" id="signupForm" onsubmit="handleSignup(event)">
         <div class="af-error" id="signupError">
@@ -1131,30 +1247,31 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
         </div>
         <div class="af-group">
           <label>Full Name</label>
-          <input type="text" class="af-input" id="signupName" placeholder="Your full name" required>
+          <input type="text" class="af-input" id="signupName" placeholder="Your full name" required autocomplete="name">
         </div>
         <div class="af-group">
           <label>Email</label>
-          <input type="email" class="af-input" id="signupEmail" placeholder="your@email.com" required>
+          <input type="email" class="af-input" id="signupEmail" placeholder="your@email.com" required autocomplete="email">
         </div>
         <div class="af-group">
           <label>Password</label>
-          <input type="password" class="af-input" id="signupPassword" placeholder="Create a password (min 8 chars)" minlength="8" required>
+          <input type="password" class="af-input" id="signupPassword" placeholder="Create a password (min 8 chars)" minlength="8" required autocomplete="new-password">
         </div>
         <div class="af-hint">By signing up, you agree to our <a href="/terms.html">Terms</a> and <a href="/privacy.html">Privacy Policy</a></div>
         <button type="submit" class="af-submit" id="signupSubmit">Create Account</button>
         <div class="auth-divider"><span>or sign up with</span></div>
         <div class="social-grid">
-          <button type="button" class="social-btn social-google" onclick="socialAuth('google')" title="Google">
+          <button type="button" class="social-btn" onclick="socialAuth('google')">
             <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-            <span class="social-text">Google</span>
+            Google
           </button>
-          <button type="button" class="social-btn social-apple" onclick="socialAuth('apple')" title="Apple">
+          <button type="button" class="social-btn" onclick="socialAuth('apple')">
             <svg viewBox="0 0 24 24" fill="#000"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.97 1.07-3.11-1.05.05-2.31.7-3.06 1.66-.68.86-1.28 2.21-1.12 3.31 1.18.09 2.38-.53 3.11-1.86z"/></svg>
-            <span class="social-text">Apple</span>
+            Apple
           </button>
         </div>
       </form>
+
       <!-- Forgot Password Form -->
       <form class="auth-form" id="forgotForm" onsubmit="handleForgotPassword(event)">
         <div class="af-success" id="forgotSuccess">
@@ -1162,7 +1279,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
         </div>
         <div class="af-group">
           <label>Email</label>
-          <input type="email" class="af-input" id="forgotEmail" placeholder="your@email.com" required>
+          <input type="email" class="af-input" id="forgotEmail" placeholder="your@email.com" required autocomplete="email">
         </div>
         <div class="af-hint">Enter your email and we'll send you a link to reset your password.</div>
         <button type="submit" class="af-submit" id="forgotSubmit">Send Reset Link</button>
@@ -1170,7 +1287,8 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
           <a href="#" onclick="showAuthForm('login')">← Back to Sign In</a>
         </div>
       </form>
-      <!-- Verify Email Form -->
+
+      <!-- Verify Email -->
       <div class="auth-form" id="verifyForm">
         <div class="verify-content">
           <div class="verify-icon">✉️</div>
@@ -1194,7 +1312,7 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 <div class="so-overlay" id="soOverlay" onclick="hideSignOutModal()">
   <div class="so-modal" onclick="event.stopPropagation()">
     <div class="so-avatar">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </div>
     <h3 class="so-title">Sign out?</h3>
     <p class="so-sub">You'll need to sign in again to access your RenterIQ account.</p>
@@ -1207,71 +1325,29 @@ input{font-family:'Nunito',sans-serif;border:none;outline:none}
 
 <script>
 // ========== FIREBASE INITIALIZATION ==========
-// Config loaded securely from server via /api/firebase-config
 firebase.initializeApp(window.__FIREBASE_CONFIG__);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ========== DOMAIN.COM.AU API INTEGRATION ==========
-// Keys now stored securely in .env.local and used via API route
-const DOMAIN_API_BASE = '/api/listings';
+// ========== MOBILE NAV TOGGLE ==========
+function toggleMobileNav() {
+  const links = document.getElementById('navLinks');
+  links.classList.toggle('mobile-open');
+}
 
-async function searchDomainListings(location, filters = {}) {
-  try {
-    const params = new URLSearchParams({
-      location: location,
-      ...(filters.minBedrooms && { minBedrooms: filters.beds }),
-      ...(filters.maxPrice && { maxPrice: filters.price }),
-      ...(filters.propertyType && { propertyType: filters.type })
+// Close mobile nav when a link is clicked
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('#navLinks a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.getElementById('navLinks').classList.remove('mobile-open');
     });
-    
-    const response = await fetch(`${DOMAIN_API_BASE}?${params}`);
-    if (!response.ok) throw new Error('Domain API Error');
-    return await response.json();
-  } catch (error) {
-    console.error('Domain API Error:', error);
-    return null;
-  }
-}
+  });
+});
 
-// ========== GEMINI AI INTEGRATION ==========
-const AI_API_BASE = '/api/ai';
-
-async function callServerAction(action, data) {
-  try {
-    const response = await fetch(`${AI_API_BASE}/${action}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('AI API Error');
-    return await response.json();
-  } catch (error) {
-    console.error('AI API Error:', error);
-    return { error: 'Server-side AI processing unavailable' };
-  }
-}
-
-async function analyzeLeaseWithGemini(leaseText, state) {
-  const result = await callServerAction('analyze-lease', { leaseText, state });
-  return result.text || 'Unable to analyze lease at this time. Please try again later.';
-}
-
-async function generateInspectionReport(roomData, photos) {
-  const result = await callServerAction('generate-report', { roomData, photos });
-  return result.text || 'Unable to generate report at this time.';
-}
-
-async function compareBondPhotos(entryPhotos, exitPhotos) {
-  const result = await callServerAction('compare-bond', { entryPhotos, exitPhotos });
-  return result.text || 'Unable to compare photos at this time.';
-}
-
-// ========== ENHANCED SEARCH WITH LOCATION AUTOCOMPLETE ==========
-
+// ========== SMART SEARCH HUB - PROVIDER SELECTION ==========
+let suburbsData = [];
 let selectedLocation = null;
 
-// Location Input & Autocomplete
 const locationInput = document.getElementById('locationInput');
 const autocompleteDropdown = document.getElementById('autocompleteDropdown');
 const selectedLocationEl = document.getElementById('selectedLocation');
@@ -1282,21 +1358,19 @@ if (locationInput) {
   locationInput.addEventListener('focus', () => {
     if (locationInput.value.trim().length >= 2) showAutocomplete(locationInput.value);
   });
+  locationInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); performSearch(); }
+  });
 }
 
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.location-search-wrap')) {
-    hideAutocomplete();
-  }
+  if (!e.target.closest('.location-search-wrap')) hideAutocomplete();
 });
 
 function handleLocationInput() {
   const value = locationInput.value.trim();
-  if (value.length >= 2) {
-    showAutocomplete(value);
-  } else {
-    hideAutocomplete();
-  }
+  if (value.length >= 2) showAutocomplete(value);
+  else hideAutocomplete();
 }
 
 function showAutocomplete(query) {
@@ -1306,7 +1380,6 @@ function showAutocomplete(query) {
     autocompleteDropdown.classList.add('open');
     return;
   }
-  
   autocompleteDropdown.innerHTML = matches.map((suburb, index) => `
     <div class="autocomplete-item ${index === 0 ? 'selected' : ''}" data-index="${index}" onclick="selectSuburb('${suburb.name}', '${suburb.postcode}', '${suburb.state}')">
       <div class="autocomplete-main">
@@ -1316,39 +1389,26 @@ function showAutocomplete(query) {
       <span class="autocomplete-postcode">${suburb.postcode}</span>
     </div>
   `).join('');
-  
   autocompleteDropdown.classList.add('open');
 }
 
 function findSuburbs(query) {
   if (!suburbsData.length) return [];
   const q = query.toLowerCase().trim();
-  
-  // Filter suburbs that match
-  const matches = suburbsData.filter(s => 
-    s.name.toLowerCase().includes(q) || 
-    s.postcode.toString().includes(q)
+  const matches = suburbsData.filter(s =>
+    s.name.toLowerCase().includes(q) || s.postcode.toString().includes(q)
   );
-  
-  // Sort by relevance: exact match first, then starts with, then contains
   matches.sort((a, b) => {
     const nameA = a.name.toLowerCase();
     const nameB = b.name.toLowerCase();
-    
-    // Exact match gets highest priority
     if (nameA === q && nameB !== q) return -1;
     if (nameB === q && nameA !== q) return 1;
-    
-    // Starts with query gets next priority
     const aStarts = nameA.startsWith(q);
     const bStarts = nameB.startsWith(q);
     if (aStarts && !bStarts) return -1;
     if (bStarts && !aStarts) return 1;
-    
-    // Shorter names come first (more relevant)
     return nameA.length - nameB.length;
   });
-  
   return matches.slice(0, 10);
 }
 
@@ -1373,18 +1433,11 @@ function clearLocation() {
   selectedLocationEl.style.display = 'none';
 }
 
-// ========== SMART SEARCH HUB - PROVIDER SELECTION ==========
-
-let suburbsData = []; // Will be loaded from JSON
-
-// Load suburbs from JSON file
 async function loadSuburbsData() {
   try {
     const response = await fetch('/data/suburbs.json');
     const data = await response.json();
     const raw = data.suburbs || [];
-    
-    // Deduplicate by name+state, keeping the lowest postcode (primary residential)
     const seen = {};
     suburbsData = raw.reduce((acc, s) => {
       const key = `${s.name.toLowerCase()}|${s.state.toLowerCase()}`;
@@ -1393,7 +1446,6 @@ async function loadSuburbsData() {
         seen[key] = { index: acc.length, postcode: pc };
         acc.push(s);
       } else if (pc < seen[key].postcode) {
-        // Replace with lower postcode entry
         acc[seen[key].index] = s;
         seen[key].postcode = pc;
       }
@@ -1405,24 +1457,19 @@ async function loadSuburbsData() {
   }
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-  loadSuburbsData();
-});
+document.addEventListener('DOMContentLoaded', () => { loadSuburbsData(); });
 
 const SS_PROVIDERS = [
-  { key: 'realestate', name: 'realestate.com.au', color: '#0066CC', logo: '🏠', desc: 'Australia\'s largest property site' },
+  { key: 'realestate', name: 'realestate.com.au', color: '#0066CC', logo: '🏠', desc: "Australia's largest property site" },
   { key: 'domain', name: 'Domain.com.au', color: '#2E3192', logo: '🔷', desc: 'Premium listings & market data' },
   { key: 'reiwa', name: 'REIWA', color: '#E60028', logo: '🏘️', desc: 'WA local specialists', waOnly: true },
   { key: 'rent', name: 'Rent.com.au', color: '#FF6B35', logo: '🔑', desc: 'Simple rental search' }
 ];
 
 function generateSearchUrls(suburb, state, postcode) {
-  // Keep original suburb name with spaces for better matching
   const formattedSuburb = suburb.toLowerCase().trim().replace(/\s+/g, '-');
   const cleanPostcode = postcode.trim();
   const stateLower = (state || 'wa').toLowerCase();
-  
   return {
     realestate: `https://www.realestate.com.au/rent/in-${formattedSuburb},+${stateLower}+${cleanPostcode}/list-1`,
     domain: `https://www.domain.com.au/rent/${formattedSuburb}-${stateLower}-${cleanPostcode}/`,
@@ -1434,32 +1481,21 @@ function generateSearchUrls(suburb, state, postcode) {
 async function performSearch() {
   const section = document.getElementById('search');
   if (!section) return;
-  
-  // Get search query from location input
   const query = locationInput?.value?.trim() || '';
-  
-  // If user selected from dropdown, use that data
-  // Otherwise try to parse the query
   let postcode, suburb, state;
-  
+
   if (selectedLocation) {
     postcode = selectedLocation.postcode;
     suburb = selectedLocation.name;
     state = selectedLocation.state;
   } else {
-    // Try to extract postcode from query (4 digits)
     const postcodeMatch = query.match(/\d{4}/);
     postcode = postcodeMatch ? postcodeMatch[0] : '';
-    
-    // Remove postcode from query to get suburb
     const suburbPart = query.replace(/\d{4}/, '').trim();
-    
-    // Try to find suburb in our data that matches
-    const matchedSuburb = suburbsData.find(s => 
+    const matchedSuburb = suburbsData.find(s =>
       s.name.toLowerCase() === suburbPart.toLowerCase() ||
       suburbPart.toLowerCase().includes(s.name.toLowerCase())
     );
-    
     if (matchedSuburb) {
       suburb = matchedSuburb.name;
       state = matchedSuburb.state;
@@ -1469,30 +1505,23 @@ async function performSearch() {
       state = 'WA';
     }
   }
-  
-  // Validate we have required data
+
   if (!postcode || !suburb) {
-    alert('Please select a suburb from the dropdown or type a valid suburb with postcode (e.g., "Morley 6062")');
+    alert('Please select a suburb from the dropdown or type a valid suburb with postcode.');
     return;
   }
-  
-  // Scroll to search section
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
   section.style.display = 'block';
-  
-  // Update location display
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   document.getElementById('ssLocation').textContent = `${suburb}, ${state} ${postcode}`;
-  
-  // Generate provider URLs
+
   const urls = generateSearchUrls(suburb, state, postcode);
-  
-  // Render provider cards - hide REIWA if not WA
   const providersContainer = document.getElementById('ssProviders');
   const visibleProviders = SS_PROVIDERS.filter(p => !p.waOnly || state === 'WA');
-  
+
   providersContainer.innerHTML = visibleProviders.map(p => `
-    <div class="ss-provider" onclick="openProvider('${urls[p.key]}')" style="border-left: 4px solid ${p.color}">
-      <div class="ss-provider-icon" style="background: ${p.color}15">${p.logo}</div>
+    <div class="ss-provider" onclick="openProvider('${urls[p.key]}')" style="border-left:4px solid ${p.color}">
+      <div class="ss-provider-icon" style="background:${p.color}18">${p.logo}</div>
       <div class="ss-provider-name">${p.name}</div>
       <div class="ss-provider-desc">${p.desc}</div>
     </div>
@@ -1500,45 +1529,27 @@ async function performSearch() {
 }
 
 function openProvider(url) {
-  if (!url) {
-    alert('This provider is not available for the selected location.');
-    return;
-  }
+  if (!url) { alert('This provider is not available for the selected location.'); return; }
   window.open(url, '_blank');
 }
 
-// Track property from URL
 async function trackFromUrl(e) {
   e.preventDefault();
-  
   const urlInput = document.getElementById('ssPropertyUrl');
   const url = urlInput.value.trim();
-  
   if (!url) return;
-  
-  // Validate it's a property URL
   const validDomains = ['realestate.com.au', 'domain.com.au', 'reiwa.com.au', 'rent.com.au'];
   const isValid = validDomains.some(domain => url.includes(domain));
-  
-  if (!isValid) {
-    alert('Please enter a URL from realestate.com.au, Domain, REIWA, or Rent.com.au');
-    return;
-  }
-  
-  // Detect source
+  if (!isValid) { alert('Please enter a URL from realestate.com.au, Domain, REIWA, or Rent.com.au'); return; }
   let source = 'unknown';
   if (url.includes('realestate.com.au')) source = 'realestate';
   else if (url.includes('domain.com.au')) source = 'domain';
   else if (url.includes('reiwa.com.au')) source = 'reiwa';
   else if (url.includes('rent.com.au')) source = 'rent';
-  
-  // Extract basic info from URL
   const address = extractAddressFromUrl(url);
-  
-  // Create property object
   const property = {
     id: 'prop_' + Date.now(),
-    address: address,
+    address,
     price: 'Contact agent',
     description: 'Property tracked from ' + source,
     imageUrl: '',
@@ -1547,216 +1558,34 @@ async function trackFromUrl(e) {
     savedAt: new Date(),
     status: 'pending'
   };
-  
-  // Save to localStorage (using same key as searchService.js)
   let tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]');
   tracked.push(property);
   localStorage.setItem('renteriq_tracked_properties', JSON.stringify(tracked));
-  
-  // Clear input and show success
   urlInput.value = '';
   alert('✓ Property tracked! View it in the app at /app/pages/tracked.html');
 }
 
 function extractAddressFromUrl(url) {
-  // Try to extract address from URL path
   try {
     const urlObj = new URL(url);
     const path = urlObj.pathname;
-    // Remove common URL parts and decode
     let address = path
-      .replace(/^\/rent\/in-/, '')
-      .replace(/^\/rent\//, '')
-      .replace(/^\/rental-properties\//, '')
-      .replace(/^\/rentals\//, '')
-      .replace(/-/g, ' ')
-      .replace(/_/g, ' ')
-      .replace(/\+/g, ' ')
-      .replace(/list-\d+$/, '')
-      .replace(/\/$/, '');
-    
-    // Decode URL encoding
+      .replace(/^\/rent\/in-/, '').replace(/^\/rent\//, '').replace(/^\/rental-properties\//, '')
+      .replace(/^\/rentals\//, '').replace(/-/g, ' ').replace(/_/g, ' ').replace(/\+/g, ' ')
+      .replace(/list-\d+$/, '').replace(/\/$/, '');
     address = decodeURIComponent(address);
-    
-    // Capitalize words
     return address.replace(/\b\w/g, c => c.toUpperCase()).substring(0, 60) || 'Property Listing';
-  } catch {
-    return 'Property Listing';
-  }
+  } catch { return 'Property Listing'; }
 }
 
-// Legacy filterResults - now uses Smart Search
-function filterResults() {
-  performSearch();
-}
-
-function renderDomainListings(listings) {
-  const grid = document.getElementById('lsGrid');
-  const noResults = document.getElementById('lsNoResults');
-  const countEl = document.getElementById('lsCount');
-  const subEl = document.getElementById('lsSubtitle');
-  
-  if (!listings || listings.length === 0) {
-    if (grid) grid.style.display = 'none';
-    if (noResults) noResults.style.display = 'block';
-    if (countEl) countEl.textContent = '0 properties';
-    return;
-  }
-  
-  if (grid) {
-    grid.innerHTML = listings.map(listing => `
-      <div class="ls-card" data-id="${listing.id}">
-        <div class="ls-card-img-wrap">
-          <img src="${listing.media?.[0]?.url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop'}" alt="${listing.address?.street || 'Property'}" loading="lazy">
-          <span class="ls-card-tag">${listing.inspections?.[0]?.inspectionTime || 'By Appointment'}</span>
-        </div>
-        <div class="ls-card-body">
-          <div class="ls-card-price">$${listing.price?.rentalPrice || 'Contact'}/wk</div>
-          <div class="ls-card-addr">${listing.address?.street}, ${listing.address?.suburb} ${listing.address?.state}</div>
-          <div class="ls-card-meta">${listing.beds || 0} bed · ${listing.baths || 0} bath · ${listing.agency?.name || 'Agent'}</div>
-          <div class="ls-card-actions">
-            <button class="ls-card-btn-primary" onclick="bookInspection('${listing.id}', '${listing.listingUrl}')">Book Inspection</button>
-            <button class="ls-card-btn-ghost" onclick="saveProperty('${listing.id}', ${listing.price?.rentalPrice || 0})">Save</button>
-          </div>
-        </div>
-      </div>
-    `).join('');
-    grid.style.display = 'grid';
-  }
-  
-  if (noResults) noResults.style.display = 'none';
-  if (countEl) countEl.textContent = listings.length + ' propert' + (listings.length === 1 ? 'y' : 'ies') + ' found';
-  if (subEl) subEl.textContent = selectedLocation ? `in ${selectedLocation.name}` : 'All locations';
-}
-
-function filterResults() {
-  const grid = document.getElementById('lsGrid');
-  const noResults = document.getElementById('lsNoResults');
-  const resultsBar = document.getElementById('lsResultsBar');
-  const countEl = document.getElementById('lsCount');
-  const subEl = document.getElementById('lsSubtitle');
-  
-  let filtered = sampleListings.filter(prop => {
-    if (searchFilters.state !== 'any' && prop.state !== searchFilters.state) return false;
-    if (searchFilters.price === '400' && prop.price >= 400) return false;
-    if (searchFilters.price === '600' && prop.price >= 600) return false;
-    if (searchFilters.price === '800' && prop.price >= 800) return false;
-    if (searchFilters.price === '800+' && prop.price < 800) return false;
-    if (searchFilters.beds !== 'any' && prop.beds < parseInt(searchFilters.beds)) return false;
-    if (searchFilters.type !== 'any' && prop.type !== searchFilters.type) return false;
-    return true;
-  });
-  
-  if (selectedLocation) {
-    filtered = filtered.slice(0, 4);
-  }
-  
-  const shown = filtered.length;
-  
-  if (grid) {
-    if (shown > 0) {
-      grid.innerHTML = filtered.map(prop => `
-        <div class="ls-card" data-id="${prop.id}" data-state="${prop.state}" data-price="${prop.price}" data-beds="${prop.beds}" data-type="${prop.type}">
-          <div class="ls-card-img-wrap">
-            <img src="${prop.img}" alt="${prop.addr}" loading="lazy">
-            <span class="ls-card-tag">${prop.insp}</span>
-          </div>
-          <div class="ls-card-body">
-            <div class="ls-card-price">$${prop.price}/wk</div>
-            <div class="ls-card-addr">${prop.addr}</div>
-            <div class="ls-card-meta">${prop.beds} bed · ${prop.baths} bath · ${prop.agent}</div>
-            <div class="ls-card-actions">
-              <button class="ls-card-btn-primary" onclick="bookInspection('${prop.addr}', '${prop.insp}')">Book Inspection</button>
-              <button class="ls-card-btn-ghost" onclick="saveProperty('${prop.addr}', ${prop.price})">Save</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-      grid.style.display = 'grid';
-    } else {
-      grid.innerHTML = '';
-      grid.style.display = 'none';
-    }
-  }
-  
-  if (noResults) noResults.style.display = shown === 0 ? 'block' : 'none';
-  if (resultsBar) resultsBar.style.display = 'flex';
-  if (countEl) countEl.textContent = shown + ' propert' + (shown === 1 ? 'y' : 'ies') + ' found';
-  if (subEl) subEl.textContent = selectedLocation ? `in ${selectedLocation.name}${searchFilters.nearby ? ' & nearby' : ''}` : 'All locations';
-}
-
-function bookInspection(address, listingUrl) {
-  // If listingUrl provided, open it directly
-  if (listingUrl) {
-    window.open(listingUrl, '_blank');
-  } else {
-    const searchQuery = encodeURIComponent(address);
-    window.open(`https://www.domain.com.au/search/?q=${searchQuery}`, '_blank');
-  }
-  
-  setTimeout(() => {
-    showPostBookingModal(address);
-  }, 1000);
-}
-
-async function saveProperty(listingId, price) {
-  const user = auth.currentUser;
-  if (!user) {
-    showAuth();
-    return;
-  }
-  
-  try {
-    await db.collection('users').doc(user.uid).collection('savedProperties').doc(listingId).set({
-      listingId,
-      price,
-      savedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert('Property saved to your account!');
-  } catch (error) {
-    console.error('Error saving property:', error);
-    alert('Unable to save property. Please try again.');
-  }
-}
-
-function showPostBookingModal(address) {
-  const overlay = document.createElement('div');
-  overlay.className = 'ls-modal-overlay';
-  overlay.style.display = 'flex';
-  overlay.style.opacity = '1';
-  overlay.id = 'postBookingModal';
-  overlay.innerHTML = `
-    <div class="ls-modal" style="transform:translateY(0)">
-      <div class="ls-modal-icon">🎉</div>
-      <h3>Inspection Booked!</h3>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:16px">You're viewing <strong>${address}</strong></p>
-      <div style="background:#F4F7FF;border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
-        <p style="font-size:13px;color:var(--muted);margin-bottom:12px"><strong>Next steps:</strong></p>
-        <ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.8">
-          <li>Complete booking on Domain.com.au</li>
-          <li>Download RenterIQ app to prepare</li>
-          <li>Use our inspection checklist</li>
-          <li>Save photos & notes for your records</li>
-        </ul>
-      </div>
-      <div class="ls-modal-btns">
-        <button class="ls-modal-btn-primary" onclick="showAuth();closePostBookingModal();">Sign Up to Track</button>
-        <button class="ls-modal-btn-ghost" onclick="installApp();closePostBookingModal();">Download App</button>
-      </div>
-      <button onclick="closePostBookingModal()" style="background:none;border:none;color:var(--muted);font-size:13px;margin-top:12px;cursor:pointer">Continue browsing</button>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-  overlay.onclick = (e) => { if (e.target === overlay) closePostBookingModal(); };
-}
-
-function closePostBookingModal() {
-  const modal = document.getElementById('postBookingModal');
-  if (modal) modal.remove();
+function lsCloseModal() {
+  const overlay = document.getElementById('lsModalOverlay');
+  const modal = document.getElementById('lsModal');
+  if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.style.display = 'none', 280); }
+  if (modal) modal.style.transform = 'translateY(100%)';
 }
 
 // ========== FIREBASE AUTHENTICATION ==========
-
 function showAuth() {
   document.getElementById('authOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1769,14 +1598,11 @@ function closeAuth() {
 }
 
 function showAuthForm(formName) {
-  document.getElementById('loginForm').classList.remove('active');
-  document.getElementById('signupForm').classList.remove('active');
-  document.getElementById('forgotForm').classList.remove('active');
-  document.getElementById('verifyForm').classList.remove('active');
-  
+  ['loginForm','signupForm','forgotForm','verifyForm'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
   const tabs = document.querySelector('.auth-tabs');
   const footer = document.querySelector('.auth-footer');
-  
   if (formName === 'login' || formName === 'signup') {
     tabs.style.display = 'flex';
     footer.style.display = 'block';
@@ -1785,17 +1611,9 @@ function showAuthForm(formName) {
     tabs.style.display = 'none';
     footer.style.display = 'none';
   }
-  
-  if (formName === 'login') {
-    document.getElementById('loginForm').classList.add('active');
-  } else if (formName === 'signup') {
-    document.getElementById('signupForm').classList.add('active');
-  } else if (formName === 'forgot') {
-    document.getElementById('forgotForm').classList.add('active');
-    document.getElementById('forgotSuccess').classList.remove('show');
-  } else if (formName === 'verify') {
-    document.getElementById('verifyForm').classList.add('active');
-  }
+  const formEl = document.getElementById(formName === 'forgot' ? 'forgotForm' : formName === 'verify' ? 'verifyForm' : formName + 'Form');
+  if (formEl) formEl.classList.add('active');
+  if (formName === 'forgot') document.getElementById('forgotSuccess').classList.remove('show');
 }
 
 function switchAuthTab(tab) {
@@ -1804,18 +1622,13 @@ function switchAuthTab(tab) {
   const loginForm = document.getElementById('loginForm');
   const signupForm = document.getElementById('signupForm');
   const footerText = document.getElementById('authFooterText');
-  
   if (tab === 'login') {
-    loginTab.classList.add('active');
-    signupTab.classList.remove('active');
-    loginForm.classList.add('active');
-    signupForm.classList.remove('active');
+    loginTab.classList.add('active'); signupTab.classList.remove('active');
+    loginForm.classList.add('active'); signupForm.classList.remove('active');
     footerText.innerHTML = 'Don\'t have an account? <a href="#" onclick="switchAuthTab(\'signup\')">Sign up</a>';
   } else {
-    signupTab.classList.add('active');
-    loginTab.classList.remove('active');
-    signupForm.classList.add('active');
-    loginForm.classList.remove('active');
+    signupTab.classList.add('active'); loginTab.classList.remove('active');
+    signupForm.classList.add('active'); loginForm.classList.remove('active');
     footerText.innerHTML = 'Already have an account? <a href="#" onclick="switchAuthTab(\'login\')">Sign in</a>';
   }
 }
@@ -1827,36 +1640,18 @@ async function handleLogin(e) {
   const remember = document.getElementById('loginRemember').checked;
   const errorEl = document.getElementById('loginError');
   const submitBtn = document.getElementById('loginSubmit');
-  
   errorEl.classList.remove('show');
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Signing in...';
-  
+  submitBtn.disabled = true; submitBtn.textContent = 'Signing in…';
   try {
-    // Set persistence based on remember checkbox
     await auth.setPersistence(remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION);
-    
-    // Sign in
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    
-    updateAuthUI();
-    closeAuth();
-    
-    // Redirect to web app after successful login
-    if (window.innerWidth <= 768 || isMobileBrowser()) {
-      // Mobile - open app
-      window.location.href = '/app';
-    } else {
-      // Desktop - open app
-      window.location.href = '/app';
-    }
+    await auth.signInWithEmailAndPassword(email, password);
+    updateAuthUI(); closeAuth();
+    window.location.href = '/app';
   } catch (error) {
-    console.error('Login error:', error);
     errorEl.classList.add('show');
     document.querySelector('#loginError .af-error-text').textContent = getAuthErrorMessage(error.code);
   } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Sign In';
+    submitBtn.disabled = false; submitBtn.textContent = 'Sign In';
   }
 }
 
@@ -1867,38 +1662,22 @@ async function handleSignup(e) {
   const password = document.getElementById('signupPassword').value;
   const errorEl = document.getElementById('signupError');
   const submitBtn = document.getElementById('signupSubmit');
-  
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Creating account...';
+  submitBtn.disabled = true; submitBtn.textContent = 'Creating account…';
   errorEl.classList.remove('show');
-  
   try {
-    // Create user
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    
-    // Update profile
     await userCredential.user.updateProfile({ displayName: name });
-    
-    // Send email verification
     await userCredential.user.sendEmailVerification();
-    
-    // Show verification screen
     document.getElementById('verifyEmail').textContent = email;
     showAuthForm('verify');
-    
-    // Store user data in Firestore
     await db.collection('users').doc(userCredential.user.uid).set({
-      name,
-      email,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      name, email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   } catch (error) {
-    console.error('Signup error:', error);
     errorEl.classList.add('show');
     document.querySelector('#signupError .af-error-text').textContent = getAuthErrorMessage(error.code);
   } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Create Account';
+    submitBtn.disabled = false; submitBtn.textContent = 'Create Account';
   }
 }
 
@@ -1907,16 +1686,12 @@ async function handleForgotPassword(e) {
   const email = document.getElementById('forgotEmail').value;
   const successEl = document.getElementById('forgotSuccess');
   const submitBtn = document.getElementById('forgotSubmit');
-  
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Sending...';
-  
+  submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
   try {
     await auth.sendPasswordResetEmail(email);
     successEl.classList.add('show');
     submitBtn.textContent = 'Resend Link';
   } catch (error) {
-    console.error('Password reset error:', error);
     alert(getAuthErrorMessage(error.code));
   } finally {
     submitBtn.disabled = false;
@@ -1925,70 +1700,40 @@ async function handleForgotPassword(e) {
 
 async function resendVerification() {
   const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-  
+  btn.disabled = true; btn.textContent = 'Sending…';
   try {
     const user = auth.currentUser;
-    if (user) {
-      await user.sendEmailVerification();
-      alert('Verification email resent!');
-    }
-  } catch (error) {
-    console.error('Resend error:', error);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Resend Email';
-  }
+    if (user) { await user.sendEmailVerification(); alert('Verification email resent!'); }
+  } catch (error) { console.error('Resend error:', error); }
+  finally { btn.disabled = false; btn.textContent = 'Resend Email'; }
 }
 
-function showForgotPassword() {
-  showAuthForm('forgot');
-}
+function showForgotPassword() { showAuthForm('forgot'); }
 
-// Social Authentication
 async function socialAuth(provider) {
   let providerObj;
-  
   switch(provider) {
-    case 'google':
-      providerObj = new firebase.auth.GoogleAuthProvider();
-      break;
-    case 'facebook':
-      providerObj = new firebase.auth.FacebookAuthProvider();
-      break;
-    case 'apple':
-      providerObj = new firebase.auth.OAuthProvider('apple.com');
-      break;
-    case 'microsoft':
-      providerObj = new firebase.auth.OAuthProvider('microsoft.com');
-      break;
-    default:
-      console.error('Unknown provider:', provider);
-      return;
+    case 'google': providerObj = new firebase.auth.GoogleAuthProvider(); break;
+    case 'apple': providerObj = new firebase.auth.OAuthProvider('apple.com'); break;
+    default: console.error('Unknown provider:', provider); return;
   }
-  
   try {
     const result = await auth.signInWithPopup(providerObj);
-    
-    // Store user data in Firestore if new user
     if (result.additionalUserInfo.isNewUser) {
       await db.collection('users').doc(result.user.uid).set({
         name: result.user.displayName || result.user.email.split('@')[0],
         email: result.user.email,
-        provider: provider,
+        provider,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
-    
-    updateAuthUI();
-    closeAuth();
-    
-    // Redirect to web app after successful social login
+    updateAuthUI(); closeAuth();
     window.location.href = '/app';
   } catch (error) {
     console.error(`${provider} auth error:`, error);
-    alert(getAuthErrorMessage(error.code));
+    if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+      alert(getAuthErrorMessage(error.code));
+    }
   }
 }
 
@@ -2015,25 +1760,17 @@ function updateAuthUI() {
   const user = auth.currentUser;
   const navCta = document.getElementById('navCta');
   const profileDropdown = document.getElementById('profileDropdown');
-  
   if (navCta) {
     if (user) {
       const firstName = (user.displayName || user.email.split('@')[0]).split(' ')[0];
       navCta.textContent = firstName;
       navCta.classList.add('signed-in');
-      navCta.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        profileDropdown.classList.toggle('open');
-      };
+      navCta.onclick = (e) => { e.preventDefault(); e.stopPropagation(); profileDropdown.classList.toggle('open'); };
     } else {
       navCta.textContent = 'Sign In';
       navCta.classList.remove('signed-in');
       if (profileDropdown) profileDropdown.classList.remove('open');
-      navCta.onclick = (e) => {
-        e.preventDefault();
-        showAuth();
-      };
+      navCta.onclick = (e) => { e.preventDefault(); showAuth(); };
     }
   }
 }
@@ -2043,274 +1780,61 @@ function showSignOutModal() {
   document.getElementById('soOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function hideSignOutModal() {
   document.getElementById('soOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
-
-function confirmSignOut() {
-  hideSignOutModal();
-  auth.signOut();
-}
+function confirmSignOut() { hideSignOutModal(); auth.signOut(); }
 
 document.addEventListener('click', (e) => {
   const wrap = document.getElementById('navCtaWrap');
   const dropdown = document.getElementById('profileDropdown');
-  if (wrap && dropdown && !wrap.contains(e.target)) {
-    dropdown.classList.remove('open');
-  }
+  if (wrap && dropdown && !wrap.contains(e.target)) dropdown.classList.remove('open');
 });
 
-// Listen for auth state changes
-auth.onAuthStateChanged((user) => {
-  updateAuthUI();
-  if (user) {
-    console.log('User signed in:', user.email);
-  } else {
-    console.log('User signed out');
-  }
-});
+auth.onAuthStateChanged((user) => { updateAuthUI(); });
 
 // ========== MOBILE APP BANNER ==========
-
 function showMobileAppBanner() {
   const banner = document.getElementById('mobileAppBanner');
   if (banner && !localStorage.getItem('appBannerClosed') && window.innerWidth <= 768) {
-    setTimeout(() => banner.classList.add('show'), 3000);
+    setTimeout(() => { banner.classList.add('show'); document.body.classList.add('banner-open'); }, 3000);
   }
 }
 
 function closeAppBanner() {
   const banner = document.getElementById('mobileAppBanner');
   banner.classList.remove('show');
+  document.body.classList.remove('banner-open');
   localStorage.setItem('appBannerClosed', 'true');
-  document.body.style.paddingBottom = '0';
 }
 
 // ========== PWA INSTALL ==========
-
 let deferredPrompt = null;
-let installEnabled = false;
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  installEnabled = true;
   updateInstallButtons(true);
 });
 
 window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
-  installEnabled = false;
-  updateInstallButtons(false);
   showInstallSuccess();
 });
 
 function updateInstallButtons(enabled) {
   const mainBtn = document.getElementById('installApp');
-  const bannerBtn = document.querySelector('.mab-install');
-  
-  if (mainBtn) {
-    // Check if PWA is already installed
-    if (isStandalone()) {
-      mainBtn.textContent = '✓ Already Installed';
-      mainBtn.style.background = '#00C896';
-      mainBtn.disabled = true;
-      mainBtn.style.opacity = '0.8';
-      mainBtn.style.cursor = 'default';
-      mainBtn.title = 'App is already installed';
-    } else if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-      // Already installed and running as PWA
-      mainBtn.textContent = '✓ Installed';
-      mainBtn.style.background = '#00C896';
-      mainBtn.disabled = true;
-      mainBtn.style.opacity = '0.8';
-      mainBtn.style.cursor = 'default';
-      mainBtn.title = 'App is installed';
-    } else {
-      // Not installed - enable install
-      mainBtn.disabled = false;
-      mainBtn.style.opacity = '1';
-      mainBtn.style.cursor = 'pointer';
-      mainBtn.title = 'Click to install app';
-    }
-  }
-  
-  if (bannerBtn) {
-    bannerBtn.disabled = false;
-    bannerBtn.style.opacity = '1';
+  if (!mainBtn) return;
+  if (isStandalone()) {
+    mainBtn.textContent = '✓ Already Installed';
+    mainBtn.style.background = '#00C896';
+    mainBtn.disabled = true;
   }
 }
 
 function isMobileBrowser() {
   return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-function installApp() {
-  if (isStandalone()) {
-    window.location.href = '/app/index.html';
-    return;
-  }
-  
-  if (deferredPrompt && typeof deferredPrompt.prompt === 'function') {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(({outcome}) => {
-      if (outcome === 'accepted') {
-        showInstallSuccess();
-      }
-      deferredPrompt = null;
-      installEnabled = false;
-      updateInstallButtons(false);
-    });
-  } else if (isIOS()) {
-    showIOSInstructions();
-  } else if (isMobileBrowser()) {
-    showManualInstallInstructions();
-  } else {
-    checkAndShowInstallOption();
-  }
-}
-
-function checkAndShowInstallOption() {
-  const installSelectors = [
-    '[aria-label*="Install"]',
-    '[aria-label*="install"]',
-    '[title*="Install"]',
-    '[title*="install"]',
-    'button[aria-label*="app"]',
-    'button[aria-label*="App"]'
-  ];
-  
-  let foundInstall = false;
-  for (const selector of installSelectors) {
-    const btn = document.querySelector(selector);
-    if (btn && btn.offsetParent !== null) {
-      btn.click();
-      foundInstall = true;
-      break;
-    }
-  }
-  
-  if (!foundInstall) {
-    showInstallHint();
-  }
-}
-
-function showInstallHint() {
-  // Create a floating hint
-  const hint = document.createElement('div');
-  hint.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #1B50C8;
-    color: white;
-    padding: 16px 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    z-index: 10000;
-    max-width: 320px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
-    animation: slideIn 0.3s ease-out;
-  `;
-  
-  hint.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-      <span style="font-size: 24px;">⚡</span>
-      <strong>Install RenterIQ</strong>
-    </div>
-    <p style="margin: 0 0 12px 0;">Look for the install icon (⚡ or +) in your browser's address bar and click it to install the app.</p>
-    <div style="display: flex; gap: 8px;">
-      <button onclick="this.parentElement.parentElement.remove()" style="
-        background: white;
-        color: #1B50C8;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-      ">Got it</button>
-      <button onclick="clearPWAInstallation()" style="
-        background: rgba(255,255,255,0.2);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.3);
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 12px;
-      ">Reset</button>
-    </div>
-  `;
-  
-  // Add animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  `;
-  document.head.appendChild(style);
-  
-  document.body.appendChild(hint);
-  
-  // Auto-remove after 8 seconds
-  setTimeout(() => {
-    if (hint.parentElement) {
-      hint.remove();
-    }
-  }, 8000);
-}
-
-function clearPWAInstallation() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(registrations => {
-      registrations.forEach(reg => reg.unregister());
-      location.reload();
-    });
-  }
-  if ('caches' in window) {
-    caches.keys().then(names => {
-      names.forEach(name => caches.delete(name));
-    });
-  }
-}
-
-function showDesktopInstallInstructions() {
-  const message = `To install RenterIQ on your computer:
-
-🖥️ On Chrome/Edge:
-1. Look for the install icon (⚡ or +) in the address bar
-2. Click it and select "Install app"
-3. Or go to Chrome menu (⋮) → "Install RenterIQ"
-
-💡 TIP: If you see an install icon in the address bar, click it now!
-
-📱 On Android:
-1. Tap the menu button (⋮) in Chrome
-2. Select "Install app" or "Add to Home screen"
-3. Tap "Install" to confirm`;
-  
-  alert(message);
-}
-
-function showManualInstallInstructions() {
-  const message = `To add RenterIQ to your home screen:
-
-📱 On Android Chrome:
-1. Tap the menu button (⋮) in the top-right
-2. Select "Add to Home screen" or "Install app"
-3. Tap "Add" or "Install" to confirm
-
-📱 On iOS Safari:
-1. Tap the Share button (□↑)
-2. Select "Add to Home Screen"
-3. Tap "Add" to confirm`;
-  
-  alert(message);
 }
 
 function isIOS() {
@@ -2319,95 +1843,68 @@ function isIOS() {
 }
 
 function isStandalone() {
-  return window.matchMedia('(display-mode: standalone)').matches
-    || window.navigator.standalone === true;
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function installApp() {
+  if (isStandalone()) { window.location.href = '/app/index.html'; return; }
+  if (deferredPrompt && typeof deferredPrompt.prompt === 'function') {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(({outcome}) => {
+      if (outcome === 'accepted') showInstallSuccess();
+      deferredPrompt = null;
+      updateInstallButtons(false);
+    });
+  } else if (isIOS()) {
+    document.getElementById('iosModal').style.display = 'flex';
+  } else if (isMobileBrowser()) {
+    alert('To install: tap the menu button (⋮) in Chrome, then "Add to Home screen".');
+  } else {
+    alert('Look for the install icon (⬇️ or +) in your browser address bar.');
+  }
 }
 
 function showInstallSuccess() {
-  const btns = document.querySelectorAll('.install-btn');
-  btns.forEach(btn => {
-    btn.textContent = '✓ Added to Home Screen';
+  document.querySelectorAll('.install-btn').forEach(btn => {
+    btn.textContent = '✓ App Installed';
     btn.style.background = '#00C896';
     btn.disabled = true;
   });
-}
-
-function showIOSInstructions() {
-  document.getElementById('iosModal').style.display = 'flex';
 }
 
 document.getElementById('iosModalClose')?.addEventListener('click', () => {
   document.getElementById('iosModal').style.display = 'none';
 });
 
-// ========== SMOOTH SCROLL & INIT ==========
-
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function(e) {
-    if (this.classList.contains('install-btn')) return;
-    const href = this.getAttribute('href');
-    if (!href || href === '#' || href.length <= 1) return;
-    const target = document.querySelector(href);
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({behavior: 'smooth', block: 'start'});
-    }
-  });
-});
-
-// Initialize
+// ========== INIT ==========
 window.addEventListener('DOMContentLoaded', () => {
   updateAuthUI();
   showMobileAppBanner();
-  updateInstallButtons(isMobileBrowser()); // Enable on mobile browsers
-  
-  // Check PWA criteria
-  checkPWACriteria();
-  
-  // Add direct event listener to install button
+  if (isMobileBrowser()) updateInstallButtons(true);
+
   const installBtn = document.getElementById('installApp');
-  if (installBtn) {
-    installBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      installApp();
-    });
-  }
-  
-  // Close auth on overlay click
+  if (installBtn) { installBtn.addEventListener('click', (e) => { e.preventDefault(); installApp(); }); }
+
   document.getElementById('authOverlay')?.addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeAuth();
   });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href || href === '#' || href.length <= 1) return;
+      const target = document.querySelector(href);
+      if (target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth',block:'start'}); }
+    });
+  });
 });
 
-function checkPWACriteria() {
-  // PWA validation - no console output in production
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistration().then(reg => {
-      // Service worker registered
-    });
-  }
-}
-
+// Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => {
-        // Service worker registered successfully
-      })
-      .catch(() => {
-        // Service worker registration failed
-      });
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
-}
-
-// Legacy function stubs for backward compatibility
-function toggleFilterPanel() { toggleAdvancedFilters(); }
-function lsFilter() { performSearch(); }
-function lsBook(url) { window.open(url, '_blank'); }
-function lsCloseModal() { 
-  document.getElementById('lsModalOverlay').style.opacity = '0';
-  document.getElementById('lsModal').style.transform = 'translateY(100%)';
-  setTimeout(() => document.getElementById('lsModalOverlay').style.display = 'none', 280);
 }
 </script>
 </body>
