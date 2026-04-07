@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="/app/css/app.css">
+<link rel="stylesheet" href="/app/css/app.css?v=3">
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -16,54 +16,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Lease Review — RenterIQ</title>
 <style>
-/* Shell */
-.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
-.view{flex-direction:column;min-height:100vh;background:var(--blue-xl);transition:opacity .2s ease}
-
-/* Shared Header */
-.sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
-.sh-row{display:flex;align-items:center;justify-content:space-between}
-.sh-back{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:44px}
-.sh-back-arrow{font-size:22px;color:rgba(255,255,255,.8);font-weight:700}
-.sh-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px;text-transform:uppercase}
-.sh-right-text{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.65)}
-.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
-.sh-sub{font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
-.sh-help{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px;min-width:44px}
-
-/* Tags */
+/* Lease-specific tag color overrides (values differ from app.css defaults) */
 .tag-muted{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;background:var(--blue-xl);color:var(--muted)}
 .tag-amber{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;background:var(--amber-lt);color:#7A5500}
 .tag-blue{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;background:rgba(27,80,200,.1);color:var(--blue)}
 
-/* Buttons */
-.btn-blue-c{background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-shadow:0 2px 8px rgba(27,80,200,.2);transition:all .18s var(--ease-smooth)}
-.btn-blue-c:active{transform:scale(.96);box-shadow:0 1px 4px rgba(27,80,200,.15)}
-.btn-muted-c{background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px}
-.btn-outline-c{background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;min-height:44px}
-.btn-full{width:100%}
-.flex-1{flex:1}
 
-/* Sticky Footer */
-.sticky-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10;align-items:center}
-
-/* Bottom Nav */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
-.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
-.nav-tab:active{transform:scale(.92)}
-.tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
-.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
-.tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
-.nav-tab.active .tab-label{color:var(--blue)}
-
-/* Section Labels */
-.sec-label{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 10px}
-
-/* Analysis Animation */
-.gen-icon{width:32px;height:32px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:all .3s}
-@keyframes aiPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(27,80,200,.3)}50%{transform:scale(1.06);box-shadow:0 0 0 16px rgba(27,80,200,0)}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 
 /* Clause Cards */
 .clause-card{background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden;transition:all .2s var(--ease-smooth)}
@@ -204,12 +162,7 @@
     </div>
   </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-    <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-    <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
-    <button class="nav-tab active" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
-  </nav>
+  
 </div>
 
 <!-- VIEW B — ANALYSING -->
@@ -572,12 +525,7 @@
     </div>
   </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-    <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-    <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
-    <button class="nav-tab active" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
-  </nav>
+  
 </div>
 
 </div><!-- /app-shell -->
@@ -860,5 +808,12 @@ document.addEventListener('DOMContentLoaded',function(){
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>
 <script src="/app/js/sidebar.js"></script>
+
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab active"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+</nav>
 </body>
 </html>

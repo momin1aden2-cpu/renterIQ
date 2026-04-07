@@ -6,14 +6,13 @@
 <meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="/app/css/app.css">
+<link rel="stylesheet" href="/app/css/app.css?v=3">
 <script src="/app/js/searchService.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Tracked Properties — RenterIQ</title>
 <style>
-.app-shell{max-width:430px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--blue-xl)}
 .app-header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18);display:flex;align-items:center;justify-content:space-between}
 .app-header h1{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff}
 .back-btn{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:8px;margin:-8px}
@@ -71,12 +70,7 @@
 .import-btn{background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;padding:12px 20px;border-radius:10px;border:none;cursor:pointer}
 .import-btn:hover{background:var(--teal-dk)}
 
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-lt);display:flex;justify-content:space-around;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:100}
-.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;background:none;border:none;cursor:pointer}
-.nav-tab.active .tab-icon{background:var(--blue);color:#fff}
-.nav-tab.active .tab-label{color:var(--blue);font-weight:700}
-.tab-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.tab-label{font-size:11px;font-family:'Sora',sans-serif;color:var(--muted)}
+/* Bottom Nav styles are global — defined in /app/css/app.css */
 </style>
 </head>
 <body>
@@ -114,24 +108,7 @@
     </div>
   </main>
 
-  <nav class="bottom-nav">
-    <button class="nav-tab" onclick="goTo('/app/index.html')">
-      <div class="tab-icon">🏠</div>
-      <span class="tab-label">Home</span>
-    </button>
-    <button class="nav-tab" onclick="goTo('/app/pages/inspection.html')">
-      <div class="tab-icon">�</div>
-      <span class="tab-label">Inspect</span>
-    </button>
-    <button class="nav-tab" onclick="goTo('/app/pages/vault.html')">
-      <div class="tab-icon">�️</div>
-      <span class="tab-label">Vault</span>
-    </button>
-    <button class="nav-tab" onclick="goTo('/app/pages/tools.html')">
-      <div class="tab-icon">�️</div>
-      <span class="tab-label">Tools</span>
-    </button>
-  </nav>
+  
 </div>
 
 <script>
@@ -287,5 +264,11 @@ async function importFromUrl(e) {
 document.addEventListener('DOMContentLoaded', renderProperties);
 </script>
 <script src="/app/js/sidebar.js"></script>
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="goTo('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="goTo('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="goTo('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab" onclick="goTo('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+</nav>
 </body>
 </html>

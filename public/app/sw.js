@@ -1,5 +1,5 @@
-// RenterIQ Service Worker v5 — fast page transitions
-const CACHE_NAME = 'renteriq-v5';
+// RenterIQ Service Worker v6 — nav fixed to viewport (bottom-nav moved to body)
+const CACHE_NAME = 'renteriq-v6';
 const CDN_CACHE  = 'renteriq-cdn-v1';
 
 const APP_SHELL = [

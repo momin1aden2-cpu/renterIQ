@@ -135,6 +135,30 @@
     document.head.appendChild(style);
   }
 
+  /**
+   * liftBottomNav — moves the mobile bottom nav to <body> so that
+   * position:fixed is always relative to the viewport, never to a
+   * parent stacking/scroll-container context (.app-shell, view divs, etc.).
+   *
+   * Also deduplicates: pages with multiple views each embed a copy of
+   * the nav — we keep only the first and remove the rest.
+   */
+  function liftBottomNav() {
+    var navs = document.querySelectorAll('.bottom-nav');
+    if (!navs.length) return;
+
+    // Keep the first nav; remove all subsequent duplicates from the DOM
+    var primaryNav = navs[0];
+    for (var i = 1; i < navs.length; i++) {
+      if (navs[i].parentNode) navs[i].parentNode.removeChild(navs[i]);
+    }
+
+    // Append to <body> — the only guaranteed fixed-position safe container
+    if (primaryNav.parentNode !== document.body) {
+      document.body.appendChild(primaryNav);
+    }
+  }
+
   function injectSidebar() {
     injectDesktopCSS();
 
@@ -222,11 +246,13 @@
   // Run on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
+      liftBottomNav();   // Always runs first — moves nav to <body> before any wrapping
       injectSidebar();
       populateFromCache();
       tryHookAuth();
     });
   } else {
+    liftBottomNav();     // Always runs first — moves nav to <body> before any wrapping
     injectSidebar();
     populateFromCache();
     tryHookAuth();

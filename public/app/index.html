@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
 <link rel="manifest" href="/manifest.json?v=5">
-<link rel="stylesheet" href="/app/css/app.css">
+<link rel="stylesheet" href="/app/css/app.css?v=3">
 <link rel="prefetch" href="/app/pages/tools.html">
 <link rel="prefetch" href="/app/pages/vault.html">
 <link rel="prefetch" href="/app/pages/inspection.html">
@@ -26,9 +26,6 @@
 <script src="/api/firebase-config"></script>
 <title>RenterIQ</title>
 <style>
-/* App Shell */
-.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl);position:relative}
-
 /* Install Banner */
 .install-banner{background:var(--blue-dk);padding:12px 16px;display:flex;align-items:center;gap:12px}
 .install-banner .ib-icon{font-size:22px;flex-shrink:0}
@@ -214,14 +211,7 @@
 /* Content */
 .content{flex:1;overflow-y:auto;padding-bottom:100px}
 
-/* Bottom Nav */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-top:1px solid rgba(213,226,248,.5);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;z-index:100;box-shadow:0 -2px 20px rgba(27,80,200,.04)}
-.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:48px;transition:transform .12s var(--ease-smooth)}
-.nav-tab:active{transform:scale(.92)}
-.tab-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-smooth)}
-.nav-tab.active .tab-icon{background:linear-gradient(135deg,var(--blue),var(--blue-md));box-shadow:0 2px 8px rgba(27,80,200,.3)}
-.tab-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);transition:color .2s}
-.nav-tab.active .tab-label{color:var(--blue)}
+
 
 /* Update Bar */
 .update-bar{position:fixed;bottom:74px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:9999;transform:translateY(30px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:var(--shadow-float)}
@@ -463,24 +453,7 @@
   </div><!-- /content -->
 
   <!-- Bottom Nav (mobile only — hidden on desktop via CSS) -->
-  <nav class="bottom-nav">
-    <button class="nav-tab active" onclick="navigate('/app/index.html')">
-      <div class="tab-icon">🏠</div>
-      <span class="tab-label">Home</span>
-    </button>
-    <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')">
-      <div class="tab-icon">📋</div>
-      <span class="tab-label">Inspect</span>
-    </button>
-    <button class="nav-tab" onclick="navigate('/app/pages/vault.html')">
-      <div class="tab-icon">🗂️</div>
-      <span class="tab-label">Vault</span>
-    </button>
-    <button class="nav-tab" onclick="navigate('/app/pages/tools.html')">
-      <div class="tab-icon">🛠️</div>
-      <span class="tab-label">Tools</span>
-    </button>
-  </nav>
+  
 
   <!-- Update Bar -->
   <div class="update-bar" id="updateBar">
@@ -1222,5 +1195,12 @@ function updateHeaderAvatar(initials) {
 </script>
 
 <script src="/app/js/sidebar.js"></script>
+
+<nav class="bottom-nav">
+  <button class="nav-tab active"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+</nav>
 </body>
 </html>

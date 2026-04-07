@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1B50C8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="/app/css/app.css">
+<link rel="stylesheet" href="/app/css/app.css?v=3">
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -16,7 +16,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Lease Renewal — RenterIQ</title>
 <style>
-.app-shell{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--blue-xl)}
 .rn-header{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
 .rn-row{display:flex;align-items:center;justify-content:space-between}
 .rn-back{background:none;border:none;color:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
@@ -25,14 +24,14 @@
 .rn-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
 .rn-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
 .rn-help{background:rgba(255,255,255,.12);border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:#fff;font-family:'Sora',sans-serif;font-weight:700}
-.view{display:flex;flex-direction:column;min-height:100vh;transition:opacity .2s ease}
+
 .teal-lt{background:rgba(0,200,150,.1)}
 .amber-lt{background:rgba(245,166,35,.1)}
 .blue-lt-bg{background:var(--blue-xl)}
 .sp-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
 .sp-text{font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55}
 .bond-checkbox{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
-@keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
 .change-row{padding:11px 0;border-bottom:1px solid var(--border-lt);display:flex;align-items:flex-start;gap:12px}
 .change-row:last-child{border-bottom:none}
 .change-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
@@ -119,12 +118,7 @@
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
-  <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
-</nav>
+
 </div>
 
 <!-- VIEW B — UPLOAD NEW LEASE -->
@@ -356,12 +350,7 @@
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
-  <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
-</nav>
+
 </div>
 
 </div><!-- /app-shell -->
@@ -554,5 +543,12 @@ document.addEventListener('DOMContentLoaded',function(){
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>
+
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab active"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+</nav>
 </body>
 </html>
