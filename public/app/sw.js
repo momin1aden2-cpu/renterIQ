@@ -1,12 +1,14 @@
-// RenterIQ Service Worker v8 — manifest links fixed to /manifest.json (root scope)
-const CACHE_NAME = 'renteriq-v8';
-const CDN_CACHE  = 'renteriq-cdn-v1';
+// RenterIQ Service Worker v9 — Pristine Rebuild
+// No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
 
-const APP_SHELL = [
-  '/app/',
+var CACHE_NAME = 'renteriq-shell-v9';
+
+var APP_SHELL = [
   '/app/index.html',
   '/app/css/app.css',
   '/app/js/sidebar.js',
+  '/app/js/pwa-init.js',
+  '/app/manifest.json',
   '/app/pages/vault.html',
   '/app/pages/inspection.html',
   '/app/pages/entry-audit.html',
@@ -21,90 +23,66 @@ const APP_SHELL = [
   '/app/pages/routine-inspection.html',
   '/app/pages/tracked.html',
   '/app/pages/webview.html',
+  '/assets/icons/icon-192.png',
+  '/assets/icons/icon-512.png',
   '/assets/logo.svg'
 ];
 
-// CDN origins we want to cache (Firebase SDK, Google Fonts)
-const CDN_ORIGINS = [
-  'https://www.gstatic.com',
-  'https://fonts.googleapis.com',
-  'https://fonts.gstatic.com'
-];
-
-function isCdnRequest(url) {
-  return CDN_ORIGINS.some(function(o) { return url.startsWith(o); });
-}
-
-function isApiRequest(url) {
-  return url.includes('/api/');
-}
-
-self.addEventListener('install', function(event) {
+// ── Install: pre-cache the entire app shell ──────────────────────────────────
+self.addEventListener('install', function (event) {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
+    caches.open(CACHE_NAME).then(function (cache) {
       return cache.addAll(APP_SHELL);
+    }).then(function () {
+      return self.skipWaiting();
     })
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', function(event) {
+// ── Activate: wipe old caches and claim all clients immediately ──────────────
+self.addEventListener('activate', function (event) {
   event.waitUntil(
-    caches.keys().then(function(cacheNames) {
+    caches.keys().then(function (cacheNames) {
       return Promise.all(
-        cacheNames.filter(function(n) {
-          return n !== CACHE_NAME && n !== CDN_CACHE;
-        }).map(function(n) { return caches.delete(n); })
+        cacheNames
+          .filter(function (name) { return name !== CACHE_NAME; })
+          .map(function (name) { return caches.delete(name); })
       );
-    }).then(function() {
+    }).then(function () {
       return self.clients.claim();
     })
   );
 });
 
-self.addEventListener('fetch', function(event) {
+// ── Fetch: cache-first for local assets, network-only for API calls ──────────
+self.addEventListener('fetch', function (event) {
   var url = event.request.url;
 
-  // Never cache API calls
-  if (isApiRequest(url)) {
+  // Never intercept API calls — always hit the network
+  if (url.includes('/api/')) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // CDN resources: stale-while-revalidate (instant from cache, update in background)
-  if (isCdnRequest(url)) {
-    event.respondWith(
-      caches.open(CDN_CACHE).then(function(cache) {
-        return cache.match(event.request).then(function(cached) {
-          var fetchPromise = fetch(event.request).then(function(networkResponse) {
-            if (networkResponse && networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          }).catch(function() { return cached; });
-          return cached || fetchPromise;
-        });
-      })
-    );
+  // Ignore non-GET and chrome-extension requests
+  if (event.request.method !== 'GET' || url.startsWith('chrome-extension')) {
     return;
   }
 
-  // Local assets: cache-first
+  // Cache-first: serve from cache, fallback to network and cache the response
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request).then(function(networkResponse) {
-        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
-          var clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clone); });
+    caches.match(event.request).then(function (cached) {
+      if (cached) { return cached; }
+
+      return fetch(event.request).then(function (response) {
+        if (response && response.status === 200) {
+          var clone = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(event.request, clone);
+          });
         }
-        return networkResponse;
+        return response;
       });
     })
   );
-});
-
-self.addEventListener('message', function(event) {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
 });
