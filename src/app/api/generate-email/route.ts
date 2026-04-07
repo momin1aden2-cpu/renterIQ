@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
-    const itemSummary = items.map((item: any, i: number) => 
+    const itemSummary = items.map((item: Record<string, string>, i: number) => 
       `${i + 1}. ${item.type || 'Document'}: ${item.name || item.title || 'Untitled'} (${item.date || 'No date'})`
     ).join('\n');
 
@@ -85,7 +85,7 @@ Generate a professional email that references these documents appropriately.`;
         body: text,
         tone: 'polite',
         keyPoints: ['Email draft generated'],
-        attachmentsMentioned: items.map((i: any) => i.name || i.title || 'Document')
+        attachmentsMentioned: items.map((i: Record<string, string>) => i.name || i.title || 'Document')
       });
     }
   } catch (error) {
@@ -97,11 +97,12 @@ Generate a professional email that references these documents appropriately.`;
   }
 }
 
-function getMockEmail(items: any[], recipient?: string, purpose?: string, state: string = 'VIC') {
+function getMockEmail(items: Record<string, string>[], recipient?: string, purpose?: string, state: string = 'VIC') {
   const itemNames = items.map(i => i.name || i.title || 'Document').join(', ');
   const today = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
   
-  const purposes: Record<string, any> = {
+  type EmailTemplate = { subject: string; body: string; tone: string; keyPoints: string[]; attachmentsMentioned: string[] };
+  const purposes: Record<string, EmailTemplate> = {
     'maintenance': {
       subject: 'Urgent: Maintenance Request for Property',
       body: `Dear ${recipient || 'Property Manager'},
