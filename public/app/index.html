@@ -20,10 +20,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="/api/firebase-config"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
 <title>RenterIQ</title>
 <style>
 /* ── Home Header ──────────────────────────────────────────── */
@@ -1290,88 +1290,108 @@ function showToast(title, sub, icon) {
 }
 
 function navigate(path) {
-  // Instant visual feedback — fade out before navigation
+  // When View Transitions are supported the browser animates the navigation
+  // automatically — skip the manual fade to avoid fighting the CSS animation.
+  if (CSS && CSS.supports && CSS.supports('view-transition-name', 'none')) {
+    window.location.href = path;
+    return;
+  }
   document.body.style.transition = 'opacity .12s ease';
   document.body.style.opacity = '0';
   setTimeout(function() { window.location.href = path; }, 100);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Firebase config loaded securely from /api/firebase-config (.env.local)
   firebase.initializeApp(window.__FIREBASE_CONFIG__);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // Check authentication
-  auth.onAuthStateChanged((user) => {
-    // In development (localhost), allow access without authentication
+  // ── Instant paint from cache ──────────────────────────────────
+  // Populate greeting and avatar from localStorage the moment the DOM is
+  // ready — before the async onAuthStateChanged callback resolves. This
+  // ensures the page looks complete on every in-app navigation with zero
+  // perceived latency. The real auth data reconciles silently underneath.
+  (function renderFromCache() {
+    try {
+      var name     = localStorage.getItem('riq-user-name');
+      var initials = localStorage.getItem('riq-user-initials') || (name ? name[0].toUpperCase() : '?');
+      if (!name) return;
+      var greetEl = document.getElementById('greeting');
+      if (greetEl) greetEl.textContent = getGreeting() + ', ' + name.split(' ')[0];
+      var dateEl = document.getElementById('currentDate');
+      if (dateEl) dateEl.textContent = formatDate(new Date());
+      updateHeaderAvatar(initials);
+    } catch(e) {}
+  })();
+
+  // ── Splash screen ─────────────────────────────────────────────
+  // Show the full-screen splash only on the first cold boot of a PWA session
+  // (i.e. when the user taps the home-screen icon). Every subsequent in-app
+  // navigation skips it immediately so View Transitions are never blocked.
+  var splash = document.getElementById('splashScreen');
+  if (splash) {
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    var freshBoot    = !sessionStorage.getItem('riq-splash-shown');
+    if (isStandalone && freshBoot) {
+      sessionStorage.setItem('riq-splash-shown', '1');
+      var sbar = document.getElementById('splashBar');
+      if (sbar) setTimeout(function() { sbar.style.transition = 'width 1.3s ease'; sbar.style.width = '100%'; }, 100);
+      setTimeout(function() {
+        splash.style.transition = 'opacity .3s ease';
+        splash.style.opacity = '0';
+        setTimeout(function() { splash.remove(); showOnboardingIfNew(); }, 300);
+      }, 1500);
+    } else {
+      // In-app navigation or browser tab: remove immediately, never block the transition
+      splash.remove();
+      setTimeout(showOnboardingIfNew, 400);
+    }
+  }
+
+  // ── Auth state ────────────────────────────────────────────────
+  auth.onAuthStateChanged(function(user) {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       initializeApp(user || { displayName: 'Dev User', email: 'dev@test.com' });
       return;
     }
-    
     if (!user) {
-      // Not signed in, redirect to landing page
       window.location.href = '/';
       return;
     }
-    
-    // User is signed in, proceed with app initialization
     initializeApp(user);
   });
-  
-  function initializeApp(user) {
-    // Greeting
-    var greetEl = document.getElementById('greeting');
-    if (greetEl) greetEl.textContent = getGreeting() + (user.displayName ? ', ' + user.displayName.split(' ')[0] : '');
 
-    // Date
+  // Called once Firebase confirms the session. Reconciles any stale cache
+  // values and updates persistent state for downstream pages.
+  function initializeApp(user) {
+    var displayName = user.displayName || user.email.split('@')[0];
+    var initials    = (user.displayName || user.email || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+
+    var greetEl = document.getElementById('greeting');
+    if (greetEl) greetEl.textContent = getGreeting() + ', ' + displayName.split(' ')[0];
     var dateEl = document.getElementById('currentDate');
     if (dateEl) dateEl.textContent = formatDate(new Date());
 
-    // User info
-    var displayName = user.displayName || user.email.split('@')[0];
-    var initials = (user.displayName || user.email || 'U').split(' ').map(function(n){ return n[0]; }).slice(0,2).join('').toUpperCase();
-    
-    // Populate sidebar user info (sidebar.js IDs)
-    var sidebarName = document.getElementById('sidebarUserName');
+    var sidebarName   = document.getElementById('sidebarUserName');
     var sidebarAvatar = document.getElementById('sidebarAvatar');
-    if (sidebarName) sidebarName.textContent = displayName;
+    if (sidebarName)   sidebarName.textContent   = displayName;
     if (sidebarAvatar) sidebarAvatar.textContent = initials;
-    
-    // Populate header avatar (mobile)
     updateHeaderAvatar(initials);
-    
-    // Cache for other pages
-    try { localStorage.setItem('riq-user-name', displayName); localStorage.setItem('riq-user-initials', initials); } catch(e) {}
 
-    // Animate lease progress bar
+    try {
+      localStorage.setItem('riq-user-name',     displayName);
+      localStorage.setItem('riq-user-initials', initials);
+    } catch(e) {}
+
     setTimeout(function() {
       var bar = document.getElementById('leaseBar');
       if (bar) bar.style.width = '41%';
     }, 300);
 
-    // Conditional card display based on appState
     var renewalCard = document.getElementById('renewalCard');
     if (renewalCard) renewalCard.style.display = appState.daysUntilLeaseEnd <= 90 ? 'block' : 'none';
-
     var maintenanceCard = document.getElementById('maintenanceCard');
     if (maintenanceCard) maintenanceCard.style.display = appState.maintenanceOpen ? 'block' : 'none';
-
-    // Splash screen — only in standalone PWA mode
-    var splash = document.getElementById('splashScreen');
-    if (splash && window.matchMedia('(display-mode: standalone)').matches) {
-      var sbar = document.getElementById('splashBar');
-      if (sbar) { setTimeout(function(){ sbar.style.transition='width 1.3s ease'; sbar.style.width='100%'; }, 100); }
-      setTimeout(function() {
-        splash.style.transition = 'opacity .3s ease';
-        splash.style.opacity = '0';
-        setTimeout(function(){ splash.remove(); showOnboardingIfNew(); }, 300);
-      }, 1500);
-    } else if (splash) {
-      splash.remove();
-      setTimeout(showOnboardingIfNew, 400);
-    }
   }
 });
 

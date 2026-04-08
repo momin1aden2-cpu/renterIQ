@@ -24,10 +24,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="/api/firebase-config"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
 
 <style>
 /* ========== RESET & BASE ========== */
@@ -1324,10 +1324,10 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 </div>
 
 <script>
-// ========== FIREBASE INITIALIZATION ==========
-firebase.initializeApp(window.__FIREBASE_CONFIG__);
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Firebase references declared here so all functions in this script can close over them.
+// Actual initialization is deferred to DOMContentLoaded — by that point all deferred
+// SDK scripts have already executed and window.__FIREBASE_CONFIG__ is populated.
+let auth, db;
 
 // ========== MOBILE NAV TOGGLE ==========
 function toggleMobileNav() {
@@ -1792,7 +1792,7 @@ document.addEventListener('click', (e) => {
   if (wrap && dropdown && !wrap.contains(e.target)) dropdown.classList.remove('open');
 });
 
-auth.onAuthStateChanged((user) => { updateAuthUI(); });
+// auth.onAuthStateChanged registered inside DOMContentLoaded after Firebase init
 
 // ========== MOBILE APP BANNER ==========
 function showMobileAppBanner() {
@@ -1878,6 +1878,13 @@ document.getElementById('iosModalClose')?.addEventListener('click', () => {
 
 // ========== INIT ==========
 window.addEventListener('DOMContentLoaded', () => {
+  // Deferred Firebase SDK scripts have fully executed by this point.
+  // Safe to initialize and register the auth state observer.
+  firebase.initializeApp(window.__FIREBASE_CONFIG__);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  auth.onAuthStateChanged(() => { updateAuthUI(); });
+
   updateAuthUI();
   showMobileAppBanner();
   if (isMobileBrowser()) updateInstallButtons(true);

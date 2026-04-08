@@ -196,15 +196,19 @@
       '/app/pages/tools.html': '/tools',
     };
     var route = routeMap[path] || path;
+    var dest = (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) ? route : path;
+
+    // When the browser supports cross-document View Transitions (@view-transition in CSS),
+    // it animates the navigation automatically — skip the manual fade entirely.
+    if (CSS && CSS.supports && CSS.supports('view-transition-name', 'none')) {
+      window.location.href = dest;
+      return;
+    }
+
+    // Fallback for browsers without View Transitions support
     document.body.style.opacity = '0';
-    document.body.style.transition = 'opacity .18s';
-    setTimeout(function() {
-      if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
-        window.location.href = route;
-      } else {
-        window.location.href = path;
-      }
-    }, 180);
+    document.body.style.transition = 'opacity .18s ease';
+    setTimeout(function() { window.location.href = dest; }, 180);
   };
 
   // Populate user info from any source
@@ -243,6 +247,34 @@
     }
   }
 
+  // Prefetch all navigable app pages so subsequent loads are near-instant
+  function prefetchAppPages() {
+    var pages = [
+      '/app/index.html',
+      '/app/pages/inspection.html',
+      '/app/pages/vault.html',
+      '/app/pages/entry-audit.html',
+      '/app/pages/lease.html',
+      '/app/pages/routine-inspection.html',
+      '/app/pages/rights.html',
+      '/app/pages/exit.html',
+      '/app/pages/profile.html',
+      '/app/pages/tools.html',
+      '/app/pages/tracked.html',
+      '/app/pages/notifications.html',
+      '/app/pages/renewal.html',
+      '/app/pages/application.html',
+    ];
+    pages.forEach(function(href) {
+      if (document.querySelector('link[rel="prefetch"][href="' + href + '"]')) return;
+      var link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = href;
+      link.as = 'document';
+      document.head.appendChild(link);
+    });
+  }
+
   // Run on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
@@ -250,11 +282,13 @@
       injectSidebar();
       populateFromCache();
       tryHookAuth();
+      prefetchAppPages();
     });
   } else {
     liftBottomNav();     // Always runs first — moves nav to <body> before any wrapping
     injectSidebar();
     populateFromCache();
     tryHookAuth();
+    prefetchAppPages();
   }
 })();
