@@ -14,6 +14,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -37,8 +39,9 @@
 .vault-stat{text-align:center}
 .vault-stat-num{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#fff}
 .vault-stat-label{font-family:'Nunito',sans-serif;font-weight:600;font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
-.folder-card{background:#fff;border-radius:18px;padding:16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth);box-shadow:var(--shadow-card)}
-.folder-card:active{transform:scale(.97);box-shadow:none}
+.folder-card{background:#fff;border-radius:20px;padding:20px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth);box-shadow:0 2px 12px rgba(0,0,0,0.04);margin-bottom:12px}
+.folder-card:active{transform:scale(0.98);box-shadow:0 1px 6px rgba(0,0,0,0.02)}
+.folder-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.08)}
 .activity-row{padding:13px 16px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .activity-row:last-child{border-bottom:none}
 .activity-row:active{background:var(--blue-xl)}
@@ -83,17 +86,18 @@
     <div class="sh-title">Your Vault</div>
     <div class="sh-sub">Your documents &amp; records</div>
   </header>
-  <div style="background:var(--blue-dk);padding:14px 20px;display:flex;justify-content:space-between">
+  <div style="background:var(--blue-dk);padding:16px 24px;display:flex;justify-content:space-between;gap:8px">
     <div class="vault-stat"><div class="vault-stat-num">0</div><div class="vault-stat-label">Documents</div></div>
     <div class="vault-stat"><div class="vault-stat-num">0</div><div class="vault-stat-label">Photos</div></div>
     <div class="vault-stat"><div class="vault-stat-num">0</div><div class="vault-stat-label">Reports</div></div>
     <div class="vault-stat"><div class="vault-stat-num">—</div><div class="vault-stat-label">Protected</div></div>
   </div>
   <div style="flex:1;overflow-y:auto;padding-bottom:100px">
-    <div style="margin:16px;background:#fff;border-radius:18px;padding:20px;border:1.5px dashed var(--border);text-align:center;color:var(--muted)">
-      <div style="font-size:32px;margin-bottom:8px">🏠</div>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:4px">No active property</div>
-      <div style="font-size:12px">Add your lease to start tracking your tenancy.</div>
+    <div style="margin:16px;background:#fff;border-radius:24px;padding:32px 24px;border:2px dashed var(--border-lt);text-align:center;color:var(--muted);box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+      <div style="font-size:48px;margin-bottom:16px">🏠</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--blue-dk);margin-bottom:8px">No active property</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.5">Add your lease to start tracking your tenancy and storing documents.</div>
+      <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:16px 24px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(27,80,200,0.2);transition:all 0.2s var(--ease-smooth)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(27,80,200,0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(27,80,200,0.2)'" onclick="showToast('Feature coming soon','Lease upload will be available soon','📄')">Add Your First Lease</button>
     </div>
     <div style="padding:20px 16px 10px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Your Documents</div><div style="font-weight:600;font-size:12px;color:var(--muted)">All stored securely</div></div>
     <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px">

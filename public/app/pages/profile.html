@@ -14,6 +14,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<!-- Authentication Guard -->
+<script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,18 +25,19 @@
 <script src="/app/js/pwa-init.js" defer></script>
 <style>
 
-.pr-header{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 28px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
-.pr-header-sm{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.pr-header{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:16px 20px 32px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.pr-header-sm{background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:16px 20px 24px;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
 .pr-row{display:flex;align-items:center;justify-content:space-between}
-.pr-back{background:none;border:none;color:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.pr-back{background:none;border:none;color:#fff;display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;margin:-8px 0;-webkit-tap-highlight-color:transparent;border-radius:8px;transition:background-color 0.2s var(--ease-smooth)}
+.pr-back:active{background-color:rgba(255,255,255,0.1)}
 .pr-back-arrow{font-size:22px;font-weight:700;line-height:1}
 .pr-back-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;opacity:.7}
 .pr-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
 .pr-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
 .sec-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 8px}
-.settings-row{min-height:52px;padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s var(--ease-smooth)}
-.settings-row:last-child{border-bottom:none}
-.settings-row:active{background:rgba(27,80,200,.03);transform:scale(.99)}
+.settings-row{min-height:56px;padding:16px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s var(--ease-smooth);border-radius:8px;margin:0 0 8px 0}
+.settings-row:last-child{border-bottom:none;margin-bottom:0}
+.settings-row:active{background:rgba(27,80,200,.05);transform:scale(0.98);box-shadow:0 2px 8px rgba(0,0,0,0.05)}
 .settings-icon{font-size:20px;width:22px;text-align:center;flex-shrink:0}
 .settings-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
 .settings-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px}
@@ -40,8 +45,9 @@
 .settings-chevron{color:var(--muted);font-size:20px;flex-shrink:0;margin-left:auto}
 .notif-toggle{width:36px;height:20px;border-radius:100px;display:flex;align-items:center;padding:2px;cursor:pointer;flex-shrink:0;transition:background .2s;position:relative}
 .notif-toggle-dot{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;transition:all .2s}
-.danger-row{min-height:52px;padding:14px;border-bottom:1px solid rgba(232,64,64,.15);display:flex;align-items:center;gap:13px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.danger-row:last-child{border-bottom:none}
+.danger-row{min-height:56px;padding:16px;border-bottom:1px solid rgba(232,64,64,.15);display:flex;align-items:center;gap:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:8px;margin:0 0 8px 0}
+.danger-row:last-child{border-bottom:none;margin-bottom:0}
+.danger-row:active{background:rgba(232,64,64,.05);transform:scale(0.98);box-shadow:0 2px 8px rgba(232,64,64,0.05)}
 .form-field{padding:13px 14px;border-bottom:1px solid var(--border-lt)}
 .form-field:last-child{border-bottom:none}
 .form-label{display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
@@ -136,8 +142,8 @@
 <!-- SECTION 6: ABOUT -->
 <div class="sec-label">About</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">ℹ️</span><div style="flex:1"><div class="settings-title">About RenterIQ</div></div><span class="settings-right" style="color:var(--muted)">v1.0.0 Beta</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
-  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Legal</div><div class="settings-sub">Privacy Policy · Terms · Disclaimer</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('https://renteriq.com.au/about.html', '_blank')"><span class="settings-icon">ℹ️</span><div style="flex:1"><div class="settings-title">About RenterIQ</div></div><span class="settings-right" style="color:var(--muted)">v1.0.0 Beta</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+  <div class="settings-row"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Legal</div><div class="settings-sub" style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap"><a href="https://renteriq.com.au/privacy.html" target="_blank" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--blue);text-decoration:none;transition:opacity 0.2s;opacity:0.9" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Privacy Policy</a><span style="color:var(--muted)">·</span><a href="https://renteriq.com.au/terms.html" target="_blank" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--blue);text-decoration:none;transition:opacity 0.2s;opacity:0.9" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Terms</a><span style="color:var(--muted)">·</span><a href="https://renteriq.com.au/disclaimer.html" target="_blank" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--blue);text-decoration:none;transition:opacity 0.2s;opacity:0.9" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Disclaimer</a></div></div><span class="settings-chevron">›</span></div>
 </div>
 
 <!-- DANGER ZONE -->
@@ -716,12 +722,104 @@ function notifyMe(){
 
 // Danger Zone
 function signOut(){
-  showToast('Signing out…','Return to the home screen to sign back in','🚪');
-  setTimeout(function(){navigate('/app/index.html')},1500);
+  showToast('Signing out…','Clearing session and redirecting to login','🚪');
+  
+  // Ensure Firebase is initialized
+  if (typeof firebase === 'undefined' || !firebase.auth) {
+    console.warn('[RenterIQ] Firebase auth not available, using fallback');
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // Check if Firebase app is initialized
+  if (!firebase.apps || firebase.apps.length === 0) {
+    console.warn('[RenterIQ] No Firebase app initialized, using fallback');
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+    return;
+  }
+
+  try {
+    firebase.auth().signOut().then(() => {
+      // Clear all local app storage
+      localStorage.clear();
+      sessionStorage.clear();
+      // Redirect to landing/login page
+      window.location.href = 'index.html';
+    }).catch((error) => {
+      console.error('[RenterIQ] Sign out error:', error);
+      showToast('Sign out failed', 'Please try again', '❌');
+      // Fallback on error
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = 'index.html';
+    });
+  } catch (error) {
+    console.error('[RenterIQ] Sign out exception:', error);
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+  }
 }
 
 function confirmDelete(){
-  showToast('Are you sure?','Tap delete again to permanently remove all your data','🗑️');
+  // Show confirmation modal
+  if (confirm('⚠️ Delete Account Permanently?\n\nThis will delete all your data from RenterIQ, including your Vault documents, inspection reports, and profile.\n\nThis action cannot be undone.')) {
+    deleteAccount();
+  }
+}
+
+function deleteAccount() {
+  showToast('Deleting account…', 'Please wait', '🗑️');
+  
+  // Check Firebase availability
+  if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) {
+    showToast('Firebase not loaded', 'Please refresh and try again', '❌');
+    return;
+  }
+  
+  // Ensure Firebase app is initialized
+  if (!firebase.apps || firebase.apps.length === 0) {
+    showToast('Firebase not initialized', 'Please refresh the page', '❌');
+    return;
+  }
+  
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    showToast('No user logged in', 'Please sign in again', '❌');
+    return;
+  }
+  
+  const userId = user.uid;
+  const db = firebase.firestore();
+  
+  // Delete user data from 'users' collection
+  db.collection('users').doc(userId).delete()
+    .then(() => {
+      // Delete the user account
+      return user.delete();
+    })
+    .then(() => {
+      // Clear local storage
+      localStorage.clear();
+      sessionStorage.clear();
+      // Redirect to login page
+      showToast('Account deleted', 'All data removed successfully', '✅');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    })
+    .catch((error) => {
+      console.error('[RenterIQ] Delete account error:', error);
+      if (error.code === 'auth/requires-recent-login') {
+        showToast('Re-authentication required', 'Please sign out and sign in again, then try deleting', '🔐');
+      } else {
+        showToast('Delete failed', error.message || 'Please try again later', '❌');
+      }
+    });
 }
 
 function confirmDataDelete(){
