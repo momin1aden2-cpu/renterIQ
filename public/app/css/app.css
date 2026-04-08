@@ -200,7 +200,8 @@ ul  { list-style: none; }
 /* ── Screen Header (.screen-header) ────────────────────────── */
 .screen-header {
   background: var(--hdr-grad);
-  padding: 16px 20px 24px;
+  /* iOS notch / Dynamic Island / Android status bar */
+  padding: max(16px, env(safe-area-inset-top, 16px)) 20px 24px;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -248,7 +249,8 @@ ul  { list-style: none; }
   top: 0;
   z-index: 10;
   background: var(--hdr-grad);
-  padding: 16px 20px 24px;
+  /* iOS notch / Dynamic Island safe area */
+  padding: max(14px, env(safe-area-inset-top, 14px)) 20px 24px;
   box-shadow: 0 2px 24px rgba(10, 36, 96, .22);
   backdrop-filter: blur(12px) saturate(1.4);
   -webkit-backdrop-filter: blur(12px) saturate(1.4);
@@ -1117,24 +1119,116 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
+/* ── iPad / Tablet (768–899px) ──────────────────────────────── */
 @media (min-width: 768px) and (max-width: 899px) {
+  html, body { overflow-y: auto; overflow-x: hidden; }
+
   .app-shell {
-    max-width: none !important;
+    max-width: 640px !important;
+    /* Centre the shell with background sides */
+    box-shadow: 0 0 60px rgba(10, 36, 96, .12);
   }
 
   .bottom-nav {
-    max-width: none;
-    left: 0;
-    right: 0;
+    max-width: 640px;
+    left: 50% !important;
+    transform: translateX(-50%);
+    right: auto !important;
+    border-radius: 24px 24px 0 0;
+    border: 1px solid rgba(213, 226, 248, .45);
+    border-bottom: none;
   }
 
   .content {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 28px;
+    padding-right: 28px;
     padding-bottom: 100px;
   }
 }
 
+
+/* ── Journey Step Cards ─────────────────────────────────────── */
+.journey-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 76px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .15s var(--ease-smooth);
+}
+.journey-step:active { transform: scale(.90); }
+.journey-node {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 10px rgba(27,80,200,.18);
+  transition: box-shadow .15s;
+}
+.journey-step:active .journey-node {
+  box-shadow: 0 1px 4px rgba(27,80,200,.12);
+}
+.journey-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 10.5px;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.3;
+  letter-spacing: -.1px;
+}
+
+/* ── Tools Quick-Grid ───────────────────────────────────────── */
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.tool-chip {
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 10px;
+  border: 1px solid var(--border-lt);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .14s var(--ease-smooth), box-shadow .14s;
+  text-align: center;
+}
+.tool-chip:active {
+  transform: scale(.93);
+  box-shadow: 0 1px 4px rgba(27,80,200,.06);
+}
+.tool-chip-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.tool-chip-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.3;
+  letter-spacing: -.1px;
+}
 
 /* ── Desktop Premium Interactions ───────────────────────────── */
 @media (min-width: 900px) {

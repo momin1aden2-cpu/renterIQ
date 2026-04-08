@@ -1086,7 +1086,7 @@
   <!-- ── Scrollable Content ──────────────────────────────── -->
   <div class="content">
 
-    <!-- Search Card (overlaps header) -->
+    <!-- ── Search Card (pulls up over header) ─────────────── -->
     <div style="padding:0 16px;margin-top:-20px;position:relative;z-index:5">
       <div class="search-card">
         <div class="sc-label">Find a Rental</div>
@@ -1099,20 +1099,19 @@
           <div class="sc-drop" id="homeSearchDrop"></div>
         </div>
         <div id="homeProviders" class="sc-providers" style="display:none"></div>
-        <!-- Track URL Box -->
         <div id="homeTrackBox" class="track-url-box" style="display:none">
           <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase">🔗 Track a Property</div>
           <div class="track-url-row">
             <input class="track-url-input" id="homeTrackUrl" type="url" placeholder="Paste property URL here…">
             <button class="track-url-btn" onclick="homeTrackProperty()">Save</button>
           </div>
-          <div id="homeTrackHint" style="font-size:11px;color:var(--muted);margin-top:7px;font-weight:600;line-height:1.55">💡 Open a listing on any site above, copy its URL and paste here to track it in RenterIQ.</div>
+          <div id="homeTrackHint" style="font-size:11px;color:var(--muted);margin-top:7px;font-weight:600;line-height:1.55">💡 Paste a listing URL from any site above to track it.</div>
         </div>
       </div>
     </div>
 
-    <!-- Inspection Reminder Banner (shown when inspection is within 24h) -->
-    <div id="reminderBanner" style="padding:0 16px;margin-top:16px;display:none">
+    <!-- ── Inspection Reminder Banner ─────────────────────── -->
+    <div id="reminderBanner" style="padding:0 16px;margin-top:14px;display:none">
       <div class="reminder-banner">
         <span class="rb-icon">🔔</span>
         <div class="rb-body">
@@ -1123,7 +1122,68 @@
       </div>
     </div>
 
-    <!-- My Tracked Properties -->
+    <!-- ── Renting Journey Timeline ────────────────────────── -->
+    <div style="padding:20px 16px 0">
+      <div class="sec-row" style="margin-bottom:14px">
+        <span class="sec-title">Your Renting Journey</span>
+        <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted)">7 steps</span>
+      </div>
+      <div style="background:#fff;border-radius:20px;padding:20px 16px 18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card)">
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x;margin:0 -16px;padding:0 16px 2px">
+          <div style="display:flex;align-items:flex-start;min-width:max-content;position:relative;gap:0">
+
+            <!-- Track connector line (sits behind nodes) -->
+            <div style="position:absolute;top:20px;left:38px;right:38px;height:2px;background:linear-gradient(90deg,var(--blue-lt),var(--border-lt));z-index:0;pointer-events:none"></div>
+
+            <!-- 1 Search -->
+            <div class="journey-step" onclick="document.getElementById('homeSearchInput').focus();document.getElementById('homeSearchInput').scrollIntoView({behavior:'smooth'})">
+              <div class="journey-node" style="background:linear-gradient(135deg,var(--blue),var(--blue-md))">🔍</div>
+              <span class="journey-label">Search</span>
+            </div>
+
+            <!-- 2 Inspect -->
+            <div class="journey-step" onclick="navigate('/app/pages/inspection.html')">
+              <div class="journey-node" style="background:linear-gradient(135deg,#2E63E0,#4A7FF0)">📋</div>
+              <span class="journey-label">Inspect</span>
+            </div>
+
+            <!-- 3 Apply -->
+            <div class="journey-step" onclick="navigate('/app/pages/application.html')">
+              <div class="journey-node" style="background:linear-gradient(135deg,#E88A00,#F5A623)">📝</div>
+              <span class="journey-label">Apply</span>
+            </div>
+
+            <!-- 4 Lease -->
+            <div class="journey-step" onclick="navigate('/app/pages/lease.html')">
+              <div class="journey-node" style="background:linear-gradient(135deg,#0A2460,#1B50C8)">📑</div>
+              <span class="journey-label">Lease</span>
+            </div>
+
+            <!-- 5 Move In -->
+            <div class="journey-step" onclick="navigate('/app/pages/entry-audit.html')">
+              <div class="journey-node" style="background:linear-gradient(135deg,var(--teal),#00DBA6)">🏠</div>
+              <span class="journey-label">Move In</span>
+            </div>
+
+            <!-- 6 Living -->
+            <div class="journey-step" onclick="navigate('/app/pages/routine-inspection.html')">
+              <div class="journey-node" style="background:linear-gradient(135deg,#1B50C8,#2E63E0)">🛡️</div>
+              <span class="journey-label">Living</span>
+            </div>
+
+            <!-- 7 Exit & Bond -->
+            <div class="journey-step" onclick="navigate('/app/pages/exit.html')">
+              <div class="journey-node" style="background:linear-gradient(135deg,#009E78,var(--teal))">💰</div>
+              <span class="journey-label">Exit &amp; Bond</span>
+            </div>
+
+          </div>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:14px">Tap any step to jump straight in.</div>
+      </div>
+    </div>
+
+    <!-- ── Contextual: Tracked Properties ─────────────────── -->
     <div id="trackedSection" style="padding:20px 16px 0;display:none">
       <div class="sec-row">
         <span class="sec-title">My Tracked Properties</span>
@@ -1132,25 +1192,57 @@
       <div id="trackedList" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
-    <!-- Upcoming Inspections -->
+    <!-- ── Contextual: Upcoming Inspections ───────────────── -->
+    <div id="upcomingInspSection" style="display:none;padding:20px 16px 0">
+      <div class="sec-row"><span class="sec-title">Upcoming Inspections</span></div>
+      <div id="upcomingInspContainer" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <!-- ── Contextual: Maintenance Alert ──────────────────── -->
+    <div id="maintenanceCard" style="display:none;padding:16px 16px 0"></div>
+
+    <!-- ── Contextual: Lease Expiry Reminder ──────────────── -->
+    <div id="renewalCard" style="display:none;padding:16px 16px 0"></div>
+
+    <!-- ── Tools Grid ──────────────────────────────────────── -->
     <div style="padding:20px 16px 0">
-      <div class="sec-row">
-        <span class="sec-title">Upcoming Inspections</span>
+      <div class="sec-row" style="margin-bottom:14px">
+        <span class="sec-title">Tools</span>
+        <span class="sec-link" onclick="navigate('/app/pages/tools.html')">See all →</span>
       </div>
-      <div id="upcomingInspContainer">
-        <div style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);padding:28px 16px;text-align:center">
-          <div style="font-size:36px;margin-bottom:10px">📅</div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:5px">No inspections booked yet</div>
-          <div style="font-size:12px;font-weight:600;color:var(--muted)">Track a property above and set an inspection date.</div>
+      <div class="tools-grid">
+        <div class="tool-chip" onclick="navigate('/app/pages/entry-audit.html')">
+          <div class="tool-chip-icon" style="background:rgba(0,200,150,.10)">🏠</div>
+          <span class="tool-chip-label">Move-In Audit</span>
+        </div>
+        <div class="tool-chip" onclick="navigate('/app/pages/lease.html')">
+          <div class="tool-chip-icon" style="background:rgba(27,80,200,.08)">📑</div>
+          <span class="tool-chip-label">Lease Review</span>
+        </div>
+        <div class="tool-chip" onclick="navigate('/app/pages/routine-inspection.html')">
+          <div class="tool-chip-icon" style="background:rgba(27,80,200,.06)">📋</div>
+          <span class="tool-chip-label">Routine Inspect</span>
+        </div>
+        <div class="tool-chip" onclick="navigate('/app/pages/exit.html')">
+          <div class="tool-chip-icon" style="background:rgba(0,200,150,.08)">💰</div>
+          <span class="tool-chip-label">Exit &amp; Bond</span>
+        </div>
+        <div class="tool-chip" onclick="navigate('/app/pages/rights.html')">
+          <div class="tool-chip-icon" style="background:rgba(27,80,200,.06)">⚖️</div>
+          <span class="tool-chip-label">Rights Hub</span>
+        </div>
+        <div class="tool-chip" onclick="navigate('/app/pages/application.html')">
+          <div class="tool-chip-icon" style="background:rgba(245,166,35,.08)">📝</div>
+          <span class="tool-chip-label">Renter Resume</span>
         </div>
       </div>
     </div>
 
-    <!-- Vault Snapshot -->
+    <!-- ── Vault Snapshot ──────────────────────────────────── -->
     <div style="padding:20px 16px 0">
       <div class="sec-row">
         <span class="sec-title">Your Vault</span>
-        <span class="sec-link" onclick="navigate('/app/pages/vault.html')">Open Vault →</span>
+        <span class="sec-link" onclick="navigate('/app/pages/vault.html')">Open →</span>
       </div>
       <div class="vault-grid">
         <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
@@ -1170,66 +1262,25 @@
           <span class="vs-label">Receipts Saved</span>
         </div>
       </div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);text-align:right;margin-top:8px;padding-right:2px">Numbers update as you use the app</div>
     </div>
 
-    <!-- Maintenance Alert -->
-    <div id="maintenanceCard" style="display:none;padding:16px 16px 0"></div>
-
-    <!-- Lease Review — Feature Card -->
-    <div style="padding:16px 16px 0" onclick="navigate('/app/pages/lease.html')">
-      <div class="feature-card blue-border">
-        <div class="fc-icon blue">📑</div>
-        <div class="fc-body">
-          <div class="fc-title">Review Your Lease Agreement</div>
-          <div class="fc-sub">Upload your lease — RenterIQ explains every clause in plain English before you sign.</div>
-        </div>
-        <span class="fc-chev">›</span>
-      </div>
-    </div>
-
-    <!-- Routine Inspection — Feature Card -->
-    <div style="padding:12px 16px 0" onclick="navigate('/app/pages/routine-inspection.html')">
-      <div class="feature-card teal-border">
-        <div class="fc-icon teal">🏠</div>
-        <div class="fc-body">
-          <div class="fc-title">Routine Inspection Due</div>
-          <div class="fc-sub">Record your routine inspection — AI categorises items by responsibility.</div>
-        </div>
-        <span class="fc-chev">›</span>
-      </div>
-    </div>
-
-    <!-- Lease Expiry Reminder -->
-    <div id="renewalCard" style="display:none;padding:12px 16px 0"></div>
-
-    <!-- Renter Rights CTA -->
-    <div style="padding:16px 16px 0">
+    <!-- ── Renter Rights CTA ───────────────────────────────── -->
+    <div style="padding:20px 16px 0">
       <div class="rights-cta" onclick="navigate('/app/pages/rights.html')">
         <div class="rc-icon">⚖️</div>
         <div class="rc-body">
           <div class="rc-title">Know Your Rights</div>
-          <div class="rc-sub">Free help in every state — NSW, VIC, QLD and more</div>
+          <div class="rc-sub">State-specific guidance — VIC, NSW, QLD &amp; more</div>
         </div>
         <span class="rc-chev">›</span>
       </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div style="padding:20px 16px 0" id="recentActivitySection">
-      <div class="sec-title" style="margin-bottom:12px">Recent Activity</div>
-      <div style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);padding:28px 16px;text-align:center">
-        <div style="font-size:36px;margin-bottom:10px">📂</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:5px">No activity yet</div>
-        <div style="font-size:12px;font-weight:600;color:var(--muted)">Your reports, inspections and documents will appear here.</div>
-      </div>
-    </div>
-
-    <!-- Disclaimer -->
-    <div style="padding:16px 16px 24px">
+    <!-- ── Disclaimer ──────────────────────────────────────── -->
+    <div style="padding:16px 16px 28px">
       <div class="disclaimer-note">
         <span class="dn-icon">⚠️</span>
-        <p>RenterIQ is an organisation and documentation tool — not a legal service. AI features assist you — all decisions and report approvals are always yours.</p>
+        <p>RenterIQ is an organisation tool — not a legal service. AI features assist you; all approvals are always yours.</p>
       </div>
     </div>
 
@@ -1863,19 +1914,16 @@ function homeRenderTracked() {
 }
 
 function homeRenderUpcoming() {
+  var section   = document.getElementById('upcomingInspSection');
   var container = document.getElementById('upcomingInspContainer');
   if (!container) return;
   var props = homeGetTracked().filter(function(p){ return p.inspectionDate; });
   props.sort(function(a,b){ return new Date(a.inspectionDate) - new Date(b.inspectionDate); });
   if (!props.length) {
-    container.innerHTML =
-      '<div style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);padding:28px 16px;text-align:center">' +
-        '<div style="font-size:36px;margin-bottom:10px">📅</div>' +
-        '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--blue-dk);margin-bottom:5px">No inspections booked yet</div>' +
-        '<div style="font-size:12px;font-weight:600;color:var(--muted)">Track a property above and set an inspection date.</div>' +
-      '</div>';
+    if (section) section.style.display = 'none';
     return;
   }
+  if (section) section.style.display = 'block';
   container.innerHTML = '<div class="insp-scroll">' + props.map(function(p) {
     var urg  = homeIsUrgent(p.inspectionDate, p.inspectionTime);
     var disp = homeInspDisplay(p.inspectionDate, p.inspectionTime);
