@@ -22,5 +22,38 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "share_target": {
+    "action": "/app/track-share.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "Track a Property",
+      "short_name": "Track",
+      "description": "Save a property listing to your tracker",
+      "url": "/app/index.html#track",
+      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Open Vault",
+      "short_name": "Vault",
+      "description": "View your saved leases, reports and documents",
+      "url": "/app/pages/vault.html",
+      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Renter Rights",
+      "short_name": "Rights",
+      "description": "Tenant rights and free help in your state",
+      "url": "/app/pages/rights.html",
+      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+    }
   ]
 }

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="/app/manifest.json">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RenterIQ">
+<link rel="stylesheet" href="/app/css/app.css?v=4">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Tracking Property — RenterIQ</title>
+<style>
+body { background: var(--blue-xl); }
+.share-shell { display: flex; flex-direction: column; min-height: 100vh; max-width: 430px; margin: 0 auto; background: var(--blue-xl); }
+.share-hdr { background: linear-gradient(180deg, var(--blue) 0%, #1545B0 100%); padding: 20px 20px 26px; box-shadow: 0 2px 16px rgba(10,36,96,.18); }
+.share-back { background: none; border: none; color: rgba(255,255,255,.7); display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .8px; }
+.share-back-arrow { font-size: 22px; font-weight: 700; line-height: 1; }
+.share-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 22px; color: #fff; margin-top: 14px; }
+.share-sub { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 13px; color: rgba(255,255,255,.7); margin-top: 4px; }
+.share-body { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.share-loading { background: #fff; border-radius: 18px; padding: 28px 22px; border: 1px solid var(--border-lt); box-shadow: var(--shadow-card); text-align: center; }
+.share-spinner { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, var(--blue), var(--blue-md)); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; animation: aiPulse 1.5s ease-in-out infinite; }
+@keyframes aiPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.share-loading-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 17px; color: var(--text); }
+.share-loading-sub { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+.share-card { background: #fff; border-radius: 18px; border: 1px solid var(--border-lt); box-shadow: var(--shadow-card); overflow: hidden; }
+.share-card-img { width: 100%; aspect-ratio: 16/9; background: var(--blue-xl); display: flex; align-items: center; justify-content: center; font-size: 48px; color: var(--muted); object-fit: cover; }
+.share-card-body { padding: 16px 18px; }
+.share-source-pill { display: inline-block; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: .6px; padding: 4px 10px; border-radius: 100px; background: var(--blue-xl); color: var(--blue); margin-bottom: 8px; }
+.share-card-addr { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 17px; color: var(--text); line-height: 1.35; }
+.share-card-price { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; color: var(--blue); margin-top: 4px; }
+.share-card-desc { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 12.5px; color: var(--muted); margin-top: 8px; line-height: 1.55; max-height: 60px; overflow: hidden; }
+.share-actions { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+.share-btn-primary { background: linear-gradient(135deg, var(--blue), var(--blue-md)); color: #fff; border: none; border-radius: 14px; padding: 16px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: all .15s; min-height: 52px; box-shadow: 0 3px 12px rgba(27,80,200,.25); }
+.share-btn-primary:active { transform: scale(.98); }
+.share-btn-ghost { background: #fff; color: var(--blue); border: 2px solid var(--border); border-radius: 14px; padding: 14px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; min-height: 50px; }
+.share-error { background: rgba(232,64,64,.06); border: 1px solid rgba(232,64,64,.25); border-radius: 14px; padding: 16px; }
+.share-error-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; color: var(--red); }
+.share-error-sub { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+.share-success { text-align: center; padding: 32px 18px; }
+.share-success-icon { width: 72px; height: 72px; border-radius: 22px; background: linear-gradient(135deg, var(--teal), var(--teal-dk)); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 18px; color: #fff; }
+.share-success-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 19px; color: var(--text); }
+.share-success-sub { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.6; max-width: 280px; margin-left: auto; margin-right: auto; }
+</style>
+</head>
+<body>
+<div class="share-shell">
+
+  <header class="share-hdr">
+    <button class="share-back" onclick="navigate('/app/index.html')"><span class="share-back-arrow">‹</span><span>RENTERIQ</span></button>
+    <div class="share-title">Track this property</div>
+    <div class="share-sub" id="shareSubText">Saving to your tracker…</div>
+  </header>
+
+  <div class="share-body">
+
+    <!-- Loading state -->
+    <div class="share-loading" id="loadingState">
+      <div class="share-spinner">📍</div>
+      <div class="share-loading-title" id="loadingTitle">Fetching property details…</div>
+      <div class="share-loading-sub" id="loadingSub">One moment while we pull the address, price and image.</div>
+    </div>
+
+    <!-- Preview state (shown after fetch) -->
+    <div id="previewState" style="display:none;flex-direction:column;gap:14px">
+      <div class="share-card">
+        <div id="previewImageWrap"></div>
+        <div class="share-card-body">
+          <span class="share-source-pill" id="previewSource">Property</span>
+          <div class="share-card-addr" id="previewAddress">—</div>
+          <div class="share-card-price" id="previewPrice"></div>
+          <div class="share-card-desc" id="previewDesc"></div>
+        </div>
+      </div>
+      <div class="share-actions">
+        <button class="share-btn-primary" onclick="confirmTrack()">📌 Track this property</button>
+        <button class="share-btn-ghost" onclick="navigate('/app/index.html')">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div class="share-error" id="errorState" style="display:none">
+      <div class="share-error-title" id="errorTitle">Couldn't read this URL</div>
+      <div class="share-error-sub" id="errorSub">Make sure it's from realestate.com.au, Domain, REIWA or Rent.com.au.</div>
+      <div style="margin-top:14px"><button class="share-btn-primary" style="width:100%" onclick="navigate('/app/index.html')">Open RenterIQ</button></div>
+    </div>
+
+    <!-- Success state -->
+    <div id="successState" style="display:none">
+      <div class="share-success">
+        <div class="share-success-icon">✓</div>
+        <div class="share-success-title">Property tracked</div>
+        <div class="share-success-sub" id="successSub">Saved to your tracker. We're taking you there now…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
+
+// ── Parse incoming share / bookmarklet payload ──
+// Web Share Target sends: ?title=...&text=...&url=...
+// Bookmarklet sends:      ?url=...
+// Some sites pack the URL into the text field — so check both.
+function parseSharedUrl() {
+  var p = new URLSearchParams(window.location.search);
+  var url = p.get('url') || '';
+  var text = p.get('text') || '';
+  var title = p.get('title') || '';
+  // If url is empty, try to extract a URL from the text or title
+  if (!url) {
+    var m = (text + ' ' + title).match(/https?:\/\/[^\s]+/);
+    if (m) url = m[0];
+  }
+  return { url: url.trim(), text: text, title: title };
+}
+
+var SUPPORTED = ['realestate.com.au', 'domain.com.au', 'reiwa.com.au', 'rent.com.au'];
+var SOURCE_INFO = {
+  realestate: { key:'realestate', name:'realestate.com.au', icon:'🏠', color:'#0066CC' },
+  domain:     { key:'domain',     name:'Domain.com.au',     icon:'🔷', color:'#2E3192' },
+  reiwa:      { key:'reiwa',      name:'REIWA',             icon:'🏘️', color:'#E60028' },
+  rent:       { key:'rent',       name:'Rent.com.au',       icon:'🔑', color:'#FF6B35' }
+};
+
+function detectSource(url) {
+  if (url.indexOf('realestate.com.au') !== -1) return SOURCE_INFO.realestate;
+  if (url.indexOf('domain.com.au') !== -1) return SOURCE_INFO.domain;
+  if (url.indexOf('reiwa.com.au') !== -1) return SOURCE_INFO.reiwa;
+  if (url.indexOf('rent.com.au') !== -1) return SOURCE_INFO.rent;
+  return null;
+}
+
+var pendingProperty = null;
+
+function showError(title, sub) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('previewState').style.display = 'none';
+  document.getElementById('errorState').style.display = 'block';
+  if (title) document.getElementById('errorTitle').textContent = title;
+  if (sub) document.getElementById('errorSub').textContent = sub;
+}
+
+function showPreview(prop) {
+  pendingProperty = prop;
+  document.getElementById('loadingState').style.display = 'none';
+  var preview = document.getElementById('previewState');
+  preview.style.display = 'flex';
+  document.getElementById('shareSubText').textContent = 'Confirm to add to your tracker';
+
+  var src = SOURCE_INFO[prop.source] || { name: 'Property', icon: '🏠' };
+  document.getElementById('previewSource').textContent = src.icon + ' ' + src.name;
+  document.getElementById('previewAddress').textContent = prop.address || 'Property listing';
+  var priceEl = document.getElementById('previewPrice');
+  if (prop.price) { priceEl.textContent = prop.price; priceEl.style.display = 'block'; }
+  else priceEl.style.display = 'none';
+  var descEl = document.getElementById('previewDesc');
+  if (prop.description) { descEl.textContent = prop.description; descEl.style.display = 'block'; }
+  else descEl.style.display = 'none';
+
+  var imgWrap = document.getElementById('previewImageWrap');
+  if (prop.image) {
+    imgWrap.innerHTML = '<img src="' + prop.image + '" alt="" class="share-card-img" loading="eager">';
+  } else {
+    imgWrap.innerHTML = '<div class="share-card-img">' + src.icon + '</div>';
+  }
+}
+
+function showSuccess() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('previewState').style.display = 'none';
+  document.getElementById('errorState').style.display = 'none';
+  document.getElementById('successState').style.display = 'block';
+  document.getElementById('shareSubText').textContent = 'Done — opening your tracker';
+}
+
+function buildId() {
+  return 'prop_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+}
+
+async function fetchAndPreview(url) {
+  var src = detectSource(url);
+  if (!src) {
+    showError('Unsupported source', 'RenterIQ tracks listings from realestate.com.au, Domain, REIWA and Rent.com.au.');
+    return;
+  }
+  document.getElementById('loadingTitle').textContent = 'Reading ' + src.name + '…';
+
+  var address = '', price = '', description = '', image = '';
+  try {
+    var resp = await fetch('/api/extract-metadata?url=' + encodeURIComponent(url));
+    if (resp.ok) {
+      var data = await resp.json();
+      if (!data.error) {
+        address = data.address || data.title || '';
+        price = data.price || '';
+        description = data.description || '';
+        image = data.image || '';
+      }
+    }
+  } catch (e) { /* fall back to URL parse */ }
+
+  if (!address) {
+    // Best-effort parse from URL path
+    try {
+      var parts = new URL(url).pathname.split('/').filter(Boolean);
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var p = parts[i];
+        if (p && p.length > 5 && /[a-z]/i.test(p)) {
+          address = p.replace(/-/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+          break;
+        }
+      }
+    } catch(e) {}
+  }
+  if (!address) address = 'Property listing';
+
+  showPreview({
+    id: buildId(),
+    url: url,
+    address: address,
+    price: price,
+    description: description,
+    image: image,
+    source: src.key,
+    sourceName: src.name,
+    sourceIcon: src.icon,
+    sourceColor: src.color
+  });
+}
+
+function confirmTrack() {
+  if (!pendingProperty) return;
+  var p = pendingProperty;
+  // Unified schema (same as homeTrackProperty + tracked.html)
+  var prop = {
+    id: p.id,
+    url: p.url, originalLink: p.url,
+    address: p.address, label: p.address,
+    price: p.price || 'Contact agent',
+    description: p.description,
+    image: p.image, imageUrl: p.image,
+    source: p.source, sourceSite: p.source,
+    sourceName: p.sourceName, sourceIcon: p.sourceIcon, sourceColor: p.sourceColor,
+    savedAt: new Date().toISOString(),
+    status: 'tracked',
+    inspectionDate: '', inspectionTime: ''
+  };
+  // Local save
+  try {
+    var existing = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]');
+    var dup = existing.find(function(x) { return (x.url || x.originalLink) === prop.url; });
+    if (!dup) {
+      existing.push(prop);
+      localStorage.setItem('renteriq_tracked_properties', JSON.stringify(existing));
+    }
+  } catch(e) {}
+
+  // Cloud sync (background)
+  if (window.RIQStore) {
+    RIQStore.ready.then(function() {
+      if (RIQStore.isAuthed()) RIQStore.write('tracked-properties', prop.id, prop);
+    });
+  }
+
+  showSuccess();
+  setTimeout(function() { navigate('/app/pages/tracked.html'); }, 1400);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var shared = parseSharedUrl();
+  if (!shared.url) {
+    showError('No URL found', 'Open this page from a property listing share, or paste a URL on the home screen.');
+    return;
+  }
+  fetchAndPreview(shared.url);
+});
+</script>
+</body>
+</html>

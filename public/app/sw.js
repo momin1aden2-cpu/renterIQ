@@ -1,14 +1,19 @@
-// RenterIQ Service Worker v9 — Pristine Rebuild
+// RenterIQ Service Worker v10 — Share Target + Storage Helper
 // No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
 
-var CACHE_NAME = 'renteriq-shell-v9';
+var CACHE_NAME = 'renteriq-shell-v10';
 
 var APP_SHELL = [
   '/app/index.html',
   '/app/css/app.css',
   '/app/js/sidebar.js',
   '/app/js/pwa-init.js',
+  '/app/js/storage.js',
+  '/app/js/firebase-init.js',
+  '/app/js/auth-guard.js',
+  '/app/js/searchService.js',
   '/app/manifest.json',
+  '/app/track-share.html',
   '/app/pages/vault.html',
   '/app/pages/inspection.html',
   '/app/pages/entry-audit.html',
@@ -69,9 +74,14 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
+  // Share-target navigation arrives with ?title=&text=&url= — strip the query
+  // when looking up the cache so we hit the precached track-share.html instantly
+  // instead of forcing a network round-trip on every share.
+  var matchOpts = url.includes('/app/track-share.html') ? { ignoreSearch: true } : undefined;
+
   // Cache-first: serve from cache, fallback to network and cache the response
   event.respondWith(
-    caches.match(event.request).then(function (cached) {
+    caches.match(event.request, matchOpts).then(function (cached) {
       if (cached) { return cached; }
 
       return fetch(event.request).then(function (response) {

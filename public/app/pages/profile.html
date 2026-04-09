@@ -237,6 +237,13 @@
   <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">💳</span><div style="flex:1"><div class="settings-title">Billing & Payments</div></div><span class="settings-right" style="color:var(--muted)">Not set up</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
 </div>
 
+<!-- SECTION 3.5: QUICK CAPTURE -->
+<div class="sec-label">Quick Capture</div>
+<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
+  <div class="settings-row" onclick="showQuickCaptureGuide()"><span class="settings-icon">📲</span><div style="flex:1"><div class="settings-title">Save listings from any site</div><div class="settings-sub">Use the system Share menu on REA, Domain, REIWA &amp; Rent.com.au</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="copyBookmarklet()"><span class="settings-icon">🔖</span><div style="flex:1"><div class="settings-title">Desktop bookmarklet</div><div class="settings-sub">One-click save from your laptop browser</div></div><span class="settings-chevron">›</span></div>
+</div>
+
 <!-- SECTION 4: DATA & VAULT -->
 <div class="sec-label">Data & Vault</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
@@ -1072,6 +1079,34 @@ function saveProfileState(code){
   closeProfileStateSelector();
   showToast('State updated',meta?meta.name+' — your rights will reflect this':code,'📍');
   syncProfileToCloud();
+}
+
+function showQuickCaptureGuide(){
+  var msg =
+    'On your phone:\n\n' +
+    '1. Open a property listing in realestate.com.au, Domain, REIWA or Rent.com.au\n' +
+    '2. Tap the system Share button (square with arrow up)\n' +
+    '3. Pick RenterIQ from the share sheet\n' +
+    '4. Confirm — done in 3 seconds\n\n' +
+    'Note: You must have RenterIQ installed to your home screen as a PWA for it to appear in the share sheet.';
+  alert(msg);
+}
+
+function copyBookmarklet(){
+  var origin = window.location.origin;
+  var code = "javascript:void(window.open('" + origin + "/app/track-share.html?url='+encodeURIComponent(location.href),'_blank'))";
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(function(){
+      showToast('Bookmarklet copied','Paste into a new bookmark on your laptop','🔖');
+      setTimeout(function(){
+        alert('To install:\n\n1. Right-click your bookmarks bar → Add Page\n2. Name: "Save to RenterIQ"\n3. URL: paste from clipboard\n\nWhen on a property listing, click the bookmark and the property opens in RenterIQ ready to track.');
+      }, 400);
+    }).catch(function(){
+      prompt('Copy this bookmarklet (right-click → Add to bookmarks bar with this as the URL):', code);
+    });
+  } else {
+    prompt('Copy this bookmarklet (right-click → Add to bookmarks bar with this as the URL):', code);
+  }
 }
 
 function replayOnboarding(){
