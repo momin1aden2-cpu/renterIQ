@@ -248,8 +248,11 @@
 <!-- SECTION 5: SUPPORT -->
 <div class="sec-label">Support</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="window.open('mailto:support@renteriq.com.au','_blank')"><span class="settings-icon">❓</span><div style="flex:1"><div class="settings-title">Help & FAQ</div><div class="settings-sub">support@renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="showToast('Support','Email: support@renteriq.com.au','💬')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Contact Support</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="replayOnboarding()"><span class="settings-icon">🎯</span><div style="flex:1"><div class="settings-title">Replay App Guide</div><div class="settings-sub">Walk through the 7-step renting journey again</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="navigate('/app/pages/rights.html')"><span class="settings-icon">⚖️</span><div style="flex:1"><div class="settings-title">Renter Rights Hub</div><div class="settings-sub">Free help &amp; tenancy info for your state</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="contactSupport('help')"><span class="settings-icon">❓</span><div style="flex:1"><div class="settings-title">Help &amp; FAQ</div><div class="settings-sub">Get answers about features &amp; usage</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="contactSupport('contact')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Contact Support</div><div class="settings-sub">support@renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="contactSupport('feedback')"><span class="settings-icon">📝</span><div style="flex:1"><div class="settings-title">Send Feedback</div><div class="settings-sub">Suggest a feature or report a bug</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="showToast('Thank you!','App store rating coming when we launch publicly','⭐')"><span class="settings-icon">⭐</span><div style="flex:1"><div class="settings-title">Rate RenterIQ</div></div><span class="settings-chevron">›</span></div>
 </div>
 
@@ -1069,6 +1072,38 @@ function saveProfileState(code){
   closeProfileStateSelector();
   showToast('State updated',meta?meta.name+' — your rights will reflect this':code,'📍');
   syncProfileToCloud();
+}
+
+function replayOnboarding(){
+  try {
+    localStorage.removeItem('riq-onboarding-done');
+    localStorage.removeItem('riq_onboarding_done');
+  } catch(e) {}
+  showToast('Restarting guide','Returning to home…','🎯');
+  setTimeout(function(){ navigate('/app/index.html'); }, 600);
+}
+
+function contactSupport(kind){
+  var subject, body;
+  var name = '';
+  try { name = localStorage.getItem('riq-user-name') || ''; } catch(e) {}
+  var version = 'v1.0.0 Beta';
+  var device = (navigator.userAgent.indexOf('Mobile') !== -1 ? 'Mobile' : 'Desktop');
+  var footer = '\n\n— — —\nApp: RenterIQ ' + version + '\nDevice: ' + device + (name ? '\nFrom: ' + name : '');
+
+  if (kind === 'help') {
+    subject = 'RenterIQ — Help question';
+    body = 'Hi RenterIQ team,\n\nI need help with:\n\n[describe your question here]' + footer;
+  } else if (kind === 'feedback') {
+    subject = 'RenterIQ — Feedback / feature request';
+    body = 'Hi RenterIQ team,\n\nI\'d like to suggest:\n\n[describe your feedback or feature idea]\n\nWhat I\'m trying to do:\n[optional context]' + footer;
+  } else {
+    subject = 'RenterIQ — Support request';
+    body = 'Hi RenterIQ team,\n\n[describe what you need help with]' + footer;
+  }
+  var mailto = 'mailto:support@renteriq.com.au?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  window.location.href = mailto;
+  setTimeout(function(){ showToast('Opening email','support@renteriq.com.au','💬'); }, 200);
 }
 
 function syncProfileToCloud(){
