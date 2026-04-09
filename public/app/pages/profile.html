@@ -220,9 +220,8 @@
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
   <div class="settings-row" onclick="switchView('B')"><span class="settings-icon">👤</span><div style="flex:1"><div class="settings-title">Personal Details</div><div class="settings-sub">Name, email, mobile, date of birth</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="openProfileStateSelector()"><span class="settings-icon">📍</span><div style="flex:1"><div class="settings-title">Your State or Territory</div><div class="settings-sub" id="profileStateRowSub">Tap to set — used for tenancy laws &amp; rights</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="navigate('/app/pages/application.html')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Renter Resume</div><div class="settings-sub">Employment, income, references, cover letter</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="switchView('C')"><span class="settings-icon">🏠</span><div style="flex:1"><div class="settings-title">Property & Tenancy</div><div class="settings-sub">Active property, lease dates, rent</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="showToast('State','State selector — change your state to update the Rights Hub','📍')"><span class="settings-icon">📍</span><div style="flex:1"><div class="settings-title">Your State</div></div><span class="settings-right">VIC</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+  <div class="settings-row" onclick="navigate('/app/pages/application.html')"><span class="settings-icon">📝</span><div style="flex:1"><div class="settings-title">Rental Application</div><div class="settings-sub">Renter resume, employment, references &amp; cover letter</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="switchView('C')"><span class="settings-icon">🏠</span><div style="flex:1"><div class="settings-title">Property &amp; Tenancy</div><div class="settings-sub">Lease dates, rent, days remaining &amp; quick actions</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 <!-- SECTION 2: NOTIFICATIONS -->
@@ -319,7 +318,6 @@
   <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" placeholder="your@email.com"></div>
   <div class="form-field"><label class="form-label">Mobile Number</label><input class="form-input" placeholder="04xx xxx xxx"></div>
   <div class="form-field"><label class="form-label">Date of Birth</label><input class="form-input" placeholder="DD/MM/YYYY"></div>
-  <div class="form-field" style="display:flex;align-items:center;justify-content:space-between"><div><label class="form-label">Current State</label><div id="profileStateDisplay" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">Victoria (VIC)</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="openProfileStateSelector()">Change ›</span></div>
   <div class="form-field"><label class="form-label">Preferred Language</label><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">English</div></div>
 </div>
 
