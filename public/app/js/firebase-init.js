@@ -32,6 +32,25 @@
       console.log('[RenterIQ] Firebase already initialized');
     }
 
+    // Enable Firestore offline persistence so writes queue while offline and
+    // sync when back online. Must be called before any other Firestore use.
+    if (firebase.firestore && !window.__RIQ_FIRESTORE_PERSISTED__) {
+      window.__RIQ_FIRESTORE_PERSISTED__ = true;
+      try {
+        firebase.firestore().enablePersistence({ synchronizeTabs: true }).catch(function(err) {
+          if (err.code === 'failed-precondition') {
+            console.warn('[RenterIQ] Firestore persistence: multiple tabs open');
+          } else if (err.code === 'unimplemented') {
+            console.warn('[RenterIQ] Firestore persistence not supported in this browser');
+          } else {
+            console.warn('[RenterIQ] Firestore persistence error:', err);
+          }
+        });
+      } catch (e) {
+        console.warn('[RenterIQ] Could not enable Firestore persistence:', e);
+      }
+    }
+
     return true;
   }
 

@@ -15,6 +15,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1214,7 +1215,60 @@ function saveResumeToVault(){
     // Also keep the old key for backward compat
     localStorage.setItem('riq_renter_resume_vault',JSON.stringify(Object.assign({},resumeSnapshot,{_savedToVault:Date.now(),_coverLetter:record.coverLetter,_idScore:idScore,_docCount:Object.keys(docMeta).length,docs:docMeta})));
     showToast('Saved to Personal Documents','Find it anytime in your Vault','🗂️');
+    // ── Cloud sync (background) ──
+    syncPersonalDocsToCloud(record);
   }catch(e){console.warn('saveResumeToVault:',e);}
+}
+
+function appDataURLToBlob(dataUrl){
+  try{
+    var parts=dataUrl.split(',');
+    var mime=(parts[0].match(/:(.*?);/)||[null,'application/octet-stream'])[1];
+    var bstr=atob(parts[1]);
+    var n=bstr.length;
+    var u8=new Uint8Array(n);
+    while(n--)u8[n]=bstr.charCodeAt(n);
+    return new Blob([u8],{type:mime});
+  }catch(e){return null}
+}
+
+function syncPersonalDocsToCloud(record){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+
+    var uploadJobs=[];
+    var uploadedDocsCloud={};
+    Object.keys(record.uploadedDocs||{}).forEach(function(docKey){
+      var doc=record.uploadedDocs[docKey];
+      if(!doc||!doc.data||doc.data.indexOf('data:')!==0){
+        // Already a URL or non-data — keep as-is (strip base64 if present)
+        var copy=Object.assign({},doc);
+        delete copy.data;
+        uploadedDocsCloud[docKey]=copy;
+        return;
+      }
+      var blob=appDataURLToBlob(doc.data);
+      if(!blob){return}
+      var ext=(doc.name&&doc.name.split('.').pop())||'bin';
+      var path='personal-docs/'+docKey+'.'+ext;
+      uploadJobs.push(
+        RIQStore.uploadFile(path,blob,{contentType:blob.type})
+          .then(function(res){
+            uploadedDocsCloud[docKey]={name:doc.name,size:doc.size,pts:doc.pts,ts:doc.ts,mimeType:doc.mimeType,url:res.url,path:res.path};
+          })
+          .catch(function(err){console.warn('Personal doc upload failed for '+docKey+':',err)})
+      );
+    });
+
+    Promise.all(uploadJobs).then(function(){
+      var cloudRecord=Object.assign({},record,{uploadedDocs:uploadedDocsCloud});
+      // Single doc per user — store under state/personal-docs
+      RIQStore.write('state','personal-docs',cloudRecord).catch(function(err){
+        console.warn('Personal docs cloud sync failed:',err);
+      });
+    });
+  });
 }
 
 function makeEditable(){

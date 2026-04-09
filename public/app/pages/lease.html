@@ -16,6 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -916,16 +917,67 @@ function saveToVault(){
     pmPhone:ld.pmPhone||'',
     totalClauses:totalClauses,
     flaggedCount:leaseData&&leaseData.clauses?leaseData.clauses.filter(function(c){return c.rating!=='standard'}).length:3,
-    state:localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||''
+    state:localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'',
+    fileUrl:'',     // populated after Cloud Storage upload
+    filePath:'',    // populated after Cloud Storage upload
+    fileSize:uploadedFile?uploadedFile.size:0,
+    fileMimeType:uploadedFile?uploadedFile.type:''
   };
   localStorage.setItem('riq-lease-record',JSON.stringify(record));
 
-  // Also save a reference in the vault lease folder
+  // Local vault folder
   try{
     var vaultLeases=JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
     vaultLeases.unshift(record);
     localStorage.setItem('riq-vault-leases',JSON.stringify(vaultLeases));
   }catch(e){}
+
+  // ── Cloud sync (background) ──
+  // Upload the PDF to Storage, then write the lease metadata (including the
+  // download URL) to Firestore. Updates the same record in localStorage so
+  // the UI shows the cloud reference next time it loads.
+  syncLeaseToCloud(record);
+}
+
+function syncLeaseToCloud(record){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+
+    function writeMetadata(rec){
+      RIQStore.write('leases',rec.id,rec).then(function(){
+        // Mirror back into localStorage so the next render picks up the cloud URL
+        try{
+          var list=JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+          var idx=list.findIndex(function(l){return l.id===rec.id});
+          if(idx!==-1){list[idx]=rec;}else{list.unshift(rec);}
+          localStorage.setItem('riq-vault-leases',JSON.stringify(list));
+        }catch(e){}
+        showToast('Saved to cloud ✓','Lease synced across your devices','☁️');
+      }).catch(function(err){
+        console.warn('Lease metadata sync failed:',err);
+      });
+    }
+
+    if(uploadedFile){
+      // Upload the PDF blob first
+      var ext=(uploadedFile.name.split('.').pop()||'pdf').toLowerCase();
+      var path='leases/'+record.id+'.'+ext;
+      RIQStore.uploadFile(path,uploadedFile,{contentType:uploadedFile.type||'application/pdf'})
+        .then(function(res){
+          record.fileUrl=res.url;
+          record.filePath=res.path;
+          writeMetadata(record);
+        })
+        .catch(function(err){
+          console.warn('Lease PDF upload failed, saving metadata only:',err);
+          writeMetadata(record);
+        });
+    } else {
+      // Demo mode or no file selected — just sync metadata
+      writeMetadata(record);
+    }
+  });
 }
 
 var STATE_AUTHORITY={

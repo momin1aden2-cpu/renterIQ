@@ -14,6 +14,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1000,17 +1004,21 @@ function updateGenerateButton(){
 
 function generateEntryReport(){
   showToast('Generating report','Creating your entry condition report...','📄');
-  
+
+  var auditId='entry_audit_'+Date.now();
+  var reportDate=new Date().toISOString();
+
   // Create comprehensive report data
   var reportData={
+    auditId:auditId,
     propertyAddress:document.getElementById('propertyAddress').textContent,
     propertyDetails:document.getElementById('propertyDetails').textContent,
-    generatedDate:new Date().toISOString(),
+    generatedDate:reportDate,
     rooms:[],
     totalPhotos:0,
     completedRooms:0
   };
-  
+
   // Collect all room data
   var allRooms=[].concat(standardRooms).concat(customRooms);
   allRooms.forEach(function(room){
@@ -1021,28 +1029,31 @@ function generateEntryReport(){
         name:room.name,
         emoji:room.emoji
       }, roomData[room.id]);
-      
+
       if(roomInfo.photos){
         reportData.totalPhotos+=roomInfo.photos.length;
       }
       reportData.rooms.push(roomInfo);
     }
   });
-  
-  // Save report to vault
-  var vaultReports=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
-  vaultReports.push({
+
+  // Local vault record (with full base64 photos for offline use)
+  var vaultRecord={
+    id:auditId,
     type:'entry-audit',
-    date:new Date().toISOString(),
+    date:reportDate,
     data:reportData
-  });
+  };
+  var vaultReports=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+  vaultReports.push(vaultRecord);
   localStorage.setItem('renteriq_vault_reports',JSON.stringify(vaultReports));
-  
+
   // Also save to standardized riq_entry_audit_past for Vault integration
   try {
     var auditRaw = localStorage.getItem('riq_entry_audit_past') || '[]';
     var auditList = JSON.parse(auditRaw);
     auditList.unshift({
+      id: auditId,
       type: 'entry_audit',
       address: reportData.propertyAddress || 'Property',
       date: Date.now(),
@@ -1051,15 +1062,105 @@ function generateEntryReport(){
     });
     localStorage.setItem('riq_entry_audit_past', JSON.stringify(auditList));
   } catch(e) { console.error('Save to riq_entry_audit_past:', e); }
-  
+
+  // ── Cloud sync (background) ──
+  syncEntryAuditToCloud(vaultRecord);
+
   // Generate downloadable report (text version for now)
   var reportText=generateTextReport(reportData);
   downloadReport(reportText, 'entry-audit-report.txt');
-  
+
   setTimeout(function(){
     showToast('Report generated',reportData.totalPhotos+' photos · '+reportData.completedRooms+' rooms documented','✓');
     navigate('/app/pages/vault.html');
   },2000);
+}
+
+// ── Cloud sync ──
+// Uploads each room photo to Cloud Storage in parallel, then writes a slim
+// metadata record (no base64) to Firestore. Local copy keeps base64 for offline.
+function dataURLToBlob(dataUrl){
+  try{
+    var parts=dataUrl.split(',');
+    var mime=(parts[0].match(/:(.*?);/)||[null,'image/jpeg'])[1];
+    var bstr=atob(parts[1]);
+    var n=bstr.length;
+    var u8=new Uint8Array(n);
+    while(n--)u8[n]=bstr.charCodeAt(n);
+    return new Blob([u8],{type:mime});
+  }catch(e){return null}
+}
+
+function syncEntryAuditToCloud(vaultRecord){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+
+    var auditId=vaultRecord.id;
+    var rooms=(vaultRecord.data&&vaultRecord.data.rooms)||[];
+    var uploadJobs=[];
+
+    // Build upload jobs for every photo across every room
+    rooms.forEach(function(room){
+      if(!room.photos)return;
+      room.photos.forEach(function(photo,idx){
+        if(!photo||!photo.data)return; // already uploaded or empty
+        var blob=dataURLToBlob(photo.data);
+        if(!blob)return;
+        var ext=(photo.fileName&&photo.fileName.split('.').pop())||'jpg';
+        var path='entry-audits/'+auditId+'/'+room.id+'/'+idx+'.'+ext;
+        uploadJobs.push(
+          RIQStore.uploadFile(path,blob,{contentType:blob.type||'image/jpeg'})
+            .then(function(res){
+              photo.url=res.url;
+              photo.path=res.path;
+              return true;
+            })
+            .catch(function(err){
+              console.warn('Photo upload failed for '+path+':',err);
+              return false;
+            })
+        );
+      });
+    });
+
+    Promise.all(uploadJobs).then(function(){
+      // Write metadata to Firestore — strip base64 from Firestore copy to stay
+      // under the 1MB doc limit. Local copy keeps base64 for offline use.
+      var firestoreRooms=rooms.map(function(room){
+        var slim=Object.assign({},room);
+        if(room.photos){
+          slim.photos=room.photos.map(function(p){
+            return {
+              time:p.time,
+              timestamp:p.timestamp,
+              fileName:p.fileName,
+              url:p.url||'',
+              path:p.path||''
+            };
+          });
+        }
+        return slim;
+      });
+      var firestoreRecord={
+        id:auditId,
+        type:'entry-audit',
+        date:vaultRecord.date,
+        data:Object.assign({},vaultRecord.data,{rooms:firestoreRooms})
+      };
+      RIQStore.write('entry-audits',auditId,firestoreRecord).then(function(){
+        // Mirror updated local record (now with photo URLs) back to localStorage
+        try{
+          var list=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+          var i=list.findIndex(function(r){return r&&r.id===auditId;});
+          if(i!==-1){list[i]=vaultRecord;localStorage.setItem('renteriq_vault_reports',JSON.stringify(list));}
+        }catch(e){}
+        showToast('Saved to cloud ✓','Photos backed up across your devices','☁️');
+      }).catch(function(err){
+        console.warn('Entry audit metadata sync failed:',err);
+      });
+    });
+  });
 }
 
 function generateTextReport(data){

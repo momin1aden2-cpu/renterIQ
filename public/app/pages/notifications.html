@@ -16,6 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,6 +161,56 @@ function tsOf(v) {
 var notifState = safeJSON('riq_notifications_state', null) || { read: [], dismissedReminders: [], toggles: [true,true,true,true,true,true,true,false] };
 function saveNotifState() {
   try { localStorage.setItem('riq_notifications_state', JSON.stringify(notifState)); } catch(e){}
+  // Cloud sync (background)
+  if (window.RIQStore) {
+    RIQStore.ready.then(function() {
+      if (RIQStore.isAuthed()) RIQStore.write('state', 'notifications', notifState);
+    });
+  }
+}
+
+function pullNotifStateFromCloud() {
+  if (!window.RIQStore) return;
+  RIQStore.ready.then(function() {
+    if (!RIQStore.isAuthed()) return;
+    RIQStore.read('state', 'notifications').then(function(remote) {
+      if (!remote) return;
+      // Merge: union of read[] and dismissedReminders[], remote toggles win
+      var merged = {
+        read: Array.from(new Set([].concat(notifState.read || [], remote.read || []))),
+        dismissedReminders: Array.from(new Set([].concat(notifState.dismissedReminders || [], remote.dismissedReminders || []))),
+        toggles: remote.toggles || notifState.toggles
+      };
+      notifState = merged;
+      try { localStorage.setItem('riq_notifications_state', JSON.stringify(notifState)); } catch(e){}
+      applyTogglesToUI();
+      renderNotifications();
+      renderReminders();
+    });
+  });
+}
+
+function pullRemindersFromCloud() {
+  if (!window.RIQStore) return;
+  RIQStore.ready.then(function() {
+    if (!RIQStore.isAuthed()) return;
+    RIQStore.list('reminders').then(function(remote) {
+      if (!Array.isArray(remote) || remote.length === 0) return;
+      var local = safeJSON('renteriq_reminders', []);
+      if (!Array.isArray(local)) local = [];
+      var localIds = {};
+      local.forEach(function(r) { if (r && r.id) localIds[r.id] = true; });
+      var changed = false;
+      remote.forEach(function(r) {
+        if (!r || !r.id) return;
+        if (!localIds[r.id]) { local.push(r); changed = true; }
+      });
+      if (changed) {
+        try { localStorage.setItem('renteriq_reminders', JSON.stringify(local)); } catch(e){}
+        renderReminders();
+      }
+    });
+  });
 }
 
 // ── Build feed from real data ──
@@ -458,6 +509,9 @@ document.addEventListener('DOMContentLoaded', function() {
   applyTogglesToUI();
   renderNotifications();
   renderReminders();
+  // Pull cloud state and any reminders saved on other devices
+  pullNotifStateFromCloud();
+  pullRemindersFromCloud();
 });
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}

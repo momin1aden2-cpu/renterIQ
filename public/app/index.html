@@ -24,6 +24,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
 <script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
 <!-- Authentication Guard -->
 <script src="/app/js/auth-guard.js" defer></script>
 <title>RenterIQ</title>
@@ -90,6 +92,32 @@
   display: none;
   box-shadow: 0 0 0 2px var(--blue);
 }
+.hdr-sys-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.14);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .15s;
+}
+.hdr-sys-dot:active { background: rgba(255,255,255,.20); }
+.hdr-sys-dot::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9AA4B8;
+  box-shadow: 0 0 0 2px rgba(154,164,184,.25);
+  transition: all .25s;
+}
+.hdr-sys-dot.sys-ok::before     { background: #00C896; box-shadow: 0 0 0 2px rgba(0,200,150,.30); }
+.hdr-sys-dot.sys-warn::before   { background: #F5A623; box-shadow: 0 0 0 2px rgba(245,166,35,.30); }
+.hdr-sys-dot.sys-down::before   { background: #FF3B30; box-shadow: 0 0 0 2px rgba(255,59,48,.30); }
 .hdr-avatar {
   width: 34px;
   height: 34px;
@@ -1161,6 +1189,7 @@
         <span class="hdr-brand-text">RenterIQ</span>
       </a>
       <div class="hdr-actions">
+        <span class="hdr-sys-dot" id="hdrSysDot" role="button" aria-label="System status" title="Checking system status…" onclick="homeShowSystemStatus()"></span>
         <span class="hdr-bell" role="button" aria-label="Notifications" onclick="navigate('/app/pages/notifications.html')">🔔<span class="hdr-bell-badge" id="hdrBellBadge"></span></span>
         <div class="hdr-avatar" id="hdrAvatar" role="button" aria-label="Profile" onclick="navigate('/app/pages/profile.html')">?</div>
       </div>
@@ -1890,6 +1919,7 @@ homeLoadSuburbs();
 
 // ========== PROPERTY TRACKING ==========
 var TRACKED_KEY = 'renteriq_tracked_properties';
+var TRACKED_COLLECTION = 'tracked-properties';
 
 function homeGetTracked() {
   try { return JSON.parse(localStorage.getItem(TRACKED_KEY) || '[]'); } catch(e) { return []; }
@@ -1897,6 +1927,52 @@ function homeGetTracked() {
 
 function homeSaveTrackedAll(props) {
   localStorage.setItem(TRACKED_KEY, JSON.stringify(props));
+}
+
+// ── Cloud sync layer (RIQStore) ──
+// Background mirror to Firestore. Sync code stays sync — these helpers run
+// in the background and re-render once the cloud catches up.
+function homeSyncTrackedToCloud(prop) {
+  if (!window.RIQStore) return;
+  RIQStore.ready.then(function() {
+    if (!RIQStore.isAuthed()) return;
+    RIQStore.write(TRACKED_COLLECTION, prop.id, prop);
+  });
+}
+
+function homeDeleteTrackedFromCloud(propId) {
+  if (!window.RIQStore) return;
+  RIQStore.ready.then(function() {
+    if (!RIQStore.isAuthed()) return;
+    RIQStore.delete(TRACKED_COLLECTION, propId);
+  });
+}
+
+function homePullTrackedFromCloud() {
+  if (!window.RIQStore) return;
+  RIQStore.ready.then(function() {
+    if (!RIQStore.isAuthed()) return;
+    // First-time migration: push existing localStorage items to Firestore
+    if (!RIQStore.isMigrated(TRACKED_KEY)) {
+      RIQStore.migrateArray(TRACKED_KEY, TRACKED_COLLECTION, 'id');
+    }
+    // Pull remote items and merge with local
+    RIQStore.list(TRACKED_COLLECTION).then(function(remoteItems) {
+      if (!Array.isArray(remoteItems) || remoteItems.length === 0) return;
+      var local = homeGetTracked();
+      var localIds = {};
+      local.forEach(function(p) { if (p && p.id) localIds[p.id] = true; });
+      var added = 0;
+      remoteItems.forEach(function(r) {
+        if (r && r.id && !localIds[r.id]) { local.push(r); added++; }
+      });
+      if (added > 0) {
+        homeSaveTrackedAll(local);
+        homeRenderTracked();
+        homeRenderUpcoming();
+      }
+    });
+  });
 }
 
 function homeDetectSource(url) {
@@ -1975,6 +2051,7 @@ async function homeTrackProperty() {
   };
   existing.push(prop);
   homeSaveTrackedAll(existing);
+  homeSyncTrackedToCloud(prop);
   if (urlEl) urlEl.value = '';
   if (btn) { btn.textContent = 'Save'; btn.style.opacity = '1'; btn.disabled = false; }
   homeTrackMsg('✓ ' + address + ' saved — set an inspection date on its card below.', false);
@@ -1996,6 +2073,7 @@ function homeTrackMsg(msg, isErr) {
 
 function homeDeleteTracked(id) {
   homeSaveTrackedAll(homeGetTracked().filter(function(p){ return p.id !== id; }));
+  homeDeleteTrackedFromCloud(id);
   homeRenderTracked();
   homeRenderUpcoming();
 }
@@ -2009,10 +2087,16 @@ function homeSaveInspection(id) {
   var d = document.getElementById('tc-d-' + id);
   var t = document.getElementById('tc-t-' + id);
   if (!d || !d.value) return;
+  var updated = null;
   var props = homeGetTracked().map(function(p) {
-    return p.id === id ? Object.assign({}, p, { inspectionDate: d.value, inspectionTime: t ? t.value : '', status: 'inspection_booked' }) : p;
+    if (p.id === id) {
+      updated = Object.assign({}, p, { inspectionDate: d.value, inspectionTime: t ? t.value : '', status: 'inspection_booked' });
+      return updated;
+    }
+    return p;
   });
   homeSaveTrackedAll(props);
+  if (updated) homeSyncTrackedToCloud(updated);
   homeRenderTracked();
   homeRenderUpcoming();
   homeCheckReminders();
@@ -2023,9 +2107,16 @@ function homeStartAudit(id) {
   var prop = props.filter(function(p){ return p.id === id; })[0];
   if (prop) {
     try { localStorage.setItem('riq-active-property', JSON.stringify(prop)); } catch(e) {}
-    homeSaveTrackedAll(props.map(function(p){
-      return p.id === id ? Object.assign({}, p, { status: 'inspecting' }) : p;
-    }));
+    var updated = null;
+    var nextProps = props.map(function(p){
+      if (p.id === id) {
+        updated = Object.assign({}, p, { status: 'inspecting' });
+        return updated;
+      }
+      return p;
+    });
+    homeSaveTrackedAll(nextProps);
+    if (updated) homeSyncTrackedToCloud(updated);
   }
   navigate('/app/pages/inspection.html');
 }
@@ -2170,6 +2261,82 @@ function homeSafeJSON(key, fallback) {
   catch (e) { return fallback; }
 }
 
+// ── System Status indicator (Firebase / Auth / Firestore health) ──
+var sysStatus = { firebase: false, auth: false, firestore: false, message: 'Checking…' };
+
+function homeSetSysDot(state, message) {
+  var el = document.getElementById('hdrSysDot');
+  if (!el) return;
+  el.classList.remove('sys-ok', 'sys-warn', 'sys-down');
+  if (state === 'ok') el.classList.add('sys-ok');
+  else if (state === 'warn') el.classList.add('sys-warn');
+  else if (state === 'down') el.classList.add('sys-down');
+  el.title = message || '';
+  sysStatus.message = message || '';
+}
+
+function homeRunSystemStatusCheck() {
+  // Stage 1: Firebase SDK loaded?
+  if (typeof firebase === 'undefined') {
+    homeSetSysDot('down', 'Firebase SDK not loaded — running in offline mode');
+    return;
+  }
+  if (!firebase.apps || firebase.apps.length === 0) {
+    homeSetSysDot('warn', 'Firebase initialising…');
+    setTimeout(homeRunSystemStatusCheck, 600);
+    return;
+  }
+  sysStatus.firebase = true;
+
+  // Stage 2: Auth state
+  try {
+    var user = firebase.auth().currentUser;
+    if (!user) {
+      homeSetSysDot('warn', 'Signed out — local data only');
+      // Re-check when auth resolves
+      firebase.auth().onAuthStateChanged(function(u) {
+        if (u) homeRunSystemStatusCheck();
+      });
+      return;
+    }
+    sysStatus.auth = true;
+  } catch (e) {
+    homeSetSysDot('warn', 'Auth unavailable: ' + (e.message || e));
+    return;
+  }
+
+  // Stage 3: Firestore reachable? (cheap read on user doc)
+  if (!firebase.firestore) {
+    homeSetSysDot('warn', 'Firestore SDK missing');
+    return;
+  }
+  try {
+    var uid = firebase.auth().currentUser.uid;
+    firebase.firestore().collection('users').doc(uid).get({ source: 'server' })
+      .then(function() {
+        sysStatus.firestore = true;
+        homeSetSysDot('ok', 'Connected · cloud sync active');
+      })
+      .catch(function(err) {
+        // Server unreachable but cache may work — degraded
+        homeSetSysDot('warn', 'Cloud sync degraded: ' + (err.code || err.message || 'unknown'));
+      });
+  } catch (e) {
+    homeSetSysDot('warn', 'Status check failed: ' + (e.message || e));
+  }
+}
+
+function homeShowSystemStatus() {
+  var lines = [
+    'Firebase SDK: ' + (sysStatus.firebase ? '✓' : '✗'),
+    'Authenticated: ' + (sysStatus.auth ? '✓' : '✗'),
+    'Cloud sync: ' + (sysStatus.firestore ? '✓ active' : '✗ offline'),
+    '',
+    sysStatus.message
+  ].join('\n');
+  alert('RenterIQ — System Status\n\n' + lines);
+}
+
 function homeEnsureLeaseRenewalReminders() {
   try {
     var leases = homeSafeJSON('riq-vault-leases', []);
@@ -2210,6 +2377,13 @@ function homeEnsureLeaseRenewalReminders() {
 
     if (changed) {
       try { localStorage.setItem('renteriq_reminders', JSON.stringify(existing)); } catch(e) {}
+      // Cloud sync any newly-created lease renewal reminders
+      if (window.RIQStore) {
+        RIQStore.ready.then(function() {
+          if (!RIQStore.isAuthed()) return;
+          existing.forEach(function(r) { if (r && r.id && r.id.indexOf('lease_end_') === 0) RIQStore.write('reminders', r.id, r); });
+        });
+      }
     }
   } catch (e) {}
 }
@@ -2288,6 +2462,8 @@ document.addEventListener('DOMContentLoaded', function() {
   homeLoadVaultStats();
   homeEnsureLeaseRenewalReminders();
   homeUpdateBellBadge();
+  homePullTrackedFromCloud();
+  setTimeout(homeRunSystemStatusCheck, 500);
 });
 
 // Update header avatar with user initials

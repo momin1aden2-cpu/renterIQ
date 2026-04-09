@@ -10,7 +10,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RenterIQ">
 <link rel="stylesheet" href="/app/css/app.css?v=3">
-<script src="/app/js/searchService.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
+<script src="/app/js/searchService.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -271,7 +279,13 @@ async function importFromUrl(e) {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', renderProperties);
+document.addEventListener('DOMContentLoaded', function() {
+  renderProperties();
+  // Pull any cloud-synced properties from other devices
+  if (window.SearchService && SearchService.pullFromCloud) {
+    SearchService.pullFromCloud(function() { renderProperties(); });
+  }
+});
 </script>
 <script src="/app/js/sidebar.js"></script>
 <nav class="bottom-nav">

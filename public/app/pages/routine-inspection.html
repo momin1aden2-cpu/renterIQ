@@ -15,6 +15,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1044,6 +1048,15 @@ function loadStoredReminders() {
 }
 function saveStoredReminders(list) {
   try { localStorage.setItem('renteriq_reminders', JSON.stringify(list)); } catch(e) {}
+  // Cloud sync each reminder as its own doc so per-device dedup works
+  if (window.RIQStore) {
+    RIQStore.ready.then(function() {
+      if (!RIQStore.isAuthed()) return;
+      list.forEach(function(r) {
+        if (r && r.id) RIQStore.write('reminders', r.id, r);
+      });
+    });
+  }
 }
 
 function buildReminderForKey(key) {
@@ -1263,42 +1276,77 @@ function loadState() {
   } catch(e) {}
 }
 
-function saveToFirestore(cb) {
-  // Save inspection record to Firestore if user is logged in
+function ri_dataURLToBlob(dataUrl) {
   try {
-    if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) { if (cb) cb(); return; }
+    var parts = dataUrl.split(',');
+    var mime = (parts[0].match(/:(.*?);/) || [null, 'image/jpeg'])[1];
+    var bstr = atob(parts[1]);
+    var n = bstr.length;
+    var u8 = new Uint8Array(n);
+    while (n--) u8[n] = bstr.charCodeAt(n);
+    return new Blob([u8], { type: mime });
+  } catch (e) { return null; }
+}
+
+function saveToFirestore(cb) {
+  // Always run callback so the UI never blocks on cloud sync
+  if (cb) setTimeout(cb, 0);
+
+  if (!window.RIQStore) return;
+  RIQStore.ready.then(function() {
+    if (!RIQStore.isAuthed()) return;
     var user = firebase.auth().currentUser;
-    if (!user) { if (cb) cb(); return; }
-    var db = firebase.firestore();
-    var record = {
-      userId: user.uid,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      agency: document.getElementById('agencyName').value || '',
-      analysis: analysisData,
-      taskCompleted: taskCompleted,
-      photoCount: Object.keys(taskPhotos).reduce(function(sum, k) { return sum + (taskPhotos[k] || []).length; }, 0),
-      status: 'completed'
-    };
-    db.collection('routine_inspections').add(record).then(function(doc) {
-      inspectionId = doc.id;
-      console.log('Inspection saved:', doc.id);
-      // Also save to vault
-      db.collection('users').doc(user.uid).collection('vault').add({
-        type: 'routine_inspection',
-        title: 'Routine Inspection — ' + new Date().toLocaleDateString('en-AU'),
-        inspectionId: doc.id,
-        summary: analysisData.summary,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    if (!user) return;
+
+    var inspId = 'routine_' + Date.now();
+    inspectionId = inspId;
+
+    // Upload task photos in parallel — each task can have several photos
+    var uploadJobs = [];
+    var uploadedPhotos = {};
+    Object.keys(taskPhotos || {}).forEach(function(taskKey) {
+      var photos = taskPhotos[taskKey] || [];
+      uploadedPhotos[taskKey] = [];
+      photos.forEach(function(photoData, idx) {
+        if (typeof photoData !== 'string' || !photoData.indexOf) return;
+        if (photoData.indexOf('data:') !== 0) {
+          // already a URL
+          uploadedPhotos[taskKey].push({ url: photoData });
+          return;
+        }
+        var blob = ri_dataURLToBlob(photoData);
+        if (!blob) return;
+        var path = 'routine-inspections/' + inspId + '/task' + taskKey + '_' + idx + '.jpg';
+        uploadJobs.push(
+          RIQStore.uploadFile(path, blob, { contentType: blob.type || 'image/jpeg' })
+            .then(function(res) {
+              uploadedPhotos[taskKey].push({ url: res.url, path: res.path });
+            })
+            .catch(function(err) {
+              console.warn('Routine inspection photo upload failed:', err);
+            })
+        );
       });
-      if (cb) cb();
-    }).catch(function(err) {
-      console.error('Firestore save error:', err);
-      if (cb) cb();
     });
-  } catch(e) {
-    console.error('Save error:', e);
-    if (cb) cb();
-  }
+
+    Promise.all(uploadJobs).then(function() {
+      var record = {
+        id: inspId,
+        agency: document.getElementById('agencyName').value || '',
+        analysis: analysisData,
+        taskCompleted: taskCompleted,
+        photos: uploadedPhotos,
+        photoCount: Object.keys(uploadedPhotos).reduce(function(sum, k) { return sum + uploadedPhotos[k].length; }, 0),
+        status: 'completed',
+        date: new Date().toISOString()
+      };
+      RIQStore.write('routine-inspections', inspId, record).then(function() {
+        showToast('Saved to cloud ✓', 'Inspection synced across your devices', '☁️');
+      }).catch(function(err) {
+        console.warn('Routine inspection metadata sync failed:', err);
+      });
+    });
+  });
 }
 
 function addToPastInspections() {
@@ -1328,6 +1376,7 @@ function savePastInspections() {
     var summary = analysisData ? (analysisData.summary || {}) : {};
     var agency = document.getElementById('agencyName').value || '';
     var record = {
+      id: inspectionId || ('routine_' + Date.now()),
       summary: summary,
       agency: agency,
       date: Date.now(),

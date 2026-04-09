@@ -13,6 +13,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -892,15 +896,28 @@ function saveToConditionReportsVault(data){
   try{
     var raw=localStorage.getItem('riq_condition_reports')||'[]';
     var reports=JSON.parse(raw);
-    reports.unshift({
+    var record={
+      id:'open_home_'+Date.now(),
       type:'open_home_inspection',
       address:data.address||'Property',
       rent:data.rent||'',
       beds:data.beds||'2',
       verdict:data.verdict||'',
+      notes:data.notes||'',
+      areas:data.areas||{},
       date:Date.now()
-    });
+    };
+    reports.unshift(record);
     localStorage.setItem('riq_condition_reports',JSON.stringify(reports));
+    // ── Cloud sync (background) — text only, no files ──
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(!RIQStore.isAuthed())return;
+        RIQStore.write('open-home-inspections',record.id,record).catch(function(err){
+          console.warn('Open home inspection cloud sync failed:',err);
+        });
+      });
+    }
   }catch(e){console.error('saveToConditionReportsVault:',e);}
 }
 function renderInspectionList(){

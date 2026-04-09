@@ -12,6 +12,49 @@ const SearchService = {
   ],
 
   STORAGE_KEY: 'renteriq_tracked_properties',
+  CLOUD_COLLECTION: 'tracked-properties',
+
+  // ── Cloud sync helpers (no-op when not signed in) ──
+  _syncToCloud(prop) {
+    if (typeof window === 'undefined' || !window.RIQStore) return;
+    window.RIQStore.ready.then(() => {
+      if (window.RIQStore.isAuthed()) {
+        window.RIQStore.write(this.CLOUD_COLLECTION, prop.id, prop);
+      }
+    });
+  },
+
+  _deleteFromCloud(id) {
+    if (typeof window === 'undefined' || !window.RIQStore) return;
+    window.RIQStore.ready.then(() => {
+      if (window.RIQStore.isAuthed()) {
+        window.RIQStore.delete(this.CLOUD_COLLECTION, id);
+      }
+    });
+  },
+
+  pullFromCloud(onChange) {
+    if (typeof window === 'undefined' || !window.RIQStore) return;
+    window.RIQStore.ready.then(() => {
+      if (!window.RIQStore.isAuthed()) return;
+      if (!window.RIQStore.isMigrated(this.STORAGE_KEY)) {
+        window.RIQStore.migrateArray(this.STORAGE_KEY, this.CLOUD_COLLECTION, 'id');
+      }
+      window.RIQStore.list(this.CLOUD_COLLECTION).then((remote) => {
+        if (!Array.isArray(remote) || remote.length === 0) return;
+        const local = this.getTrackedProperties();
+        const localIds = new Set(local.map(p => p.id));
+        let added = 0;
+        remote.forEach(r => {
+          if (r && r.id && !localIds.has(r.id)) { local.push(r); added++; }
+        });
+        if (added > 0) {
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(local));
+          if (typeof onChange === 'function') onChange();
+        }
+      });
+    });
+  },
 
   generateSearchUrls(suburb, postcode) {
     const formattedSuburb = suburb.toLowerCase().trim().replace(/\s+/g, '-');
@@ -42,6 +85,7 @@ const SearchService = {
     const existing = this.getTrackedProperties();
     existing.push(property);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existing));
+    this._syncToCloud(property);
   },
 
   getTrackedProperties() {
@@ -56,13 +100,15 @@ const SearchService = {
   deleteProperty(id) {
     const existing = this.getTrackedProperties();
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existing.filter(p => p.id !== id)));
+    this._deleteFromCloud(id);
   },
 
   updatePropertyStatus(id, status) {
     const existing = this.getTrackedProperties();
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(
-      existing.map(p => p.id === id ? { ...p, status } : p)
-    ));
+    const updated = existing.map(p => p.id === id ? { ...p, status } : p);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updated));
+    const target = updated.find(p => p.id === id);
+    if (target) this._syncToCloud(target);
   },
 
   isPropertyPage(url) {

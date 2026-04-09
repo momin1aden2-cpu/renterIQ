@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "renteriq-e1096"
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}

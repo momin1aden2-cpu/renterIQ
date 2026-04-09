@@ -14,6 +14,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -885,15 +889,34 @@ function markFixed(n){
 function generateExitReport(){
   var disc=aiComparisonData?aiComparisonData.discrepancies||[]:[];
   var confirmed=Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='confirmed'}).length;
+  var auditId='exit_audit_'+Date.now();
   var report={
-    type:'exit-audit',date:new Date().toISOString(),
-    areas:exitRoomData.length,discrepancies:disc.length,confirmed:confirmed,
-    rooms:exitRoomData.map(function(r,i){return Object.assign({},r,exitRoomNotes[i]||{})})
+    id:auditId,
+    type:'exit-audit',
+    date:new Date().toISOString(),
+    areas:exitRoomData.length,
+    discrepancies:disc.length,
+    confirmed:confirmed,
+    rooms:exitRoomData.map(function(r,i){return Object.assign({},r,exitRoomNotes[i]||{})}),
+    aiComparison:aiComparisonData||null
   };
   try{
     var vault=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
     vault.push(report);localStorage.setItem('renteriq_vault_reports',JSON.stringify(vault));
   }catch(e){}
+
+  // ── Cloud sync (background) ──
+  if(window.RIQStore){
+    RIQStore.ready.then(function(){
+      if(!RIQStore.isAuthed())return;
+      RIQStore.write('exit-audits',auditId,report).then(function(){
+        showToast('Saved to cloud ✓','Exit record backed up across your devices','☁️');
+      }).catch(function(err){
+        console.warn('Exit audit cloud sync failed:',err);
+      });
+    });
+  }
+
   showToast('Exit report saved to Vault','Your bond protection record is complete','📄');
   setTimeout(function(){switchView('H')},1200);
 }

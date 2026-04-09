@@ -16,6 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
 <!-- Authentication Guard -->
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1067,6 +1068,47 @@ function saveProfileState(code){
   if(display && meta) display.textContent=meta.name+' ('+meta.code+')';
   closeProfileStateSelector();
   showToast('State updated',meta?meta.name+' — your rights will reflect this':code,'📍');
+  syncProfileToCloud();
+}
+
+function syncProfileToCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    var profile={
+      state: localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'',
+      name: localStorage.getItem('riq-user-name')||'',
+      initials: localStorage.getItem('riq-user-initials')||'',
+      address: localStorage.getItem('riq-user-address')||localStorage.getItem('riq-tenancy-address')||'',
+      updatedAt: Date.now()
+    };
+    RIQStore.write('state','profile',profile).catch(function(err){
+      console.warn('Profile cloud sync failed:',err);
+    });
+  });
+}
+
+function pullProfileFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    RIQStore.read('state','profile').then(function(remote){
+      if(!remote)return;
+      // Apply remote profile to local — only if local is empty (don't overwrite recent local edits)
+      try{
+        if(remote.state&&!localStorage.getItem('renteriq_user_state')){
+          localStorage.setItem('renteriq_user_state',remote.state);
+          localStorage.setItem('riq-user-state',remote.state);
+          var meta=profileStateData.find(function(s){return s.code===remote.state});
+          var display=document.getElementById('profileStateDisplay');
+          if(display&&meta) display.textContent=meta.name+' ('+meta.code+')';
+        }
+        if(remote.name&&!localStorage.getItem('riq-user-name'))localStorage.setItem('riq-user-name',remote.name);
+        if(remote.initials&&!localStorage.getItem('riq-user-initials'))localStorage.setItem('riq-user-initials',remote.initials);
+        if(remote.address&&!localStorage.getItem('riq-user-address'))localStorage.setItem('riq-user-address',remote.address);
+      }catch(e){}
+    });
+  });
 }
 
 // Init
@@ -1085,6 +1127,9 @@ document.addEventListener('DOMContentLoaded',function(){
       if(display&&meta) display.textContent=meta.name+' ('+meta.code+')';
     }
   })();
+
+  // Pull profile from cloud (will only fill empty local fields)
+  pullProfileFromCloud();
 
   setTimeout(function(){
     var bar=document.getElementById('profileLeaseBar');

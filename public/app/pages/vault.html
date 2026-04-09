@@ -16,6 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -531,10 +532,11 @@ function submitMaintenance(){
     showToast('Error', 'Please describe the issue', '❌');
     return;
   }
+  var maintRecord = null;
   try {
     var raw = localStorage.getItem('riq_maintenance_items') || '[]';
     var items = JSON.parse(raw);
-    items.unshift({
+    maintRecord = {
       id: 'maint_' + Date.now(),
       issueType: issueType,
       description: description,
@@ -543,7 +545,8 @@ function submitMaintenance(){
       source: 'manual',
       date: Date.now(),
       photos: maintPhotos || []
-    });
+    };
+    items.unshift(maintRecord);
     localStorage.setItem('riq_maintenance_items', JSON.stringify(items));
     maintPhotos = [];
     loadMaintenanceItems();
@@ -552,6 +555,91 @@ function submitMaintenance(){
   } catch(e) { console.error('submitMaintenance:', e); }
   closeMaintenanceSheet();
   showToast('Request submitted ✓', 'Logged in Maintenance Log', '🔧');
+
+  // ── Cloud sync (background) ──
+  if (maintRecord) syncMaintenanceToCloud(maintRecord);
+}
+
+function maint_dataURLToBlob(dataUrl){
+  try{
+    var parts=dataUrl.split(',');
+    var mime=(parts[0].match(/:(.*?);/)||[null,'image/jpeg'])[1];
+    var bstr=atob(parts[1]);
+    var n=bstr.length;
+    var u8=new Uint8Array(n);
+    while(n--)u8[n]=bstr.charCodeAt(n);
+    return new Blob([u8],{type:mime});
+  }catch(e){return null}
+}
+
+function syncMaintenanceToCloud(rec){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+
+    var photos=rec.photos||[];
+    var uploadJobs=[];
+    var uploadedPhotos=[];
+
+    photos.forEach(function(photo,idx){
+      // photos can be a base64 string OR an object {type:'file',name,icon}
+      if(typeof photo==='string'&&photo.indexOf('data:')===0){
+        var blob=maint_dataURLToBlob(photo);
+        if(!blob){return}
+        var path='maintenance/'+rec.id+'/photo_'+idx+'.jpg';
+        uploadJobs.push(
+          RIQStore.uploadFile(path,blob,{contentType:blob.type||'image/jpeg'})
+            .then(function(res){uploadedPhotos.push({url:res.url,path:res.path})})
+            .catch(function(err){console.warn('Maintenance photo upload failed:',err)})
+        );
+      } else if(photo&&typeof photo==='object'){
+        // file-type placeholder — keep as-is, no upload
+        uploadedPhotos.push(photo);
+      }
+    });
+
+    Promise.all(uploadJobs).then(function(){
+      var cloudRec=Object.assign({},rec,{photos:uploadedPhotos});
+      RIQStore.write('maintenance-items',rec.id,cloudRec).then(function(){
+        // Mirror cloud URLs back to local cache
+        try{
+          var list=JSON.parse(localStorage.getItem('riq_maintenance_items')||'[]');
+          var i=list.findIndex(function(x){return x.id===rec.id});
+          if(i!==-1){list[i]=cloudRec;localStorage.setItem('riq_maintenance_items',JSON.stringify(list));}
+        }catch(e){}
+      }).catch(function(err){
+        console.warn('Maintenance cloud sync failed:',err);
+      });
+    });
+  });
+}
+
+function pullMaintenanceItemsFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    if(!RIQStore.isMigrated('riq_maintenance_items')){
+      RIQStore.migrateArray('riq_maintenance_items','maintenance-items','id');
+    }
+    RIQStore.list('maintenance-items').then(function(remote){
+      if(!Array.isArray(remote)||remote.length===0)return;
+      var local=[];
+      try{local=JSON.parse(localStorage.getItem('riq_maintenance_items')||'[]');}catch(e){}
+      if(!Array.isArray(local))local=[];
+      var localIds={};
+      local.forEach(function(r){if(r&&r.id)localIds[r.id]=true;});
+      var changed=false;
+      remote.forEach(function(r){
+        if(!r||!r.id)return;
+        if(!localIds[r.id]){local.unshift(r);changed=true;}
+      });
+      if(changed){
+        try{localStorage.setItem('riq_maintenance_items',JSON.stringify(local));}catch(e){}
+        loadMaintenanceItems();
+        loadVaultCounts();
+      }
+    });
+  });
 }
 
 // Receipts sheet functions
@@ -607,17 +695,19 @@ function submitReceipt(){
     showToast('Error', 'Please enter a description', '❌');
     return;
   }
+  var receiptRecord = null;
   try {
     var raw = localStorage.getItem('riq_receipts') || '[]';
     var receipts = JSON.parse(raw);
-    receipts.unshift({
+    receiptRecord = {
       id: 'receipt_' + Date.now(),
       type: type,
       description: description,
       amount: amount,
       date: date ? new Date(date).getTime() : Date.now(),
       photo: receiptPhoto
-    });
+    };
+    receipts.unshift(receiptRecord);
     localStorage.setItem('riq_receipts', JSON.stringify(receipts));
     receiptPhoto = null;
     loadReceipts();
@@ -626,6 +716,67 @@ function submitReceipt(){
   } catch(e) { console.error('submitReceipt:', e); }
   closeReceiptsSheet();
   showToast('Receipt saved ✓', 'Added to Receipts & Payments', '🧾');
+  // ── Cloud sync (background) ──
+  if (receiptRecord) syncReceiptToCloud(receiptRecord);
+}
+
+function syncReceiptToCloud(rec){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    var photo=rec.photo;
+    var afterUpload=function(cloudPhoto){
+      var cloudRec=Object.assign({},rec,{photo:cloudPhoto||null});
+      RIQStore.write('receipts',rec.id,cloudRec).then(function(){
+        try{
+          var list=JSON.parse(localStorage.getItem('riq_receipts')||'[]');
+          var i=list.findIndex(function(x){return x.id===rec.id});
+          if(i!==-1){list[i]=cloudRec;localStorage.setItem('riq_receipts',JSON.stringify(list));}
+        }catch(e){}
+      }).catch(function(err){console.warn('Receipt cloud sync failed:',err)});
+    };
+    if(typeof photo==='string'&&photo.indexOf('data:')===0){
+      var blob=maint_dataURLToBlob(photo);
+      if(!blob){afterUpload(null);return}
+      var ext=blob.type.split('/')[1]||'jpg';
+      var path='receipts/'+rec.id+'.'+ext;
+      RIQStore.uploadFile(path,blob,{contentType:blob.type})
+        .then(function(res){afterUpload({url:res.url,path:res.path})})
+        .catch(function(err){console.warn('Receipt photo upload failed:',err);afterUpload(null);});
+    } else if(photo&&typeof photo==='object'){
+      afterUpload(photo); // file placeholder
+    } else {
+      afterUpload(null);
+    }
+  });
+}
+
+function pullReceiptsFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    if(!RIQStore.isMigrated('riq_receipts')){
+      RIQStore.migrateArray('riq_receipts','receipts','id');
+    }
+    RIQStore.list('receipts').then(function(remote){
+      if(!Array.isArray(remote)||remote.length===0)return;
+      var local=[];
+      try{local=JSON.parse(localStorage.getItem('riq_receipts')||'[]');}catch(e){}
+      if(!Array.isArray(local))local=[];
+      var localIds={};
+      local.forEach(function(r){if(r&&r.id)localIds[r.id]=true;});
+      var changed=false;
+      remote.forEach(function(r){
+        if(!r||!r.id)return;
+        if(!localIds[r.id]){local.unshift(r);changed=true;}
+      });
+      if(changed){
+        try{localStorage.setItem('riq_receipts',JSON.stringify(local));}catch(e){}
+        loadReceipts();
+        loadVaultCounts();
+      }
+    });
+  });
 }
 
 // Show custom type input when "Other" selected
@@ -653,6 +804,12 @@ function resolveItem(id){
       loadMaintenanceItems();
       loadVaultCounts();
       showToast(item.status === 'resolved' ? 'Marked resolved ✓' : 'Reopened', item.status === 'resolved' ? 'Moved to resolved items' : 'Item reopened', item.status === 'resolved' ? '✓' : '🔧');
+      // Cloud sync the status change
+      if (window.RIQStore) {
+        RIQStore.ready.then(function() {
+          if (RIQStore.isAuthed()) RIQStore.write('maintenance-items', item.id, item);
+        });
+      }
     }
   } catch(e) { console.error('resolveItem:', e); }
 }
@@ -870,6 +1027,15 @@ document.addEventListener('DOMContentLoaded',function(){
   loadRecentActivity();
   renderCustomFolders();
   checkResumeFolder();
+  // Pull cloud data in the background and re-render when ready
+  pullLeasesFromCloud();
+  pullEntryAuditsFromCloud();
+  pullExitAuditsFromCloud();
+  pullRoutineInspectionsFromCloud();
+  pullMaintenanceItemsFromCloud();
+  pullPersonalDocsFromCloud();
+  pullReceiptsFromCloud();
+  pullOpenHomeInspectionsFromCloud();
 });
 /* ── Load Routine Inspection Reports from localStorage ── */
 function loadRoutineReports(){
@@ -945,8 +1111,173 @@ function ensureLeaseRenewalReminders(){
       });
     });
 
-    if(changed)localStorage.setItem('renteriq_reminders',JSON.stringify(existing));
+    if(changed){
+      localStorage.setItem('renteriq_reminders',JSON.stringify(existing));
+      // Cloud sync any newly-created lease reminders
+      if(window.RIQStore){
+        RIQStore.ready.then(function(){
+          if(!RIQStore.isAuthed())return;
+          existing.forEach(function(r){if(r&&r.id&&r.id.indexOf('lease_end_')===0)RIQStore.write('reminders',r.id,r);});
+        });
+      }
+    }
   }catch(e){console.error('ensureLeaseRenewalReminders:',e);}
+}
+
+/* ── Cloud sync: pull open-home inspections from Firestore ── */
+function pullOpenHomeInspectionsFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    if(!RIQStore.isMigrated('riq_condition_reports')){
+      RIQStore.migrateArray('riq_condition_reports','open-home-inspections','id');
+    }
+    RIQStore.list('open-home-inspections').then(function(remote){
+      if(!Array.isArray(remote)||remote.length===0)return;
+      var local=[];
+      try{local=JSON.parse(localStorage.getItem('riq_condition_reports')||'[]');}catch(e){}
+      if(!Array.isArray(local))local=[];
+      var localIds={};
+      local.forEach(function(r){if(r&&r.id)localIds[r.id]=true;});
+      var changed=false;
+      remote.forEach(function(r){
+        if(!r||!r.id)return;
+        if(!localIds[r.id]){local.unshift(r);changed=true;}
+      });
+      if(changed){
+        try{localStorage.setItem('riq_condition_reports',JSON.stringify(local));}catch(e){}
+        loadConditionReports();
+        loadVaultCounts();
+      }
+    });
+  });
+}
+
+/* ── Cloud sync: pull routine inspections from Firestore ── */
+function pullRoutineInspectionsFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    if(!RIQStore.isMigrated('riq_routine_inspection_past')){
+      RIQStore.migrateArray('riq_routine_inspection_past','routine-inspections','id');
+    }
+    RIQStore.list('routine-inspections').then(function(remote){
+      if(!Array.isArray(remote)||remote.length===0)return;
+      var local=[];
+      try{local=JSON.parse(localStorage.getItem('riq_routine_inspection_past')||'[]');}catch(e){}
+      if(!Array.isArray(local))local=[];
+      var localIds={};
+      local.forEach(function(r){if(r&&r.id)localIds[r.id]=true;});
+      var changed=false;
+      remote.forEach(function(r){
+        if(!r||!r.id)return;
+        if(!localIds[r.id]){
+          // Map cloud record to the past-inspection summary shape
+          var summary=(r.analysis&&r.analysis.summary)||{};
+          local.unshift({
+            id:r.id,
+            summary:summary,
+            agency:r.agency||'',
+            date:r.date?new Date(r.date).getTime():Date.now(),
+            itemCount:(r.analysis&&r.analysis.items&&r.analysis.items.length)||0
+          });
+          changed=true;
+        }
+      });
+      if(changed){
+        try{localStorage.setItem('riq_routine_inspection_past',JSON.stringify(local));}catch(e){}
+        loadRoutineReports();
+        loadVaultCounts();
+      }
+    });
+  });
+}
+
+/* ── Cloud sync: pull exit audits from Firestore and merge into vault reports ── */
+function pullExitAuditsFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    RIQStore.list('exit-audits').then(function(remote){
+      if(!Array.isArray(remote)||remote.length===0)return;
+      var local=[];
+      try{local=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');}catch(e){}
+      if(!Array.isArray(local))local=[];
+      var map={};
+      local.forEach(function(r){if(r&&r.id)map[r.id]=r;});
+      var changed=false;
+      remote.forEach(function(r){
+        if(!r||!r.id)return;
+        if(!map[r.id]){local.push(r);changed=true;}
+      });
+      if(changed){
+        try{localStorage.setItem('renteriq_vault_reports',JSON.stringify(local));}catch(e){}
+        loadExitReports();
+        loadVaultCounts();
+      }
+    });
+  });
+}
+
+/* ── Cloud sync: pull entry audits from Firestore and merge into vault reports ── */
+function pullEntryAuditsFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    RIQStore.list('entry-audits').then(function(remote){
+      if(!Array.isArray(remote)||remote.length===0)return;
+      var local=[];
+      try{local=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');}catch(e){}
+      if(!Array.isArray(local))local=[];
+      var map={};
+      local.forEach(function(r){if(r&&r.id)map[r.id]=r;});
+      var changed=false;
+      remote.forEach(function(r){
+        if(!r||!r.id)return;
+        if(!map[r.id]){local.push(r);changed=true;}
+        // If we already have a local copy, prefer it (it has base64 for offline)
+      });
+      if(changed){
+        try{localStorage.setItem('renteriq_vault_reports',JSON.stringify(local));}catch(e){}
+        loadConditionReports();
+        loadVaultCounts();
+      }
+    });
+  });
+}
+
+/* ── Cloud sync: pull leases from Firestore and merge into local cache ── */
+function pullLeasesFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    if(!RIQStore.isMigrated('riq-vault-leases')){
+      RIQStore.migrateArray('riq-vault-leases','leases','id');
+    }
+    RIQStore.list('leases').then(function(remote){
+      if(!Array.isArray(remote)||remote.length===0)return;
+      var local=[];
+      try{local=JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');}catch(e){}
+      if(!Array.isArray(local))local=[];
+      var map={};
+      local.forEach(function(l){if(l&&l.id)map[l.id]=l;});
+      var changed=false;
+      remote.forEach(function(r){
+        if(!r||!r.id)return;
+        if(!map[r.id]){local.unshift(r);changed=true;}
+        else if(JSON.stringify(map[r.id])!==JSON.stringify(r)){
+          // Cloud copy differs (e.g. file URL was added) — prefer cloud
+          var i=local.findIndex(function(x){return x.id===r.id;});
+          if(i!==-1){local[i]=r;changed=true;}
+        }
+      });
+      if(changed){
+        try{localStorage.setItem('riq-vault-leases',JSON.stringify(local));}catch(e){}
+        loadLeaseAgreements();
+        loadVaultCounts();
+      }
+    });
+  });
 }
 
 /* ── Load Lease Agreements from riq-vault-leases ── */
@@ -982,11 +1313,12 @@ function loadLeaseAgreements(){
       var flaggedTag=flagged>0
         ?'<span class="tag tag-amber">'+flagged+' to review</span>'
         :'<span class="tag tag-teal">All standard ✓</span>';
+      var cloudIndicator=l.fileUrl?'<span title="Original PDF in cloud" style="font-size:12px;margin-left:6px">☁️</span>':'';
       var meta=[date,l.weeklyRent?l.weeklyRent+'/wk':'',endDateStr].filter(Boolean).join(' · ');
       html+='<div class="folder-card" style="margin-bottom:10px;cursor:pointer" onclick="openReportDetail(\'lease\',\''+l.id+'\')">'
         +'<div style="display:flex;align-items:center;gap:12px;width:100%">'
           +'<div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📑</div>'
-          +'<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+vaultEsc(l.address||l.fileName||'Lease')+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">'+vaultEsc(meta)+'</div></div>'
+          +'<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+vaultEsc(l.address||l.fileName||'Lease')+cloudIndicator+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">'+vaultEsc(meta)+'</div></div>'
           +flaggedTag
         +'</div></div>';
     });
@@ -1245,7 +1577,10 @@ function renderLeaseDetail(l){
     html+='<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px;margin-bottom:14px"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:5px">⚠️ '+flagged+' clause'+(flagged!==1?'s':'')+' need review</div><div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6">Open the Lease Reviewer to see the full plain-English breakdown and your concerns flagged by the AI.</div></div>';
   }
 
-  html+='<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="navigate(\'/app/pages/lease.html\')">Open in Lease Reviewer →</button>';
+  if(l.fileUrl){
+    html+='<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;margin-bottom:10px" onclick="window.open(\''+vaultEsc(l.fileUrl)+'\',\'_blank\')">📄 Open original PDF →</button>';
+  }
+  html+='<button class="btn-outline-c btn-full" style="border-radius:14px;padding:14px" onclick="navigate(\'/app/pages/lease.html\')">Open in Lease Reviewer →</button>';
 
   body.innerHTML=html;
 }
@@ -1292,9 +1627,10 @@ function renderEntryAuditDetail(record){
       if(photos.length){
         html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">';
         photos.slice(0,8).forEach(function(p){
-          var src=typeof p==='string'?p:(p&&p.data)||'';
+          // Prefer cloud URL when present, fall back to legacy base64 data
+          var src=typeof p==='string'?p:(p&&(p.url||p.data))||'';
           if(src){
-            html+='<div style="aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--blue-xl)"><img src="'+src+'" style="width:100%;height:100%;object-fit:cover" alt=""></div>';
+            html+='<div style="aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--blue-xl)"><img src="'+src+'" loading="lazy" style="width:100%;height:100%;object-fit:cover" alt=""></div>';
           }else{
             html+='<div style="aspect-ratio:1;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px">📷</div>';
           }
@@ -1866,8 +2202,11 @@ function handlePersonalDocUpload(input){
         var raw=localStorage.getItem('riq_personal_docs');
         if(raw)rec=JSON.parse(raw);
         if(!rec.userDocs)rec.userDocs=[];
-        rec.userDocs.push({name:file.name,size:file.size,mimeType:file.type,data:e.target.result,addedAt:Date.now(),pts:0});
+        var newDoc={id:'doc_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),name:file.name,size:file.size,mimeType:file.type,data:e.target.result,addedAt:Date.now(),pts:0};
+        rec.userDocs.push(newDoc);
         localStorage.setItem('riq_personal_docs',JSON.stringify(rec));
+        // Cloud sync the single new file
+        syncPersonalDocFileToCloud(newDoc,file);
         loaded++;
         if(loaded>=total){
           showToast(loaded+' file'+(loaded!==1?'s':'')+' added','Saved to Personal Documents','📎');
@@ -1883,20 +2222,104 @@ function handlePersonalDocUpload(input){
   input.value='';
 }
 
+function syncPersonalDocFileToCloud(docMeta,file){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    var ext=(docMeta.name.split('.').pop()||'bin').toLowerCase();
+    var path='personal-docs/userdocs/'+docMeta.id+'.'+ext;
+    RIQStore.uploadFile(path,file,{contentType:file.type||'application/octet-stream'})
+      .then(function(res){
+        // Update the local record with the cloud URL and re-sync the full doc
+        try{
+          var raw=localStorage.getItem('riq_personal_docs');
+          if(!raw)return;
+          var rec=JSON.parse(raw);
+          if(!rec.userDocs)return;
+          var i=rec.userDocs.findIndex(function(d){return d&&d.id===docMeta.id});
+          if(i!==-1){
+            rec.userDocs[i].url=res.url;
+            rec.userDocs[i].path=res.path;
+            localStorage.setItem('riq_personal_docs',JSON.stringify(rec));
+          }
+          // Push the full personal-docs record to Firestore (slim version without base64)
+          var slim=Object.assign({},rec);
+          if(slim.userDocs){
+            slim.userDocs=slim.userDocs.map(function(d){
+              var c=Object.assign({},d);
+              delete c.data;
+              return c;
+            });
+          }
+          if(slim.uploadedDocs){
+            var udClean={};
+            Object.keys(slim.uploadedDocs).forEach(function(k){
+              var v=Object.assign({},slim.uploadedDocs[k]);
+              delete v.data;
+              udClean[k]=v;
+            });
+            slim.uploadedDocs=udClean;
+          }
+          RIQStore.write('state','personal-docs',slim);
+        }catch(e){}
+      })
+      .catch(function(err){console.warn('Personal doc upload failed:',err)});
+  });
+}
+
 function deletePersonalDoc(idx){
   try{
     var raw=localStorage.getItem('riq_personal_docs');
     if(!raw)return;
     var rec=JSON.parse(raw);
     if(rec.userDocs&&rec.userDocs[idx]!==undefined){
-      var name=rec.userDocs[idx].name;
+      var doc=rec.userDocs[idx];
+      var name=doc.name;
       rec.userDocs.splice(idx,1);
       localStorage.setItem('riq_personal_docs',JSON.stringify(rec));
       showToast('File removed',name,'🗑️');
       checkResumeFolder();
       loadPersonalDocuments();
+      // Cloud sync — delete the file and re-write the slim record
+      if(window.RIQStore&&doc.path){
+        RIQStore.ready.then(function(){
+          if(!RIQStore.isAuthed())return;
+          RIQStore.deleteFile(doc.path);
+          var slim=Object.assign({},rec);
+          if(slim.userDocs){slim.userDocs=slim.userDocs.map(function(d){var c=Object.assign({},d);delete c.data;return c;});}
+          RIQStore.write('state','personal-docs',slim);
+        });
+      }
     }
   }catch(e){}
+}
+
+function pullPersonalDocsFromCloud(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    RIQStore.read('state','personal-docs').then(function(remote){
+      if(!remote)return;
+      var local=null;
+      try{var raw=localStorage.getItem('riq_personal_docs');if(raw)local=JSON.parse(raw);}catch(e){}
+      // Merge: prefer remote for new fields, keep any local base64 for offline render
+      var merged=Object.assign({},remote,local||{});
+      if(remote.userDocs){
+        // For each remote doc not in local, add it
+        var localUserDocs=(local&&local.userDocs)||[];
+        var localIds={};
+        localUserDocs.forEach(function(d){if(d&&d.id)localIds[d.id]=true;});
+        remote.userDocs.forEach(function(d){
+          if(d&&d.id&&!localIds[d.id]){localUserDocs.push(d);}
+        });
+        merged.userDocs=localUserDocs;
+      }
+      try{localStorage.setItem('riq_personal_docs',JSON.stringify(merged));}catch(e){}
+      checkResumeFolder();
+      if(currentView==='I')loadPersonalDocuments();
+      loadVaultCounts();
+    });
+  });
 }
 
 /* ── Load Vault Counts from localStorage ── */
