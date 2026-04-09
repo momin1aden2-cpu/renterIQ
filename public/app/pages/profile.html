@@ -240,14 +240,14 @@
 <div class="sec-label">Data & Vault</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
   <div class="settings-row" onclick="navigate('/app/pages/vault.html')"><span class="settings-icon">�️</span><div style="flex:1"><div class="settings-title">Your Vault</div><div class="settings-sub">0 documents</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="showToast('Export','Generating your data export — feature coming soon','📦')"><span class="settings-icon">📦</span><div style="flex:1"><div class="settings-title">Export All Data</div><div class="settings-sub">Download all Vault contents as ZIP</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="exportAllData()"><span class="settings-icon">📦</span><div style="flex:1"><div class="settings-title">Export All Data</div><div class="settings-sub">Download all Vault contents as ZIP</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="switchView('F')"><span class="settings-icon">🔒</span><div style="flex:1"><div class="settings-title">Data & Privacy</div><div class="settings-sub">How RenterIQ handles your data</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 <!-- SECTION 5: SUPPORT -->
 <div class="sec-label">Support</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="showToast('Help','Full help centre coming soon — contact support below','❓')"><span class="settings-icon">❓</span><div style="flex:1"><div class="settings-title">Help & FAQ</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('mailto:support@renteriq.com.au','_blank')"><span class="settings-icon">❓</span><div style="flex:1"><div class="settings-title">Help & FAQ</div><div class="settings-sub">support@renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="showToast('Support','Email: support@renteriq.com.au','💬')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Contact Support</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="showToast('Thank you!','App store rating coming when we launch publicly','⭐')"><span class="settings-icon">⭐</span><div style="flex:1"><div class="settings-title">Rate RenterIQ</div></div><span class="settings-chevron">›</span></div>
 </div>
@@ -296,7 +296,7 @@
 <!-- AVATAR SECTION -->
 <div style="text-align:center;padding:20px 0 24px">
   <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);border:3px solid rgba(27,80,200,.15);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:32px;color:#fff;margin:0 auto">AJ</div>
-  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-top:12px;display:block;cursor:pointer" onclick="showToast('Photo','Profile photo upload coming soon','📷')">Change Photo</span>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);margin-top:12px;display:block" id="profileEmailLabel"></span>
 </div>
 
 <!-- PERSONAL INFO -->
@@ -306,8 +306,8 @@
   <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" placeholder="your@email.com"></div>
   <div class="form-field"><label class="form-label">Mobile Number</label><input class="form-input" placeholder="04xx xxx xxx"></div>
   <div class="form-field"><label class="form-label">Date of Birth</label><input class="form-input" placeholder="DD/MM/YYYY"></div>
-  <div class="form-field" style="display:flex;align-items:center;justify-content:space-between"><div><label class="form-label">Current State</label><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">Victoria (VIC)</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="showToast('State','Select your state to update the Rights Hub','📍')">Change ›</span></div>
-  <div class="form-field" style="display:flex;align-items:center;justify-content:space-between"><div><label class="form-label">Preferred Language</label><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">English</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="showToast('Language','Language options coming soon','🌏')">Change ›</span></div>
+  <div class="form-field" style="display:flex;align-items:center;justify-content:space-between"><div><label class="form-label">Current State</label><div id="profileStateDisplay" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">Victoria (VIC)</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="openProfileStateSelector()">Change ›</span></div>
+  <div class="form-field"><label class="form-label">Preferred Language</label><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text)">English</div></div>
 </div>
 
 <!-- RENTER RESUME LINK -->
@@ -327,8 +327,7 @@
 <!-- SECURITY -->
 <div class="sec-label" style="margin-top:20px">Security</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="showToast('Password','Password change coming soon — auth module in progress','🔑')"><span class="settings-icon">🔑</span><div style="flex:1"><div class="settings-title">Change Password</div><div class="settings-sub">Last changed: Never</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="showToast('2FA','Two-factor auth coming soon','🔐')"><span class="settings-icon">🔐</span><div style="flex:1"><div class="settings-title">Two-Factor Authentication</div></div><span class="settings-right" style="color:var(--muted)">OFF</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+  <div class="settings-row" onclick="sendPasswordReset()"><span class="settings-icon">🔑</span><div style="flex:1"><div class="settings-title">Change Password</div><div class="settings-sub">Send a reset link to your email</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 </div>
@@ -372,7 +371,7 @@
     <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Bond Lodged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
   </div>
   <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
-  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;display:block;text-align:center" onclick="showToast('Update','Tenancy details editor coming soon','✏️')">Update tenancy details →</span>
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;display:block;text-align:center" onclick="navigate('/app/pages/lease.html')">Analyse your lease →</span>
 </div>
 
 <!-- LEASE PROGRESS -->
@@ -391,10 +390,6 @@
 <div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
   <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
     <div style="flex:1;color:var(--muted)"><div style="font-family:'Sora',sans-serif;font-weight:600;font-size:13px">No previous tenancies added</div></div>
-  </div>
-  <div style="padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="showToast('Import','Previous tenancy import coming soon','📋')">
-    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">+ Add Previous Property</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Import past tenancy history</div></div>
-    <span style="font-size:20px;color:var(--blue);cursor:pointer">+</span>
   </div>
 </div>
 
@@ -651,17 +646,9 @@
 <!-- DATA ACTIONS -->
 <div class="sec-label" style="margin-top:20px">Your Data</div>
 <div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="showToast('Export','Data export feature coming soon','📦')"><span class="settings-icon">📦</span><div style="flex:1"><div class="settings-title">Export All Data</div><div class="settings-sub">Download all Vault contents as a ZIP file</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="exportAllData()"><span class="settings-icon">📦</span><div style="flex:1"><div class="settings-title">Export All Data</div><div class="settings-sub">Download your data as a JSON file</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="showToast('Cache cleared','Temporary files removed','✓')"><span class="settings-icon">🗑️</span><div style="flex:1"><div class="settings-title">Clear Cache</div><div class="settings-sub">Remove temporary app data</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="confirmDataDelete()"><span class="settings-icon">❌</span><div style="flex:1"><div class="settings-title" style="color:var(--red)">Delete All Data</div><div class="settings-sub" style="color:rgba(232,64,64,.7)">Permanently delete all documents and photos</div></div><span class="settings-chevron">›</span></div>
-</div>
-
-<!-- LEGAL LINKS -->
-<div class="sec-label" style="margin-top:20px">Legal</div>
-<div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="window.open('/privacy.html', '_blank')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Privacy Policy</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="window.open('/terms.html', '_blank')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms of Service</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="window.open('/disclaimer.html', '_blank')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Disclaimer</div><div class="settings-sub">RenterIQ is not a legal service</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 </div>
@@ -858,6 +845,34 @@ function notifyMe(){
   }else{showToast('Enter a valid email','','⚠️')}
 }
 
+/* --- PASSWORD RESET --- */
+function sendPasswordReset(){
+  var user = typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null;
+  var email = user ? user.email : null;
+  if(!email){showToast('Not signed in','Sign in first to reset your password','⚠️');return;}
+  firebase.auth().sendPasswordResetEmail(email).then(function(){
+    showToast('Reset email sent ✓','Check your inbox for a reset link','📧');
+  }).catch(function(err){
+    showToast('Could not send reset email',err.message,'❌');
+  });
+}
+
+/* --- DATA EXPORT --- */
+function exportAllData(){
+  var data={};
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);
+    try{data[k]=JSON.parse(localStorage.getItem(k))}catch(e){data[k]=localStorage.getItem(k)}
+  }
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='renteriq-export-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  showToast('Export ready','Your data has been downloaded','📦');
+}
+
 /* --- DANGER ZONE: ACCOUNT ACTIONS --- */
 // VIBE CHECK: Critical actions (sign out, delete) with clear visual separation.
 // Firebase integration with graceful fallbacks for offline scenarios.
@@ -1011,12 +1026,65 @@ function confirmDataDelete(){
   showToast('Data deletion','Contact support@renteriq.com.au to request full data deletion','❌');
 }
 
+/* --- STATE SELECTOR --- */
+var profileStateData = [
+  {code:'VIC',name:'Victoria'},
+  {code:'NSW',name:'New South Wales'},
+  {code:'QLD',name:'Queensland'},
+  {code:'WA',name:'Western Australia'},
+  {code:'SA',name:'South Australia'},
+  {code:'TAS',name:'Tasmania'},
+  {code:'ACT',name:'ACT'},
+  {code:'NT',name:'Northern Territory'}
+];
+
+function openProfileStateSelector(){
+  var backdrop=document.getElementById('profileStateBackdrop');
+  var modal=document.getElementById('profileStateModal');
+  if(!backdrop||!modal) return;
+  var current=localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'VIC';
+  modal.querySelectorAll('.pss-btn').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.code===current.toUpperCase());
+  });
+  backdrop.classList.add('active');
+  modal.classList.add('active');
+  document.body.style.overflow='hidden';
+}
+
+function closeProfileStateSelector(){
+  var backdrop=document.getElementById('profileStateBackdrop');
+  var modal=document.getElementById('profileStateModal');
+  if(backdrop) backdrop.classList.remove('active');
+  if(modal) modal.classList.remove('active');
+  document.body.style.overflow='';
+}
+
+function saveProfileState(code){
+  localStorage.setItem('renteriq_user_state', code);
+  localStorage.setItem('riq-user-state', code);
+  var meta=profileStateData.find(function(s){return s.code===code});
+  var display=document.getElementById('profileStateDisplay');
+  if(display && meta) display.textContent=meta.name+' ('+meta.code+')';
+  closeProfileStateSelector();
+  showToast('State updated',meta?meta.name+' — your rights will reflect this':code,'📍');
+}
+
 // Init
 document.addEventListener('DOMContentLoaded',function(){
   views.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
 
   // Setup delete modal event listeners
   setupDeleteModalListeners();
+
+  // Populate saved state on "Current State" field
+  (function(){
+    var saved=localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state');
+    if(saved){
+      var meta=profileStateData.find(function(s){return s.code===saved.toUpperCase()});
+      var display=document.getElementById('profileStateDisplay');
+      if(display&&meta) display.textContent=meta.name+' ('+meta.code+')';
+    }
+  })();
 
   setTimeout(function(){
     var bar=document.getElementById('profileLeaseBar');
@@ -1031,6 +1099,15 @@ document.addEventListener('DOMContentLoaded',function(){
   if('Notification' in window&&Notification.permission==='granted'){
     pushEnabled=true;updatePushToggle(true);updatePushStatusCard(true);
   }
+
+  // Populate signed-in email on personal details view
+  setTimeout(function(){
+    if(typeof firebase !== 'undefined' && firebase.auth){
+      var user = firebase.auth().currentUser;
+      var lbl = document.getElementById('profileEmailLabel');
+      if(lbl && user && user.email) lbl.textContent = user.email;
+    }
+  }, 1200);
 });
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
@@ -1043,6 +1120,28 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
   <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
   <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
 </nav>
+
+<!-- STATE SELECTOR MODAL -->
+<div class="delete-modal-backdrop" id="profileStateBackdrop" onclick="closeProfileStateSelector()"></div>
+<div class="delete-modal" id="profileStateModal" style="padding:28px 24px;max-height:90vh;overflow-y:auto">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--text);margin-bottom:6px">Your State</div>
+  <div style="font-family:'Nunito',sans-serif;font-size:13px;color:var(--text-sub);margin-bottom:20px">Select the state where you rent. Your rights hub will update automatically.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+    <button class="pss-btn" data-code="VIC" onclick="saveProfileState('VIC')" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:2px solid var(--border);background:#fff;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:left;transition:all .2s">Victoria<br><span style="font-size:11px;font-weight:400;color:var(--text-sub)">VIC</span></button>
+    <button class="pss-btn" data-code="NSW" onclick="saveProfileState('NSW')" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:2px solid var(--border);background:#fff;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:left;transition:all .2s">New South Wales<br><span style="font-size:11px;font-weight:400;color:var(--text-sub)">NSW</span></button>
+    <button class="pss-btn" data-code="QLD" onclick="saveProfileState('QLD')" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:2px solid var(--border);background:#fff;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:left;transition:all .2s">Queensland<br><span style="font-size:11px;font-weight:400;color:var(--text-sub)">QLD</span></button>
+    <button class="pss-btn" data-code="WA" onclick="saveProfileState('WA')" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:2px solid var(--border);background:#fff;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:left;transition:all .2s">Western Australia<br><span style="font-size:11px;font-weight:400;color:var(--text-sub)">WA</span></button>
+    <button class="pss-btn" data-code="SA" onclick="saveProfileState('SA')" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:2px solid var(--border);background:#fff;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:left;transition:all .2s">South Australia<br><span style="font-size:11px;font-weight:400;color:var(--text-sub)">SA</span></button>
+    <button class="pss-btn" data-code="TAS" onclick="saveProfileState('TAS')" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:2px solid var(--border);background:#fff;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:left;transition:all .2s">Tasmania<br><span style="font-size:11px;font-weight:400;color:var(--text-sub)">TAS</span></button>
+    <button class="pss-btn" data-code="ACT" onclick="saveProfileState('ACT')" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:2px solid var(--border);background:#fff;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:left;transition:all .2s">ACT<br><span style="font-size:11px;font-weight:400;color:var(--text-sub)">ACT</span></button>
+    <button class="pss-btn" data-code="NT" onclick="saveProfileState('NT')" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;border:2px solid var(--border);background:#fff;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:left;transition:all .2s">Northern Territory<br><span style="font-size:11px;font-weight:400;color:var(--text-sub)">NT</span></button>
+  </div>
+  <button onclick="closeProfileStateSelector()" style="width:100%;padding:14px;border:none;background:var(--border);border-radius:14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:15px;color:var(--text-sub);cursor:pointer">Cancel</button>
+</div>
+<style>
+.pss-btn.active{border-color:var(--blue)!important;background:rgba(0,102,255,.07)!important;color:var(--blue)!important}
+.pss-btn.active span{color:var(--blue)!important}
+</style>
 
 <!-- CUSTOM DELETE ACCOUNT MODAL -->
 <div class="delete-modal-backdrop" id="deleteModalBackdrop"></div>

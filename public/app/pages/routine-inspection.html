@@ -489,7 +489,7 @@
         <div class="rr-title">7 days before next inspection</div>
         <div class="rr-sub" id="remind7days">Set inspection date first</div>
       </div>
-      <div class="rr-toggle" style="background:var(--teal)" data-key="remind_7d" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
+      <div class="rr-toggle" style="background:var(--border)" data-key="remind_7d" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="left:2px"></div></div>
     </div>
 
     <div class="reminder-row">
@@ -498,7 +498,7 @@
         <div class="rr-title">1 day before next inspection</div>
         <div class="rr-sub" id="remind1day">Set inspection date first</div>
       </div>
-      <div class="rr-toggle" style="background:var(--teal)" data-key="remind_1d" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div>
+      <div class="rr-toggle" style="background:var(--border)" data-key="remind_1d" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="left:2px"></div></div>
     </div>
 
     <div id="taskRemindersSection"></div>
@@ -590,6 +590,9 @@ function switchView(id) {
     btn.innerHTML = '🤖 Analyse with AI';
     btn.style.opacity = '1';
     btn.style.pointerEvents = 'auto';
+  }
+  if (id === 'F') {
+    renderReminders();
   }
 }
 
@@ -1001,6 +1004,7 @@ function renderReminders() {
   if (!analysisData) {
     document.getElementById('taskRemindersSection').innerHTML = '';
     document.getElementById('completeSection').style.display = analysisData ? 'block' : 'none';
+    syncReminderTogglesFromStorage();
     return;
   }
   var items = analysisData.items || [];
@@ -1012,29 +1016,127 @@ function renderReminders() {
     var colors = ['rgba(0,200,150,.1)', 'rgba(27,80,200,.08)', 'rgba(245,166,35,.1)', 'rgba(232,64,64,.1)'];
     tenantItems.forEach(function(it, i) {
       var dueDate = it.deadline_days ? new Date(Date.now() + it.deadline_days * 86400000).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) : 'No deadline set';
-      html += '<div class="reminder-row"><div class="rr-icon" style="background:' + colors[i % colors.length] + '">' + icons[i % icons.length] + '</div><div class="rr-body"><div class="rr-title">' + esc(it.description) + '</div><div class="rr-sub">Due ' + dueDate + '</div></div><div class="rr-toggle" style="background:var(--teal)" data-key="task_' + i + '" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="right:2px"></div></div></div>';
+      html += '<div class="reminder-row"><div class="rr-icon" style="background:' + colors[i % colors.length] + '">' + icons[i % icons.length] + '</div><div class="rr-body"><div class="rr-title">' + esc(it.description) + '</div><div class="rr-sub">Due ' + dueDate + '</div></div><div class="rr-toggle" style="background:var(--border)" data-key="task_' + i + '" onclick="toggleReminder(this)"><div class="rr-toggle-dot" style="left:2px"></div></div></div>';
     });
   }
   document.getElementById('taskRemindersSection').innerHTML = html;
   document.getElementById('completeSection').style.display = 'block';
+  syncReminderTogglesFromStorage();
+}
+
+// Refresh stored reminder timestamps when the schedule changes
+function refreshScheduleReminders() {
+  var stored = loadStoredReminders();
+  ['remind_7d', 'remind_1d'].forEach(function(key) {
+    var idx = stored.findIndex(function(r){ return r.id === 'routine_' + key; });
+    if (idx === -1) return;
+    var fresh = buildReminderForKey(key);
+    if (fresh) stored[idx] = fresh;
+    else stored.splice(idx, 1);
+  });
+  saveStoredReminders(stored);
+}
+
+// ── Persistent reminders → /app/pages/notifications.html ──
+function loadStoredReminders() {
+  try { var raw = localStorage.getItem('renteriq_reminders'); return raw ? JSON.parse(raw) : []; }
+  catch(e) { return []; }
+}
+function saveStoredReminders(list) {
+  try { localStorage.setItem('renteriq_reminders', JSON.stringify(list)); } catch(e) {}
+}
+
+function buildReminderForKey(key) {
+  // Inspection-schedule reminders need a scheduled inspection date
+  if (key === 'remind_7d' || key === 'remind_1d') {
+    var sched = (function(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY + '_schedule') || 'null'); } catch(e) { return null; } })();
+    if (!sched || !sched.lastDate || !sched.frequency) return null;
+    var last = new Date(sched.lastDate);
+    var next = new Date(last);
+    next.setMonth(next.getMonth() + parseInt(sched.frequency, 10));
+    next.setHours(9, 0, 0, 0);
+    var offsetDays = key === 'remind_7d' ? 7 : 1;
+    var when = next.getTime() - offsetDays * 86400000;
+    if (when < Date.now()) return null;
+    var agencyName = (sched.agency || 'your agent');
+    return {
+      id: 'routine_' + key,
+      icon: key === 'remind_7d' ? '📅' : '⏰',
+      iconBg: key === 'remind_7d' ? 'rgba(27,80,200,.08)' : 'rgba(245,166,35,.1)',
+      title: (offsetDays === 7 ? '7 days before' : '1 day before') + ' routine inspection',
+      body: 'Inspection by ' + agencyName + ' on ' + next.toLocaleDateString('en-AU', { day:'numeric', month:'long' }),
+      timestamp: when
+    };
+  }
+  // Task reminders — derived from analysisData tenant items
+  if (key.indexOf('task_') === 0 && analysisData) {
+    var idx = parseInt(key.replace('task_', ''), 10);
+    var items = (analysisData.items || []).filter(function(it){ return it.responsibility === 'tenant'; });
+    var it = items[idx];
+    if (!it) return null;
+    var deadline = it.deadline_days || 14;
+    var when = Date.now() + deadline * 86400000;
+    return {
+      id: 'routine_' + key,
+      icon: '🔧',
+      iconBg: 'rgba(245,166,35,.1)',
+      title: it.description || 'Tenant action item',
+      body: 'Due in ' + deadline + ' day' + (deadline !== 1 ? 's' : '') + ' · routine inspection task',
+      timestamp: when
+    };
+  }
+  return null;
 }
 
 function toggleReminder(el) {
   var dot = el.querySelector('.rr-toggle-dot');
-  var isOn = getComputedStyle(el).backgroundColor !== 'rgb(213, 226, 248)';
-  if (el.style.background === 'var(--border)' || el.style.background === 'var(--border-lt)') isOn = false;
+  var key = el.getAttribute('data-key');
+  var bg = el.style.background || '';
+  var isOn = bg !== 'var(--border)' && bg !== 'var(--border-lt)';
+
+  var stored = loadStoredReminders();
+  var existingIdx = stored.findIndex(function(r){ return r.id === 'routine_' + key; });
+
   if (isOn) {
+    // turning OFF
     el.style.background = 'var(--border)';
     dot.style.right = 'auto';
     dot.style.left = '2px';
+    if (existingIdx !== -1) { stored.splice(existingIdx, 1); saveStoredReminders(stored); }
     showToast('Off', 'Reminder disabled', '🔕');
   } else {
+    // turning ON
+    var entry = buildReminderForKey(key);
+    if (!entry) {
+      // can't enable — bounce the toggle back
+      el.style.background = 'var(--border)';
+      dot.style.right = 'auto';
+      dot.style.left = '2px';
+      showToast('Set the date first', key.indexOf('task_') === 0 ? 'Run AI analysis first' : 'Add your last inspection date below', '⚠️');
+      return;
+    }
     el.style.background = 'var(--teal)';
     dot.style.left = 'auto';
     dot.style.right = '2px';
-    showToast('On', 'Reminder enabled', '🔔');
+    if (existingIdx !== -1) stored[existingIdx] = entry;
+    else stored.push(entry);
+    saveStoredReminders(stored);
+    showToast('Reminder set', new Date(entry.timestamp).toLocaleDateString('en-AU', { day:'numeric', month:'long' }), '🔔');
   }
   saveState();
+}
+
+function syncReminderTogglesFromStorage() {
+  var stored = loadStoredReminders();
+  var enabledIds = stored.map(function(r){ return r.id; });
+  document.querySelectorAll('.rr-toggle[data-key]').forEach(function(el){
+    var key = el.getAttribute('data-key');
+    var dot = el.querySelector('.rr-toggle-dot');
+    if (!dot) return;
+    var on = enabledIds.indexOf('routine_' + key) !== -1;
+    if (on) { el.style.background = 'var(--teal)'; dot.style.left = 'auto'; dot.style.right = '2px'; }
+    else    { el.style.background = 'var(--border)'; dot.style.right = 'auto'; dot.style.left = '2px'; }
+  });
 }
 
 // ── Complete & Save to Vault (View G) ──
@@ -1113,6 +1215,7 @@ function updateSchedule() {
   document.getElementById('remind1day').textContent = remind1.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) + ' at 9:00am';
 
   saveSchedule();
+  refreshScheduleReminders();
 }
 
 function saveSchedule() {

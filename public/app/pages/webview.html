@@ -215,18 +215,17 @@ function showSuccessToast() {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-function goTo(path) {
-  window.location.href = path;
-}
+function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
+function goTo(path) { window.location.href = path; }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
 </script>
 <nav class="bottom-nav">
-  <button class="nav-tab" onclick="goTo('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-  <button class="nav-tab" onclick="goTo('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-  <button class="nav-tab" onclick="goTo('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
-  <button class="nav-tab" onclick="goTo('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
 </nav>
 </body>
 </html>

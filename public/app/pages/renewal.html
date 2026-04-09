@@ -439,35 +439,69 @@ function removeRenewalFile(){
   document.getElementById('renewalFile').value='';
 }
 
+function getPreviousLeaseSummary(){
+  try{
+    var raw=localStorage.getItem('riq-vault-leases');
+    if(!raw)return null;
+    var leases=JSON.parse(raw);
+    if(!Array.isArray(leases)||leases.length===0)return null;
+    leases.sort(function(a,b){return new Date(b.savedAt||0).getTime()-new Date(a.savedAt||0).getTime()});
+    var l=leases[0];
+    return {
+      address:l.address||'',
+      startDate:l.startDate||'',
+      endDate:l.endDate||'',
+      weeklyRent:l.weeklyRent||'',
+      bond:l.bond||'',
+      agencyName:l.agencyName||'',
+      totalClauses:l.totalClauses||0,
+      flaggedCount:l.flaggedCount||0
+    };
+  }catch(e){return null}
+}
+
+function rnEsc(s){if(s==null)return'';return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
 function startRenewalAnalysis(){
   showToast('Analysing new lease…','Comparing to previous agreement','⚖️');
 
   var fileInput=document.getElementById('renewalFile');
-  var isDemoMode=!fileInput||!fileInput.files||!fileInput.files[0];
+  var hasFile=fileInput&&fileInput.files&&fileInput.files[0];
+  var prev=getPreviousLeaseSummary();
   var fetchPromise;
 
-  if(!isDemoMode){
+  if(hasFile){
     var formData=new FormData();
     formData.append('file',fileInput.files[0]);
+    if(prev)formData.append('previousLease',JSON.stringify(prev));
     fetchPromise=fetch('/api/analyze-renewal',{method:'POST',body:formData});
   } else {
     fetchPromise=fetch('/api/analyze-renewal',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({text:''})
+      body:JSON.stringify({text:'',previousLease:prev})
     });
   }
 
   fetchPromise
-    .then(function(r){return r.json()})
+    .then(function(r){
+      if(!r.ok){
+        return r.json().then(function(err){throw new Error(err.error||err.details||'Server returned '+r.status)},function(){throw new Error('Server returned '+r.status)});
+      }
+      return r.json();
+    })
     .then(function(data){
-      if(data.changes||data.new_clauses)renderRenewalChanges(data);
-      switchView('C');
+      if(data.error){throw new Error(data.error)}
+      if(data.changes||data.new_clauses){
+        renderRenewalChanges(data);
+        switchView('C');
+      } else {
+        throw new Error('AI returned an empty response');
+      }
     })
     .catch(function(err){
       console.error('Renewal analysis error:',err);
-      showToast('Analysis note','Using demo comparison','📄');
-      switchView('C');
+      showToast('Analysis failed',String(err.message||err),'⚠️');
     });
 }
 
@@ -476,38 +510,88 @@ function renderRenewalChanges(data){
   if(!container)return;
   var html='';
 
-  if(data.changes){
+  // Headline summary stats
+  if(data.summary){
+    var s=data.summary;
+    var pos=s.positive_count||0,neu=s.neutral_count||0,neg=s.negative_count||0;
+    html+='<div style="background:var(--blue-xl);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">'
+      +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:var(--teal-dk)">'+pos+'</div><div style="font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Positive</div></div>'
+      +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:var(--muted)">'+neu+'</div><div style="font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Neutral</div></div>'
+      +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:var(--red)">'+neg+'</div><div style="font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Concerns</div></div>'
+    +'</div>';
+  }
+
+  // Changes list
+  if(data.changes&&data.changes.length){
     data.changes.forEach(function(change){
-      var isNeg=change.impact==='negative';
-      var iconClass=isNeg?'amber-lt':'teal-lt';
-      var icon=isNeg?'⚠️':'✓';
+      var impact=change.impact||'neutral';
+      var icon=impact==='negative'?'⚠️':impact==='positive'?'✓':'•';
+      var iconClass=impact==='negative'?'amber-lt':impact==='positive'?'teal-lt':'';
+      var iconBg=impact==='negative'?'rgba(245,166,35,.1)':impact==='positive'?'rgba(0,200,150,.1)':'var(--blue-xl)';
       html+='<div class="change-row">';
-      html+='<div class="change-icon '+iconClass+'">'+icon+'</div>';
-      html+='<div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+change.title+'</div>';
-      html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">'+change.explanation+'</div>';
-      if(change.action_needed)html+='<div style="font-family:\'Sora\',sans-serif;font-weight:600;font-size:11px;color:var(--blue);margin-top:4px">→ '+change.action_needed+'</div>';
+      html+='<div class="change-icon '+iconClass+'" style="background:'+iconBg+'">'+icon+'</div>';
+      html+='<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+rnEsc(change.title||'Change')+'</div>';
+      if(change.old_text&&change.new_text){
+        html+='<div style="display:flex;flex-direction:column;gap:4px;margin-top:6px"><div style="font-weight:600;font-size:11px;color:var(--muted);font-style:italic">Was: '+rnEsc(change.old_text)+'</div><div style="font-weight:600;font-size:11px;color:var(--text)">Now: '+rnEsc(change.new_text)+'</div></div>';
+      }
+      html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:6px;line-height:1.55">'+rnEsc(change.explanation||'')+'</div>';
+      if(change.action_needed)html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:var(--blue);margin-top:6px">→ '+rnEsc(change.action_needed)+'</div>';
       html+='</div></div>';
     });
   }
 
-  if(data.new_clauses){
+  // New clauses
+  if(data.new_clauses&&data.new_clauses.length){
     data.new_clauses.forEach(function(clause){
       var isWarn=clause.rating==='warning'||clause.rating==='unusual';
+      var icon=clause.rating==='warning'?'⚠️':isWarn?'⚠':'➕';
       html+='<div class="change-row">';
-      html+='<div class="change-icon '+(isWarn?'amber-lt':'teal-lt')+'">'+(isWarn?'⚠️':'➕')+'</div>';
-      html+='<div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">New: '+clause.title+'</div>';
-      html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">'+clause.explanation+'</div></div>';
-      html+='</div>';
+      html+='<div class="change-icon '+(isWarn?'amber-lt':'teal-lt')+'" style="background:'+(isWarn?'rgba(245,166,35,.1)':'rgba(0,200,150,.1)')+'">'+icon+'</div>';
+      html+='<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">New clause: '+rnEsc(clause.title||'')+'</div>';
+      if(clause.text)html+='<div style="font-weight:600;font-size:11px;color:var(--text);margin-top:4px;font-style:italic">"'+rnEsc(clause.text)+'"</div>';
+      html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:6px;line-height:1.55">'+rnEsc(clause.explanation||'')+'</div>';
+      html+='</div></div>';
     });
   }
 
+  // Removed clauses
+  if(data.removed_clauses&&data.removed_clauses.length){
+    data.removed_clauses.forEach(function(clause){
+      html+='<div class="change-row">';
+      html+='<div class="change-icon teal-lt" style="background:rgba(0,200,150,.1)">−</div>';
+      html+='<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Removed: '+rnEsc(clause.title||'')+'</div>';
+      html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:6px;line-height:1.55">'+rnEsc(clause.explanation||'')+'</div>';
+      html+='</div></div>';
+    });
+  }
+
+  // Detailed bottom summary
   if(data.summary){
-    var s=data.summary;
-    html+='<div style="margin-top:12px;padding:12px;background:var(--blue-xl);border-radius:12px">';
-    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px">Summary</div>';
-    if(s.rent_change)html+='<div style="font-weight:600;font-size:12px;color:var(--muted);line-height:1.5">Rent: '+s.rent_change+'</div>';
-    if(s.overall_assessment)html+='<div style="font-weight:600;font-size:12px;color:var(--muted);line-height:1.5;margin-top:4px">'+s.overall_assessment+'</div>';
+    var s2=data.summary;
+    html+='<div style="margin-top:14px;padding:14px 16px;background:#fff;border:1px solid var(--border-lt);border-radius:14px">';
+    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">Renewal Summary</div>';
+    function row(label,value,isLast){
+      if(!value)return'';
+      return '<div style="padding:8px 0;'+(isLast?'':'border-bottom:1px solid var(--border-lt);')+'display:flex;align-items:center;gap:10px">'
+        +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;flex:1">'+label+'</div>'
+        +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--text);text-align:right">'+rnEsc(value)+'</div>'
+      +'</div>';
+    }
+    html+=row('Rent',s2.rent_change);
+    html+=row('Bond',s2.bond_change);
+    html+=row('Lease term',s2.lease_duration_change);
+    if(s2.rent_change&&s2.rent_increase_legal===false){
+      html+='<div style="margin-top:8px;padding:10px 12px;background:rgba(232,64,64,.06);border:1px solid rgba(232,64,64,.2);border-radius:10px;font-weight:600;font-size:12px;color:var(--red);line-height:1.55">⚠️ The rent increase may exceed legal limits. Check your state\'s tenancy authority before signing.</div>';
+    }
+    if(s2.overall_assessment){
+      html+='<div style="margin-top:10px;padding:10px 12px;background:var(--blue-xl);border-radius:10px;font-weight:600;font-size:12px;color:var(--text);line-height:1.65">'+rnEsc(s2.overall_assessment)+'</div>';
+    }
     html+='</div>';
+  }
+
+  // Empty state
+  if(!html){
+    html='<div style="text-align:center;padding:24px;color:var(--muted);font-weight:600;font-size:13px">The AI did not find any material changes to highlight.</div>';
   }
 
   container.innerHTML=html;

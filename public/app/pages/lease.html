@@ -14,6 +14,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -118,20 +121,24 @@
     <!-- Upload Area -->
     <div style="margin:0 16px 14px;background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px">Upload Your Lease Agreement</div>
-      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">PDF format preferred. Photo of document also accepted.</div>
+      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">PDF preferred — also accepts JPG, PNG, HEIC and Word documents.</div>
 
       <div class="drop-zone" id="dropZone" onclick="triggerUpload()">
         <span style="font-size:44px;display:block;margin-bottom:14px">📄</span>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Tap to upload your lease</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted)">PDF, JPG or PNG · Max 20MB</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted)">PDF · JPG · PNG · HEIC · DOCX · Max 20MB</div>
       </div>
-      <input type="file" id="leaseFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(this)">
+      <input type="file" id="leaseFile" accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,.docx,.doc" style="display:none" onchange="handleFileSelect(this)">
 
-      <div id="fileSelected" style="display:none;padding:20px;text-align:center">
-        <div style="width:64px;height:64px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px;color:var(--teal-dk);font-family:'Sora',sans-serif;font-weight:700">✓</div>
-        <div id="fileName" style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">lease_agreement.pdf</div>
-        <div id="fileSize" style="font-weight:600;font-size:12px;color:var(--muted)">2.4 MB · Ready to analyse</div>
-        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;margin-top:8px;display:block" onclick="triggerUpload()">Change file</span>
+      <div id="fileSelected" style="display:none;padding:16px 0 4px">
+        <div style="display:flex;align-items:center;gap:12px;background:var(--teal-lt);border-radius:12px;padding:12px 14px">
+          <div style="width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📄</div>
+          <div style="flex:1;min-width:0">
+            <div id="fileName" style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--teal-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">lease_agreement.pdf</div>
+            <div id="fileSize" style="font-weight:600;font-size:11px;color:var(--teal-dk);opacity:.75;margin-top:2px">Ready to analyse</div>
+          </div>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal-dk);cursor:pointer;flex-shrink:0" onclick="triggerUpload()">Change</span>
+        </div>
       </div>
 
       <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
@@ -141,6 +148,53 @@
       </div>
 
       <button class="btn-muted-c btn-full" onclick="loadDemoLease()">Use Demo Lease for This Walkthrough</button>
+    </div>
+
+    <!-- Lease Details Form (reveals after file selected) -->
+    <div id="leaseDetailsSection" style="display:none;margin:0 16px 14px;background:#fff;border-radius:18px;padding:20px;border:1px solid var(--border-lt)">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px">Enter Your Lease Details</div>
+      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5">Optional but recommended — RenterIQ uses these to track key dates and send reminders.</div>
+
+      <div style="display:flex;flex-direction:column;gap:0;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border-lt)">
+          <label style="display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Property Address</label>
+          <input id="ld-address" style="width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:transparent;box-sizing:border-box" placeholder="Full rental address">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border-lt)">
+          <div style="padding:12px 14px;border-right:1px solid var(--border-lt)">
+            <label style="display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Start Date</label>
+            <input id="ld-startDate" type="date" style="width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);background:transparent;box-sizing:border-box">
+          </div>
+          <div style="padding:12px 14px">
+            <label style="display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">End Date</label>
+            <input id="ld-endDate" type="date" style="width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);background:transparent;box-sizing:border-box">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border-lt)">
+          <div style="padding:12px 14px;border-right:1px solid var(--border-lt)">
+            <label style="display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Weekly Rent</label>
+            <input id="ld-weeklyRent" style="width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:transparent;box-sizing:border-box" placeholder="$0">
+          </div>
+          <div style="padding:12px 14px">
+            <label style="display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Bond Amount</label>
+            <input id="ld-bond" style="width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:transparent;box-sizing:border-box" placeholder="$0">
+          </div>
+        </div>
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border-lt)">
+          <label style="display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Agency / Property Manager Name</label>
+          <input id="ld-agencyName" style="width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:transparent;box-sizing:border-box" placeholder="Agency or landlord name">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr">
+          <div style="padding:12px 14px;border-right:1px solid var(--border-lt)">
+            <label style="display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">PM Name</label>
+            <input id="ld-pmName" style="width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:transparent;box-sizing:border-box" placeholder="Contact name">
+          </div>
+          <div style="padding:12px 14px">
+            <label style="display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">PM Phone</label>
+            <input id="ld-pmPhone" type="tel" style="width:100%;border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:transparent;box-sizing:border-box" placeholder="04XX XXX XXX">
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- What's in a Typical Lease -->
@@ -186,7 +240,7 @@
       </div>
       <div id="lStep2" style="background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div class="gen-icon" id="lIcon-2">⚖️</div>
-        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Checking Australian law</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Comparing to standard VIC agreement</div></div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Checking Australian law</div><div id="lStep2State" style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Comparing to your state's standard agreement</div></div>
       </div>
       <div id="lStep3" style="background:#fff;border-radius:13px;padding:12px 15px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
         <div class="gen-icon" id="lIcon-3">⚠️</div>
@@ -453,24 +507,24 @@
       </div>
     </div>
 
-    <!-- Your Rights Reminder -->
+    <!-- Your Rights Reminder — state-aware -->
     <div style="margin-top:14px;background:linear-gradient(135deg,var(--blue-dk),var(--blue));border-radius:16px;padding:18px;cursor:pointer" onclick="navigate('/app/pages/rights.html')">
       <span style="font-size:28px;display:block;margin-bottom:10px">⚖️</span>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:6px">Know your rights as a Victorian renter</div>
-      <div style="font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.6">Consumer Affairs Victoria provides free advice on any lease clause you're unsure about. VCAT handles disputes.</div>
-      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal);margin-top:10px;display:block">View VIC Tenancy Resources →</span>
+      <div id="rightsStateTitle" style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:6px">Know your rights as a renter</div>
+      <div id="rightsStateBody" style="font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.6">Your state tenancy authority provides free advice on any lease clause you're unsure about.</div>
+      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal);margin-top:10px;display:block">View Tenancy Resources for Your State →</span>
     </div>
 
     <!-- Disclaimer -->
     <div style="margin-top:14px;background:rgba(245,166,35,.07);border:1.5px solid rgba(245,166,35,.25);border-radius:16px;padding:15px 16px;display:flex;gap:11px;align-items:flex-start">
       <span style="font-size:18px;flex-shrink:0;margin-top:1px">⚠️</span>
-      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">This review is an Smart plain-English summary for your personal understanding only. It is not legal advice. For any concerns about specific clauses, contact Consumer Affairs Victoria on 1300 55 81 81 or seek independent legal advice.</div>
+      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">This review is a plain-English summary for your personal understanding only — not legal advice. For any concerns about specific clauses, contact your state tenancy authority or seek independent legal advice.</div>
     </div>
   </div>
 
   <div class="sticky-footer">
     <button class="btn-outline-c" onclick="switchView('C')">← Back to Clauses</button>
-    <button class="btn-blue-c flex-1" style="border-radius:12px;padding:13px" onclick="switchView('E')">Save Lease to Vault →</button>
+    <button class="btn-blue-c flex-1" style="border-radius:12px;padding:13px" onclick="saveToVault();switchView('E')">Save Lease to Vault →</button>
   </div>
 </div>
 
@@ -580,15 +634,17 @@ function triggerUpload(){document.getElementById('leaseFile').click()}
 function handleFileSelect(input){
   if(!input.files||!input.files[0])return;
   uploadedFile=input.files[0];
+  var kb=Math.round(uploadedFile.size/1024);
+  var mb=(uploadedFile.size/(1024*1024)).toFixed(1);
   document.getElementById('dropZone').style.display='none';
   document.getElementById('fileSelected').style.display='block';
   document.getElementById('fileName').textContent=uploadedFile.name;
-  var kb=Math.round(uploadedFile.size/1024);
-  var mb=(uploadedFile.size/(1024*1024)).toFixed(1);
-  document.getElementById('fileSize').textContent=(kb>1024?mb+' MB':kb+' KB')+' · Ready to analyse';
+  document.getElementById('fileSize').textContent=(kb>1024?mb+' MB':kb+' KB');
+  revealLeaseForm();
   document.getElementById('analyseBtn').style.opacity='1';
   document.getElementById('analyseBtn').style.pointerEvents='auto';
-  showToast('Lease uploaded ✓','Tap Analyse to begin your review','📄');
+  document.getElementById('analyseBtn').textContent='Analyse My Lease →';
+  showToast('Lease uploaded ✓','Fill in your details below then tap Analyse','📄');
 }
 
 function loadDemoLease(){
@@ -596,10 +652,51 @@ function loadDemoLease(){
   document.getElementById('dropZone').style.display='none';
   document.getElementById('fileSelected').style.display='block';
   document.getElementById('fileName').textContent='sample_lease.pdf';
-  document.getElementById('fileSize').textContent='2.4 MB · Demo lease loaded';
+  document.getElementById('fileSize').textContent='Demo lease';
+  revealLeaseForm();
   document.getElementById('analyseBtn').style.opacity='1';
   document.getElementById('analyseBtn').style.pointerEvents='auto';
-  showToast('Demo lease loaded','Tap Analyse to begin','📄');
+  document.getElementById('analyseBtn').textContent='Analyse My Lease →';
+  showToast('Demo lease loaded','Fill in your details then tap Analyse','📄');
+}
+
+function revealLeaseForm(){
+  var section=document.getElementById('leaseDetailsSection');
+  if(section&&section.style.display==='none'){
+    section.style.display='block';
+    // Pre-fill address from localStorage
+    var saved=localStorage.getItem('riq-tenancy-address')||localStorage.getItem('riq-user-address')||'';
+    var addrEl=document.getElementById('ld-address');
+    if(addrEl&&saved&&!addrEl.value)addrEl.value=saved;
+    // Pre-fill from existing lease data
+    try{var ld=JSON.parse(localStorage.getItem('riq-lease-data')||'{}');
+      if(ld.weeklyRent&&document.getElementById('ld-weeklyRent'))document.getElementById('ld-weeklyRent').value=ld.weeklyRent;
+      if(ld.bond&&document.getElementById('ld-bond'))document.getElementById('ld-bond').value=ld.bond;
+      if(ld.agencyName&&document.getElementById('ld-agencyName'))document.getElementById('ld-agencyName').value=ld.agencyName;
+      if(ld.pmName&&document.getElementById('ld-pmName'))document.getElementById('ld-pmName').value=ld.pmName;
+      if(ld.pmPhone&&document.getElementById('ld-pmPhone'))document.getElementById('ld-pmPhone').value=ld.pmPhone;
+      if(ld.startDate&&document.getElementById('ld-startDate'))document.getElementById('ld-startDate').value=ld.startDate;
+      if(ld.endDate&&document.getElementById('ld-endDate'))document.getElementById('ld-endDate').value=ld.endDate;
+    }catch(e){}
+    setTimeout(function(){section.scrollIntoView({behavior:'smooth',block:'start'})},200);
+  }
+}
+
+function collectLeaseDetails(){
+  var d={
+    address:document.getElementById('ld-address').value.trim(),
+    startDate:document.getElementById('ld-startDate').value,
+    endDate:document.getElementById('ld-endDate').value,
+    weeklyRent:document.getElementById('ld-weeklyRent').value.trim(),
+    bond:document.getElementById('ld-bond').value.trim(),
+    agencyName:document.getElementById('ld-agencyName').value.trim(),
+    pmName:document.getElementById('ld-pmName').value.trim(),
+    pmPhone:document.getElementById('ld-pmPhone').value.trim(),
+    savedAt:Date.now()
+  };
+  if(d.address)localStorage.setItem('riq-tenancy-address',d.address);
+  localStorage.setItem('riq-lease-data',JSON.stringify(d));
+  return d;
 }
 
 // Analysis — calls /api/analyze-lease (Gemini AI)
@@ -608,6 +705,10 @@ var totalClauses=12;
 var understood={};
 
 function startAnalysis(){
+  collectLeaseDetails();
+  var userState=localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'your state';
+  var stepStateEl=document.getElementById('lStep2State');
+  if(stepStateEl)stepStateEl.textContent='Comparing to standard '+userState+' agreement';
   switchView('B');
   understood={};
 
@@ -795,17 +896,75 @@ function toggleOriginal(n){
 
 // Save to Vault
 function saveToVault(){
+  var now=new Date();
   var el=document.getElementById('savedTime');
-  if(el){
-    var now=new Date();
-    el.textContent='Saved '+now.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit',hour12:true})+' · '+now.toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
-  }
+  if(el)el.textContent='Saved '+now.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit',hour12:true})+' · '+now.toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+
+  // Persist lease review record to localStorage
+  var ld={};try{ld=JSON.parse(localStorage.getItem('riq-lease-data')||'{}')}catch(e){}
+  var record={
+    id:'lease_'+Date.now(),
+    savedAt:now.toISOString(),
+    fileName:document.getElementById('fileName')?document.getElementById('fileName').textContent:'',
+    address:ld.address||'',
+    startDate:ld.startDate||'',
+    endDate:ld.endDate||'',
+    weeklyRent:ld.weeklyRent||'',
+    bond:ld.bond||'',
+    agencyName:ld.agencyName||'',
+    pmName:ld.pmName||'',
+    pmPhone:ld.pmPhone||'',
+    totalClauses:totalClauses,
+    flaggedCount:leaseData&&leaseData.clauses?leaseData.clauses.filter(function(c){return c.rating!=='standard'}).length:3,
+    state:localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||''
+  };
+  localStorage.setItem('riq-lease-record',JSON.stringify(record));
+
+  // Also save a reference in the vault lease folder
+  try{
+    var vaultLeases=JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+    vaultLeases.unshift(record);
+    localStorage.setItem('riq-vault-leases',JSON.stringify(vaultLeases));
+  }catch(e){}
 }
+
+var STATE_AUTHORITY={
+  VIC:{name:'Consumer Affairs Victoria',phone:'1300 55 81 81'},
+  NSW:{name:'Fair Trading NSW',phone:'13 32 20'},
+  QLD:{name:'Residential Tenancies Authority',phone:'1300 366 311'},
+  WA:{name:'Consumer Protection WA',phone:'1300 30 40 54'},
+  SA:{name:'Consumer and Business Services SA',phone:'131 882'},
+  TAS:{name:'Consumer, Building and Occupational Services',phone:'1300 654 499'},
+  ACT:{name:'ACT Civil and Administrative Tribunal',phone:'(02) 6207 1740'},
+  NT:{name:'NT Consumer Affairs',phone:'1800 019 319'}
+};
 
 // Init
 document.addEventListener('DOMContentLoaded',function(){
   allViews.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
-  saveToVault();
+
+  // State-aware rights card
+  var state=(localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'').toUpperCase();
+  var auth=STATE_AUTHORITY[state];
+  if(auth){
+    var titleEl=document.getElementById('rightsStateTitle');
+    var bodyEl=document.getElementById('rightsStateBody');
+    if(titleEl)titleEl.textContent='Know your rights as a '+state+' renter';
+    if(bodyEl)bodyEl.textContent=auth.name+' provides free advice on any lease clause. Call '+auth.phone+'.';
+  }
+
+  // Load existing lease details if any
+  try{
+    var ld=JSON.parse(localStorage.getItem('riq-lease-data')||'{}');
+    if(ld.address&&document.getElementById('ld-address'))document.getElementById('ld-address').value=ld.address;
+    if(ld.startDate&&document.getElementById('ld-startDate'))document.getElementById('ld-startDate').value=ld.startDate;
+    if(ld.endDate&&document.getElementById('ld-endDate'))document.getElementById('ld-endDate').value=ld.endDate;
+    if(ld.weeklyRent&&document.getElementById('ld-weeklyRent'))document.getElementById('ld-weeklyRent').value=ld.weeklyRent;
+    if(ld.bond&&document.getElementById('ld-bond'))document.getElementById('ld-bond').value=ld.bond;
+    if(ld.agencyName&&document.getElementById('ld-agencyName'))document.getElementById('ld-agencyName').value=ld.agencyName;
+    if(ld.pmName&&document.getElementById('ld-pmName'))document.getElementById('ld-pmName').value=ld.pmName;
+    if(ld.pmPhone&&document.getElementById('ld-pmPhone'))document.getElementById('ld-pmPhone').value=ld.pmPhone;
+  }catch(e){}
 });
 
 // Service Worker

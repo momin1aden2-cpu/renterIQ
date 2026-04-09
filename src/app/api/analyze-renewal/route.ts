@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const SYSTEM_PROMPT = `You are an Australian tenancy lease renewal analyst for RenterIQ.
-You receive TWO lease texts from a renter — their previous lease and their new/renewed lease.
+You receive a renter's NEW/renewed lease (as a PDF or image) and the structured summary of their PREVIOUS lease.
 Your job is to compare them and highlight what changed.
 
 1. Identify every clause that changed between the old and new lease
@@ -59,43 +59,112 @@ Rules:
 - Flag any rent increase above 10% as potentially excessive
 - Flag any new restrictions that weren't in the original lease
 - Be practical — minor wording changes are neutral
-- If only one lease is provided, analyse it as if comparing to a standard VIC lease`;
+- If no previous lease summary is provided, analyse the new lease against a standard Australian residential tenancy agreement and treat existing standard clauses as "no change"`;
+
+type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } };
+
+const SUPPORTED_MIME_TYPES = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/heic',
+  'image/heif',
+  'image/webp',
+]);
+
+const MAX_FILE_BYTES = 18 * 1024 * 1024;
+
+interface PreviousLeaseSummary {
+  address?: string;
+  startDate?: string;
+  endDate?: string;
+  weeklyRent?: string;
+  bond?: string;
+  agencyName?: string;
+  totalClauses?: number;
+  flaggedCount?: number;
+}
+
+function formatPreviousLease(p: PreviousLeaseSummary): string {
+  const lines = [
+    p.address ? `- Address: ${p.address}` : null,
+    p.startDate ? `- Start date: ${p.startDate}` : null,
+    p.endDate ? `- End date: ${p.endDate}` : null,
+    p.weeklyRent ? `- Weekly rent: ${p.weeklyRent}` : null,
+    p.bond ? `- Bond: ${p.bond}` : null,
+    p.agencyName ? `- Agency: ${p.agencyName}` : null,
+    p.totalClauses ? `- Total clauses: ${p.totalClauses}` : null,
+    p.flaggedCount ? `- Previously flagged clauses: ${p.flaggedCount}` : null,
+  ].filter(Boolean);
+  return lines.join('\n');
+}
 
 export async function POST(request: Request) {
-  let oldLeaseText = '';
-  let newLeaseText = '';
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(getMockRenewalAnalysis());
+    }
+
     const contentType = request.headers.get('content-type') || '';
+    let file: File | null = null;
+    let newLeaseText = '';
+    let previousLease: PreviousLeaseSummary | null = null;
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
-      oldLeaseText = (formData.get('oldText') as string) || '';
+      file = (formData.get('file') as File) || null;
       newLeaseText = (formData.get('newText') as string) || (formData.get('text') as string) || '';
+      const prevRaw = formData.get('previousLease') as string;
+      if (prevRaw) {
+        try { previousLease = JSON.parse(prevRaw); } catch { /* ignore */ }
+      }
     } else {
       const body = await request.json();
-      oldLeaseText = body.oldText || '';
       newLeaseText = body.newText || body.text || '';
+      previousLease = body.previousLease || null;
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!newLeaseText || !apiKey) {
+    if (!file && !newLeaseText) {
       return NextResponse.json(getMockRenewalAnalysis());
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    let prompt = SYSTEM_PROMPT + '\n\n';
-    if (oldLeaseText) {
-      prompt += `PREVIOUS LEASE:\n${oldLeaseText}\n\nNEW/RENEWED LEASE:\n${newLeaseText}`;
+    const parts: GeminiPart[] = [{ text: SYSTEM_PROMPT }];
+
+    if (previousLease && Object.keys(previousLease).length > 0) {
+      parts.push({ text: `PREVIOUS LEASE SUMMARY (from RenterIQ vault):\n${formatPreviousLease(previousLease)}` });
     } else {
-      prompt += `NEW LEASE (compare to standard VIC residential tenancy agreement):\n${newLeaseText}`;
+      parts.push({ text: 'No previous lease summary was provided. Compare the new lease against a standard Australian residential tenancy agreement.' });
     }
 
-    const result = await model.generateContent([{ text: prompt }]);
-    const response = result.response;
-    const text = response.text();
+    if (file) {
+      if (file.size > MAX_FILE_BYTES) {
+        return NextResponse.json(
+          { error: 'File too large', details: `Maximum ${Math.round(MAX_FILE_BYTES / 1024 / 1024)}MB` },
+          { status: 413 }
+        );
+      }
+      const mimeType = file.type || 'application/octet-stream';
+      if (!SUPPORTED_MIME_TYPES.has(mimeType)) {
+        return NextResponse.json(
+          { error: 'Unsupported file type', details: `Got ${mimeType}. Supported: PDF, JPG, PNG, HEIC, WEBP` },
+          { status: 415 }
+        );
+      }
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const base64 = buffer.toString('base64');
+      parts.push({ text: 'NEW/RENEWED LEASE is attached. Compare it against the previous lease summary above and return the structured JSON described.' });
+      parts.push({ inlineData: { mimeType, data: base64 } });
+    } else {
+      parts.push({ text: `NEW/RENEWED LEASE TEXT:\n${newLeaseText}` });
+    }
 
+    const result = await model.generateContent(parts);
+    const text = result.response.text();
     const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text];
     const jsonStr = (jsonMatch[1] || text).trim();
 
@@ -111,7 +180,10 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error('Renewal analysis error:', error);
-    return NextResponse.json(getMockRenewalAnalysis());
+    return NextResponse.json(
+      { error: 'Failed to analyse renewal', details: String(error) },
+      { status: 500 }
+    );
   }
 }
 

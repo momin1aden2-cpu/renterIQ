@@ -14,6 +14,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -81,9 +84,14 @@
   <button class="btn-sm-blue" style="flex-shrink:0" onclick="requestPushPermission()">Enable</button>
 </div>
 
-<!-- EMPTY STATE -->
-<div style="text-align:center;padding:48px 24px 24px">
-  <div style="font-size:44px;margin-bottom:12px">�</div>
+<!-- ACTIVITY FEED -->
+<div class="sec-label" id="notifSecLabel" style="display:none">
+  <span class="sec-label-text">Recent Activity</span>
+  <span class="sec-label-count" id="notifSecCount"></span>
+</div>
+<div id="notifFeed"></div>
+<div id="notifEmpty" style="text-align:center;padding:48px 24px 24px">
+  <div style="font-size:44px;margin-bottom:12px">🔔</div>
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:6px">No notifications yet</div>
   <div style="font-weight:600;font-size:13px;color:var(--muted)">Inspection reminders, lease alerts and maintenance follow-ups will appear here once you're active in the app.</div>
 </div>
@@ -93,7 +101,8 @@
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Upcoming Reminders</div>
   <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Scheduled alerts</div>
 </div>
-<div style="margin:0 16px;background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);text-align:center;color:var(--muted)">
+<div id="reminderFeed"></div>
+<div id="reminderEmpty" style="margin:0 16px;background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);text-align:center;color:var(--muted)">
   <div style="font-size:24px;margin-bottom:6px">📋</div>
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk);margin-bottom:4px">No reminders set</div>
   <div style="font-size:12px">Reminders for inspections, lease renewal and maintenance will appear here.</div>
@@ -119,75 +128,336 @@
 </div>
 
 <script>
-/* RenterIQ — Notifications JS */
+/* RenterIQ — Notifications */
 
 function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
-
 function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
 
-// Notification State
-var readNotifs=new Set([4,5,6,7,8]);
-var notifToggles=[true,true,true,true,true,true,true,false];
-
-function markAllRead(){
-  for(var i=0;i<=8;i++){
-    readNotifs.add(i);
-    var card=document.getElementById('notif-'+i);
-    var dot=document.getElementById('dot-'+i);
-    if(card){card.style.borderLeft='1px solid var(--border-lt)';card.style.background='white';card.style.opacity='.85';card.classList.remove('notif-unread')}
-    if(dot)dot.style.display='none';
-  }
-  var subtitle=document.getElementById('notifSubtitle');
-  if(subtitle)subtitle.textContent='All caught up';
-  showToast('All notifications read','','✓');
+function safeJSON(key, fallback) {
+  try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+  catch (e) { return fallback; }
 }
 
-function markRead(n){
-  readNotifs.add(n);
-  var card=document.getElementById('notif-'+n);
-  var dot=document.getElementById('dot-'+n);
-  if(card){card.style.borderLeft='1px solid var(--border-lt)';card.style.background='white';card.classList.remove('notif-unread')}
-  if(dot)dot.style.display='none';
-  updateUnreadCount();
+function timeAgo(ts) {
+  if (!ts) return '';
+  var diff = Date.now() - ts;
+  if (diff < 0) return new Date(ts).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return Math.round(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.round(diff/3600000) + 'h ago';
+  if (diff < 604800000) return Math.round(diff/86400000) + 'd ago';
+  return new Date(ts).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 }
 
-function updateUnreadCount(){
-  var unread=9-readNotifs.size;
-  var subtitle=document.getElementById('notifSubtitle');
-  if(subtitle)subtitle.textContent=unread>0?unread+' unread':'All caught up';
+function tsOf(v) {
+  if (!v) return 0;
+  if (typeof v === 'number') return v;
+  var t = new Date(v).getTime();
+  return isNaN(t) ? 0 : t;
 }
 
-function dismissReminder(n){
-  var card=document.getElementById('reminder-'+n);
-  if(card){card.style.transition='opacity .3s,max-height .3s';card.style.opacity='0';card.style.maxHeight='0';card.style.padding='0';card.style.margin='0';card.style.overflow='hidden';setTimeout(function(){card.style.display='none'},300)}
-  showToast('Reminder dismissed','','✓');
+// ── Notification State (persisted) ──
+var notifState = safeJSON('riq_notifications_state', null) || { read: [], dismissedReminders: [], toggles: [true,true,true,true,true,true,true,false] };
+function saveNotifState() {
+  try { localStorage.setItem('riq_notifications_state', JSON.stringify(notifState)); } catch(e){}
 }
 
-// Push Permission
-function requestPushPermission(){
-  if('Notification' in window){
-    Notification.requestPermission().then(function(perm){
-      var banner=document.getElementById('pushBanner');
-      if(perm==='granted'){showToast('Notifications enabled ✓','You\'ll receive all RenterIQ alerts','🔔');if(banner)banner.style.display='none'}
-      else{showToast('Notifications blocked','Enable in your browser or phone settings','⚙')}
+// ── Build feed from real data ──
+function buildNotificationFeed() {
+  var feed = [];
+
+  var tracked = safeJSON('renteriq_tracked_properties', []);
+  if (Array.isArray(tracked)) {
+    tracked.slice(-5).forEach(function(p) {
+      var ts = tsOf(p.savedAt);
+      if (!ts) return;
+      feed.push({
+        id: 'tracked-' + p.id,
+        icon: '🏠', iconBg: 'var(--blue-xl)',
+        title: 'Property tracked',
+        body: p.address || p.label || 'New property added to your tracker',
+        ts: ts, href: '/app/pages/tracked.html'
+      });
     });
-  }else{showToast('Not supported','Your browser doesn\'t support push notifications','⚠️')}
+  }
+
+  var leases = safeJSON('riq-vault-leases', []);
+  if (Array.isArray(leases)) {
+    leases.slice(-3).forEach(function(l) {
+      var ts = tsOf(l.savedAt || l.date || l.timestamp);
+      if (!ts) return;
+      var flagged = l.flaggedCount || 0;
+      feed.push({
+        id: 'lease-' + ts,
+        icon: '📑', iconBg: 'rgba(245,166,35,.1)',
+        title: 'Lease analysis ready',
+        body: flagged > 0 ? flagged + ' clause' + (flagged !== 1 ? 's' : '') + ' flagged for your review' : 'Your lease has been analysed and saved',
+        ts: ts, href: '/app/pages/lease.html'
+      });
+    });
+  }
+
+  var vaultReports = safeJSON('renteriq_vault_reports', []);
+  if (Array.isArray(vaultReports)) {
+    vaultReports.forEach(function(r) {
+      var ts = tsOf(r.date);
+      if (!ts) return;
+      if (r.type === 'entry-audit') {
+        var rooms = (r.data && r.data.completedRooms) || (r.rooms ? r.rooms.length : 0);
+        feed.push({
+          id: 'entry-' + ts,
+          icon: '📸', iconBg: 'rgba(0,200,150,.1)',
+          title: 'Entry audit saved',
+          body: rooms + ' room' + (rooms !== 1 ? 's' : '') + ' documented · saved to Vault',
+          ts: ts, href: '/app/pages/vault.html'
+        });
+      } else if (r.type === 'exit-audit') {
+        feed.push({
+          id: 'exit-' + ts,
+          icon: '🚪', iconBg: 'rgba(232,64,64,.08)',
+          title: 'Exit inspection complete',
+          body: (r.confirmed || 0) + ' item' + ((r.confirmed||0) !== 1 ? 's' : '') + ' flagged · bond protection record saved',
+          ts: ts, href: '/app/pages/vault.html'
+        });
+      }
+    });
+  }
+
+  var maint = safeJSON('riq_maintenance_items', []);
+  if (Array.isArray(maint)) {
+    maint.slice(-3).forEach(function(m, i) {
+      var ts = tsOf(m.date || m.createdAt || m.timestamp);
+      if (!ts) return;
+      feed.push({
+        id: 'maint-' + (m.id || ts),
+        icon: '🔧', iconBg: 'rgba(245,166,35,.1)',
+        title: 'Maintenance logged',
+        body: m.title || m.description || m.issue || 'New maintenance item recorded',
+        ts: ts, href: '/app/pages/vault.html'
+      });
+    });
+  }
+
+  var routinePast = safeJSON('riq_routine_inspection_past', []);
+  if (Array.isArray(routinePast)) {
+    routinePast.slice(-2).forEach(function(r) {
+      var ts = tsOf(r.date || r.timestamp);
+      if (!ts) return;
+      feed.push({
+        id: 'routine-' + ts,
+        icon: '📋', iconBg: 'var(--blue-xl)',
+        title: 'Routine inspection analysed',
+        body: (r.itemCount || r.items && r.items.length || 0) + ' items reviewed · response built',
+        ts: ts, href: '/app/pages/routine-inspection.html'
+      });
+    });
+  }
+
+  var docs = safeJSON('riq_personal_docs', null);
+  if (docs && docs.updatedAt) {
+    feed.push({
+      id: 'docs-' + docs.updatedAt,
+      icon: '🗂️', iconBg: 'var(--blue-xl)',
+      title: 'Personal Documents updated',
+      body: 'Your renter resume and supporting documents are saved',
+      ts: docs.updatedAt, href: '/app/pages/vault.html#resume'
+    });
+  }
+
+  return feed.sort(function(a, b) { return b.ts - a.ts; });
 }
 
-// Toggle Notification Types
-function toggleNotifType(n){
-  notifToggles[n]=!notifToggles[n];
-  var toggle=document.getElementById('toggle-'+n);
-  var dot=document.getElementById('toggleDot-'+n);
-  var on=notifToggles[n];
-  if(toggle){toggle.style.background=on?'var(--teal)':'var(--border)';toggle.style.justifyContent=on?'flex-end':'flex-start'}
-  if(dot){if(on){dot.style.right='2px';dot.style.left='auto'}else{dot.style.right='auto';dot.style.left='2px'}}
-  showToast(on?'Notification enabled':'Notification disabled','',on?'🔔':'🔕');
+function buildReminderFeed() {
+  var reminders = [];
+  var now = Date.now(), DAY = 86400000;
+
+  var inspections = safeJSON('renteriq_scheduled_inspections', []);
+  if (Array.isArray(inspections)) {
+    inspections.forEach(function(i) {
+      var dateStr = i.date || '';
+      var timeStr = i.time || '10:00';
+      var when = dateStr ? new Date(dateStr + 'T' + timeStr).getTime() : 0;
+      if (when && when > now - DAY && when < now + 30 * DAY) {
+        var daysAway = Math.round((when - now) / DAY);
+        var label = daysAway === 0 ? 'Today at ' + timeStr : daysAway === 1 ? 'Tomorrow at ' + timeStr : 'In ' + daysAway + ' days';
+        reminders.push({
+          id: 'insp-' + (i.id || when),
+          icon: '📅', iconBg: 'var(--blue-xl)',
+          title: 'Open home: ' + (i.address || i.propertyAddress || 'Property'),
+          body: label, ts: when
+        });
+      }
+    });
+  }
+
+  var custom = safeJSON('renteriq_reminders', []);
+  if (Array.isArray(custom)) {
+    custom.forEach(function(r) {
+      var when = tsOf(r.timestamp || r.date);
+      if (!when) return;
+      // Visibility window: show from 14 days before until 7 days after the target timestamp.
+      // Stops far-future reminders (e.g. 90/60/30-day lease alerts) from cluttering the feed
+      // until they're imminent, while still surfacing recently-fired ones for a week.
+      if (when - now > 14 * DAY) return;
+      if (now - when > 7 * DAY) return;
+      reminders.push({
+        id: r.id || ('rem-' + when),
+        icon: r.icon || '🔔',
+        iconBg: r.iconBg || 'var(--blue-xl)',
+        title: r.title || 'Reminder',
+        body: r.body || timeAgo(when),
+        ts: when
+      });
+    });
+  }
+
+  return reminders.filter(function(r) {
+    return notifState.dismissedReminders.indexOf(r.id) === -1;
+  }).sort(function(a, b) { return a.ts - b.ts; });
 }
 
-// Init
-document.addEventListener('DOMContentLoaded',function(){
-  if('Notification' in window&&Notification.permission==='granted'){var banner=document.getElementById('pushBanner');if(banner)banner.style.display='none'}
+// ── Render ──
+function renderNotifications() {
+  var feed = buildNotificationFeed();
+  var container = document.getElementById('notifFeed');
+  var empty = document.getElementById('notifEmpty');
+  var label = document.getElementById('notifSecLabel');
+  var subtitle = document.getElementById('notifSubtitle');
+
+  if (feed.length === 0) {
+    if (container) container.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    if (label) label.style.display = 'none';
+    if (subtitle) subtitle.textContent = 'All caught up';
+    return;
+  }
+
+  if (empty) empty.style.display = 'none';
+  if (label) label.style.display = 'flex';
+
+  var unread = feed.filter(function(n) { return notifState.read.indexOf(n.id) === -1; }).length;
+  if (subtitle) subtitle.textContent = unread > 0 ? unread + ' unread' : 'All caught up';
+  var labelCount = document.getElementById('notifSecCount');
+  if (labelCount) labelCount.textContent = feed.length + ' total';
+
+  container.innerHTML = feed.map(function(n) {
+    var isUnread = notifState.read.indexOf(n.id) === -1;
+    return '<div class="notif-card' + (isUnread ? ' notif-unread' : '') + '" onclick="openNotification(\'' + n.id + '\',\'' + n.href + '\')">'
+      + '<div class="notif-icon" style="background:' + n.iconBg + '">' + n.icon + '</div>'
+      + '<div style="flex:1;min-width:0">'
+        + '<div class="notif-title">' + escapeHtml(n.title) + '</div>'
+        + '<div class="notif-body">' + escapeHtml(n.body) + '</div>'
+      + '</div>'
+      + '<div class="notif-right">'
+        + '<span class="notif-time">' + timeAgo(n.ts) + '</span>'
+        + (isUnread ? '<div class="notif-dot"></div>' : '')
+      + '</div>'
+    + '</div>';
+  }).join('');
+}
+
+function renderReminders() {
+  var reminders = buildReminderFeed();
+  var container = document.getElementById('reminderFeed');
+  var empty = document.getElementById('reminderEmpty');
+  if (!container) return;
+
+  if (reminders.length === 0) {
+    container.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  container.innerHTML = reminders.map(function(r) {
+    return '<div class="reminder-card" id="rem-card-' + r.id + '" style="margin:0 16px 10px">'
+      + '<div class="notif-icon" style="background:' + r.iconBg + '">' + r.icon + '</div>'
+      + '<div style="flex:1;min-width:0"><div class="notif-title">' + escapeHtml(r.title) + '</div><div class="notif-body">' + escapeHtml(r.body) + '</div></div>'
+      + '<button class="btn-sm-muted" onclick="dismissReminder(\'' + r.id + '\')">Dismiss</button>'
+    + '</div>';
+  }).join('');
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, function(c) {
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+  });
+}
+
+function openNotification(id, href) {
+  if (notifState.read.indexOf(id) === -1) {
+    notifState.read.push(id);
+    saveNotifState();
+  }
+  if (href && href !== 'undefined') navigate(href);
+  else renderNotifications();
+}
+
+function markAllRead() {
+  var feed = buildNotificationFeed();
+  feed.forEach(function(n) {
+    if (notifState.read.indexOf(n.id) === -1) notifState.read.push(n.id);
+  });
+  saveNotifState();
+  renderNotifications();
+  showToast('All notifications read', '', '✓');
+}
+
+function dismissReminder(id) {
+  if (notifState.dismissedReminders.indexOf(id) === -1) {
+    notifState.dismissedReminders.push(id);
+    saveNotifState();
+  }
+  var card = document.getElementById('rem-card-' + id);
+  if (card) {
+    card.style.transition = 'opacity .3s';
+    card.style.opacity = '0';
+    setTimeout(function() { renderReminders(); }, 280);
+  } else {
+    renderReminders();
+  }
+  showToast('Reminder dismissed', '', '✓');
+}
+
+function requestPushPermission() {
+  if ('Notification' in window) {
+    Notification.requestPermission().then(function(perm) {
+      var banner = document.getElementById('pushBanner');
+      if (perm === 'granted') { showToast('Notifications enabled ✓', "You'll receive all RenterIQ alerts", '🔔'); if (banner) banner.style.display = 'none'; }
+      else showToast('Notifications blocked', 'Enable in your browser or phone settings', '⚙');
+    });
+  } else showToast('Not supported', "Your browser doesn't support push notifications", '⚠️');
+}
+
+function toggleNotifType(n) {
+  notifState.toggles[n] = !notifState.toggles[n];
+  saveNotifState();
+  var toggle = document.getElementById('toggle-' + n);
+  var dot = document.getElementById('toggleDot-' + n);
+  var on = notifState.toggles[n];
+  if (toggle) { toggle.style.background = on ? 'var(--teal)' : 'var(--border)'; toggle.style.justifyContent = on ? 'flex-end' : 'flex-start'; }
+  if (dot) { if (on) { dot.style.right = '2px'; dot.style.left = 'auto'; } else { dot.style.right = 'auto'; dot.style.left = '2px'; } }
+  showToast(on ? 'Notification enabled' : 'Notification disabled', '', on ? '🔔' : '🔕');
+}
+
+function applyTogglesToUI() {
+  notifState.toggles.forEach(function(on, n) {
+    var toggle = document.getElementById('toggle-' + n);
+    var dot = document.getElementById('toggleDot-' + n);
+    if (toggle) { toggle.style.background = on ? 'var(--teal)' : 'var(--border)'; toggle.style.justifyContent = on ? 'flex-end' : 'flex-start'; }
+    if (dot) { if (on) { dot.style.right = '2px'; dot.style.left = 'auto'; } else { dot.style.right = 'auto'; dot.style.left = '2px'; } }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    var banner = document.getElementById('pushBanner');
+    if (banner) banner.style.display = 'none';
+  }
+  applyTogglesToUI();
+  renderNotifications();
+  renderReminders();
 });
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}

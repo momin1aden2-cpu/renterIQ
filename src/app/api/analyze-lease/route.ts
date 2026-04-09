@@ -47,35 +47,74 @@ Rules:
 - Always provide the plain-English explanation even for standard clauses
 - Limit to the 12 most important clauses if the lease is very long`;
 
+type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } };
+
+const SUPPORTED_MIME_TYPES = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/heic',
+  'image/heif',
+  'image/webp',
+]);
+
+const MAX_FILE_BYTES = 18 * 1024 * 1024; // Gemini inlineData hard cap is ~20MB; leave headroom
+
 export async function POST(request: Request) {
-  let leaseText = '';
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(getMockLeaseAnalysis());
+    }
+
     const contentType = request.headers.get('content-type') || '';
+    let leaseText = '';
+    let file: File | null = null;
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
+      file = (formData.get('file') as File) || null;
       leaseText = (formData.get('text') as string) || '';
     } else {
       const body = await request.json();
       leaseText = body.text || '';
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!leaseText || !apiKey) {
+    // No file AND no text → demo mode
+    if (!file && !leaseText) {
       return NextResponse.json(getMockLeaseAnalysis());
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    const result = await model.generateContent([
-      { text: SYSTEM_PROMPT },
-      { text: `Here is the lease/tenancy agreement text:\n\n${leaseText}` }
-    ]);
+    const parts: GeminiPart[] = [{ text: SYSTEM_PROMPT }];
 
-    const response = result.response;
-    const text = response.text();
+    if (file) {
+      if (file.size > MAX_FILE_BYTES) {
+        return NextResponse.json(
+          { error: 'File too large', details: `Maximum ${Math.round(MAX_FILE_BYTES / 1024 / 1024)}MB` },
+          { status: 413 }
+        );
+      }
+      const mimeType = file.type || 'application/octet-stream';
+      if (!SUPPORTED_MIME_TYPES.has(mimeType)) {
+        return NextResponse.json(
+          { error: 'Unsupported file type', details: `Got ${mimeType}. Supported: PDF, JPG, PNG, HEIC, WEBP` },
+          { status: 415 }
+        );
+      }
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const base64 = buffer.toString('base64');
+      parts.push({ text: 'Analyse the attached residential lease agreement and return the structured JSON described above.' });
+      parts.push({ inlineData: { mimeType, data: base64 } });
+    } else {
+      parts.push({ text: `Here is the lease/tenancy agreement text:\n\n${leaseText}` });
+    }
 
+    const result = await model.generateContent(parts);
+    const text = result.response.text();
     const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text];
     const jsonStr = (jsonMatch[1] || text).trim();
 
@@ -91,7 +130,10 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error('Lease analysis error:', error);
-    return NextResponse.json(getMockLeaseAnalysis());
+    return NextResponse.json(
+      { error: 'Failed to analyse lease', details: String(error) },
+      { status: 500 }
+    );
   }
 }
 

@@ -69,8 +69,27 @@
   background: rgba(255,255,255,.10);
   border: 1px solid rgba(255,255,255,.14);
   transition: background .15s;
+  position: relative;
 }
 .hdr-bell:active { background: rgba(255,255,255,.20); }
+.hdr-bell-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 100px;
+  background: #FF3B30;
+  color: #fff;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  display: none;
+  box-shadow: 0 0 0 2px var(--blue);
+}
 .hdr-avatar {
   width: 34px;
   height: 34px;
@@ -836,6 +855,73 @@
 .ar-date { font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 2px; }
 .ar-chev { color: var(--muted); font-size: 18px; flex-shrink: 0; }
 
+/* ── Home Header Overrides ────────────────────────────────── */
+.screen-header { padding-bottom: 40px; }
+.hdr-status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+  border-radius: 100px; padding: 5px 12px 5px 10px;
+  font-family: 'Sora', sans-serif; font-weight: 700; font-size: 10px;
+  color: rgba(255,255,255,.88); letter-spacing: .8px; text-transform: uppercase;
+  margin-bottom: 11px;
+}
+.hdr-pill-dot { width:6px; height:6px; border-radius:50%; background:var(--teal); flex-shrink:0; }
+.hdr-name {
+  font-family: 'Sora', sans-serif; font-weight: 800; font-size: 30px;
+  color: #fff; letter-spacing: -.6px; line-height: 1.12;
+}
+.hdr-date { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.48); margin-top: 6px; }
+
+/* ── What's On Activity Feed ──────────────────────────────── */
+.wa-item {
+  padding: 13px 14px; border-bottom: 1px solid var(--border-lt);
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .12s;
+}
+.wa-item:last-child { border-bottom: none; }
+.wa-item:active { background: var(--blue-xl); }
+.wa-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.wa-dot.blue { background: var(--blue); }
+.wa-dot.amber { background: var(--amber); }
+.wa-dot.teal { background: var(--teal); }
+.wa-dot.muted { background: var(--border); }
+.wa-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.wa-body { flex: 1; min-width: 0; }
+.wa-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wa-sub { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+.wa-chev { color: var(--muted); font-size: 18px; flex-shrink: 0; }
+.wa-badge { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 10px; border-radius: 100px; padding: 3px 9px; white-space: nowrap; flex-shrink: 0; }
+.wa-badge.urgent { background: rgba(232,64,64,.10); color: var(--red); }
+.wa-badge.warn   { background: rgba(245,166,35,.12); color: #7A5500; }
+.wa-badge.ok     { background: rgba(0,200,150,.10); color: var(--teal-dk); }
+
+/* ── Journey Rows (replaces horizontal scroll) ────────────── */
+.jrn-row {
+  display: flex; align-items: center; gap: 13px; padding: 14px 16px;
+  border-bottom: 1px solid var(--border-lt); cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: background .12s;
+}
+.jrn-row:active { background: var(--blue-xl); }
+.jrn-icon {
+  width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+  box-shadow: 0 2px 8px rgba(27,80,200,.15);
+}
+.jrn-body { flex: 1; min-width: 0; }
+.jrn-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 13.5px; color: var(--text); }
+.jrn-sub { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.jrn-step-num {
+  font-family: 'Sora', sans-serif; font-weight: 800; font-size: 11px;
+  color: var(--blue); background: var(--blue-xl); border-radius: 100px;
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.jrn-chev { color: var(--muted); font-size: 20px; flex-shrink: 0; }
+
 /* ── Disclaimer Note ──────────────────────────────────────── */
 .disclaimer-note {
   background: rgba(245,166,35,.06);
@@ -1075,19 +1161,22 @@
         <span class="hdr-brand-text">RenterIQ</span>
       </a>
       <div class="hdr-actions">
-        <span class="hdr-bell" role="button" aria-label="Notifications" onclick="navigate('/app/pages/notifications.html')">🔔</span>
+        <span class="hdr-bell" role="button" aria-label="Notifications" onclick="navigate('/app/pages/notifications.html')">🔔<span class="hdr-bell-badge" id="hdrBellBadge"></span></span>
         <div class="hdr-avatar" id="hdrAvatar" role="button" aria-label="Profile" onclick="navigate('/app/pages/profile.html')">?</div>
       </div>
     </div>
-    <div class="hdr-title" id="greeting" style="margin-top:14px">Good morning</div>
-    <div class="hdr-sub" id="currentDate">Ready to rent smart</div>
+    <div style="margin-top:20px">
+      <div class="hdr-status-pill"><span class="hdr-pill-dot"></span><span id="hdrStatusText">Searching</span></div>
+      <div class="hdr-name" id="greeting">Good morning</div>
+      <div class="hdr-date" id="currentDate">Let's rent smart today</div>
+    </div>
   </header>
 
   <!-- ── Scrollable Content ──────────────────────────────── -->
   <div class="content">
 
     <!-- ── Search Card (pulls up over header) ─────────────── -->
-    <div style="padding:0 16px;margin-top:-20px;position:relative;z-index:5">
+    <div style="padding:0 16px;margin-top:14px;position:relative;z-index:5">
       <div class="search-card">
         <div class="sc-label">Find a Rental</div>
         <div class="sc-input-wrap">
@@ -1110,6 +1199,15 @@
       </div>
     </div>
 
+    <!-- ── What's On ─────────────────────────────────────────── -->
+    <div style="padding:20px 16px 0">
+      <div class="sec-row" style="margin-bottom:12px">
+        <span class="sec-title">What's On</span>
+        <span id="waTodayLabel" style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted)"></span>
+      </div>
+      <div class="activity-card" id="activityFeed"></div>
+    </div>
+
     <!-- ── Inspection Reminder Banner ─────────────────────── -->
     <div id="reminderBanner" style="padding:0 16px;margin-top:14px;display:none">
       <div class="reminder-banner">
@@ -1126,60 +1224,81 @@
     <div style="padding:20px 16px 0">
       <div class="sec-row" style="margin-bottom:14px">
         <span class="sec-title">Your Renting Journey</span>
-        <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted)">7 steps</span>
+        <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer" onclick="navigate('/app/pages/tools.html')">All tools →</span>
       </div>
-      <div style="background:#fff;border-radius:20px;padding:20px 16px 18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card)">
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x;margin:0 -16px;padding:0 16px 2px">
-          <div style="display:flex;align-items:flex-start;min-width:max-content;position:relative;gap:0">
+      <div style="background:#fff;border-radius:20px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden">
 
-            <!-- Track connector line (sits behind nodes) -->
-            <div style="position:absolute;top:20px;left:38px;right:38px;height:2px;background:linear-gradient(90deg,var(--blue-lt),var(--border-lt));z-index:0;pointer-events:none"></div>
-
-            <!-- 1 Search -->
-            <div class="journey-step" onclick="document.getElementById('homeSearchInput').focus();document.getElementById('homeSearchInput').scrollIntoView({behavior:'smooth'})">
-              <div class="journey-node" style="background:linear-gradient(135deg,var(--blue),var(--blue-md))">🔍</div>
-              <span class="journey-label">Search</span>
-            </div>
-
-            <!-- 2 Inspect -->
-            <div class="journey-step" onclick="navigate('/app/pages/inspection.html')">
-              <div class="journey-node" style="background:linear-gradient(135deg,#2E63E0,#4A7FF0)">📋</div>
-              <span class="journey-label">Inspect</span>
-            </div>
-
-            <!-- 3 Apply -->
-            <div class="journey-step" onclick="navigate('/app/pages/application.html')">
-              <div class="journey-node" style="background:linear-gradient(135deg,#E88A00,#F5A623)">📝</div>
-              <span class="journey-label">Apply</span>
-            </div>
-
-            <!-- 4 Lease -->
-            <div class="journey-step" onclick="navigate('/app/pages/lease.html')">
-              <div class="journey-node" style="background:linear-gradient(135deg,#0A2460,#1B50C8)">📑</div>
-              <span class="journey-label">Lease</span>
-            </div>
-
-            <!-- 5 Move In -->
-            <div class="journey-step" onclick="navigate('/app/pages/entry-audit.html')">
-              <div class="journey-node" style="background:linear-gradient(135deg,var(--teal),#00DBA6)">🏠</div>
-              <span class="journey-label">Move In</span>
-            </div>
-
-            <!-- 6 Living -->
-            <div class="journey-step" onclick="navigate('/app/pages/routine-inspection.html')">
-              <div class="journey-node" style="background:linear-gradient(135deg,#1B50C8,#2E63E0)">🛡️</div>
-              <span class="journey-label">Living</span>
-            </div>
-
-            <!-- 7 Exit & Bond -->
-            <div class="journey-step" onclick="navigate('/app/pages/exit.html')">
-              <div class="journey-node" style="background:linear-gradient(135deg,#009E78,var(--teal))">💰</div>
-              <span class="journey-label">Exit &amp; Bond</span>
-            </div>
-
+        <!-- Step rows — all visible, no scroll required -->
+        <div class="jrn-row" onclick="document.getElementById('homeSearchInput').focus();document.getElementById('homeSearchInput').scrollIntoView({behavior:'smooth'})">
+          <div class="jrn-icon" style="background:linear-gradient(135deg,var(--blue),var(--blue-md))">🔍</div>
+          <div class="jrn-body">
+            <div class="jrn-title">Searching for a Place</div>
+            <div class="jrn-sub">Find suburbs, track listings & compare properties</div>
           </div>
+          <div class="jrn-step-num">1</div>
+          <span class="jrn-chev">›</span>
         </div>
-        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:14px">Tap any step to jump straight in.</div>
+
+        <div class="jrn-row" onclick="navigate('/app/pages/inspection.html')">
+          <div class="jrn-icon" style="background:linear-gradient(135deg,#2E63E0,#4A7FF0)">📋</div>
+          <div class="jrn-body">
+            <div class="jrn-title">Attending Open Homes</div>
+            <div class="jrn-sub">Book inspections, extract details & compare</div>
+          </div>
+          <div class="jrn-step-num">2</div>
+          <span class="jrn-chev">›</span>
+        </div>
+
+        <div class="jrn-row" onclick="navigate('/app/pages/application.html')">
+          <div class="jrn-icon" style="background:linear-gradient(135deg,#E88A00,#F5A623)">📝</div>
+          <div class="jrn-body">
+            <div class="jrn-title">Applying for a Rental</div>
+            <div class="jrn-sub">Build your renter resume & generate cover letters</div>
+          </div>
+          <div class="jrn-step-num">3</div>
+          <span class="jrn-chev">›</span>
+        </div>
+
+        <div class="jrn-row" onclick="navigate('/app/pages/lease.html')">
+          <div class="jrn-icon" style="background:linear-gradient(135deg,#0A2460,#1B50C8)">📑</div>
+          <div class="jrn-body">
+            <div class="jrn-title">Reviewing Your Lease</div>
+            <div class="jrn-sub">AI explains every clause before you sign</div>
+          </div>
+          <div class="jrn-step-num">4</div>
+          <span class="jrn-chev">›</span>
+        </div>
+
+        <div class="jrn-row" onclick="navigate('/app/pages/entry-audit.html')">
+          <div class="jrn-icon" style="background:linear-gradient(135deg,var(--teal),#00DBA6)">🏠</div>
+          <div class="jrn-body">
+            <div class="jrn-title">Moving In</div>
+            <div class="jrn-sub">Entry condition audit — document everything on day one</div>
+          </div>
+          <div class="jrn-step-num">5</div>
+          <span class="jrn-chev">›</span>
+        </div>
+
+        <div class="jrn-row" onclick="navigate('/app/pages/routine-inspection.html')">
+          <div class="jrn-icon" style="background:linear-gradient(135deg,#1B50C8,#2E63E0)">🛡️</div>
+          <div class="jrn-body">
+            <div class="jrn-title">Already Renting</div>
+            <div class="jrn-sub">Handle routine inspections, maintenance & renewal decisions</div>
+          </div>
+          <div class="jrn-step-num">6</div>
+          <span class="jrn-chev">›</span>
+        </div>
+
+        <div class="jrn-row" style="border-bottom:none" onclick="navigate('/app/pages/exit.html')">
+          <div class="jrn-icon" style="background:linear-gradient(135deg,#009E78,var(--teal))">💰</div>
+          <div class="jrn-body">
+            <div class="jrn-title">Moving Out</div>
+            <div class="jrn-sub">Exit audit, bond claim & get every dollar back</div>
+          </div>
+          <div class="jrn-step-num">7</div>
+          <span class="jrn-chev">›</span>
+        </div>
+
       </div>
     </div>
 
@@ -1204,40 +1323,6 @@
     <!-- ── Contextual: Lease Expiry Reminder ──────────────── -->
     <div id="renewalCard" style="display:none;padding:16px 16px 0"></div>
 
-    <!-- ── Tools Grid ──────────────────────────────────────── -->
-    <div style="padding:20px 16px 0">
-      <div class="sec-row" style="margin-bottom:14px">
-        <span class="sec-title">Tools</span>
-        <span class="sec-link" onclick="navigate('/app/pages/tools.html')">See all →</span>
-      </div>
-      <div class="tools-grid">
-        <div class="tool-chip" onclick="navigate('/app/pages/entry-audit.html')">
-          <div class="tool-chip-icon" style="background:rgba(0,200,150,.10)">🏠</div>
-          <span class="tool-chip-label">Move-In Audit</span>
-        </div>
-        <div class="tool-chip" onclick="navigate('/app/pages/lease.html')">
-          <div class="tool-chip-icon" style="background:rgba(27,80,200,.08)">📑</div>
-          <span class="tool-chip-label">Lease Review</span>
-        </div>
-        <div class="tool-chip" onclick="navigate('/app/pages/routine-inspection.html')">
-          <div class="tool-chip-icon" style="background:rgba(27,80,200,.06)">📋</div>
-          <span class="tool-chip-label">Routine Inspect</span>
-        </div>
-        <div class="tool-chip" onclick="navigate('/app/pages/exit.html')">
-          <div class="tool-chip-icon" style="background:rgba(0,200,150,.08)">💰</div>
-          <span class="tool-chip-label">Exit &amp; Bond</span>
-        </div>
-        <div class="tool-chip" onclick="navigate('/app/pages/rights.html')">
-          <div class="tool-chip-icon" style="background:rgba(27,80,200,.06)">⚖️</div>
-          <span class="tool-chip-label">Rights Hub</span>
-        </div>
-        <div class="tool-chip" onclick="navigate('/app/pages/application.html')">
-          <div class="tool-chip-icon" style="background:rgba(245,166,35,.08)">📝</div>
-          <span class="tool-chip-label">Renter Resume</span>
-        </div>
-      </div>
-    </div>
-
     <!-- ── Vault Snapshot ──────────────────────────────────── -->
     <div style="padding:20px 16px 0">
       <div class="sec-row">
@@ -1246,19 +1331,19 @@
       </div>
       <div class="vault-grid">
         <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
-          <div class="vs-top"><span class="vs-icon">📑</span><span class="vs-count">0</span></div>
+          <div class="vs-top"><span class="vs-icon">📑</span><span class="vs-count" id="vsCountLeases">0</span></div>
           <span class="vs-label">Lease Agreements</span>
         </div>
         <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
-          <div class="vs-top"><span class="vs-icon">📸</span><span class="vs-count">0</span></div>
+          <div class="vs-top"><span class="vs-icon">📸</span><span class="vs-count" id="vsCountReports">0</span></div>
           <span class="vs-label">Condition Reports</span>
         </div>
         <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
-          <div class="vs-top"><span class="vs-icon">🔧</span><span class="vs-count">0</span></div>
+          <div class="vs-top"><span class="vs-icon">🔧</span><span class="vs-count" id="vsCountMaint">0</span></div>
           <span class="vs-label">Maintenance Logs</span>
         </div>
         <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
-          <div class="vs-top"><span class="vs-icon">🧾</span><span class="vs-count">0</span></div>
+          <div class="vs-top"><span class="vs-icon">🧾</span><span class="vs-count" id="vsCountReceipts">0</span></div>
           <span class="vs-label">Receipts Saved</span>
         </div>
       </div>
@@ -1374,6 +1459,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var dateEl = document.getElementById('currentDate');
       if (dateEl) dateEl.textContent = formatDate(new Date());
       updateHeaderAvatar(initials);
+      renderActivityFeed();
     } catch(e) {}
   })();
 
@@ -1445,8 +1531,101 @@ document.addEventListener('DOMContentLoaded', function() {
     if (renewalCard) renewalCard.style.display = appState.daysUntilLeaseEnd <= 90 ? 'block' : 'none';
     var maintenanceCard = document.getElementById('maintenanceCard');
     if (maintenanceCard) maintenanceCard.style.display = appState.maintenanceOpen ? 'block' : 'none';
+
+    // Status pill
+    var statusEl = document.getElementById('hdrStatusText');
+    if (statusEl) {
+      if (appState.hasActiveLease) statusEl.textContent = 'Active Tenant';
+      else statusEl.textContent = 'Searching';
+    }
+
+    renderActivityFeed();
   }
 });
+
+// ========== ACTIVITY FEED ==========
+function renderActivityFeed() {
+  var feed = document.getElementById('activityFeed');
+  if (!feed) return;
+
+  var label = document.getElementById('waTodayLabel');
+  if (label) {
+    label.textContent = new Date().toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  var items = [];
+
+  // Tracked properties with upcoming inspections
+  try {
+    var tracked = JSON.parse(localStorage.getItem('riq-tracked-properties') || '[]');
+    tracked.forEach(function(p) {
+      if (!p.inspectionDate) return;
+      var diff = Math.ceil((new Date(p.inspectionDate) - new Date()) / 86400000);
+      if (diff < 0 || diff > 14) return;
+      items.push({
+        icon: '📋', iconBg: 'var(--blue-xl)', dotCls: diff <= 1 ? 'blue' : 'amber',
+        title: 'Inspection: ' + (p.address || 'Property'),
+        sub: diff === 0 ? 'Today' : diff === 1 ? 'Tomorrow' : 'In ' + diff + ' days',
+        badge: diff <= 1 ? { text: 'Today', cls: 'urgent' } : diff <= 3 ? { text: 'Soon', cls: 'warn' } : null,
+        path: '/app/pages/inspection.html'
+      });
+    });
+  } catch(e) {}
+
+  // Lease expiry
+  if (appState.daysUntilLeaseEnd > 0 && appState.daysUntilLeaseEnd <= 90) {
+    items.push({
+      icon: '📑', iconBg: 'rgba(245,166,35,.10)', dotCls: 'amber',
+      title: 'Lease Renewal Decision',
+      sub: appState.daysUntilLeaseEnd + ' days until your lease ends',
+      badge: appState.daysUntilLeaseEnd <= 30 ? { text: 'Urgent', cls: 'urgent' } : { text: 'Review', cls: 'warn' },
+      path: '/app/pages/renewal.html'
+    });
+  }
+
+  // Open maintenance items
+  try {
+    var maint = JSON.parse(localStorage.getItem('riq-maintenance') || '[]');
+    var open = maint.filter(function(m) { return m.status === 'open' || m.status === 'pending'; });
+    if (open.length) {
+      items.push({
+        icon: '🔧', iconBg: 'rgba(245,166,35,.08)', dotCls: 'amber',
+        title: open.length + ' Maintenance ' + (open.length === 1 ? 'Issue' : 'Issues') + ' Open',
+        sub: 'Tap to review and follow up with your agent',
+        badge: null, path: '/app/pages/vault.html'
+      });
+    }
+  } catch(e) {}
+
+  // Recent lease in vault
+  try {
+    var leases = JSON.parse(localStorage.getItem('riq-vault-leases') || '[]');
+    if (leases.length) {
+      var last = leases[leases.length - 1];
+      var ds = last.savedAt ? new Date(last.savedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) : '';
+      items.push({
+        icon: '🗄️', iconBg: 'var(--blue-xl)', dotCls: 'teal',
+        title: 'Lease saved to Vault',
+        sub: (ds ? ds + ' · ' : '') + 'Tap to view in your Vault',
+        badge: null, path: '/app/pages/vault.html'
+      });
+    }
+  } catch(e) {}
+
+  if (!items.length) {
+    feed.innerHTML = '<div class="wa-item" style="cursor:default"><div class="wa-icon" style="background:rgba(0,200,150,.10)">✓</div><div class="wa-body"><div class="wa-title">All caught up</div><div class="wa-sub">No upcoming deadlines or alerts right now.</div></div></div>';
+    return;
+  }
+
+  feed.innerHTML = items.map(function(item) {
+    return '<div class="wa-item" onclick="navigate(\'' + item.path + '\')">' +
+      '<div class="wa-dot ' + item.dotCls + '"></div>' +
+      '<div class="wa-icon" style="background:' + item.iconBg + '">' + item.icon + '</div>' +
+      '<div class="wa-body"><div class="wa-title">' + item.title + '</div><div class="wa-sub">' + item.sub + '</div></div>' +
+      (item.badge ? '<span class="wa-badge ' + item.badge.cls + '">' + item.badge.text + '</span>' : '') +
+      '<span class="wa-chev">›</span></div>';
+  }).join('');
+}
 
 // ========== ONBOARDING FLOW ==========
 var obStep = 0;
@@ -1747,22 +1926,49 @@ function homeExtractLabel(url) {
   } catch(e) { return 'Property Listing'; }
 }
 
-function homeTrackProperty() {
+async function homeTrackProperty() {
   var urlEl = document.getElementById('homeTrackUrl');
+  var btn = document.querySelector('.track-url-btn');
   var url = urlEl ? urlEl.value.trim() : '';
   if (!url) { homeTrackMsg('Please paste a property URL', true); return; }
   try { new URL(url); } catch(e) { homeTrackMsg('Please enter a valid URL (start with https://)', true); return; }
+  var validDomains = ['realestate.com.au','domain.com.au','reiwa.com.au','rent.com.au'];
+  if (!validDomains.some(function(d){return url.includes(d);})) {
+    homeTrackMsg('Paste a URL from realestate.com.au, Domain, REIWA or Rent.com.au', true); return;
+  }
   var existing = homeGetTracked();
-  if (existing.some(function(p){ return p.url === url; })) { homeTrackMsg('This property is already tracked', true); return; }
+  if (existing.some(function(p){ return (p.url||p.originalLink) === url; })) {
+    homeTrackMsg('This property is already saved', true); return;
+  }
   var src = homeDetectSource(url);
+  if (btn) { btn.textContent = 'Saving…'; btn.style.opacity = '.65'; btn.disabled = true; }
+  homeTrackMsg('Fetching property details…', false);
+  var address = homeExtractLabel(url);
+  var price = '', description = '', image = '';
+  try {
+    var resp = await fetch('/api/extract-metadata?url=' + encodeURIComponent(url));
+    if (resp.ok) {
+      var data = await resp.json();
+      if (!data.error) {
+        address    = data.address || data.title || address;
+        price       = data.price       || '';
+        description = data.description || '';
+        image       = data.image       || '';
+      }
+    }
+  } catch(fetchErr) { /* fallback to URL-parsed values */ }
   var prop = {
     id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-    url: url,
-    label: homeExtractLabel(url),
-    suburb: homeSelectedSuburb ? homeSelectedSuburb.name    : '',
-    state:  homeSelectedSuburb ? homeSelectedSuburb.state   : '',
+    url: url, originalLink: url,
+    address: address, label: address,
+    price: price || 'Contact agent',
+    description: description,
+    image: image, imageUrl: image,
+    source: src.key, sourceSite: src.key,
+    sourceName: src.name, sourceIcon: src.icon, sourceColor: src.color,
+    suburb:   homeSelectedSuburb ? homeSelectedSuburb.name     : '',
+    state:    homeSelectedSuburb ? homeSelectedSuburb.state    : '',
     postcode: homeSelectedSuburb ? homeSelectedSuburb.postcode : '',
-    source: src.key, sourceName: src.name, sourceIcon: src.icon, sourceColor: src.color,
     savedAt: new Date().toISOString(),
     status: 'tracked',
     inspectionDate: '', inspectionTime: ''
@@ -1770,7 +1976,8 @@ function homeTrackProperty() {
   existing.push(prop);
   homeSaveTrackedAll(existing);
   if (urlEl) urlEl.value = '';
-  homeTrackMsg('✅ Property saved! Set an inspection date on its card below.', false);
+  if (btn) { btn.textContent = 'Save'; btn.style.opacity = '1'; btn.disabled = false; }
+  homeTrackMsg('✓ ' + address + ' saved — set an inspection date on its card below.', false);
   homeRenderTracked();
   homeRenderUpcoming();
 }
@@ -1958,10 +2165,129 @@ function homeCheckReminders() {
   banner.style.display = 'block';
 }
 
+function homeSafeJSON(key, fallback) {
+  try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+  catch (e) { return fallback; }
+}
+
+function homeEnsureLeaseRenewalReminders() {
+  try {
+    var leases = homeSafeJSON('riq-vault-leases', []);
+    if (!Array.isArray(leases) || leases.length === 0) return;
+    var existing = homeSafeJSON('renteriq_reminders', []);
+    if (!Array.isArray(existing)) existing = [];
+    var state = homeSafeJSON('riq_notifications_state', {}) || {};
+    var dismissed = state.dismissedReminders || [];
+    var now = Date.now();
+    var changed = false;
+
+    leases.forEach(function(lease) {
+      if (!lease || !lease.endDate || !lease.id) return;
+      var end = new Date(lease.endDate);
+      if (isNaN(end.getTime())) return;
+      end.setHours(9, 0, 0, 0);
+      var addr = lease.address || 'your rental';
+
+      [90, 60, 30].forEach(function(days) {
+        var when = end.getTime() - days * 86400000;
+        if (when < now) return;
+        var id = 'lease_end_' + days + '_' + lease.id;
+        if (dismissed.indexOf(id) !== -1) return;
+
+        var idx = existing.findIndex(function(r) { return r && r.id === id; });
+        var entry = {
+          id: id,
+          icon: '📑',
+          iconBg: 'rgba(245,166,35,.1)',
+          title: days + ' days until lease ends',
+          body: addr + ' · ' + (days === 90 ? 'time to plan ahead' : days === 60 ? 'consider renewal or notice' : 'start exit inspection prep'),
+          timestamp: when
+        };
+        if (idx === -1) { existing.push(entry); changed = true; }
+        else if (existing[idx].timestamp !== when) { existing[idx] = entry; changed = true; }
+      });
+    });
+
+    if (changed) {
+      try { localStorage.setItem('renteriq_reminders', JSON.stringify(existing)); } catch(e) {}
+    }
+  } catch (e) {}
+}
+
+function homeUpdateBellBadge() {
+  var ids = [];
+  function tsOf(v) { if (!v) return 0; if (typeof v === 'number') return v; var t = new Date(v).getTime(); return isNaN(t) ? 0 : t; }
+
+  var tracked = homeSafeJSON('renteriq_tracked_properties', []);
+  if (Array.isArray(tracked)) tracked.slice(-5).forEach(function(p){ if (tsOf(p.savedAt)) ids.push('tracked-' + p.id); });
+
+  var leases = homeSafeJSON('riq-vault-leases', []);
+  if (Array.isArray(leases)) leases.slice(-3).forEach(function(l){ var ts = tsOf(l.savedAt || l.date); if (ts) ids.push('lease-' + ts); });
+
+  var vaultReports = homeSafeJSON('renteriq_vault_reports', []);
+  if (Array.isArray(vaultReports)) vaultReports.forEach(function(r){
+    var ts = tsOf(r.date); if (!ts) return;
+    if (r.type === 'entry-audit') ids.push('entry-' + ts);
+    else if (r.type === 'exit-audit') ids.push('exit-' + ts);
+  });
+
+  var maint = homeSafeJSON('riq_maintenance_items', []);
+  if (Array.isArray(maint)) maint.slice(-3).forEach(function(m){ var ts = tsOf(m.date || m.createdAt); if (ts) ids.push('maint-' + (m.id || ts)); });
+
+  var routinePast = homeSafeJSON('riq_routine_inspection_past', []);
+  if (Array.isArray(routinePast)) routinePast.slice(-2).forEach(function(r){ var ts = tsOf(r.date); if (ts) ids.push('routine-' + ts); });
+
+  var docs = homeSafeJSON('riq_personal_docs', null);
+  if (docs && docs.updatedAt) ids.push('docs-' + docs.updatedAt);
+
+  var state = homeSafeJSON('riq_notifications_state', null) || { read: [] };
+  var unread = ids.filter(function(id){ return state.read.indexOf(id) === -1; }).length;
+
+  var badge = document.getElementById('hdrBellBadge');
+  if (badge) {
+    if (unread > 0) { badge.textContent = unread > 9 ? '9+' : String(unread); badge.style.display = 'block'; }
+    else badge.style.display = 'none';
+  }
+}
+
+function homeLoadVaultStats() {
+  function setCount(id, n) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = n > 99 ? '99+' : String(n);
+  }
+
+  // Lease Agreements — saved leases from lease.html
+  var leases = homeSafeJSON('riq-vault-leases', []);
+  setCount('vsCountLeases', Array.isArray(leases) ? leases.length : 0);
+
+  // Condition Reports — entry audits + exit audits + open-home inspection reports
+  var vaultReports = homeSafeJSON('renteriq_vault_reports', []);
+  var conditionReports = homeSafeJSON('riq_condition_reports', []);
+  var entryPast = homeSafeJSON('riq_entry_audit_past', []);
+  var reportCount = 0;
+  if (Array.isArray(vaultReports)) reportCount += vaultReports.filter(function(r){return r && (r.type==='entry-audit'||r.type==='exit-audit')}).length;
+  if (Array.isArray(conditionReports)) reportCount += conditionReports.length;
+  if (Array.isArray(entryPast)) reportCount += entryPast.length;
+  setCount('vsCountReports', reportCount);
+
+  // Maintenance Logs — maintenance items + routine inspection records
+  var maint = homeSafeJSON('riq_maintenance_items', []);
+  var routinePast = homeSafeJSON('riq_routine_inspection_past', []);
+  var maintCount = (Array.isArray(maint) ? maint.length : 0) + (Array.isArray(routinePast) ? routinePast.length : 0);
+  setCount('vsCountMaint', maintCount);
+
+  // Receipts Saved
+  var receipts = homeSafeJSON('riq_receipts', []);
+  setCount('vsCountReceipts', Array.isArray(receipts) ? receipts.length : 0);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   homeRenderTracked();
   homeRenderUpcoming();
   homeCheckReminders();
+  homeLoadVaultStats();
+  homeEnsureLeaseRenewalReminders();
+  homeUpdateBellBadge();
 });
 
 // Update header avatar with user initials

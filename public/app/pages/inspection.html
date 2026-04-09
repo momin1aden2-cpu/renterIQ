@@ -321,17 +321,17 @@
   <div class="picker-sheet">
     <div class="sheet-handle"></div>
     <div style="text-align:center;margin-bottom:20px">
-      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:6px">📸 Upload Booking Confirmation</div>
-      <div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.5">Take a screenshot of your inspection booking confirmation from any property site</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:6px">📎 Upload Booking Confirmation</div>
+      <div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.5">Screenshot, photo or PDF of your confirmation from any property site or agent email</div>
     </div>
     
     <div id="uploadStep1" style="display:block">
       <div style="border:2px dashed var(--border);border-radius:16px;padding:32px 20px;text-align:center;margin-bottom:20px;background:var(--blue-xl)" id="uploadZone">
-        <div style="font-size:48px;margin-bottom:12px">📱</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Upload Screenshot</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">From Domain, Realestate.com.au, or agent email/SMS</div>
-        <button class="btn-blue" style="margin-bottom:8px" onclick="selectBookingImage()">📷 Choose Image</button>
-        <div style="font-weight:600;font-size:11px;color:var(--muted)">Or drag & drop your screenshot here</div>
+        <div style="font-size:48px;margin-bottom:12px">📎</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Upload Confirmation</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Domain, Realestate.com.au, agent email or SMS</div>
+        <button class="btn-blue" style="margin-bottom:8px" onclick="selectBookingImage()">📎 Choose File</button>
+        <div style="font-weight:600;font-size:11px;color:var(--muted)">JPG · PNG · HEIC · PDF accepted</div>
       </div>
       
       <div style="margin-bottom:16px">
@@ -367,7 +367,7 @@
   </div>
 </div>
 
-<input type="file" id="bookingImageInput" accept="image/*" style="display:none">
+<input type="file" id="bookingImageInput" accept="image/*,.heic,.heif,.pdf" style="display:none">
 
 </div><!-- /app-shell -->
 <script>
@@ -419,22 +419,25 @@ document.getElementById('bookingImageInput').addEventListener('change', function
   var file = e.target.files[0];
   if (!file) return;
   
-  if (!file.type.startsWith('image/')) {
-    showToast('Invalid File', 'Please select an image file', '❌');
+  var allowedBookingExts = ['jpg','jpeg','png','heic','heif','gif','webp','pdf'];
+  var bookingExt = file.name.split('.').pop().toLowerCase();
+  if(!file.type.startsWith('image/') && allowedBookingExts.indexOf(bookingExt)===-1){
+    showToast('File not supported','Please use an image or PDF (e.g. confirmation email saved as PDF)','⚠️');
     return;
   }
   
   selectedBookingFile = file;
   document.getElementById('processBtn').disabled = false;
   document.getElementById('processBtn').style.opacity = '1';
-  
-  // Update upload zone to show selected file
+
+  var fileIcon = bookingExt === 'pdf' ? '📄' : '✅';
+  var fileLabel = bookingExt === 'pdf' ? 'PDF Ready' : 'File Ready';
   var zone = document.getElementById('uploadZone');
-  zone.innerHTML = 
-    '<div style="font-size:48px;margin-bottom:12px">✅</div>' +
-    '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Screenshot Ready</div>' +
+  zone.innerHTML =
+    '<div style="font-size:48px;margin-bottom:12px">' + fileIcon + '</div>' +
+    '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">' + fileLabel + '</div>' +
     '<div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">' + file.name + '</div>' +
-    '<button class="btn-outline" style="margin-bottom:8px" onclick="selectBookingImage()">📷 Choose Different Image</button>';
+    '<button class="btn-outline" style="margin-bottom:8px" onclick="selectBookingImage()">📎 Choose Different File</button>';
 });
 
 function processBookingImage() {
@@ -757,9 +760,9 @@ document.getElementById('uploadZone').addEventListener('drop', function(e) {
     
     this.innerHTML = 
       '<div style="font-size:48px;margin-bottom:12px">✅</div>' +
-      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Screenshot Ready</div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">File Ready</div>' +
       '<div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">' + files[0].name + '</div>' +
-      '<button class="btn-outline" style="margin-bottom:8px" onclick="selectBookingImage()">📷 Choose Different Image</button>';
+      '<button class="btn-outline" style="margin-bottom:8px" onclick="selectBookingImage()">📎 Choose Different File</button>';
   }
 });
 
@@ -866,7 +869,7 @@ function renderAreas(){var html='';AREAS.forEach(function(area,i){var d=inspecti
 function toggleArea(id){var card=document.getElementById('area-'+id);var isOpen=card.classList.contains('open');card.classList.toggle('open');var d=inspectionData.areas[id]=inspectionData.areas[id]||{};d.open=!isOpen}
 function setCond(id,cond){var d=inspectionData.areas[id]=inspectionData.areas[id]||{};d.condition=cond;renderAreas();updateProgress()}
 function toggleTips(id){var panel=document.getElementById('tips-'+id);var arr=document.getElementById('tips-arr-'+id);panel.classList.toggle('open');arr.style.transform=panel.classList.contains('open')?'rotate(90deg)':''}
-function addPhoto(id){var input=document.createElement('input');input.type='file';input.accept='image/*';input.onchange=function(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var d=inspectionData.areas[id]=inspectionData.areas[id]||{};if(!d.photos)d.photos=[];var photo={url:e.target.result,ts:new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})};d.photos.push(photo);addPhotoThumb(id,photo)};reader.readAsDataURL(file)};input.click()}
+function addPhoto(id){var input=document.createElement('input');input.type='file';input.accept='image/*,.heic,.heif';input.capture='environment';input.onchange=function(e){var file=e.target.files[0];if(!file)return;var ext=file.name.split('.').pop().toLowerCase();if(['jpg','jpeg','png','heic','heif','gif','webp'].indexOf(ext)===-1&&!file.type.startsWith('image/')){showToast('Photos only','Use JPG, PNG or HEIC for inspection photos','⚠️');return;}var reader=new FileReader();reader.onload=function(e){var d=inspectionData.areas[id]=inspectionData.areas[id]||{};if(!d.photos)d.photos=[];var photo={url:e.target.result,ts:new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})};d.photos.push(photo);addPhotoThumb(id,photo)};reader.readAsDataURL(file)};input.click()}
 function addPhotoThumb(id,photo){var grid=document.getElementById('photos-'+id);if(!grid)return;var thumb=document.createElement('div');thumb.className='ph-thumb';thumb.innerHTML='<img src="'+photo.url+'" alt="Photo"><span class="ph-ts">'+photo.ts+'</span>';thumb.onclick=function(){window.open(photo.url,'_blank')};grid.insertBefore(thumb,grid.querySelector('.ph-add'))}
 function addQuickNote(id,text,chip){var field=document.getElementById('notes-'+id);if(!field)return;field.value=(field.value?field.value+'; ':'')+text;field.dispatchEvent(new Event('input'));chip.style.opacity='0.5;pointer-events:none';setTimeout(function(){chip.style.opacity='1';chip.style.pointerEvents=''},200)}
 function saveAreaNote(id){var field=document.getElementById('notes-'+id);if(!field)return;var d=inspectionData.areas[id]=inspectionData.areas[id]||{};d.notes=field.value}

@@ -357,123 +357,30 @@
   </div>
 </div>
 
-<!-- VIEW F — AI COMPARISON & TENANT REVIEW -->
+<!-- VIEW F — AI COMPARISON & TENANT REVIEW (dynamic) -->
 <div class="view" id="viewF" style="display:none">
   <header class="sh">
     <div class="sh-row"><button class="sh-back" onclick="switchView('C')"><span class="sh-back-arrow">‹</span><span class="sh-label">BACK</span></button></div>
     <div class="sh-title">Your Review</div>
-    <div class="sh-sub">AI found items for your review</div>
+    <div class="sh-sub" id="compSubtitle">AI found items for your review</div>
   </header>
   <div style="background:var(--blue-dk);padding:12px 20px;display:flex;gap:10px;align-items:flex-start">
     <span style="font-size:14px;flex-shrink:0;margin-top:1px">🤖</span>
-    <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#fff;line-height:1.5">RenterIQ found 2 potential differences. Review each one — you decide what gets recorded.</div>
+    <div id="compBannerText" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#fff;line-height:1.5">Analysing your exit walkthrough…</div>
   </div>
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
-
     <div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:14px 16px;margin-bottom:16px">
       <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12.5px;color:var(--teal-dk);line-height:1.6">You are in control. The AI surfaces differences — you confirm or dismiss each one. Nothing enters your exit report without your approval.</div>
     </div>
-
-    <div class="sec-label" style="padding:0 0 10px">All 8 Areas</div>
-    <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:20px">
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🚪</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Entry &amp; Hallway</span><span class="tag tag-teal">Match ✓</span></div>
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🛋</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Living Room</span><span class="tag tag-teal">Match ✓</span></div>
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px;background:rgba(245,166,35,.03)"><span style="font-size:16px">🍳</span><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--text);flex:1">Kitchen</span><span class="tag tag-amber">Review ⚠</span></div>
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🛏</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Master Bedroom</span><span class="tag tag-teal">Match ✓</span></div>
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🛏</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Bedroom 2</span><span class="tag tag-teal">Match ✓</span></div>
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px;background:rgba(245,166,35,.03)"><span style="font-size:16px">🚿</span><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--text);flex:1">Bathroom</span><span class="tag tag-amber">Review ⚠</span></div>
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:10px"><span style="font-size:16px">🧺</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Laundry / Garage</span><span class="tag tag-teal">Match ✓</span></div>
-      <div style="padding:10px 14px;display:flex;align-items:center;gap:10px"><span style="font-size:16px">🌿</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Outdoor &amp; Garden</span><span class="tag tag-teal">Match ✓</span></div>
-    </div>
-
-    <div class="sec-label" style="padding:0 0 6px">Items Requiring Your Decision</div>
-    <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">For each item below, RenterIQ will tell you what it noticed. You decide how to handle it.</div>
-
-    <div style="display:flex;flex-direction:column;gap:16px">
-
-      <!-- REVIEW CARD 0 — Kitchen -->
-      <div id="reviewCard-0" style="background:#fff;border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden">
-        <div style="padding:14px 16px;background:rgba(245,166,35,.08);display:flex;align-items:center;gap:10px">
-          <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🍳</div>
-          <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Kitchen</div><div style="font-weight:600;font-size:12px;color:#8A6500">Difference detected</div></div>
-          <span class="tag tag-amber">⚠️ Review</span>
-        </div>
-        <div style="padding:14px 16px">
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:8px"><span style="font-size:12px">🤖</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">RenterIQ noticed:</span></div>
-          <div style="font-weight:600;font-size:13.5px;color:var(--text);line-height:1.75">Your exit photo shows the kitchen splashback has a small stain that appears different in size from your move-in photo. At move-in, a pre-existing stain was documented as approximately 2cm. The exit photo shows a stain that appears larger — approximately 5cm.</div>
-        </div>
-        <div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center">
-            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Move-in</div>
-            <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-blue">🍳</div>
-            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">Pre-existing 2cm stain noted</div>
-          </div>
-          <div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center">
-            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Exit</div>
-            <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-teal">🍳</div>
-            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">Stain appears larger at exit</div>
-          </div>
-        </div>
-        <div id="discQuestion-0" style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl)">
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Is this something that happened during your tenancy?</div>
-          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report as a discrepancy and RenterIQ will suggest how to address it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>
-          <div style="display:flex;gap:10px">
-            <button id="yesBtn-0" style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed(0)">Yes — this happened during my tenancy</button>
-            <button id="noBtn-0" style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed(0)">No — pre-existing / wear &amp; tear</button>
-          </div>
-        </div>
-        <div id="decidedState-0" style="display:none">
-          <div id="confirmedState-0" style="display:none;background:rgba(232,64,64,.06);border-top:1px solid rgba(232,64,64,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">⚠️</span><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--red);line-height:1.5">Noted — included in your exit report. RenterIQ will suggest fixes in the next step.</div></div>
-          <div id="dismissedState-0" style="display:none;background:rgba(0,200,150,.06);border-top:1px solid rgba(0,200,150,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">✓</span><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);line-height:1.5">Noted as pre-existing or fair wear and tear. Not included as a discrepancy.</div></div>
-        </div>
-      </div>
-
-      <!-- REVIEW CARD 1 — Bathroom -->
-      <div id="reviewCard-1" style="background:#fff;border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden">
-        <div style="padding:14px 16px;background:rgba(245,166,35,.08);display:flex;align-items:center;gap:10px">
-          <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚿</div>
-          <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Bathroom</div><div style="font-weight:600;font-size:12px;color:#8A6500">Difference detected</div></div>
-          <span class="tag tag-amber">⚠️ Review</span>
-        </div>
-        <div style="padding:14px 16px">
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:8px"><span style="font-size:12px">🤖</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">RenterIQ noticed:</span></div>
-          <div style="font-weight:600;font-size:13.5px;color:var(--text);line-height:1.75">Your exit photos show a scuff mark on the bathroom wall that does not appear in either your move-in photos or the agency condition report. The mark appears to be on the south wall near the door frame, approximately 8cm in length.</div>
-        </div>
-        <div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center">
-            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Move-in</div>
-            <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-teal">🚿</div>
-            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">No mark in move-in photos</div>
-          </div>
-          <div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center">
-            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Exit</div>
-            <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-blue">🚿</div>
-            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">Scuff mark visible at exit</div>
-          </div>
-        </div>
-        <div id="discQuestion-1" style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl)">
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Is this something that happened during your tenancy?</div>
-          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report as a discrepancy and RenterIQ will suggest how to address it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>
-          <div style="display:flex;gap:10px">
-            <button id="yesBtn-1" style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed(1)">Yes — this happened during my tenancy</button>
-            <button id="noBtn-1" style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed(1)">No — pre-existing / wear &amp; tear</button>
-          </div>
-        </div>
-        <div id="decidedState-1" style="display:none">
-          <div id="confirmedState-1" style="display:none;background:rgba(232,64,64,.06);border-top:1px solid rgba(232,64,64,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">⚠️</span><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--red);line-height:1.5">Noted — included in your exit report. RenterIQ will suggest fixes in the next step.</div></div>
-          <div id="dismissedState-1" style="display:none;background:rgba(0,200,150,.06);border-top:1px solid rgba(0,200,150,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">✓</span><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);line-height:1.5">Noted as pre-existing or fair wear and tear. Not included as a discrepancy.</div></div>
-        </div>
-      </div>
-
-    </div>
+    <div id="compAreasList"></div>
+    <div id="compDiscrepanciesContainer"></div>
   </div>
-
   <div id="reviewFooter" style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10;text-align:center">
-    <div style="font-weight:600;font-size:12px;color:var(--muted);padding:12px">Review both items above to continue</div>
+    <div style="font-weight:600;font-size:12px;color:var(--muted);padding:12px" id="reviewFooterMsg">Loading AI comparison…</div>
   </div>
 </div>
 
-<!-- VIEW G — BOND RECOVERY SUGGESTIONS -->
+<!-- VIEW G — BOND RECOVERY SUGGESTIONS (dynamic) -->
 <div class="view" id="viewG" style="display:none">
   <header class="sh">
     <div class="sh-row"><button class="sh-back" onclick="switchView('F')"><span class="sh-back-arrow">‹</span><span class="sh-label">REVIEW</span></button></div>
@@ -481,89 +388,13 @@
     <div class="sh-sub">Suggestions to get your full bond back</div>
   </header>
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
-
-    <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr)">
-      <div style="padding:14px 10px;text-align:center;border-right:1px solid var(--border-lt)"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">8</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Areas Inspected</div></div>
-      <div style="padding:14px 10px;text-align:center;border-right:1px solid var(--border-lt)"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--teal)">6</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Areas Match</div></div>
-      <div style="padding:14px 10px;text-align:center"><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--red)">2</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Items to Fix</div></div>
-    </div>
-
+    <div id="bondStatsRow" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr)"></div>
     <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px;margin-bottom:16px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:5px">⚠️ These are suggestions only — not legal advice.</div>
       <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">RenterIQ suggests practical fixes based on what was detected. The decision to act on any suggestion is entirely yours. Bond outcomes depend on your specific situation and the agency's assessment. For disputes, contact your state tenancy authority.</div>
     </div>
-
-    <div class="sec-label" style="padding:0 0 10px">Items You Confirmed</div>
-
-    <!-- FIX CARD 0 — Kitchen Splashback -->
-    <div id="fixCard-0" style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px">
-      <div style="background:var(--blue);padding:14px 16px;display:flex;align-items:center;gap:12px">
-        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🍳</div>
-        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;flex:1">Kitchen Splashback</span>
-        <span style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 10px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Fix Suggested</span>
-      </div>
-      <div style="padding:14px 16px">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:5px">The Issue:</div>
-        <div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.65">Kitchen splashback stain appears larger than documented at move-in. Pre-existing stain was 2cm — exit photo shows approximately 5cm.</div>
-      </div>
-      <div style="padding:0 16px 14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>
-        <div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:13px 14px">
-          <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.75">Clean the splashback thoroughly with a degreaser or kitchen cleaner (e.g. Exit Mould or Ajax spray). If the stain has grown due to grease or cooking residue, a professional oven/kitchen clean may be required. Many cleaning companies offer kitchen deep cleans for $80–$150. If the stain is permanent, document this and note it was partially pre-existing — your move-in photos support this.</div>
-        </div>
-      </div>
-      <div style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl);display:flex;gap:16px">
-        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">⏱</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">30–60 mins</span></div>
-        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">💰</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">$0–$150</span></div>
-        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">📈</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Medium</span></div>
-      </div>
-      <div class="fix-action-row" style="padding:12px 16px;display:flex;gap:8px">
-        <button style="flex:1;background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="markFixed(0)">✓ Mark as Fixed</button>
-        <button style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast('Photo added','Evidence saved to exit report','📷')">📷 Add Photo</button>
-        <button style="background:var(--blue-xl);color:var(--muted);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast('Skipped','Item remains in exit report','→')">Skip</button>
-      </div>
-    </div>
-
-    <!-- FIX CARD 1 — Bathroom Scuff -->
-    <div id="fixCard-1" style="background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px">
-      <div style="background:var(--blue);padding:14px 16px;display:flex;align-items:center;gap:12px">
-        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚿</div>
-        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;flex:1">Bathroom Scuff Mark</span>
-        <span style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 10px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Fix Suggested</span>
-      </div>
-      <div style="padding:14px 16px">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:5px">The Issue:</div>
-        <div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.65">Scuff mark on south bathroom wall approximately 8cm in length. Not present in move-in photos or agency report.</div>
-      </div>
-      <div style="padding:0 16px 14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>
-        <div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:13px 14px">
-          <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.75">Lightly sand the scuff mark with fine sandpaper (220 grit) then touch up with matching wall paint. Standard rental white is usually Dulux Vivid White or Taubmans Antique White — both available at Bunnings for under $20. Apply one thin coat, allow 2 hours to dry, apply a second coat if needed. Photograph the repaired area before key handover and save to your Vault as evidence of the repair.</div>
-        </div>
-      </div>
-      <div style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl);display:flex;gap:16px">
-        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">⏱</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">20–30 mins</span></div>
-        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">💰</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Under $20</span></div>
-        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">📈</span><span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Low if repaired</span></div>
-      </div>
-      <div class="fix-action-row" style="padding:12px 16px;display:flex;gap:8px">
-        <button style="flex:1;background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="markFixed(1)">✓ Mark as Fixed</button>
-        <button style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast('Photo added','Evidence saved to exit report','📷')">📷 Add Photo</button>
-        <button style="background:var(--blue-xl);color:var(--muted);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast('Skipped','Item remains in exit report','→')">Skip</button>
-      </div>
-    </div>
-
-    <div class="sec-label" style="padding:6px 0 10px">All Other Areas — No Issues</div>
-    <div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;flex-direction:column;gap:0">
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Entry &amp; Hallway</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Living Room</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Master Bedroom</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Bedroom 2</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Laundry / Garage</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><div style="width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">✓</div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">Outdoor &amp; Garden</span><span style="font-weight:600;font-size:11px;color:var(--muted)">Match</span></div>
-    </div>
+    <div id="bondRecoveryCards"></div>
   </div>
-
   <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10">
     <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="generateExitReport()">Generate Final Exit Report →</button>
   </div>
@@ -627,15 +458,12 @@
 </div><!-- /app-shell -->
 
 <script>
-/* RenterIQ — Exit Inspection JS */
+/* RenterIQ — Exit Inspection */
 
 function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
-
 function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
 
-// View Management
 var allViews=['A','B','C','D','E','F','G','H'],currentView='A';
-
 function switchView(id){
   var c=document.getElementById('view'+currentView),n=document.getElementById('view'+id);
   if(!n||id===currentView)return;
@@ -643,73 +471,95 @@ function switchView(id){
   setTimeout(function(){
     c.style.display='none';c.style.opacity='';
     n.style.display='flex';n.style.flexDirection='column';n.style.minHeight='100vh';
-    requestAnimationFrame(function(){
-      n.style.opacity='0';
-      requestAnimationFrame(function(){n.style.transition='opacity .2s ease';n.style.opacity='1';n.style.pointerEvents=''});
-    });
+    requestAnimationFrame(function(){n.style.opacity='0';requestAnimationFrame(function(){n.style.transition='opacity .2s ease';n.style.opacity='1';n.style.pointerEvents=''})});
     window.scrollTo(0,0);
     if(id==='E')runExitGeneration();
   },150);
   currentView=id;
 }
 
-// Pre-Exit Checklist
+// ── Pre-Exit Checklist ──
 var exitChecked=new Set();
-
 function toggleExitCheck(n){
-  var box=document.getElementById('exitCheck-'+n);
-  var item=document.getElementById('exitItem-'+n);
-  var label=item?item.querySelector('.exit-check-label'):null;
-  if(exitChecked.has(n)){
-    exitChecked.delete(n);
-    if(box){box.style.background='white';box.style.borderColor='var(--border)';box.textContent=''}
-    if(label){label.style.color='var(--text)';label.style.textDecoration='none'}
-  }else{
-    exitChecked.add(n);
-    if(box){box.style.background='var(--teal)';box.style.borderColor='var(--teal)';box.style.color='white';box.style.fontFamily='Sora,sans-serif';box.style.fontWeight='700';box.style.fontSize='13px';box.textContent='✓'}
-    if(label){label.style.color='var(--muted)';label.style.textDecoration='line-through'}
-  }
+  var box=document.getElementById('exitCheck-'+n),item=document.getElementById('exitItem-'+n),label=item?item.querySelector('.exit-check-label'):null;
+  if(exitChecked.has(n)){exitChecked.delete(n);if(box){box.style.background='white';box.style.borderColor='var(--border)';box.textContent=''}if(label){label.style.color='var(--text)';label.style.textDecoration='none'}}
+  else{exitChecked.add(n);if(box){box.style.background='var(--teal)';box.style.borderColor='var(--teal)';box.style.color='white';box.style.fontFamily='Sora,sans-serif';box.style.fontWeight='700';box.style.fontSize='13px';box.textContent='✓'}if(label){label.style.color='var(--muted)';label.style.textDecoration='line-through'}}
   updateExitCheckProgress();
 }
-
 function updateExitCheckProgress(){
-  var total=8,done=exitChecked.size;
-  var el=document.getElementById('exitCheckProgress');
-  var btn=document.getElementById('startExitBtn');
+  var total=8,done=exitChecked.size,el=document.getElementById('exitCheckProgress'),btn=document.getElementById('startExitBtn');
   if(el){el.textContent=done===total?'✓ All items confirmed — ready to start':done+' of '+total+' items confirmed';el.style.color=done===total?'var(--teal-dk)':'var(--muted)'}
   if(btn){btn.style.opacity=done===total?'1':'.5';btn.style.pointerEvents=done===total?'auto':'none'}
 }
 
-// Room State
-var exitRoomData=[
-  {name:'Entry & Hallway',emoji:'🚪',miContext:'Good condition · 3 photos'},
-  {name:'Living Room',emoji:'🛋',miContext:'Good condition · 4 photos'},
-  {name:'Kitchen',emoji:'🍳',miContext:'1 item noted · 3 photos'},
-  {name:'Master Bedroom',emoji:'🛏',miContext:'Good condition · 3 photos'},
-  {name:'Bedroom 2',emoji:'🛏',miContext:'Good condition · 2 photos'},
-  {name:'Bathroom & Toilet',emoji:'🚿',miContext:'1 item noted · 2 photos'},
-  {name:'Laundry / Garage',emoji:'🧺',miContext:'Good condition · 2 photos'},
-  {name:'Outdoor & Garden',emoji:'🌿',miContext:'Lawn noted · 2 photos'}
+// ── Load entry audit data from localStorage ──
+var entryAuditRooms=[];
+function loadEntryAuditData(){
+  try{
+    var reports=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+    var entry=reports.filter(function(r){return r.type==='entry-audit'}).pop();
+    if(entry&&entry.data&&entry.data.rooms){
+      entryAuditRooms=entry.data.rooms.filter(function(r){return r.completed});
+      return entry.data.propertyAddress||'';
+    }
+  }catch(e){}
+  return '';
+}
+
+function buildEntryContext(roomName){
+  var match=entryAuditRooms.find(function(r){return r.name&&r.name.toLowerCase()===roomName.toLowerCase()});
+  if(!match)return 'No move-in data recorded';
+  var condMap={good:'Good condition',fair:'Minor issues noted',poor:'Issues noted'};
+  var cond=condMap[match.condition]||'Good condition';
+  var photoCount=(match.photos||[]).length;
+  var notes=match.notes?(' · '+match.notes.substring(0,60)):'';
+  return cond+(photoCount?' · '+photoCount+' photo'+(photoCount!==1?'s':'')+notes:notes);
+}
+
+// ── Room State ──
+var DEFAULT_ROOMS=[
+  {name:'Entry & Hallway',emoji:'🚪'},
+  {name:'Living Room',emoji:'🛋'},
+  {name:'Kitchen',emoji:'🍳'},
+  {name:'Master Bedroom',emoji:'🛏'},
+  {name:'Bedroom 2',emoji:'🛏'},
+  {name:'Bathroom & Toilet',emoji:'🚿'},
+  {name:'Laundry / Garage',emoji:'🧺'},
+  {name:'Outdoor & Garden',emoji:'🌿'}
 ];
-var exitRoomsDone=new Array(8).fill(false);
+var exitRoomData=[];
+var exitRoomNotes={};
+var exitRoomsDone=[];
 var exitCurrentRoom=0;
 var exitSelectedCondition=null;
+
+function initRoomData(){
+  var entryNames=entryAuditRooms.map(function(r){return r.name});
+  exitRoomData=entryNames.length>0
+    ?entryAuditRooms.map(function(r){return{name:r.name,emoji:r.emoji||'🏠',entryCondition:r.condition,entryNotes:r.notes||''}})
+    :DEFAULT_ROOMS.map(function(r){return{name:r.name,emoji:r.emoji,entryCondition:'good',entryNotes:''}});
+  exitRoomsDone=new Array(exitRoomData.length).fill(false);
+}
 
 function buildExitAreaList(){
   var list=document.getElementById('exitAreaList');
   if(!list)return;
   list.innerHTML='';
   for(var i=0;i<exitRoomData.length;i++){
-    var r=exitRoomData[i];
-    var isFirst=i===0;
+    var r=exitRoomData[i],isFirst=i===0;
     var row=document.createElement('div');
-    row.className='room-row';
-    row.id='exitRoom-'+i;
+    row.className='room-row';row.id='exitRoom-'+i;
     row.onclick=(function(idx){return function(){openExitRoom(idx)}})(i);
     if(isFirst){row.style.border='2px solid var(--blue)';row.style.boxShadow='0 4px 16px rgba(27,80,200,.1)'}
-    row.innerHTML='<div class="room-icon-wrap" id="exitIcon-'+i+'" style="'+(isFirst?'background:var(--blue-lt)':'')+'">'+r.emoji+'</div><div class="room-body"><div class="room-name">'+r.name+'</div><div class="room-status" id="exitStatus-'+i+'">'+(isFirst?'Ready — tap to start':'Tap to begin')+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px" id="exitMiContext-'+i+'">Move-in: '+r.miContext+'</div></div><div class="room-check" id="exitCheck2-'+i+'"></div>';
+    var miCtx=buildEntryContext(r.name);
+    row.innerHTML='<div class="room-icon-wrap" id="exitIcon-'+i+'" style="'+(isFirst?'background:var(--blue-lt)':'')+'">'+r.emoji+'</div>'
+      +'<div class="room-body"><div class="room-name">'+r.name+'</div>'
+      +'<div class="room-status" id="exitStatus-'+i+'">'+(isFirst?'Ready — tap to start':'Tap to begin')+'</div>'
+      +'<div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Move-in: '+miCtx+'</div></div>'
+      +'<div class="room-check" id="exitCheck2-'+i+'"></div>';
     list.appendChild(row);
   }
+  var lbl=document.getElementById('exitProgressLabel');if(lbl)lbl.textContent='0 of '+exitRoomData.length+' areas completed';
 }
 
 function openExitRoom(idx){
@@ -720,31 +570,35 @@ function openExitRoom(idx){
   document.getElementById('exitRoomCounter').textContent=(idx+1)+' / '+exitRoomData.length;
   exitSelectedCondition=null;
   var ctx=document.getElementById('exitMiPhotoContext');
-  if(ctx)ctx.textContent='Move-in: '+r.miContext;
+  if(ctx)ctx.textContent='Move-in: '+buildEntryContext(r.name);
   ['good','fair','poor'].forEach(function(c){var el=document.getElementById('exit-cond-'+c);if(el)el.className='cond-btn'});
-  var nf=document.getElementById('exitNotesField');if(nf)nf.value='';
+  var saved=exitRoomNotes[idx]||{};
+  var nf=document.getElementById('exitNotesField');if(nf)nf.value=saved.notes||'';
+  if(saved.condition){selectExitCondition(saved.condition)}
   document.querySelectorAll('#viewD .qn-chip').forEach(function(c){c.classList.remove('chip-active')});
   for(var i=0;i<7;i++){var cb=document.getElementById('exck'+i);if(cb)cb.checked=false}
   var pg=document.getElementById('exitPhotoGrid');
   if(pg){
-    var colors=['ph-teal','ph-blue','ph-slate'];
-    var emojis=['📸','🏠','🪟','🔍','🧱'];
-    pg.innerHTML='<div class="photo-cell"><div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">09:14</span></div><div class="photo-cell"><div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">09:15</span></div><div class="add-photo" onclick="addExitPhoto()"><span class="add-photo-icon">📷</span><span class="add-photo-label">Add Photo</span></div>';
+    var colors=['ph-teal','ph-blue','ph-slate'],emojis=['📸','🏠','🪟','🔍','🧱'];
+    pg.innerHTML='<div class="photo-cell"><div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">09:14</span></div>'
+      +'<div class="photo-cell"><div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">09:15</span></div>'
+      +'<div class="add-photo" onclick="addExitPhoto()"><span class="add-photo-icon">📷</span><span class="add-photo-label">Add Photo</span></div>';
   }
-  setExitTab(0);
-  switchView('D');
+  setExitTab(0);switchView('D');
 }
 
 function goBackToExitRooms(){switchView('C')}
 
 function markExitAreaComplete(){
-  exitRoomsDone[exitCurrentRoom]=true;
   var cond=exitSelectedCondition||'good';
+  var notes=document.getElementById('exitNotesField')?document.getElementById('exitNotesField').value:'';
+  exitRoomNotes[exitCurrentRoom]={condition:cond,notes:notes};
+  exitRoomsDone[exitCurrentRoom]=true;
   var condLabel=cond==='good'?'Clean & good':cond==='fair'?'Minor issues':'Needs attention';
   var row=document.getElementById('exitRoom-'+exitCurrentRoom);
   if(row){
     row.style.borderColor='rgba(0,200,150,.3)';row.style.borderWidth='1.5px';row.style.background='rgba(0,200,150,.02)';row.style.boxShadow='none';
-    var icon=row.querySelector('.room-icon-wrap');var status=row.querySelector('.room-status');var check=row.querySelector('.room-check');
+    var icon=row.querySelector('.room-icon-wrap'),status=row.querySelector('.room-status'),check=row.querySelector('.room-check');
     if(icon)icon.style.background='rgba(0,200,150,.1)';
     if(status){status.textContent='Done · '+condLabel;status.style.color='var(--teal-dk)'}
     if(check){check.style.background='var(--teal)';check.style.borderColor='var(--teal)';check.style.color='white';check.textContent='✓'}
@@ -761,26 +615,20 @@ function markExitAreaComplete(){
 }
 
 function updateExitProgress(){
-  var done=exitRoomsDone.filter(Boolean).length;
-  var pct=Math.round((done/exitRoomData.length)*100);
-  var lbl=document.getElementById('exitProgressLabel');
-  var pctEl=document.getElementById('exitProgressPct');
-  var fill=document.getElementById('exitProgressFill');
-  var btn=document.getElementById('exitCompleteBtn');
-  var hint=document.getElementById('exitCompleteHint');
-  if(lbl)lbl.textContent=done+' of 8 areas completed';
+  var done=exitRoomsDone.filter(Boolean).length,total=exitRoomData.length;
+  var pct=Math.round((done/total)*100);
+  var lbl=document.getElementById('exitProgressLabel'),pctEl=document.getElementById('exitProgressPct'),fill=document.getElementById('exitProgressFill'),btn=document.getElementById('exitCompleteBtn'),hint=document.getElementById('exitCompleteHint');
+  if(lbl)lbl.textContent=done+' of '+total+' areas completed';
   if(pctEl)pctEl.textContent=pct+'%';
   if(fill)fill.style.width=pct+'%';
-  var allDone=done===exitRoomData.length;
+  var allDone=done===total;
   if(btn){btn.style.opacity=allDone?'1':'.4';btn.style.pointerEvents=allDone?'auto':'none'}
-  if(hint){hint.textContent=allDone?'All areas done — generating comparison ✓':(exitRoomData.length-done)+' areas remaining';if(allDone)hint.style.color='var(--teal-dk)'}
+  if(hint){hint.textContent=allDone?'All areas done — ready to generate comparison ✓':(total-done)+' areas remaining';if(allDone)hint.style.color='var(--teal-dk)'}
 }
 
-// Tabs
 function setExitTab(idx){
   [0,1,2].forEach(function(i){
-    var tab=document.getElementById('exitTab'+i);
-    var content=document.getElementById('exitTabContent'+i);
+    var tab=document.getElementById('exitTab'+i),content=document.getElementById('exitTabContent'+i);
     if(tab)tab.classList.toggle('tab-active',i===idx);
     if(content)content.style.display=i===idx?'block':'none';
   });
@@ -798,21 +646,20 @@ function addExitQuickNote(text,el){
 }
 
 function addExitPhoto(){
-  var now=new Date();
-  var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  var colors=['ph-blue','ph-teal','ph-slate'];
-  var emojis=['🏠','🪟','📸','🔍','🧱'];
-  var pg=document.getElementById('exitPhotoGrid');
-  var addBtn=pg.querySelector('.add-photo');
-  var cell=document.createElement('div');
-  cell.className='photo-cell';
+  var now=new Date(),time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  var colors=['ph-blue','ph-teal','ph-slate'],emojis=['🏠','🪟','📸','🔍','🧱'];
+  var pg=document.getElementById('exitPhotoGrid'),addBtn=pg.querySelector('.add-photo');
+  var cell=document.createElement('div');cell.className='photo-cell';
   cell.innerHTML='<div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">'+time+'</span>';
   pg.insertBefore(cell,addBtn);
   showToast('Photo added · '+time,'Timestamped · Saved to exit report','📷');
 }
 
-// Generation
-function runExitGeneration(){
+// ── AI Exit Comparison ──
+var aiComparisonData=null;
+var tenantDecisions={};
+
+async function runExitGeneration(){
   var delays=[600,1400,2200,3200,4400,5400];
   delays.forEach(function(delay,i){
     setTimeout(function(){
@@ -822,68 +669,249 @@ function runExitGeneration(){
       if(i<delays.length-1){var next=document.getElementById('exitGenIcon-'+(i+1));if(next)next.style.animation='spin 1s linear infinite'}
     },delay);
   });
-  setTimeout(function(){switchView('F')},6000);
+
+  var rooms=exitRoomData.map(function(r,i){
+    var exit=exitRoomNotes[i]||{};
+    return{
+      name:r.name,emoji:r.emoji,
+      entryCondition:r.entryCondition||'good',
+      entryNotes:r.entryNotes||'',
+      exitCondition:exit.condition||'good',
+      exitNotes:exit.notes||''
+    };
+  });
+
+  var propertyAddress='';
+  try{
+    var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+    if(tracked.length>0)propertyAddress=tracked[tracked.length-1].address||tracked[tracked.length-1].label||'';
+  }catch(e){}
+
+  try{
+    var resp=await fetch('/api/compare-exit',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({rooms:rooms,propertyAddress:propertyAddress})
+    });
+    if(resp.ok){
+      var data=await resp.json();
+      if(!data.error){aiComparisonData=data}
+    }
+  }catch(e){}
+
+  if(!aiComparisonData){
+    aiComparisonData={
+      summary:{areasChecked:exitRoomData.length,matches:exitRoomData.length,discrepancies:0},
+      areas:exitRoomData.map(function(r){return{room:r.name,emoji:r.emoji,status:'match'}}),
+      discrepancies:[],bondRecovery:[]
+    };
+  }
+
+  setTimeout(function(){
+    renderComparisonResults(aiComparisonData);
+    switchView('F');
+  },6200);
 }
 
-// Tenant Decisions
-var tenantDecisions={};
+function renderComparisonResults(data){
+  var disc=data.discrepancies||[];
+  var banner=document.getElementById('compBannerText');
+  var subtitle=document.getElementById('compSubtitle');
+  if(banner){banner.textContent=disc.length===0?'✓ No significant differences found — your property matches move-in condition.':'RenterIQ found '+disc.length+' potential difference'+(disc.length!==1?'s':'')+'. Review each one — you decide what gets recorded.'}
+  if(subtitle){subtitle.textContent=disc.length===0?'All areas match move-in':''+disc.length+' item'+(disc.length!==1?'s':'')+' for your review'}
+
+  var areasList=document.getElementById('compAreasList');
+  if(areasList&&data.areas&&data.areas.length>0){
+    var rows=data.areas.map(function(a,idx){
+      var isLast=idx===data.areas.length-1;
+      var isReview=a.status==='review';
+      return '<div style="padding:10px 14px;'+(isLast?'':'border-bottom:1px solid var(--border-lt);')+'display:flex;align-items:center;gap:10px;'+(isReview?'background:rgba(245,166,35,.03)':'')+'">'
+        +'<span style="font-size:16px">'+a.emoji+'</span>'
+        +'<span style="font-family:\'Sora\',sans-serif;font-weight:'+(isReview?'800':'700')+';font-size:13px;color:var(--text);flex:1">'+a.room+'</span>'
+        +(isReview?'<span class="tag tag-amber">Review ⚠</span>':'<span class="tag tag-teal">Match ✓</span>')
+        +'</div>';
+    }).join('');
+    areasList.innerHTML='<div class="sec-label" style="padding:0 0 10px">All '+data.areas.length+' Areas</div>'
+      +'<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:20px">'+rows+'</div>';
+  }
+
+  var container=document.getElementById('compDiscrepanciesContainer');
+  if(!container)return;
+  if(disc.length===0){
+    container.innerHTML='<div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.25);border-radius:16px;padding:20px 18px;text-align:center">'
+      +'<div style="font-size:36px;margin-bottom:12px">🎉</div>'
+      +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--teal-dk);margin-bottom:6px">All clear — no discrepancies found</div>'
+      +'<div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Your exit condition matches your move-in record. You\'re in a strong position to get your full bond back.</div>'
+      +'</div>'
+      +'<div style="height:16px"></div>'
+      +'<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="generateExitReport()">Generate Exit Report →</button>';
+    var footer=document.getElementById('reviewFooterMsg');if(footer)footer.textContent='No items to review — you\'re all clear ✓';
+    return;
+  }
+
+  container.innerHTML='<div class="sec-label" style="padding:0 0 6px">Items Requiring Your Decision</div>'
+    +'<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">For each item below, RenterIQ will tell you what it noticed. You decide how to handle it.</div>'
+    +'<div style="display:flex;flex-direction:column;gap:16px" id="discCards"></div>';
+
+  var cards=document.getElementById('discCards');
+  disc.forEach(function(d,n){
+    var card=document.createElement('div');
+    card.id='reviewCard-'+n;
+    card.style.cssText='background:#fff;border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden';
+    card.innerHTML=
+      '<div style="padding:14px 16px;background:rgba(245,166,35,.08);display:flex;align-items:center;gap:10px">'
+        +'<div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+d.emoji+'</div>'
+        +'<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+d.room+'</div><div style="font-weight:600;font-size:12px;color:#8A6500">Difference detected</div></div>'
+        +'<span class="tag tag-amber">⚠️ Review</span>'
+      +'</div>'
+      +'<div style="padding:14px 16px">'
+        +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px"><span style="font-size:12px">🤖</span><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">RenterIQ noticed:</span></div>'
+        +'<div style="font-weight:600;font-size:13.5px;color:var(--text);line-height:1.75">'+d.description+'</div>'
+      +'</div>'
+      +'<div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+        +'<div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Move-in</div><div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-blue">'+d.emoji+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">'+d.entryContext+'</div></div>'
+        +'<div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Exit</div><div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-teal">'+d.emoji+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">'+d.exitContext+'</div></div>'
+      +'</div>'
+      +'<div id="discQuestion-'+n+'" style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl)">'
+        +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Is this something that happened during your tenancy?</div>'
+        +'<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report and RenterIQ will suggest how to fix it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>'
+        +'<div style="display:flex;gap:10px">'
+          +'<button style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed('+n+')">Yes — this happened during my tenancy</button>'
+          +'<button style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed('+n+')">No — pre-existing / wear &amp; tear</button>'
+        +'</div>'
+      +'</div>'
+      +'<div id="decidedState-'+n+'" style="display:none">'
+        +'<div id="confirmedState-'+n+'" style="display:none;background:rgba(232,64,64,.06);border-top:1px solid rgba(232,64,64,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">⚠️</span><div style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:13px;color:var(--red);line-height:1.5">Noted — included in your exit report. RenterIQ will suggest fixes in the next step.</div></div>'
+        +'<div id="dismissedState-'+n+'" style="display:none;background:rgba(0,200,150,.06);border-top:1px solid rgba(0,200,150,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">✓</span><div style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);line-height:1.5">Noted as pre-existing or fair wear and tear. Not included as a discrepancy.</div></div>'
+      +'</div>';
+    cards.appendChild(card);
+  });
+
+  var footer=document.getElementById('reviewFooterMsg');
+  if(footer)footer.textContent='Review all '+disc.length+' item'+(disc.length!==1?'s':'')+' above to continue';
+}
 
 function tenantConfirmed(n){
   tenantDecisions[n]='confirmed';
-  var q=document.getElementById('discQuestion-'+n);
-  var d=document.getElementById('decidedState-'+n);
-  var cs=document.getElementById('confirmedState-'+n);
-  if(q)q.style.display='none';
-  if(d)d.style.display='block';
-  if(cs){cs.style.display='flex'}
+  var q=document.getElementById('discQuestion-'+n),d=document.getElementById('decidedState-'+n),cs=document.getElementById('confirmedState-'+n);
+  if(q)q.style.display='none';if(d)d.style.display='block';if(cs)cs.style.display='flex';
   showToast('Noted — included in report','RenterIQ will suggest fixes in the next step','⚠️');
   checkReviewComplete();
 }
 
 function tenantDismissed(n){
   tenantDecisions[n]='dismissed';
-  var q=document.getElementById('discQuestion-'+n);
-  var d=document.getElementById('decidedState-'+n);
-  var ds=document.getElementById('dismissedState-'+n);
-  if(q)q.style.display='none';
-  if(d)d.style.display='block';
-  if(ds){ds.style.display='flex'}
+  var q=document.getElementById('discQuestion-'+n),d=document.getElementById('decidedState-'+n),ds=document.getElementById('dismissedState-'+n);
+  if(q)q.style.display='none';if(d)d.style.display='block';if(ds)ds.style.display='flex';
   showToast('Pre-existing noted ✓','Not included as a discrepancy','✓');
   checkReviewComplete();
 }
 
 function checkReviewComplete(){
+  if(!aiComparisonData)return;
+  var total=(aiComparisonData.discrepancies||[]).length;
   var done=Object.keys(tenantDecisions).length;
-  if(done>=2){
+  if(done>=total){
     var footer=document.getElementById('reviewFooter');
-    if(footer){footer.innerHTML='<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="switchView(\'G\')">Continue to Bond Recovery →</button>'}
+    if(footer)footer.innerHTML='<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="showBondRecovery()">Continue to Bond Recovery →</button>';
   }
 }
 
-// Fixed Items
-var fixedItems=new Set();
+function showBondRecovery(){
+  renderBondRecovery(aiComparisonData);
+  switchView('G');
+}
 
+function renderBondRecovery(data){
+  var summary=data.summary||{};
+  var confirmed=(data.bondRecovery||[]).filter(function(item,n){return tenantDecisions[n]==='confirmed'});
+  var statsRow=document.getElementById('bondStatsRow');
+  if(statsRow){
+    statsRow.innerHTML=
+      '<div style="padding:14px 10px;text-align:center;border-right:1px solid var(--border-lt)"><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:var(--blue)">'+(summary.areasChecked||exitRoomData.length)+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Areas Inspected</div></div>'
+      +'<div style="padding:14px 10px;text-align:center;border-right:1px solid var(--border-lt)"><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:var(--teal)">'+(summary.matches||0)+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Areas Match</div></div>'
+      +'<div style="padding:14px 10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:var(--red)">'+confirmed.length+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:3px">Items to Fix</div></div>';
+  }
+
+  var cards=document.getElementById('bondRecoveryCards');
+  if(!cards)return;
+  if(confirmed.length===0){
+    cards.innerHTML='<div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.25);border-radius:16px;padding:20px 18px;text-align:center"><div style="font-size:32px;margin-bottom:10px">✓</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--teal-dk)">Nothing to fix — all clear</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6">You dismissed all flagged items as pre-existing or wear and tear. You\'re in a strong position to claim your full bond.</div></div>';
+    return;
+  }
+  var label=document.createElement('div');label.className='sec-label';label.style.padding='0 0 10px';label.textContent='Items You Confirmed';
+  cards.appendChild(label);
+  confirmed.forEach(function(item,n){
+    var card=document.createElement('div');
+    card.id='fixCard-'+n;
+    card.style.cssText='background:#fff;border-radius:18px;border:1px solid var(--border-lt);box-shadow:0 4px 16px rgba(27,80,200,.06);overflow:hidden;margin-bottom:14px';
+    card.innerHTML=
+      '<div style="background:var(--blue);padding:14px 16px;display:flex;align-items:center;gap:12px">'
+        +'<div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+item.emoji+'</div>'
+        +'<span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:#fff;flex:1">'+item.room+'</span>'
+        +'<span style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px">Fix Suggested</span>'
+      +'</div>'
+      +'<div style="padding:14px 16px"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:5px">The Issue:</div><div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.65">'+item.issue+'</div></div>'
+      +'<div style="padding:0 16px 14px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>'
+        +'<div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:13px 14px"><div style="font-weight:600;font-size:13px;color:#005040;line-height:1.75">'+item.suggestion+'</div></div>'
+      +'</div>'
+      +'<div style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl);display:flex;gap:16px">'
+        +'<div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">⏱</span><span style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;color:var(--text)">'+item.timeEst+'</span></div>'
+        +'<div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">💰</span><span style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;color:var(--text)">'+item.costEst+'</span></div>'
+        +'<div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px">📈</span><span style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;color:var(--text)">'+item.difficulty+'</span></div>'
+      +'</div>'
+      +'<div class="fix-action-row" style="padding:12px 16px;display:flex;gap:8px">'
+        +'<button style="flex:1;background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="markFixed('+n+')">✓ Mark as Fixed</button>'
+        +'<button style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast(\'Photo added\',\'Evidence saved to exit report\',\'📷\')">📷 Add Photo</button>'
+        +'<button style="background:var(--blue-xl);color:var(--muted);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;min-height:44px" onclick="showToast(\'Skipped\',\'Item remains in exit report\',\'→\')">Skip</button>'
+      +'</div>';
+    cards.appendChild(card);
+  });
+}
+
+var fixedItems=new Set();
 function markFixed(n){
   fixedItems.add(n);
   var card=document.getElementById('fixCard-'+n);
   if(card){
     var actionRow=card.querySelector('.fix-action-row');
-    if(actionRow){actionRow.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:4px 0"><div style="width:24px;height:24px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:white;font-family:Sora,sans-serif;font-weight:700;font-size:13px">✓</div><span style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk)">Marked as fixed · Evidence saved</span></div>'}
+    if(actionRow)actionRow.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:4px 0"><div style="width:24px;height:24px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:white;font-family:Sora,sans-serif;font-weight:700;font-size:13px">✓</div><span style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk)">Marked as fixed · Evidence saved</span></div>';
     card.style.borderColor='rgba(0,200,150,.4)';
   }
   showToast('Fix recorded ✓','Evidence saved to your exit report','✓');
 }
 
 function generateExitReport(){
-  showToast('Generating final report…','Saving everything to Vault','📄');
+  var disc=aiComparisonData?aiComparisonData.discrepancies||[]:[];
+  var confirmed=Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='confirmed'}).length;
+  var report={
+    type:'exit-audit',date:new Date().toISOString(),
+    areas:exitRoomData.length,discrepancies:disc.length,confirmed:confirmed,
+    rooms:exitRoomData.map(function(r,i){return Object.assign({},r,exitRoomNotes[i]||{})})
+  };
+  try{
+    var vault=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+    vault.push(report);localStorage.setItem('renteriq_vault_reports',JSON.stringify(vault));
+  }catch(e){}
+  showToast('Exit report saved to Vault','Your bond protection record is complete','📄');
   setTimeout(function(){switchView('H')},1200);
 }
 
-// Init
 document.addEventListener('DOMContentLoaded',function(){
   allViews.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
+  var addr=loadEntryAuditData();
+  initRoomData();
   buildExitAreaList();
   updateExitProgress();
+  if(addr){var sub=document.getElementById('sh-sub-c');if(sub)sub.textContent=addr}
+  var reports=document.getElementById('reportsReady');
+  if(reports&&entryAuditRooms.length>0){
+    var badge=reports.querySelector('.tag-muted');
+    if(badge){badge.className='tag tag-teal';badge.textContent='Ready ✓'}
+    var detail=reports.querySelector('[style*="Complete an inspection"]');
+    if(detail)detail.textContent=entryAuditRooms.length+' rooms · '+entryAuditRooms.reduce(function(a,r){return a+(r.photos||[]).length},0)+' photos';
+  }
 });
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}

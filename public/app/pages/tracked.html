@@ -124,9 +124,8 @@ const STATUS_OPTIONS = [
   { value: 'rejected', label: 'Rejected', class: 'status-rejected' }
 ];
 
-function goTo(path) {
-  window.location.href = path;
-}
+function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
+function goTo(path) { window.location.href = path; }
 
 function showHelp() {
   alert('Tracked Properties Help:\n\n• View all properties you\'ve saved\n• Update status as you progress\n• Import properties from any URL\n• Click View to open original listing\n• Click Delete to remove a property');
@@ -154,39 +153,45 @@ function renderProperties() {
   const sorted = properties.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
   
   list.innerHTML = sorted.map(prop => {
+    // backward-compat: support both old field names and new unified schema
+    const addr    = prop.address    || prop.label   || 'Property Listing';
+    const imgUrl  = prop.imageUrl   || prop.image   || '';
+    const srcSite = prop.sourceSite || prop.source  || 'unknown';
+    const link    = prop.originalLink || prop.url   || '#';
+
     const status = STATUS_OPTIONS.find(s => s.value === prop.status) || STATUS_OPTIONS[0];
     const date = new Date(prop.savedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
-    
+
     return `
       <div class="property-card" data-id="${prop.id}">
         <button class="delete-btn" onclick="deleteProperty('${prop.id}')">🗑️</button>
-        
-        <div class="property-source">${SearchService.getSourceName(prop.sourceSite)}</div>
-        
+
+        <div class="property-source">${SearchService.getSourceName(srcSite)}</div>
+
         <div class="property-image">
-          ${prop.imageUrl ? `<img src="${prop.imageUrl}" alt="${prop.address}" onerror="this.style.display='none'; this.parentElement.textContent='🏠'">` : '🏠'}
+          ${imgUrl ? `<img src="${imgUrl}" alt="${addr}" onerror="this.style.display='none'; this.parentElement.textContent='🏠'">` : '🏠'}
         </div>
-        
+
         <span class="status-badge ${status.class}">${status.label}</span>
-        
-        <div class="property-price">${prop.price}</div>
-        <div class="property-address">${prop.address}</div>
+
+        <div class="property-price">${prop.price || ''}</div>
+        <div class="property-address">${addr}</div>
         ${prop.description ? `<div class="property-description">${prop.description}</div>` : ''}
-        
+
         <div class="status-selector">
           ${STATUS_OPTIONS.map(opt => `
-            <button class="status-option ${prop.status === opt.value ? 'active' : ''}" 
+            <button class="status-option ${prop.status === opt.value ? 'active' : ''}"
                     onclick="updateStatus('${prop.id}', '${opt.value}')">
               ${opt.label}
             </button>
           `).join('')}
         </div>
-        
+
         <div class="property-actions">
-          <button class="property-btn btn-primary" onclick="viewProperty('${prop.originalLink}')">View Listing</button>
-          <button class="property-btn btn-secondary" onclick="shareProperty('${prop.address}', '${prop.originalLink}')">Share</button>
+          <button class="property-btn btn-primary" onclick="viewProperty('${link}')">View Listing</button>
+          <button class="property-btn btn-secondary" onclick="shareProperty('${addr}', '${link}')">Share</button>
         </div>
-        
+
         <div style="margin-top:12px;font-size:11px;color:var(--muted)">Tracked on ${date}</div>
       </div>
     `;
@@ -239,14 +244,15 @@ async function importFromUrl(e) {
     
     const property = {
       id: SearchService.generateId(),
-      address: metadata.address,
-      price: metadata.price,
-      description: metadata.description,
-      imageUrl: metadata.imageUrl,
-      sourceSite: metadata.source,
-      originalLink: url,
-      savedAt: new Date(),
-      status: 'pending'
+      url, originalLink: url,
+      address: metadata.address, label: metadata.address,
+      price: metadata.price || '',
+      description: metadata.description || '',
+      image: metadata.imageUrl || '', imageUrl: metadata.imageUrl || '',
+      source: metadata.source, sourceSite: metadata.source,
+      savedAt: new Date().toISOString(),
+      status: 'tracked',
+      inspectionDate: '', inspectionTime: ''
     };
     
     SearchService.saveProperty(property);
@@ -269,10 +275,10 @@ document.addEventListener('DOMContentLoaded', renderProperties);
 </script>
 <script src="/app/js/sidebar.js"></script>
 <nav class="bottom-nav">
-  <button class="nav-tab" onclick="goTo('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
-  <button class="nav-tab" onclick="goTo('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-  <button class="nav-tab" onclick="goTo('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
-  <button class="nav-tab" onclick="goTo('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
 </nav>
 </body>
 </html>

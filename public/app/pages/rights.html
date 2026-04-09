@@ -65,6 +65,13 @@
 .teal-lt{background:rgba(0,200,150,.1)}
 .amber-lt{background:rgba(245,166,35,.1)}
 .red-lt{background:rgba(232,64,64,.1)}
+/* ── Quick Facts Cards ─── */
+.qf-card{background:linear-gradient(135deg,rgba(27,80,200,.05),rgba(27,80,200,.02));border-radius:16px;padding:16px;border:1px solid rgba(27,80,200,.12);margin:0 16px 10px}
+.qf-title{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.qf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qf-item{background:#fff;border-radius:12px;padding:11px 12px;border:1px solid var(--border-lt)}
+.qf-num{font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--blue-dk)}
+.qf-label{font-family:'Nunito',sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3}
 /* Bottom Nav styles are global — defined in /app/css/app.css */
 </style>
 </head>
@@ -74,21 +81,20 @@
 <!-- STICKY HEADER -->
 <header class="rh-header">
   <div class="rh-row">
-    <button class="rh-back" onclick="navigate('/dashboard')"><span class="rh-back-arrow">‹</span><span class="rh-back-label">RENTERIQ</span></button>
-    <button class="rh-search" onclick="showToast('Search','Rights search coming soon','🔍')">🔍</button>
+    <button class="rh-back" onclick="navigate('/app/index.html')"><span class="rh-back-arrow">‹</span><span class="rh-back-label">RENTERIQ</span></button>
   </div>
-  <div class="rh-title">Renter Rights Hub</div>
-  <div class="rh-sub">Free help in every state and territory</div>
+  <div class="rh-title">Your Renter Rights</div>
+  <div class="rh-sub" id="rhSub">Free help &amp; info for your state</div>
   <div class="pill-row" id="pillRow">
-    <!-- Pills will be dynamically inserted here with user's state first -->
+    <!-- Pills are dynamically inserted with user's state first -->
   </div>
   <!-- USER STATE DISPLAY (Sticky with header) -->
   <div class="user-state-bar" id="userStateBar">
     <div style="display:flex;align-items:center;gap:12px">
       <span style="font-size:22px">📍</span>
       <div>
-        <div id="userStateDisplay" style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff">You're in <strong>VIC</strong></div>
-        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:rgba(255,255,255,.7);margin-top:1px">Tap to change your state</div>
+        <div id="userStateDisplay" style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff">Detecting your state…</div>
+        <div id="userStateSource" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:rgba(255,255,255,.7);margin-top:1px">Tap to change</div>
       </div>
     </div>
     <button onclick="changeUserState()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;padding:7px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Change</button>
@@ -119,13 +125,13 @@
   <div style="display:flex;gap:12px;align-items:center">
     <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">⚖️</div>
     <div>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text)">You have more rights than you think</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">Free help is available in every state</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text)" id="introTitle">You have more rights than you think</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px" id="introSub">Free help is available in your state</div>
     </div>
   </div>
   <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
   <div style="display:flex;flex-direction:column;gap:10px">
-    <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.1);color:var(--teal-dk);font-family:'Sora',sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✓</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.55">Every state has a free government tenancy authority that provides advice, dispute resolution and guidance at no cost to renters.</div></div>
+    <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.1);color:var(--teal-dk);font-family:'Sora',sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✓</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.55" id="introPoint1">Your state has a free government tenancy authority that provides advice, dispute resolution and guidance at no cost.</div></div>
     <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.1);color:var(--teal-dk);font-family:'Sora',sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✓</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.55">Your landlord or agent must follow the law — if they don't, you have the right to challenge them through your state tribunal.</div></div>
     <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.1);color:var(--teal-dk);font-family:'Sora',sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✓</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.55">Keeping records of everything is your strongest protection. RenterIQ helps you do exactly that.</div></div>
   </div>
@@ -133,8 +139,8 @@
 
 <!-- COMMON RIGHTS SECTION -->
 <div class="sec-hdr">
-  <div class="sec-title">Your Rights as a Renter</div>
-  <div class="sec-sub">Applies in all Australian states</div>
+  <div class="sec-title">Rights you have as a renter</div>
+  <div class="sec-sub">Applies everywhere in Australia</div>
 </div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 16px;border:1px solid var(--border-lt);overflow:hidden">
   <div class="right-row"><div class="right-icon" style="background:var(--blue-xl)">🔑</div><div><div class="right-title">Bond Protection</div><div class="right-desc">Your bond must be lodged with the state bond authority — not held by the landlord or agent. You are entitled to a lodgement receipt.</div></div></div>
@@ -147,6 +153,12 @@
   <div class="right-row"><div class="right-icon" style="background:var(--blue-xl)">⚖️</div><div><div class="right-title">Fair Wear & Tear</div><div class="right-desc">Normal deterioration from everyday use cannot be charged to you at exit. Only damage beyond fair wear and tear can be deducted from your bond.</div></div></div>
 </div>
 
+<!-- STATE-SPECIFIC HEADER -->
+<div class="sec-hdr">
+  <div class="sec-title" id="stateSecTitle">Rights specific to your state</div>
+  <div class="sec-sub" id="stateSecSub">Detecting…</div>
+</div>
+
 <!-- STATE: VIC -->
 <div class="state-section" id="state-VIC">
 <div class="state-hdr" style="background:linear-gradient(135deg,#003580,#1B50C8)">
@@ -155,14 +167,25 @@
   <div class="state-tag">Consumer Affairs Victoria · VCAT</div>
   <div class="state-free">All services listed below are free</div>
 </div>
+<div class="qf-card">
+  <div class="qf-title">Victoria — Key Numbers at a Glance</div>
+  <div class="qf-grid">
+    <div class="qf-item"><div class="qf-num">1 month</div><div class="qf-label">Max bond (rent ≤$350/wk)</div></div>
+    <div class="qf-item"><div class="qf-num">60 days</div><div class="qf-label">Rent increase written notice</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Minimum entry notice</div></div>
+    <div class="qf-item"><div class="qf-num">6 months</div><div class="qf-label">Min. between routine inspections</div></div>
+    <div class="qf-item"><div class="qf-num">ASAP</div><div class="qf-label">Urgent repair timeframe</div></div>
+    <div class="qf-item"><div class="qf-num">14 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
+  </div>
+</div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.consumer.vic.gov.au/housing/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Consumer Affairs Victoria</div><div class="rights-link-desc">Tenancy advice, guides and dispute help</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://www.vcat.vic.gov.au/')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">VCAT — Tenancy Division</div><div class="rights-link-desc">Victorian Civil and Administrative Tribunal</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://tenantsvic.org.au/')"><div class="rights-link-icon teal-lt">🏘</div><div style="flex:1"><div class="rights-link-title">Tenants Victoria</div><div class="rights-link-desc">Free legal advice and tenant advocacy</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.consumer.vic.gov.au/housing/renting/ending-a-lease-or-residency/bond')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Refund — Consumer Affairs</div><div class="rights-link-desc">How to get your bond back in Victoria</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.consumer.vic.gov.au/housing/renting/repairs-alterations-safety/repairs-in-rental-properties')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs & Maintenance Rights VIC</div><div class="rights-link-desc">Your rights when repairs are not done</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.consumer.vic.gov.au/housing/renting/rent-bond-bills-and-condition-reports/bond')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Refund — Consumer Affairs</div><div class="rights-link-desc">How to get your bond back in Victoria</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.consumer.vic.gov.au/housing/renting/repairs-alterations-safety-and-pets/repairs/repairs-in-rental-properties')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs & Maintenance Rights VIC</div><div class="rights-link-desc">Your rights when repairs are not done</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('tel:1300558181')"><div class="rights-link-icon" style="background:var(--blue-xl)">📞</div><div style="flex:1"><div class="rights-link-title">CAV Helpline — 1300 55 81 81</div><div class="rights-link-desc">Free tenancy advice by phone</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
   </div>
 </div>
@@ -191,14 +214,25 @@
   <div class="state-tag">NSW Fair Trading · NCAT</div>
   <div class="state-free">All services listed below are free</div>
 </div>
+<div class="qf-card">
+  <div class="qf-title">New South Wales — Key Numbers at a Glance</div>
+  <div class="qf-grid">
+    <div class="qf-item"><div class="qf-num">4 weeks</div><div class="qf-label">Max bond (standard tenancy)</div></div>
+    <div class="qf-item"><div class="qf-num">60 days</div><div class="qf-label">Rent increase written notice</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Minimum entry notice</div></div>
+    <div class="qf-item"><div class="qf-num">4 per year</div><div class="qf-label">Max routine inspections</div></div>
+    <div class="qf-item"><div class="qf-num">ASAP</div><div class="qf-label">Urgent repair timeframe</div></div>
+    <div class="qf-item"><div class="qf-num">14 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
+  </div>
+</div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
-    <div class="rights-link-row" onclick="openLink('https://www.fairtrading.nsw.gov.au/housing-and-property/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">NSW Fair Trading — Renting</div><div class="rights-link-desc">Official renting guide for NSW tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">NSW Fair Trading — Renting</div><div class="rights-link-desc">Official renting guide for NSW tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://www.ncat.nsw.gov.au/')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">NCAT — Tenancy Division</div><div class="rights-link-desc">NSW Civil and Administrative Tribunal</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://www.tenants.org.au/')"><div class="rights-link-icon teal-lt">🏘</div><div style="flex:1"><div class="rights-link-title">Tenants' Union of NSW</div><div class="rights-link-desc">Free advice, advocacy and factsheets</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.fairtrading.nsw.gov.au/housing-and-property/renting/resolving-rental-disputes')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Resolving Rental Disputes</div><div class="rights-link-desc">Step by step dispute resolution guide</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.fairtrading.nsw.gov.au/housing-and-property/renting/during-a-tenancy/repairs-and-maintenance')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs in NSW Rentals</div><div class="rights-link-desc">Your rights when repairs are not completed</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live/resolving-residential-tenancy-disputes')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Resolving Rental Disputes</div><div class="rights-link-desc">Step by step dispute resolution guide</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live/getting-repairs-done')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs in NSW Rentals</div><div class="rights-link-desc">Your rights when repairs are not completed</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('tel:133220')"><div class="rights-link-icon" style="background:var(--blue-xl)">📞</div><div style="flex:1"><div class="rights-link-title">Fair Trading — 13 32 20</div><div class="rights-link-desc">Free tenancy advice by phone</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
   </div>
 </div>
@@ -227,13 +261,24 @@
   <div class="state-tag">Residential Tenancies Authority · QCAT</div>
   <div class="state-free">All services listed below are free</div>
 </div>
+<div class="qf-card">
+  <div class="qf-title">Queensland — Key Numbers at a Glance</div>
+  <div class="qf-grid">
+    <div class="qf-item"><div class="qf-num">4 weeks</div><div class="qf-label">Max bond (rent ≤$700/wk)</div></div>
+    <div class="qf-item"><div class="qf-num">2 months</div><div class="qf-label">Rent increase written notice</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Minimum entry notice</div></div>
+    <div class="qf-item"><div class="qf-num">3 months</div><div class="qf-label">Min. between routine inspections</div></div>
+    <div class="qf-item"><div class="qf-num">ASAP</div><div class="qf-label">Urgent repair timeframe</div></div>
+    <div class="qf-item"><div class="qf-num">7 days</div><div class="qf-label">Non-urgent repair (Form 9)</div></div>
+  </div>
+</div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.rta.qld.gov.au/')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Residential Tenancies Authority</div><div class="rights-link-desc">Queensland's dedicated rental authority</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://www.qcat.qld.gov.au/')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">QCAT — Tenancy Disputes</div><div class="rights-link-desc">Queensland Civil and Administrative Tribunal</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.rta.qld.gov.au/renting/ending-a-tenancy/bond-refund')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Refund Process QLD</div><div class="rights-link-desc">How to claim your bond back in Queensland</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.rta.qld.gov.au/renting/during-a-tenancy/repairs-and-maintenance')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs & Maintenance QLD</div><div class="rights-link-desc">Emergency and routine repair rights</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.rta.qld.gov.au/refund')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Refund Process QLD</div><div class="rights-link-desc">How to claim your bond back in Queensland</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.rta.qld.gov.au/repairs')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs & Maintenance QLD</div><div class="rights-link-desc">Emergency and routine repair rights</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://www.rta.qld.gov.au/forms-resources/forms')"><div class="rights-link-icon" style="background:var(--blue-xl)">📋</div><div style="flex:1"><div class="rights-link-title">RTA Forms & Documents</div><div class="rights-link-desc">All standard tenancy forms for QLD</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('tel:1300366311')"><div class="rights-link-icon" style="background:var(--blue-xl)">📞</div><div style="flex:1"><div class="rights-link-title">RTA Hotline — 1300 366 311</div><div class="rights-link-desc">Free tenancy advice by phone</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
   </div>
@@ -248,7 +293,7 @@
     <div class="sp-point"><div class="sp-dot"></div><div class="sp-text">Bond must be lodged with the RTA within 10 days of receipt by the agent.</div></div>
   </div>
 </div>
-<div class="disp-card" onclick="openLink('https://www.rta.qld.gov.au/resolving-issues/dispute-resolution')">
+<div class="disp-card" onclick="openLink('https://www.rta.qld.gov.au/dispute-resolution')">
   <div style="width:40px;height:40px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚖️</div>
   <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">RTA Dispute Resolution — Free Service</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Queensland's free conciliation service resolves most disputes without needing to go to tribunal.</div></div>
   <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
@@ -263,14 +308,25 @@
   <div class="state-tag">Consumer Protection WA · Magistrates Court</div>
   <div class="state-free">All services listed below are free</div>
 </div>
+<div class="qf-card">
+  <div class="qf-title">Western Australia — Key Numbers at a Glance</div>
+  <div class="qf-grid">
+    <div class="qf-item"><div class="qf-num">4 weeks</div><div class="qf-label">Max bond (most tenancies)</div></div>
+    <div class="qf-item"><div class="qf-num">60 days</div><div class="qf-label">Rent increase written notice</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Minimum entry notice</div></div>
+    <div class="qf-item"><div class="qf-num">4 per year</div><div class="qf-label">Max routine inspections</div></div>
+    <div class="qf-item"><div class="qf-num">ASAP</div><div class="qf-label">Urgent repair timeframe</div></div>
+    <div class="qf-item"><div class="qf-num">14 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
+  </div>
+</div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
-    <div class="rights-link-row" onclick="openLink('https://www.commerce.wa.gov.au/consumer-protection/renting-home')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Consumer Protection WA — Renting</div><div class="rights-link-desc">Official renting guide for WA tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.courts.wa.gov.au/content/courts/magistrates/jurisdiction/civil-matters/residential-tenancies.html')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">Magistrates Court — Tenancies</div><div class="rights-link-desc">WA tenancy dispute resolution</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.commerce.wa.gov.au/consumer-protection/renters-guide')"><div class="rights-link-icon teal-lt">📋</div><div style="flex:1"><div class="rights-link-title">Full WA Renters Guide</div><div class="rights-link-desc">Comprehensive guide to renting in WA</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.commerce.wa.gov.au/consumer-protection/rental-bonds')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Information WA</div><div class="rights-link-desc">Bond lodgement and refund in WA</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.commerce.wa.gov.au/consumer-protection/residential-tenancy-database')"><div class="rights-link-icon amber-lt">🏘</div><div style="flex:1"><div class="rights-link-title">Tenancy Database Rules WA</div><div class="rights-link-desc">Your rights regarding tenancy databases</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.consumerprotection.wa.gov.au/renting-home')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Consumer Protection WA — Renting</div><div class="rights-link-desc">Official renting guide for WA tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.magistratescourt.wa.gov.au/C/civil_matters.aspx?uid=1226-6994-1097-9582')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">Magistrates Court — Tenancies</div><div class="rights-link-desc">WA tenancy dispute resolution</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.consumerprotection.wa.gov.au/publications/tenant-guide-renting-home-wa')"><div class="rights-link-icon teal-lt">📋</div><div style="flex:1"><div class="rights-link-title">Full WA Renters Guide</div><div class="rights-link-desc">Comprehensive guide to renting in WA</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.consumerprotection.wa.gov.au/rental-bonds')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Information WA</div><div class="rights-link-desc">Bond lodgement and refund in WA</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.consumerprotection.wa.gov.au/tenancy-databases')"><div class="rights-link-icon amber-lt">🏘</div><div style="flex:1"><div class="rights-link-title">Tenancy Database Rules WA</div><div class="rights-link-desc">Your rights regarding tenancy databases</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('tel:1300304054')"><div class="rights-link-icon" style="background:var(--blue-xl)">📞</div><div style="flex:1"><div class="rights-link-title">Consumer Protection — 1300 30 40 54</div><div class="rights-link-desc">Free tenancy advice by phone</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
   </div>
 </div>
@@ -284,7 +340,7 @@
     <div class="sp-point"><div class="sp-dot"></div><div class="sp-text">WA has specific provisions for caravan parks and residential parks — different rules apply.</div></div>
   </div>
 </div>
-<div class="disp-card" onclick="openLink('https://www.courts.wa.gov.au/content/courts/magistrates/jurisdiction/civil-matters/residential-tenancies.html')">
+<div class="disp-card" onclick="openLink('https://www.magistratescourt.wa.gov.au/C/civil_matters.aspx?uid=1226-6994-1097-9582')">
   <div style="width:40px;height:40px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚖️</div>
   <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">WA Magistrates Court — Tenancy Claims</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">File a minor case claim for tenancy disputes. Most cases are heard within 8 weeks.</div></div>
   <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
@@ -299,14 +355,25 @@
   <div class="state-tag">Consumer and Business Services · SACAT</div>
   <div class="state-free">All services listed below are free</div>
 </div>
+<div class="qf-card">
+  <div class="qf-title">South Australia — Key Numbers at a Glance</div>
+  <div class="qf-grid">
+    <div class="qf-item"><div class="qf-num">4 weeks</div><div class="qf-label">Max bond (most tenancies)</div></div>
+    <div class="qf-item"><div class="qf-num">60 days</div><div class="qf-label">Rent increase written notice</div></div>
+    <div class="qf-item"><div class="qf-num">24–48 hrs</div><div class="qf-label">Minimum entry notice</div></div>
+    <div class="qf-item"><div class="qf-num">4 per year</div><div class="qf-label">Max routine inspections</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Urgent repair timeframe</div></div>
+    <div class="qf-item"><div class="qf-num">Reasonable</div><div class="qf-label">Non-urgent repair timeframe</div></div>
+  </div>
+</div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
-    <div class="rights-link-row" onclick="openLink('https://www.cbs.sa.gov.au/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">CBS SA — Renting Guide</div><div class="rights-link-desc">Consumer and Business Services SA</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://cbs.sa.gov.au/sections/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">CBS SA — Renting Guide</div><div class="rights-link-desc">Consumer and Business Services SA</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://www.sacat.sa.gov.au/')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">SACAT — Tenancy Division</div><div class="rights-link-desc">South Australian Civil and Administrative Tribunal</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.cbs.sa.gov.au/renting/bond')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Lodgement & Refund SA</div><div class="rights-link-desc">Residential Bonds in South Australia</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.cbs.sa.gov.au/renting/repairs-and-maintenance')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs & Maintenance SA</div><div class="rights-link-desc">Your repair rights as a SA tenant</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.cbs.sa.gov.au/renting/ending-a-tenancy')"><div class="rights-link-icon" style="background:var(--blue-xl)">📋</div><div style="flex:1"><div class="rights-link-title">Ending a Tenancy SA</div><div class="rights-link-desc">Rights and process for ending your lease</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://cbs.sa.gov.au/sections/renting/bonds')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Lodgement & Refund SA</div><div class="rights-link-desc">Residential Bonds in South Australia</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.sa.gov.au/topics/housing/renting-and-letting/renting-privately/during-a-tenancy/Repairs-and-maintenance')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs & Maintenance SA</div><div class="rights-link-desc">Your repair rights as a SA tenant</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.sa.gov.au/topics/housing/renting-and-letting/renting-privately/ending-a-tenancy')"><div class="rights-link-icon" style="background:var(--blue-xl)">📋</div><div style="flex:1"><div class="rights-link-title">Ending a Tenancy SA</div><div class="rights-link-desc">Rights and process for ending your lease</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('tel:131882')"><div class="rights-link-icon" style="background:var(--blue-xl)">📞</div><div style="flex:1"><div class="rights-link-title">CBS SA — 131 882</div><div class="rights-link-desc">Free tenancy advice by phone</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
   </div>
 </div>
@@ -335,14 +402,25 @@
   <div class="state-tag">CBOS Tasmania · Magistrates Court</div>
   <div class="state-free">All services listed below are free</div>
 </div>
+<div class="qf-card">
+  <div class="qf-title">Tasmania — Key Numbers at a Glance</div>
+  <div class="qf-grid">
+    <div class="qf-item"><div class="qf-num">1 month</div><div class="qf-label">Max bond (most tenancies)</div></div>
+    <div class="qf-item"><div class="qf-num">42 days</div><div class="qf-label">Rent increase written notice</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Minimum entry notice</div></div>
+    <div class="qf-item"><div class="qf-num">4 per year</div><div class="qf-label">Max routine inspections</div></div>
+    <div class="qf-item"><div class="qf-num">ASAP</div><div class="qf-label">Urgent repair timeframe</div></div>
+    <div class="qf-item"><div class="qf-num">28 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
+  </div>
+</div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.cbos.tas.gov.au/topics/housing/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">CBOS — Renting in Tasmania</div><div class="rights-link-desc">Consumer, Building and Occupational Services</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.justice.tas.gov.au/courts/magistrates-court/magistrates-court-civil-division/residential-tenancy')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">Magistrates Court — Tenancies</div><div class="rights-link-desc">Tasmanian tenancy dispute resolution</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.cbos.tas.gov.au/topics/housing/renting/bond')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Information TAS</div><div class="rights-link-desc">Bond lodgement and refund in Tasmania</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.cbos.tas.gov.au/topics/housing/renting/repairs')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repair Rights TAS</div><div class="rights-link-desc">Urgent and routine repairs in Tasmania</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.cbos.tas.gov.au/topics/housing/renting/ending-a-tenancy')"><div class="rights-link-icon" style="background:var(--blue-xl)">📋</div><div style="flex:1"><div class="rights-link-title">Ending a Tenancy TAS</div><div class="rights-link-desc">How to end your tenancy in Tasmania</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.magistratescourt.tas.gov.au/about_us/civil/residential_tenancy')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">Magistrates Court — Tenancies</div><div class="rights-link-desc">Tasmanian tenancy dispute resolution</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.cbos.tas.gov.au/topics/housing/renting/bonds')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Information TAS</div><div class="rights-link-desc">Bond lodgement and refund in Tasmania</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.cbos.tas.gov.au/topics/housing/renting/rental-maintenance-repairs-changes')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repair Rights TAS</div><div class="rights-link-desc">Urgent and routine repairs in Tasmania</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.cbos.tas.gov.au/topics/housing/renting/ending-a-tenancylease')"><div class="rights-link-icon" style="background:var(--blue-xl)">📋</div><div style="flex:1"><div class="rights-link-title">Ending a Tenancy TAS</div><div class="rights-link-desc">How to end your tenancy in Tasmania</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('tel:1300654499')"><div class="rights-link-icon" style="background:var(--blue-xl)">📞</div><div style="flex:1"><div class="rights-link-title">CBOS TAS — 1300 654 499</div><div class="rights-link-desc">Free tenancy advice by phone</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
   </div>
 </div>
@@ -356,7 +434,7 @@
     <div class="sp-point"><div class="sp-dot"></div><div class="sp-text">CBOS provides a free dispute resolution service — contact them before going to the Magistrates Court.</div></div>
   </div>
 </div>
-<div class="disp-card" onclick="openLink('https://www.justice.tas.gov.au/courts/magistrates-court/magistrates-court-civil-division/residential-tenancy')">
+<div class="disp-card" onclick="openLink('https://www.magistratescourt.tas.gov.au/about_us/civil/residential_tenancy')">
   <div style="width:40px;height:40px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚖️</div>
   <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Magistrates Court — Residential Tenancy</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Apply for a tenancy order in Tasmania. Free initial advice available from CBOS.</div></div>
   <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
@@ -371,14 +449,25 @@
   <div class="state-tag">Access Canberra · ACAT</div>
   <div class="state-free">All services listed below are free</div>
 </div>
+<div class="qf-card">
+  <div class="qf-title">ACT — Key Numbers at a Glance</div>
+  <div class="qf-grid">
+    <div class="qf-item"><div class="qf-num">4 weeks</div><div class="qf-label">Max bond (most tenancies)</div></div>
+    <div class="qf-item"><div class="qf-num">8 weeks</div><div class="qf-label">Rent increase written notice</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Minimum entry notice</div></div>
+    <div class="qf-item"><div class="qf-num">4 per year</div><div class="qf-label">Max routine inspections</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Urgent repair timeframe</div></div>
+    <div class="qf-item"><div class="qf-num">4 weeks</div><div class="qf-label">Non-urgent repair timeframe</div></div>
+  </div>
+</div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
-    <div class="rights-link-row" onclick="openLink('https://www.accesscanberra.act.gov.au/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Access Canberra — Renting</div><div class="rights-link-desc">Official renting information for ACT tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.act.gov.au/housing-planning-and-property/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Access Canberra — Renting</div><div class="rights-link-desc">Official renting information for ACT tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://www.acat.act.gov.au/')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">ACAT — Tenancy Division</div><div class="rights-link-desc">ACT Civil and Administrative Tribunal</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://tenantsact.org.au/')"><div class="rights-link-icon teal-lt">🏘</div><div style="flex:1"><div class="rights-link-title">Tenants ACT</div><div class="rights-link-desc">Free advice and tenant advocacy in the ACT</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.accesscanberra.act.gov.au/renting/bonds')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond & Security Deposits ACT</div><div class="rights-link-desc">Bond lodgement and refund in the ACT</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://www.accesscanberra.act.gov.au/renting/repairs-and-maintenance')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs in ACT Rentals</div><div class="rights-link-desc">Urgent and routine repair rights in ACT</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.revenue.act.gov.au/rental-bonds')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond & Security Deposits ACT</div><div class="rights-link-desc">Bond lodgement and refund in the ACT</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://www.act.gov.au/housing-planning-and-property/renting/during-a-tenancy')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs in ACT Rentals</div><div class="rights-link-desc">Urgent and routine repair rights in ACT</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('tel:132281')"><div class="rights-link-icon" style="background:var(--blue-xl)">📞</div><div style="flex:1"><div class="rights-link-title">Access Canberra — 13 22 81</div><div class="rights-link-desc">Free tenancy advice by phone</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
   </div>
 </div>
@@ -407,14 +496,22 @@
   <div class="state-tag">NT Consumer Affairs · NTCAT</div>
   <div class="state-free">All services listed below are free</div>
 </div>
+<div class="qf-card">
+  <div class="qf-title">Northern Territory — Key Numbers at a Glance</div>
+  <div class="qf-grid">
+    <div class="qf-item"><div class="qf-num">4 weeks</div><div class="qf-label">Max bond (most tenancies)</div></div>
+    <div class="qf-item"><div class="qf-num">30 days</div><div class="qf-label">Rent increase written notice</div></div>
+    <div class="qf-item"><div class="qf-num">24 hrs</div><div class="qf-label">Minimum entry notice</div></div>
+    <div class="qf-item"><div class="qf-num">4 per year</div><div class="qf-label">Max routine inspections</div></div>
+    <div class="qf-item"><div class="qf-num">ASAP</div><div class="qf-label">Urgent repair timeframe</div></div>
+    <div class="qf-item"><div class="qf-num">14 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
+  </div>
+</div>
 <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
-    <div class="rights-link-row" onclick="openLink('https://consumeraffairs.nt.gov.au/tenants-landlords')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">NT Consumer Affairs — Tenants</div><div class="rights-link-desc">Tenancy information for NT renters</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
+    <div class="rights-link-row" onclick="openLink('https://consumeraffairs.nt.gov.au/for-consumers/residential-tenancies')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">NT Consumer Affairs — Renting</div><div class="rights-link-desc">Bond, repairs, ending tenancy &amp; full tenant guide</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('https://ntcat.nt.gov.au/')"><div class="rights-link-icon" style="background:var(--blue-xl)">⚖️</div><div style="flex:1"><div class="rights-link-title">NTCAT — Tenancy Disputes</div><div class="rights-link-desc">Northern Territory Civil and Administrative Tribunal</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://consumeraffairs.nt.gov.au/tenants-landlords/bonds')"><div class="rights-link-icon teal-lt">💰</div><div style="flex:1"><div class="rights-link-title">Bond Information NT</div><div class="rights-link-desc">Bond lodgement and refund in the NT</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://consumeraffairs.nt.gov.au/tenants-landlords/repairs')"><div class="rights-link-icon amber-lt">🔧</div><div style="flex:1"><div class="rights-link-title">Repairs & Maintenance NT</div><div class="rights-link-desc">Your repair rights as an NT tenant</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
-    <div class="rights-link-row" onclick="openLink('https://consumeraffairs.nt.gov.au/tenants-landlords/ending-tenancy')"><div class="rights-link-icon" style="background:var(--blue-xl)">📋</div><div style="flex:1"><div class="rights-link-title">Ending a Tenancy NT</div><div class="rights-link-desc">Rights and process for ending your NT lease</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
     <div class="rights-link-row" onclick="openLink('tel:1800019319')"><div class="rights-link-icon" style="background:var(--blue-xl)">📞</div><div style="flex:1"><div class="rights-link-title">NT Consumer Affairs — 1800 019 319</div><div class="rights-link-desc">Free tenancy advice by phone</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
   </div>
 </div>
@@ -451,9 +548,37 @@
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Domestic Violence Tenancy Help</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">1800RESPECT — 1800 737 732 · 24/7 free service</div></div>
     <span style="font-size:16px;flex-shrink:0">📞</span>
   </div>
-  <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--blue);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://www.legalaid.gov.au')">
+  <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--blue);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://nationallegalaid.org/')">
     <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" style="background:var(--blue-xl)">🆘</div>
-    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Legal Aid</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Free legal advice in your state — legalaid.gov.au</div></div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Legal Aid</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Free legal advice in your state — peak body for all legal aid commissions</div></div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
+  </div>
+</div>
+
+<!-- NATIONAL SUPPORT — applies to renters in every state -->
+<div class="sec-hdr">
+  <div class="sec-title">Free national support</div>
+  <div class="sec-sub">Helpful for renters in any state or territory</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin:0 16px 16px">
+  <div style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('tel:1800007007')">
+    <div style="width:40px;height:40px;border-radius:11px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💸</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Debt Helpline — 1800 007 007</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Free financial counselling for rent stress &amp; debt — every state</div></div>
+    <span style="font-size:16px;flex-shrink:0">📞</span>
+  </div>
+  <div style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://ndh.org.au/')">
+    <div style="width:40px;height:40px;border-radius:11px;background:rgba(27,80,200,.08);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏦</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Debt Helpline — Online</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Self-help guides for rent arrears &amp; financial hardship</div></div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
+  </div>
+  <div style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://www.tenants.org.au/nato')">
+    <div style="width:40px;height:40px;border-radius:11px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤝</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Renters' Organisations</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Peak body linking every state &amp; territory tenant union</div></div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
+  </div>
+  <div style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://www.betterrenting.org.au/')">
+    <div style="width:40px;height:40px;border-radius:11px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏘️</div>
+    <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Better Renting</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">National housing-justice campaigns &amp; renter research</div></div>
     <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
   </div>
 </div>
@@ -462,6 +587,17 @@
 <div style="margin:16px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:16px;padding:16px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:6px">⚠️ RenterIQ is not a legal service.</div>
   <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">All links on this page go to official government or not-for-profit advocacy websites. RenterIQ does not provide legal advice and is not affiliated with any government body. For legal questions about your specific situation, always contact your state tenancy authority or seek independent advice.</div>
+</div>
+
+<div style="margin:0 16px 24px">
+  <div id="stateToggleRow" style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleAllStates()">
+    <div style="width:38px;height:38px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🗺️</div>
+    <div style="flex:1">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)" id="stateToggleTitle">Compare with other states</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px">Tap to see rights in all states &amp; territories</div>
+    </div>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0" id="stateToggleArrow">→</span>
+  </div>
 </div>
 
 <div style="height:24px"></div>
@@ -478,158 +614,298 @@ function navigate(p){document.body.style.transition='opacity .12s ease';document
 
 function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:var(--text);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:var(--muted);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
 
-// State Selector
-var states=['NSW','VIC','QLD','WA','SA','TAS','ACT','NT'];
-var activeState='VIC';
-var userState=null;
+// ── State data & helpers ──
+var states = ['NSW','VIC','QLD','WA','SA','TAS','ACT','NT'];
+var STATE_NAMES = {
+  NSW: 'New South Wales', VIC: 'Victoria', QLD: 'Queensland', WA: 'Western Australia',
+  SA: 'South Australia', TAS: 'Tasmania', ACT: 'Australian Capital Territory', NT: 'Northern Territory'
+};
+var STATE_AUTHORITIES = {
+  VIC: { name: 'Consumer Affairs Victoria', short: 'CAV' },
+  NSW: { name: 'NSW Fair Trading', short: 'Fair Trading' },
+  QLD: { name: 'the Residential Tenancies Authority', short: 'RTA' },
+  WA:  { name: 'Consumer Protection WA', short: 'Consumer Protection' },
+  SA:  { name: 'Consumer and Business Services SA', short: 'CBS' },
+  TAS: { name: 'Consumer, Building & Occupational Services', short: 'CBOS' },
+  ACT: { name: 'ACT Civil and Administrative Tribunal', short: 'ACAT' },
+  NT:  { name: 'NT Consumer Affairs', short: 'NT Consumer Affairs' }
+};
 
-// Detect user state
-function detectUserState(){
-  // Try to get state from localStorage first
-  var savedState=localStorage.getItem('renteriq_user_state');
-  if(savedState && states.indexOf(savedState.toUpperCase())!==-1){
-    userState=savedState.toUpperCase();
-  }else{
-    // Default to browser timezone detection
-    var timezone=Intl.DateTimeFormat().resolvedOptions().timeZone;
-    var stateMap={
-      'Australia/Sydney':'NSW',
-      'Australia/Melbourne':'VIC',
-      'Australia/Brisbane':'QLD',
-      'Australia/Perth':'WA',
-      'Australia/Adelaide':'SA',
-      'Australia/Hobart':'TAS',
-      'Australia/Canberra':'ACT',
-      'Australia/Darwin':'NT'
-    };
-    userState=stateMap[timezone]||'VIC'; // Default to VIC
-    // Save detected state
-    localStorage.setItem('renteriq_user_state',userState);
+var activeState = 'VIC';
+var userState = null;
+var detectionSource = '';   // 'lease' | 'tracked' | 'saved' | 'address' | 'timezone' | 'default'
+var showAllStates = false;
+
+function safeJSON(key, fallback) {
+  try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+  catch(e) { return fallback; }
+}
+
+// Map an Australian postcode to a state code. Order matters for overlapping ranges (NT, ACT, NSW).
+function postcodeToState(pc) {
+  if (!pc || isNaN(pc)) return '';
+  pc = parseInt(pc, 10);
+  // NT — 0800-0899, 0900-0999
+  if (pc >= 800 && pc <= 999) return 'NT';
+  // ACT — 0200-0299 (PO boxes), 2600-2618, 2900-2920
+  if ((pc >= 200 && pc <= 299) || (pc >= 2600 && pc <= 2618) || (pc >= 2900 && pc <= 2920)) return 'ACT';
+  // NSW — 1000-1999 (LVR), 2000-2599, 2619-2899, 2921-2999
+  if (pc >= 1000 && pc <= 1999) return 'NSW';
+  if (pc >= 2000 && pc <= 2599) return 'NSW';
+  if (pc >= 2619 && pc <= 2899) return 'NSW';
+  if (pc >= 2921 && pc <= 2999) return 'NSW';
+  // VIC — 3000-3999, 8000-8999
+  if (pc >= 3000 && pc <= 3999) return 'VIC';
+  if (pc >= 8000 && pc <= 8999) return 'VIC';
+  // QLD — 4000-4999, 9000-9999
+  if (pc >= 4000 && pc <= 4999) return 'QLD';
+  if (pc >= 9000 && pc <= 9999) return 'QLD';
+  // SA — 5000-5999
+  if (pc >= 5000 && pc <= 5999) return 'SA';
+  // WA — 6000-6999
+  if (pc >= 6000 && pc <= 6999) return 'WA';
+  // TAS — 7000-7999
+  if (pc >= 7000 && pc <= 7999) return 'TAS';
+  return '';
+}
+
+function stateFromAddress(addr) {
+  if (!addr) return '';
+  // Postcode lookup first — most reliable
+  var pcMatch = String(addr).match(/\b(\d{4})\b/);
+  if (pcMatch) {
+    var s = postcodeToState(pcMatch[1]);
+    if (s) return s;
   }
+  // Then state name / abbreviation
+  var u = String(addr).toUpperCase();
+  var pairs = [
+    ['NEW SOUTH WALES','NSW'], ['VICTORIA','VIC'], ['QUEENSLAND','QLD'],
+    ['WESTERN AUSTRALIA','WA'], ['SOUTH AUSTRALIA','SA'], ['TASMANIA','TAS'],
+    ['AUSTRALIAN CAPITAL TERRITORY','ACT'], ['NORTHERN TERRITORY','NT']
+  ];
+  for (var i = 0; i < pairs.length; i++) {
+    if (u.indexOf(pairs[i][0]) !== -1) return pairs[i][1];
+  }
+  // Match abbreviation only at word boundaries to avoid 'WA' inside 'WANGARATTA'
+  var abbrs = ['NSW','VIC','QLD','WA','SA','TAS','ACT','NT'];
+  for (var j = 0; j < abbrs.length; j++) {
+    var re = new RegExp('(^|[\\s,])' + abbrs[j] + '(?=[\\s,]|$)');
+    if (re.test(u)) return abbrs[j];
+  }
+  return '';
+}
+
+// Detection priority: lease (most authoritative) → tracked property → explicit save → legacy address → timezone
+function detectUserState() {
+  // 1. Most recent saved lease — strongest signal (it's where you actually rent)
+  var leases = safeJSON('riq-vault-leases', []);
+  if (Array.isArray(leases) && leases.length > 0) {
+    leases.sort(function(a, b) { return new Date(b.savedAt || 0).getTime() - new Date(a.savedAt || 0).getTime(); });
+    for (var i = 0; i < leases.length; i++) {
+      var s = stateFromAddress(leases[i].address || '') || (leases[i].state || '').toUpperCase();
+      if (s && states.indexOf(s) !== -1) { detectionSource = 'lease'; userState = s; return s; }
+    }
+  }
+  // 2. Most recent tracked property
+  var tracked = safeJSON('renteriq_tracked_properties', []);
+  if (Array.isArray(tracked) && tracked.length > 0) {
+    for (var k = tracked.length - 1; k >= 0; k--) {
+      var p = tracked[k];
+      var ts = (p.state || '').toUpperCase();
+      if (!ts || states.indexOf(ts) === -1) ts = stateFromAddress(p.address || p.label || '');
+      if (ts && states.indexOf(ts) !== -1) { detectionSource = 'tracked'; userState = ts; return ts; }
+    }
+  }
+  // 3. Explicit user save
+  var saved = (localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || '').toUpperCase();
+  if (saved && states.indexOf(saved) !== -1) { detectionSource = 'saved'; userState = saved; return saved; }
+  // 4. Legacy tenancy/user address
+  var legacyAddr = localStorage.getItem('riq-tenancy-address') || localStorage.getItem('riq-user-address') || '';
+  var legacyState = stateFromAddress(legacyAddr);
+  if (legacyState) { detectionSource = 'address'; userState = legacyState; return legacyState; }
+  // 5. Timezone fallback
+  try {
+    var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    var tzMap = {
+      'Australia/Sydney':'NSW','Australia/Melbourne':'VIC','Australia/Brisbane':'QLD',
+      'Australia/Perth':'WA','Australia/Adelaide':'SA','Australia/Hobart':'TAS',
+      'Australia/Canberra':'ACT','Australia/Darwin':'NT','Australia/Currie':'TAS',
+      'Australia/Lord_Howe':'NSW','Australia/Broken_Hill':'NSW','Australia/Lindeman':'QLD'
+    };
+    if (tzMap[tz]) { detectionSource = 'timezone'; userState = tzMap[tz]; return tzMap[tz]; }
+  } catch(e) {}
+  // 6. Default
+  detectionSource = 'default';
+  userState = 'VIC';
   return userState;
 }
 
-function updateUserStateDisplay(){
-  var state=detectUserState();
-  var displayEl=document.getElementById('userStateDisplay');
-  if(displayEl){
-    displayEl.innerHTML='You\'re in <strong>'+state+'</strong>';
+function detectionSourceLabel() {
+  switch (detectionSource) {
+    case 'lease':    return 'From your saved lease';
+    case 'tracked':  return 'From your tracked property';
+    case 'saved':    return 'You set this';
+    case 'address':  return 'From your saved address';
+    case 'timezone': return 'Detected from your timezone';
+    default:         return 'Tap to set your state';
   }
-  // Render pills with user state first
-  renderPills(state);
-  // Set active state to user's state
-  updatePills(state);
-  // Scroll to user's state section
-  setTimeout(function(){scrollToState(state)},500);
 }
 
-function renderPills(userState){
+function updateUserStateDisplay() {
+  var state = detectUserState();
+  var displayEl = document.getElementById('userStateDisplay');
+  if (displayEl) {
+    displayEl.innerHTML = "You're renting in <strong>" + state + '</strong> &nbsp;·&nbsp; ' + STATE_NAMES[state];
+  }
+  var sourceEl = document.getElementById('userStateSource');
+  if (sourceEl) sourceEl.textContent = detectionSourceLabel() + ' · tap Change to update';
+
+  var rhSub = document.getElementById('rhSub');
+  if (rhSub) rhSub.textContent = 'Free help & info for renters in ' + state;
+
+  var introTitle = document.getElementById('introTitle');
+  if (introTitle) introTitle.textContent = 'Your rights as a renter in ' + STATE_NAMES[state];
+
+  var introSub = document.getElementById('introSub');
+  if (introSub) introSub.textContent = 'Free help is available from ' + (STATE_AUTHORITIES[state] ? STATE_AUTHORITIES[state].name : 'your state authority');
+
+  var introPoint1 = document.getElementById('introPoint1');
+  if (introPoint1 && STATE_AUTHORITIES[state]) {
+    introPoint1.textContent = STATE_AUTHORITIES[state].name + ' provides free advice, dispute resolution and tenancy guidance at no cost to renters.';
+  }
+
+  var stateSecTitle = document.getElementById('stateSecTitle');
+  if (stateSecTitle) stateSecTitle.textContent = 'Your rights in ' + STATE_NAMES[state];
+
+  var stateSecSub = document.getElementById('stateSecSub');
+  if (stateSecSub) stateSecSub.textContent = 'Specific to renters in ' + state;
+
+  renderPills(state);
+  setActiveState(state);
+}
+
+function renderPills(primaryState) {
   var pillRow = document.getElementById('pillRow');
-  if(!pillRow) return;
-  // Clear existing
+  if (!pillRow) return;
   pillRow.innerHTML = '';
-  // Put user state first, then others
-  var orderedStates = [userState];
-  states.forEach(function(s){
-    if(s !== userState) orderedStates.push(s);
-  });
-  // Create pills
-  orderedStates.forEach(function(s){
+  var ordered = [primaryState].concat(states.filter(function(s) { return s !== primaryState; }));
+  ordered.forEach(function(s) {
     var pill = document.createElement('div');
     pill.className = 'state-pill';
     pill.id = 'pill-' + s;
     pill.textContent = s;
-    pill.onclick = function(){ scrollToState(s); };
+    pill.onclick = function() { setActiveState(s); };
     pillRow.appendChild(pill);
   });
 }
 
-function changeUserState(){
-  var stateSelect=document.getElementById('stateSelectModal');
-  if(stateSelect){
-    stateSelect.style.display='flex';
-  }
-}
-
-function saveUserState(state){
-  localStorage.setItem('renteriq_user_state',state);
-  userState=state;
-  updateUserStateDisplay();
-  closeStateSelect();
-  showToast('State updated','Now showing '+state+' information','📍');
-}
-
-function closeStateSelect(){
-  var stateSelect=document.getElementById('stateSelectModal');
-  if(stateSelect){
-    stateSelect.style.display='none';
-  }
-}
-
-function updatePills(stateId){
-  states.forEach(function(s){
-    var pill=document.getElementById('pill-'+s);
-    if(!pill)return;
-    if(s===stateId){
-      pill.style.background='white';pill.style.color='var(--blue)';pill.style.border='none';
-    }else{
-      pill.style.background='var(--glass-surface-2)';pill.style.color='rgba(255,255,255,.8)';pill.style.border='1px solid rgba(255,255,255,.25)';
+function setActiveState(stateId) {
+  // Update pill visuals
+  states.forEach(function(s) {
+    var pill = document.getElementById('pill-' + s);
+    if (!pill) return;
+    if (s === stateId) {
+      pill.style.background = 'white';
+      pill.style.color = 'var(--blue)';
+      pill.style.border = 'none';
+    } else {
+      pill.style.background = 'var(--glass-surface-2)';
+      pill.style.color = 'rgba(255,255,255,.8)';
+      pill.style.border = '1px solid rgba(255,255,255,.25)';
     }
   });
-  activeState=stateId;
-}
+  activeState = stateId;
 
-function scrollToState(stateId){
-  updatePills(stateId);
-  var el=document.getElementById('state-'+stateId);
-  if(el){
-    var headerHeight=140;
-    var top=el.getBoundingClientRect().top+window.pageYOffset-headerHeight;
-    window.scrollTo({top:top,behavior:'smooth'});
-  }
-}
-
-// Open External Link
-function openLink(url){
-  if(url.startsWith('tel:')){
-    showToast('Opening phone',url.replace('tel:','')+' · Free call','📞');
-    setTimeout(function(){window.open(url)},800);
-  }else{
-    showToast('Opening official site','Links to government or advocacy website','🔗');
-    setTimeout(function(){window.open(url,'_blank')},400);
-  }
-}
-
-// Scroll Spy
-function initScrollSpy(){
-  var observer=new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){
-        var id=entry.target.id;
-        var state=id.replace('state-','');
-        if(states.indexOf(state)!==-1&&state!==activeState){
-          updatePills(state);
-          var pill=document.getElementById('pill-'+state);
-          if(pill)pill.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-        }
-      }
+  // Show/hide state sections — single-state mode by default
+  if (!showAllStates) {
+    states.forEach(function(s) {
+      var sec = document.getElementById('state-' + s);
+      if (sec) sec.style.display = s === stateId ? 'block' : 'none';
     });
-  },{threshold:0.3,rootMargin:'-200px 0px 0px 0px'});
+  }
 
-  states.forEach(function(s){
-    var el=document.getElementById('state-'+s);
-    if(el)observer.observe(el);
-  });
+  // Update section header copy when active state isn't user's state (still browsing)
+  var stateSecTitle = document.getElementById('stateSecTitle');
+  var stateSecSub = document.getElementById('stateSecSub');
+  if (stateSecTitle && stateSecSub) {
+    if (stateId === userState) {
+      stateSecTitle.textContent = 'Your rights in ' + STATE_NAMES[stateId];
+      stateSecSub.textContent = 'Specific to renters in ' + stateId;
+    } else {
+      stateSecTitle.textContent = STATE_NAMES[stateId] + ' renter rights';
+      stateSecSub.textContent = 'You\'re viewing ' + stateId + ' — tap your state pill to return';
+    }
+  }
+
+  // Smooth-scroll the state pill into view
+  var pill = document.getElementById('pill-' + stateId);
+  if (pill && pill.scrollIntoView) {
+    try { pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e) {}
+  }
 }
 
-// Init
-document.addEventListener('DOMContentLoaded',function(){
-  initScrollSpy();
-  updateUserStateDisplay(); // Initialize with user's state
-  var hash=window.location.hash;
-  if(hash){
-    var state=hash.replace('#','').toUpperCase();
-    if(states.indexOf(state)!==-1){setTimeout(function(){scrollToState(state)},400)}
+function toggleAllStates() {
+  showAllStates = !showAllStates;
+  var arrow = document.getElementById('stateToggleArrow');
+  var title = document.getElementById('stateToggleTitle');
+  if (showAllStates) {
+    states.forEach(function(s) {
+      var sec = document.getElementById('state-' + s);
+      if (sec) sec.style.display = 'block';
+    });
+    if (arrow) arrow.textContent = '↑';
+    if (title) title.textContent = 'Hide other states';
+    showToast('Showing all states', 'Scroll to compare', '🗺️');
+  } else {
+    setActiveState(activeState);
+    if (arrow) arrow.textContent = '→';
+    if (title) title.textContent = 'Compare with other states';
+  }
+}
+
+function changeUserState() {
+  var modal = document.getElementById('stateSelectModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function saveUserState(state) {
+  localStorage.setItem('renteriq_user_state', state);
+  localStorage.setItem('riq-user-state', state);
+  detectionSource = 'saved';
+  userState = state;
+  updateUserStateDisplay();
+  closeStateSelect();
+  showToast('State updated to ' + state, 'Rights now shown for ' + STATE_NAMES[state], '📍');
+}
+
+function closeStateSelect() {
+  var modal = document.getElementById('stateSelectModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openLink(url) {
+  if (url.indexOf('tel:') === 0) {
+    showToast('Opening phone', url.replace('tel:', '') + ' · Free call', '📞');
+    setTimeout(function() { window.open(url); }, 800);
+  } else {
+    showToast('Opening official site', 'Government or advocacy website', '🔗');
+    setTimeout(function() { window.open(url, '_blank'); }, 400);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Hide all state sections immediately so single-state mode is the default render
+  states.forEach(function(s) {
+    var sec = document.getElementById('state-' + s);
+    if (sec) sec.style.display = 'none';
+  });
+  updateUserStateDisplay();
+  // If a hash was passed (e.g. /rights.html#NSW), honour it as a one-off view
+  var hash = window.location.hash;
+  if (hash) {
+    var hs = hash.replace('#', '').toUpperCase();
+    if (states.indexOf(hs) !== -1) setTimeout(function() { setActiveState(hs); }, 200);
   }
 });
 
