@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
-<title>Open Home Inspection — RenterIQ</title>
+<title>Property Inspection — RenterIQ</title>
 <script src="/app/js/pwa-init.js" defer></script>
 <style>
 .content{flex:1;overflow-y:auto;padding-bottom:110px}
@@ -114,7 +114,7 @@
       <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RENTERIQ</span></button>
       <div id="hdrAvatar" onclick="navigate('/app/pages/profile.html')" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)">?</div>
     </div>
-    <div class="sh-title">Open Home Inspections</div>
+    <div class="sh-title">Property Inspection</div>
     <div class="sh-sub" id="inspSubtitle">Your upcoming open homes</div>
   </header>
   <div class="content" style="padding:16px 16px 120px">
@@ -142,7 +142,7 @@
 <div class="view" id="viewB" style="display:none">
   <header class="sh">
     <div class="sh-row"><button class="sh-back" onclick="switchView('A')"><span class="sh-back-arrow">‹</span><span class="sh-label">Back</span></button></div>
-    <div class="sh-title">Open Home Inspection</div>
+    <div class="sh-title">Inspect Property</div>
     <div class="sh-sub">Quick, user-guided — fill in the basics</div>
   </header>
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:32px">
@@ -889,6 +889,26 @@ function saveAndGoHome(){
   var key='renteriq_openhome_insp_'+Date.now();
   localStorage.setItem(key,JSON.stringify(inspectionData));
   saveToConditionReportsVault(inspectionData);
+  // ── Update the tracked property status with the verdict ──
+  if(inspectionData.trackedId){
+    try{
+      var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+      var idx=tracked.findIndex(function(p){return p&&p.id===inspectionData.trackedId});
+      if(idx!==-1){
+        tracked[idx].status='inspected';
+        tracked[idx].verdict=inspectionData.verdict||'';
+        tracked[idx].inspectedAt=Date.now();
+        tracked[idx].inspectionKey=key;
+        localStorage.setItem('renteriq_tracked_properties',JSON.stringify(tracked));
+        // Cloud sync if available
+        if(window.RIQStore){
+          RIQStore.ready.then(function(){
+            if(RIQStore.isAuthed())RIQStore.write('tracked-properties',tracked[idx].id,tracked[idx]);
+          });
+        }
+      }
+    }catch(e){}
+  }
   showToast('Saved','Your inspection notes are saved to your device and Vault','💾');
   setTimeout(function(){navigate('/app/index.html')},1500)
 }
@@ -921,17 +941,28 @@ function saveToConditionReportsVault(data){
     }
   }catch(e){console.error('saveToConditionReportsVault:',e);}
 }
+function escAttr(s){return String(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}
+
 function renderInspectionList(){
   var list=document.getElementById('inspList');
   if(!list)return;
-  
-  // Get scheduled inspections (from booking uploads)
+
+  // ── Source 1: Tracked properties from the home tracker ──
+  // These are properties the user has saved but not yet inspected.
+  // This is the bridge from Step 1 (search/track) → Step 2 (inspect).
+  var tracked=[];
+  try{
+    tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+    if(!Array.isArray(tracked))tracked=[];
+  }catch(e){}
+
+  // ── Source 2: Scheduled inspections (from booking screenshot uploads) ──
   var scheduled=[];
   try{
     scheduled=JSON.parse(localStorage.getItem('renteriq_scheduled_inspections')||'[]');
   }catch(e){}
-  
-  // Get completed inspection reports
+
+  // ── Source 3: Completed inspection reports ──
   var saved=[];
   for(var i=0;i<localStorage.length;i++){
     var key=localStorage.key(i);
@@ -942,61 +973,143 @@ function renderInspectionList(){
       }catch(e){}
     }
   }
-  
-  var html = '';
-  
-  // Show scheduled inspections first
-  if(scheduled.length>0){
-    html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--teal-dk);text-transform:uppercase;margin-bottom:10px">📅 Upcoming Inspections</div>';
-    
-    scheduled.forEach(function(insp){
-      var isToday = isInspectionToday(insp.date);
-      var isTomorrow = isInspectionTomorrow(insp.date);
-      var isPast = isInspectionPast(insp.date, insp.time);
-      
-      var dateLabel = isPast ? 'Past' : isToday ? 'Today' : isTomorrow ? 'Tomorrow' : formatInspectionDate(insp.date);
-      var cardStyle = isPast ? 'opacity:0.6;' : isToday ? 'border-left:4px solid #10B981;' : '';
-      
-      html += '<div class="card" style="margin-bottom:10px;cursor:pointer;'+cardStyle+'" onclick="'+(isPast?'':'loadScheduledInspection(\''+insp.id+'\')')+'">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">';
-      html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(insp.address||'Property')+'</div>';
-      html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:'+(isPast?'var(--muted)':isToday?'#10B981':'var(--blue)')+'">' + dateLabel + '</div>';
-      html += '</div>';
-      
-      if(insp.time_display){
-        html += '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:3px">⏰ ' + insp.time_display + '</div>';
-      }
-      
-      if(insp.agent_name){
-        html += '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:3px">👤 ' + insp.agent_name + '</div>';
-      }
-      
-      var details = [];
-      if(insp.bedrooms) details.push(insp.bedrooms + ' bed');
-      if(insp.rent_weekly) details.push(insp.rent_weekly + '/week');
-      if(details.length > 0){
-        html += '<div style="font-weight:600;font-size:12px;color:var(--muted)">' + details.join(' • ') + '</div>';
-      }
-      
-      html += '</div>';
-    });
-    
-    html += '<div style="margin-bottom:20px"></div>';
+
+  // Build a set of inspected property URLs so we can mark tracked items as "inspected"
+  var inspectedUrls={};
+  saved.forEach(function(s){
+    if(s.data&&s.data.sourceUrl)inspectedUrls[s.data.sourceUrl]=s.key;
+  });
+
+  var html='';
+
+  // ── Tracked properties section ──
+  // Show ones that are NOT yet inspected first; inspected ones at the bottom of this section.
+  if(tracked.length>0){
+    var notInspected=tracked.filter(function(p){return p&&!inspectedUrls[(p.url||p.originalLink||'')]});
+    var alreadyInspected=tracked.filter(function(p){return p&&inspectedUrls[(p.url||p.originalLink||'')]});
+
+    if(notInspected.length>0){
+      html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--blue);text-transform:uppercase;margin-bottom:10px">🏠 Your Tracked Properties · Tap to inspect</div>';
+      notInspected.slice().reverse().forEach(function(p){
+        var addr=p.address||p.label||'Property listing';
+        var srcKey=(p.source||p.sourceSite||'unknown');
+        var srcName=p.sourceName||({realestate:'realestate.com.au',domain:'Domain',reiwa:'REIWA',rent:'Rent.com.au'}[srcKey])||'Property';
+        var srcIcon=p.sourceIcon||'🏠';
+        var price=p.price||'';
+        var inspDate='';
+        if(p.inspectionDate){
+          var d=new Date(p.inspectionDate);
+          if(!isNaN(d.getTime())){
+            inspDate=d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})+(p.inspectionTime?' · '+p.inspectionTime:'');
+          }
+        }
+        html+='<div class="card" style="margin-bottom:10px;cursor:pointer;border-left:3px solid var(--blue)" onclick="startInspectionForTracked(\''+escAttr(p.id||'')+'\')">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">'
+            +'<div style="flex:1;min-width:0">'
+              +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);line-height:1.35">'+escAttr(addr)+'</div>'
+              +'<div style="font-weight:600;font-size:11.5px;color:var(--muted);margin-top:4px">'+srcIcon+' '+escAttr(srcName)+(price?' · '+escAttr(price):'')+'</div>'
+              +(inspDate?'<div style="font-weight:600;font-size:11.5px;color:var(--blue);margin-top:4px">📅 '+escAttr(inspDate)+'</div>':'')
+            +'</div>'
+            +'<span style="background:var(--blue);color:#fff;padding:7px 12px;border-radius:100px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;flex-shrink:0;align-self:flex-start">Inspect →</span>'
+          +'</div>'
+        +'</div>';
+      });
+      html+='<div style="margin-bottom:18px"></div>';
+    }
+
+    if(alreadyInspected.length>0){
+      html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--teal-dk);text-transform:uppercase;margin-bottom:10px">✓ Already Inspected · Tap to view</div>';
+      alreadyInspected.slice().reverse().forEach(function(p){
+        var addr=p.address||p.label||'Property';
+        var srcIcon=p.sourceIcon||'🏠';
+        var key=inspectedUrls[(p.url||p.originalLink||'')];
+        html+='<div class="card" style="margin-bottom:10px;cursor:pointer;border-left:3px solid var(--teal)" onclick="loadSavedInspection(\''+escAttr(key)+'\')">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">'
+            +'<div style="flex:1;min-width:0">'
+              +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+escAttr(addr)+'</div>'
+              +'<div style="font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">'+srcIcon+' Inspected · tap to view report</div>'
+            +'</div>'
+            +'<span style="color:var(--teal-dk);font-size:18px;flex-shrink:0">✓</span>'
+          +'</div>'
+        +'</div>';
+      });
+      html+='<div style="margin-bottom:18px"></div>';
+    }
   }
-  
-  // Show completed inspections
-  if(saved.length>0){
-    html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">📋 Completed Reports</div>';
-    html += saved.map(function(item){
-      return '<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\''+item.key+'\')"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(item.data.address||'Property')+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds:'')+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:6px">'+new Date(parseInt(item.key.split('_')[3])).toLocaleDateString('en-AU')+'</div></div>';
+
+  // ── Scheduled inspections (from booking screenshots) ──
+  if(scheduled.length>0){
+    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--teal-dk);text-transform:uppercase;margin-bottom:10px">📅 Upcoming Inspections</div>';
+
+    scheduled.forEach(function(insp){
+      var isToday=isInspectionToday(insp.date);
+      var isTomorrow=isInspectionTomorrow(insp.date);
+      var isPast=isInspectionPast(insp.date,insp.time);
+
+      var dateLabel=isPast?'Past':isToday?'Today':isTomorrow?'Tomorrow':formatInspectionDate(insp.date);
+      var cardStyle=isPast?'opacity:0.6;':isToday?'border-left:4px solid #10B981;':'';
+
+      html+='<div class="card" style="margin-bottom:10px;cursor:pointer;'+cardStyle+'" onclick="'+(isPast?'':'loadScheduledInspection(\''+insp.id+'\')')+'">';
+      html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">';
+      html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(insp.address||'Property')+'</div>';
+      html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:'+(isPast?'var(--muted)':isToday?'#10B981':'var(--blue)')+'">'+dateLabel+'</div>';
+      html+='</div>';
+      if(insp.time_display)html+='<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:3px">⏰ '+insp.time_display+'</div>';
+      if(insp.agent_name)html+='<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:3px">👤 '+insp.agent_name+'</div>';
+      var details=[];
+      if(insp.bedrooms)details.push(insp.bedrooms+' bed');
+      if(insp.rent_weekly)details.push(insp.rent_weekly+'/week');
+      if(details.length>0)html+='<div style="font-weight:600;font-size:12px;color:var(--muted)">'+details.join(' • ')+'</div>';
+      html+='</div>';
+    });
+    html+='<div style="margin-bottom:18px"></div>';
+  }
+
+  // ── Other completed reports (no matching tracked property) ──
+  var orphanSaved=saved.filter(function(s){return !s.data||!s.data.sourceUrl||!tracked.some(function(t){return(t.url||t.originalLink||'')===s.data.sourceUrl})});
+  if(orphanSaved.length>0){
+    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">📋 Other Completed Reports</div>';
+    html+=orphanSaved.map(function(item){
+      var ts=parseInt((item.key.split('_')[3]||'0'),10);
+      var dateStr=ts?new Date(ts).toLocaleDateString('en-AU'):'';
+      return '<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\''+item.key+'\')"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+(item.data.address||'Property')+'</div><div style="font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds+' bed':'')+(dateStr?' · '+dateStr:'')+'</div></div>';
     }).join('');
   }
-  
-  if(!scheduled.length && !saved.length){
-    html = '<div style="text-align:center;padding:40px 16px"><div style="font-size:44px;margin-bottom:12px">📋</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:6px">No inspections yet</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Upload a booking confirmation or start a quick inspection.</div></div>';
+
+  // ── Empty state ──
+  if(!tracked.length && !scheduled.length && !saved.length){
+    html='<div style="text-align:center;padding:48px 16px"><div style="font-size:48px;margin-bottom:12px">🏠</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:17px;color:var(--blue-dk);margin-bottom:8px">No properties yet</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.65;max-width:280px;margin-left:auto;margin-right:auto">Track properties from realestate.com.au, Domain, REIWA or Rent.com.au — they\'ll appear here ready to inspect.</div><button class="btn-blue" style="max-width:280px;margin:0 auto" onclick="navigate(\'/app/index.html\')">Track a Property →</button></div>';
   }
-  
+
   list.innerHTML=html;
+}
+
+// ── Bridge: start an inspection pre-filled from a tracked property ──
+function startInspectionForTracked(propId){
+  try{
+    var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+    var prop=tracked.find(function(p){return p&&p.id===propId});
+    if(!prop){showToast('Not found','That property is no longer tracked','⚠️');return;}
+
+    // Stash the property reference so the saved report links back to the tracked record
+    inspectionData.sourceUrl=prop.url||prop.originalLink||'';
+    inspectionData.trackedId=prop.id;
+
+    // Pre-fill the setup view fields with what we already know
+    var addrField=document.getElementById('setupAddress');
+    var rentField=document.getElementById('setupRent');
+    if(addrField)addrField.value=prop.address||prop.label||'';
+    if(rentField){
+      var p=prop.price||'';
+      // Clean up "$550 per week" / "$550/wk" → "$550"
+      rentField.value=p.replace(/\s*(per\s*week|p\/?w|\/wk|\/week)\s*$/i,'').trim();
+    }
+    switchView('B');
+    showToast('Property loaded',(prop.address||'Inspection ready'),'🏠');
+  }catch(e){
+    console.error('startInspectionForTracked:',e);
+    showToast('Error','Could not start inspection','⚠️');
+  }
 }
 
 function isInspectionToday(dateStr) {

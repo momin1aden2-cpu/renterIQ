@@ -219,6 +219,7 @@
 <div class="sec-label">Account</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
   <div class="settings-row" onclick="switchView('B')"><span class="settings-icon">👤</span><div style="flex:1"><div class="settings-title">Personal Details</div><div class="settings-sub">Name, email, mobile, date of birth</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="openProfileStateSelector()"><span class="settings-icon">📍</span><div style="flex:1"><div class="settings-title">Your State or Territory</div><div class="settings-sub" id="profileStateRowSub">Tap to set — used for tenancy laws &amp; rights</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="navigate('/app/pages/application.html')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Renter Resume</div><div class="settings-sub">Employment, income, references, cover letter</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="switchView('C')"><span class="settings-icon">🏠</span><div style="flex:1"><div class="settings-title">Property & Tenancy</div><div class="settings-sub">Active property, lease dates, rent</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="showToast('State','State selector — change your state to update the Rights Hub','📍')"><span class="settings-icon">📍</span><div style="flex:1"><div class="settings-title">Your State</div></div><span class="settings-right">VIC</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
@@ -261,7 +262,7 @@
   <div class="settings-row" onclick="contactSupport('help')"><span class="settings-icon">❓</span><div style="flex:1"><div class="settings-title">Help &amp; FAQ</div><div class="settings-sub">Get answers about features &amp; usage</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="contactSupport('contact')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Contact Support</div><div class="settings-sub">support@renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="contactSupport('feedback')"><span class="settings-icon">📝</span><div style="flex:1"><div class="settings-title">Send Feedback</div><div class="settings-sub">Suggest a feature or report a bug</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="showToast('Thank you!','App store rating coming when we launch publicly','⭐')"><span class="settings-icon">⭐</span><div style="flex:1"><div class="settings-title">Rate RenterIQ</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="window.open('https://renteriq.com.au/reviews.html','_blank')"><span class="settings-icon">⭐</span><div style="flex:1"><div class="settings-title">Rate RenterIQ</div><div class="settings-sub">Read &amp; share renter reviews</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 <!-- SECTION 6: ABOUT -->
@@ -364,46 +365,41 @@
 
 <div style="flex:1;padding:16px;padding-bottom:120px">
 
-<!-- ACTIVE PROPERTY CARD -->
-<div style="background:#fff;border-radius:18px;padding:18px;border:1.5px solid var(--blue-lt);box-shadow:0 4px 16px rgba(27,80,200,.1);margin-bottom:14px">
+<!-- ACTIVE PROPERTY CARD — populated from riq-vault-leases by loadTenancyView() -->
+<div id="tenancyCard" style="background:#fff;border-radius:18px;padding:18px;border:1.5px solid var(--blue-lt);box-shadow:0 4px 16px rgba(27,80,200,.1);margin-bottom:14px">
   <div style="display:flex;justify-content:space-between;align-items:center">
     <div style="display:flex;gap:12px;align-items:center">
       <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🏠</div>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Active Tenancy</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)" id="tenancyHeading">Active Tenancy</div>
     </div>
-    <span style="background:rgba(0,200,150,.1);color:var(--teal-dk);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Active</span>
+    <span id="tenancyBadge" style="background:rgba(0,200,150,.1);color:var(--teal-dk);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Active</span>
   </div>
   <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Property</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Not set</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Agent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Not set</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Weekly Rent</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Started</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Ends</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
-    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Bond Lodged</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Property</div><div id="tenancyAddress" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Not set</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Agency</div><div id="tenancyAgency" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Not set</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Weekly Rent</div><div id="tenancyRent" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Bond</div><div id="tenancyBond" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Starts</div><div id="tenancyStart" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Lease Ends</div><div id="tenancyEnd" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Property Manager</div><div id="tenancyPm" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text)">&mdash;</div></div>
+    <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">PM Phone</div><div id="tenancyPmPhone" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text)">&mdash;</div></div>
   </div>
-  <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
-  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer;display:block;text-align:center" onclick="navigate('/app/pages/lease.html')">Analyse your lease →</span>
 </div>
 
 <!-- LEASE PROGRESS -->
 <div class="sec-label" style="margin-top:20px">Lease Progress</div>
 <div style="background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt)">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Add your lease to track progress</span></div>
-  <div style="height:8px;background:var(--blue-xl);border-radius:100px;overflow:hidden"><div id="profileLeaseBar" style="height:100%;background:var(--teal);border-radius:100px;width:0;transition:width .8s cubic-bezier(.4,0,.2,1)"></div></div>
-  <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Renewing or moving out?</span>
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer" onclick="navigate('/app/pages/renewal.html')">Decide →</span>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <span id="tenancyProgressLabel" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Connect a lease to track progress</span>
+    <span id="tenancyDaysLeft" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)"></span>
   </div>
+  <div style="height:8px;background:var(--blue-xl);border-radius:100px;overflow:hidden"><div id="profileLeaseBar" style="height:100%;background:var(--teal);border-radius:100px;width:0;transition:width .8s cubic-bezier(.4,0,.2,1)"></div></div>
 </div>
 
-<!-- PREVIOUS PROPERTIES -->
-<div class="sec-label" style="margin-top:20px">Previous Tenancies</div>
-<div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div style="padding:14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
-    <div style="flex:1;color:var(--muted)"><div style="font-family:'Sora',sans-serif;font-weight:600;font-size:13px">No previous tenancies added</div></div>
-  </div>
-</div>
+<!-- QUICK ACTIONS -->
+<div class="sec-label" style="margin-top:20px">Quick Actions</div>
+<div id="tenancyQuickActions" style="display:flex;flex-direction:column;gap:8px"></div>
 
 </div>
 
@@ -763,6 +759,8 @@ function switchView(id){
       requestAnimationFrame(function(){nxt.style.transition='opacity .2s ease';nxt.style.opacity='1';nxt.style.pointerEvents=''});
     });
     window.scrollTo(0,0);
+    // Load view-specific data on entry
+    if(id==='C')loadTenancyView();
   },150);
   currentView=id;
 }
@@ -1050,6 +1048,131 @@ var profileStateData = [
   {code:'NT',name:'Northern Territory'}
 ];
 
+// ── Property & Tenancy live dashboard ──
+// Pulls from riq-vault-leases (most recent saved lease) and renders
+// every relevant tenancy field, days remaining, and quick actions.
+function loadTenancyView(){
+  var lease=null;
+  try{
+    var raw=localStorage.getItem('riq-vault-leases');
+    if(raw){
+      var list=JSON.parse(raw);
+      if(Array.isArray(list)&&list.length>0){
+        list.sort(function(a,b){return new Date(b.savedAt||0).getTime()-new Date(a.savedAt||0).getTime()});
+        lease=list[0];
+      }
+    }
+  }catch(e){}
+
+  var $=function(id){return document.getElementById(id)};
+  var addrEl=$('tenancyAddress'),agencyEl=$('tenancyAgency'),rentEl=$('tenancyRent'),bondEl=$('tenancyBond'),
+      startEl=$('tenancyStart'),endEl=$('tenancyEnd'),pmEl=$('tenancyPm'),pmPhoneEl=$('tenancyPmPhone'),
+      badge=$('tenancyBadge'),heading=$('tenancyHeading'),
+      progressLabel=$('tenancyProgressLabel'),daysLeft=$('tenancyDaysLeft'),bar=$('profileLeaseBar'),
+      actions=$('tenancyQuickActions');
+
+  // Empty state
+  if(!lease){
+    if(heading)heading.textContent='No Active Tenancy';
+    if(badge){badge.textContent='None saved';badge.style.background='var(--blue-xl)';badge.style.color='var(--muted)';}
+    if(progressLabel)progressLabel.textContent='Connect a lease to see your tenancy';
+    if(actions){
+      actions.innerHTML=
+        '<button class="settings-row" style="width:100%;border:1px solid var(--border-lt);border-radius:14px;background:#fff;cursor:pointer;text-align:left" onclick="navigate(\'/app/pages/lease.html\')">'
+          +'<span class="settings-icon">📑</span><div style="flex:1"><div class="settings-title">Add Your Lease</div><div class="settings-sub">Upload your tenancy agreement to populate this dashboard</div></div><span class="settings-chevron">›</span>'
+        +'</button>';
+    }
+    return;
+  }
+
+  // Populate fields
+  if(addrEl)addrEl.textContent=lease.address||'Not set';
+  if(agencyEl)agencyEl.textContent=lease.agencyName||'Not set';
+  if(rentEl)rentEl.textContent=lease.weeklyRent||'—';
+  if(bondEl)bondEl.textContent=lease.bond||'—';
+  if(pmEl)pmEl.textContent=lease.pmName||'—';
+  if(pmPhoneEl){
+    if(lease.pmPhone){
+      pmPhoneEl.innerHTML='<a href="tel:'+lease.pmPhone.replace(/[^0-9+]/g,'')+'" style="color:var(--blue);text-decoration:none">'+lease.pmPhone+'</a>';
+    } else {
+      pmPhoneEl.textContent='—';
+    }
+  }
+
+  var startDate=lease.startDate?new Date(lease.startDate):null;
+  var endDate=lease.endDate?new Date(lease.endDate):null;
+  var validStart=startDate&&!isNaN(startDate.getTime());
+  var validEnd=endDate&&!isNaN(endDate.getTime());
+  var fmt=function(d){return d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})};
+  if(startEl)startEl.textContent=validStart?fmt(startDate):'—';
+  if(endEl)endEl.textContent=validEnd?fmt(endDate):'—';
+
+  // Lease progress + status
+  if(validStart&&validEnd){
+    var now=Date.now();
+    var totalMs=endDate.getTime()-startDate.getTime();
+    var elapsedMs=now-startDate.getTime();
+    var pct=Math.max(0,Math.min(100,Math.round(elapsedMs/totalMs*100)));
+    var daysRemaining=Math.ceil((endDate.getTime()-now)/86400000);
+
+    if(bar)bar.style.width=pct+'%';
+    if(daysRemaining>0){
+      if(progressLabel)progressLabel.textContent=pct+'% through your lease';
+      if(daysLeft)daysLeft.textContent=daysRemaining+' day'+(daysRemaining!==1?'s':'')+' left';
+      // Status badge
+      if(badge){
+        if(daysRemaining<=30){badge.textContent='Ending soon';badge.style.background='rgba(245,166,35,.12)';badge.style.color='#7A5500';}
+        else if(daysRemaining<=90){badge.textContent='Renewal window';badge.style.background='rgba(27,80,200,.1)';badge.style.color='var(--blue)';}
+        else{badge.textContent='Active';badge.style.background='rgba(0,200,150,.1)';badge.style.color='var(--teal-dk)';}
+      }
+    } else {
+      if(progressLabel)progressLabel.textContent='Lease ended';
+      if(daysLeft)daysLeft.textContent=Math.abs(daysRemaining)+' day'+(Math.abs(daysRemaining)!==1?'s':'')+' ago';
+      if(bar)bar.style.width='100%';
+      if(badge){badge.textContent='Ended';badge.style.background='rgba(232,64,64,.08)';badge.style.color='var(--red)';}
+    }
+  } else {
+    if(progressLabel)progressLabel.textContent='Add lease dates to track progress';
+  }
+
+  // Quick actions — context-aware based on days remaining
+  if(actions){
+    var html='';
+    html+='<button class="settings-row" style="width:100%;border:1px solid var(--border-lt);border-radius:14px;background:#fff;cursor:pointer;text-align:left" onclick="navigate(\'/app/pages/lease.html\')">'
+      +'<span class="settings-icon">📑</span><div style="flex:1"><div class="settings-title">View Lease Review</div><div class="settings-sub">Plain-English breakdown of every clause</div></div><span class="settings-chevron">›</span>'
+    +'</button>';
+    if(validEnd){
+      var d=Math.ceil((endDate.getTime()-Date.now())/86400000);
+      if(d<=90&&d>30){
+        html+='<button class="settings-row" style="width:100%;border:1px solid var(--border-lt);border-radius:14px;background:rgba(27,80,200,.04);cursor:pointer;text-align:left" onclick="navigate(\'/app/pages/renewal.html\')">'
+          +'<span class="settings-icon">🔄</span><div style="flex:1"><div class="settings-title">Renewal Helper</div><div class="settings-sub">Review your renewal offer or plan to move out</div></div><span class="settings-chevron">›</span>'
+        +'</button>';
+      }
+      if(d<=30&&d>0){
+        html+='<button class="settings-row" style="width:100%;border:1px solid rgba(245,166,35,.3);border-radius:14px;background:rgba(245,166,35,.06);cursor:pointer;text-align:left" onclick="navigate(\'/app/pages/exit.html\')">'
+          +'<span class="settings-icon">🚪</span><div style="flex:1"><div class="settings-title">Start Exit Inspection Prep</div><div class="settings-sub">Lease ends in '+d+' days — start documenting</div></div><span class="settings-chevron">›</span>'
+        +'</button>';
+      }
+    }
+    html+='<button class="settings-row" style="width:100%;border:1px solid var(--border-lt);border-radius:14px;background:#fff;cursor:pointer;text-align:left" onclick="navigate(\'/app/pages/vault.html#lease\')">'
+      +'<span class="settings-icon">🗄️</span><div style="flex:1"><div class="settings-title">Open in Vault</div><div class="settings-sub">View all saved tenancy documents</div></div><span class="settings-chevron">›</span>'
+    +'</button>';
+    actions.innerHTML=html;
+  }
+}
+
+function updateProfileStateRowSubtitle(){
+  var saved=localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'';
+  var sub=document.getElementById('profileStateRowSub');
+  if(!sub)return;
+  if(saved){
+    var meta=profileStateData&&profileStateData.find&&profileStateData.find(function(s){return s.code===saved.toUpperCase()});
+    sub.textContent=meta?meta.name+' ('+meta.code+')':saved;
+  } else {
+    sub.textContent='Tap to set — used for tenancy laws & rights';
+  }
+}
+
 function openProfileStateSelector(){
   var backdrop=document.getElementById('profileStateBackdrop');
   var modal=document.getElementById('profileStateModal');
@@ -1077,6 +1200,7 @@ function saveProfileState(code){
   var meta=profileStateData.find(function(s){return s.code===code});
   var display=document.getElementById('profileStateDisplay');
   if(display && meta) display.textContent=meta.name+' ('+meta.code+')';
+  updateProfileStateRowSubtitle();
   closeProfileStateSelector();
   showToast('State updated',meta?meta.name+' — your rights will reflect this':code,'📍');
   syncProfileToCloud();
@@ -1199,13 +1323,14 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   })();
 
+  // Update the new top-level state row subtitle
+  updateProfileStateRowSubtitle();
+
   // Pull profile from cloud (will only fill empty local fields)
   pullProfileFromCloud();
 
-  setTimeout(function(){
-    var bar=document.getElementById('profileLeaseBar');
-    if(bar)bar.style.width='41%';
-  },400);
+  // Pre-load tenancy data so it's instant when the user opens view C
+  loadTenancyView();
 
   var hash=window.location.hash;
   if(hash==='#notifications')switchView('D');
