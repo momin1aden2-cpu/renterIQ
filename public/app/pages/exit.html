@@ -133,8 +133,8 @@
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:16px">How the Exit Inspection works</div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">1</div><div class="brief-text">Walk through every room and area photographing the current state of the empty, clean property.</div></div>
-        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">2</div><div class="brief-text">RenterIQ's AI compares your exit photos against your move-in report and the agency's report.</div></div>
-        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">3</div><div class="brief-text">Where the AI spots a difference, it asks you — is this something that happened during your tenancy?</div></div>
+        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">2</div><div class="brief-text">RenterIQ compares your exit photos against your move-in report and the agency's report.</div></div>
+        <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">3</div><div class="brief-text">Where a difference is spotted, you are asked — is this something that happened during your tenancy?</div></div>
         <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">4</div><div class="brief-text">You confirm or dismiss each item. Nothing enters the report without your approval.</div></div>
         <div style="display:flex;gap:13px;align-items:flex-start"><div class="brief-num">5</div><div class="brief-text">For any confirmed items, RenterIQ suggests practical fixes to help you recover your full bond.</div></div>
       </div>
@@ -156,7 +156,7 @@
 
     <div style="margin:0 16px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:6px">⏱ Best time to do this</div>
-      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">Ideally complete the exit inspection the morning of your key handover — after everything is cleaned and removed. This gives you a few hours to address any issues the AI detects before meeting the agent.</div>
+      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">Ideally complete the exit inspection the morning of your key handover — after everything is cleaned and removed. This gives you a few hours to address any issues detected before meeting the agent.</div>
     </div>
 
     <div style="padding:0 16px 24px;display:flex;flex-direction:column;gap:10px">
@@ -228,7 +228,7 @@
   </div>
   <div style="background:var(--blue-dk);padding:0 20px 14px;display:flex;gap:10px;align-items:flex-start">
     <span style="font-size:15px;flex-shrink:0;margin-top:1px">📸</span>
-    <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.65);line-height:1.55">Photograph the same areas you documented at move-in. The AI will compare each photo against your original record and the agency report.</div>
+    <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.65);line-height:1.55">Photograph the same areas you documented at move-in. Each photo will be compared against your original record and the agency report.</div>
   </div>
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
     <div style="display:flex;flex-direction:column;gap:10px" id="exitAreaList"></div>
@@ -361,12 +361,12 @@
   </div>
 </div>
 
-<!-- VIEW F — AI COMPARISON & TENANT REVIEW (dynamic) -->
+<!-- VIEW F — COMPARISON & TENANT REVIEW (dynamic) -->
 <div class="view" id="viewF" style="display:none">
   <header class="sh">
     <div class="sh-row"><button class="sh-back" onclick="switchView('C')"><span class="sh-back-arrow">‹</span><span class="sh-label">BACK</span></button></div>
     <div class="sh-title">Your Review</div>
-    <div class="sh-sub" id="compSubtitle">AI found items for your review</div>
+    <div class="sh-sub" id="compSubtitle">Items found for your review</div>
   </header>
   <div style="background:var(--blue-dk);padding:12px 20px;display:flex;gap:10px;align-items:flex-start">
     <span style="font-size:14px;flex-shrink:0;margin-top:1px">🤖</span>
@@ -374,13 +374,13 @@
   </div>
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
     <div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:14px 16px;margin-bottom:16px">
-      <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12.5px;color:var(--teal-dk);line-height:1.6">You are in control. The AI surfaces differences — you confirm or dismiss each one. Nothing enters your exit report without your approval.</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12.5px;color:var(--teal-dk);line-height:1.6">You are in control. RenterIQ surfaces differences — you confirm or dismiss each one. Nothing enters your exit report without your approval.</div>
     </div>
     <div id="compAreasList"></div>
     <div id="compDiscrepanciesContainer"></div>
   </div>
   <div id="reviewFooter" style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10;text-align:center">
-    <div style="font-weight:600;font-size:12px;color:var(--muted);padding:12px" id="reviewFooterMsg">Loading AI comparison…</div>
+    <div style="font-weight:600;font-size:12px;color:var(--muted);padding:12px" id="reviewFooterMsg">Loading comparison…</div>
   </div>
 </div>
 
@@ -659,7 +659,7 @@ function addExitPhoto(){
   showToast('Photo added · '+time,'Timestamped · Saved to exit report','📷');
 }
 
-// ── AI Exit Comparison ──
+// ── Exit Comparison ──
 var aiComparisonData=null;
 var tenantDecisions={};
 

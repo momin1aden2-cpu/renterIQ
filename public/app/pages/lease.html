@@ -700,7 +700,7 @@ function collectLeaseDetails(){
   return d;
 }
 
-// Analysis — calls /api/analyze-lease (Gemini AI)
+// Analysis — calls /api/analyze-lease
 var leaseData=null;
 var totalClauses=12;
 var understood={};
@@ -726,7 +726,7 @@ function startAnalysis(){
     },delay);
   });
 
-  // Call Gemini-powered lease analysis API
+  // Call lease analysis API
   var isDemoMode=document.getElementById('fileName').textContent==='sample_lease.pdf';
   var fetchPromise;
   if(!isDemoMode&&uploadedFile){
