@@ -9,17 +9,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RenterIQ">
-<link rel="stylesheet" href="/app/css/app.css?v=3">
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
-<script src="/api/firebase-config" defer></script>
-<script src="/app/js/firebase-init.js" defer></script>
-<script src="/app/js/storage.js" defer></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/app/css/app.css?v=5">
+<!-- Async font load (non-blocking) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
 <title>Your Vault — RenterIQ</title>
 <script src="/app/js/pwa-init.js" defer></script>
 <style>
@@ -986,7 +981,7 @@ function loadReceipts(){
         '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">' + date + (r.amount ? ' · $' + r.amount : '') + '</div></div>' +
         '<span style="font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;color:' + typeColor + ';background:' + typeColor.replace(')', '').replace('var(--', 'rgba(') + ',.1);border-radius:8px;padding:4px 10px;text-transform:capitalize">' + (r.type || 'Other') + '</span></div>';
       if (r.photo) {
-        html += '<div style="padding-left:56px"><img src="' + r.photo + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="window.open(this.src)"></div>';
+        html += '<div style="padding-left:56px"><img src="' + r.photo + '" loading="lazy" decoding="async" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="window.open(this.src)"></div>';
       }
       html += '</div>';
     });
@@ -1005,6 +1000,28 @@ function setPriority(el){document.querySelectorAll('.priority-pill').forEach(fun
 
 document.getElementById('maintenanceOverlay')?.addEventListener('click',function(e){if(e.target===this)closeMaintenanceSheet()});
 
+// ── Two-phase init ──
+// Phase 1 (sync): paint the active view from localStorage cache
+// Phase 2 (idle): load every other folder + cloud sync
+function vaultIdleInit(){
+  loadConditionReports();
+  loadExitReports();
+  loadRoutineReports();
+  loadMaintenanceItems();
+  loadComms();
+  loadReceipts();
+  loadRecentActivity();
+  renderCustomFolders();
+  checkResumeFolder();
+  pullLeasesFromCloud();
+  pullEntryAuditsFromCloud();
+  pullExitAuditsFromCloud();
+  pullRoutineInspectionsFromCloud();
+  pullMaintenanceItemsFromCloud();
+  pullPersonalDocsFromCloud();
+  pullReceiptsFromCloud();
+  pullOpenHomeInspectionsFromCloud();
+}
 document.addEventListener('DOMContentLoaded',function(){
   allViews.forEach(function(v){var e=document.getElementById('view'+v);if(e)e.style.display=v==='A'?'flex':'none'});
   var h=window.location.hash;
@@ -1016,26 +1033,15 @@ document.addEventListener('DOMContentLoaded',function(){
   if(h==='#exit')switchView('G');
   if(h==='#routine')switchView('H');
   if(h==='#resume'){loadPersonalDocuments();switchView('I');}
+  // Critical: counts and lease list (most likely first view)
   loadLeaseAgreements();
-  loadConditionReports();
-  loadExitReports();
-  loadRoutineReports();
-  loadMaintenanceItems();
-  loadComms();
-  loadReceipts();
   loadVaultCounts();
-  loadRecentActivity();
-  renderCustomFolders();
-  checkResumeFolder();
-  // Pull cloud data in the background and re-render when ready
-  pullLeasesFromCloud();
-  pullEntryAuditsFromCloud();
-  pullExitAuditsFromCloud();
-  pullRoutineInspectionsFromCloud();
-  pullMaintenanceItemsFromCloud();
-  pullPersonalDocsFromCloud();
-  pullReceiptsFromCloud();
-  pullOpenHomeInspectionsFromCloud();
+  // Defer everything else
+  if('requestIdleCallback' in window){
+    requestIdleCallback(vaultIdleInit, { timeout: 2000 });
+  } else {
+    setTimeout(vaultIdleInit, 250);
+  }
 });
 /* ── Load Routine Inspection Reports from localStorage ── */
 function loadRoutineReports(){
@@ -3088,5 +3094,13 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
   <button class="nav-tab active"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
   <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
 </nav>
+
+<!-- Firebase + auth load AFTER body so page parses without blocking on vendor JS -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
 </body>
 </html>

@@ -12,22 +12,19 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
 <link rel="manifest" href="/app/manifest.json">
-<link rel="stylesheet" href="/app/css/app.css?v=4">
+<link rel="stylesheet" href="/app/css/app.css?v=5">
+<!-- Async font load (non-blocking) + preconnect for warm sockets -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
+<!-- Pre-warm the next-page sockets so navigation feels instant -->
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="prefetch" href="/app/pages/tools.html">
 <link rel="prefetch" href="/app/pages/vault.html">
 <link rel="prefetch" href="/app/pages/inspection.html">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
-<script src="/api/firebase-config" defer></script>
-<script src="/app/js/firebase-init.js" defer></script>
-<script src="/app/js/storage.js" defer></script>
-<!-- Authentication Guard -->
-<script src="/app/js/auth-guard.js" defer></script>
+<link rel="prefetch" href="/app/pages/tracked.html">
+<link rel="prefetch" href="/app/css/app.css?v=5">
 <title>RenterIQ</title>
 <style>
 /* ── Home Header ──────────────────────────────────────────── */
@@ -1250,7 +1247,7 @@
     </div>
 
     <!-- ── Renting Journey Timeline ────────────────────────── -->
-    <div style="padding:20px 16px 0">
+    <div class="cv-auto" style="padding:20px 16px 0">
       <div class="sec-row" style="margin-bottom:14px">
         <span class="sec-title">Your Renting Journey</span>
         <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer" onclick="navigate('/app/pages/tools.html')">All tools →</span>
@@ -1353,7 +1350,7 @@
     <div id="renewalCard" style="display:none;padding:16px 16px 0"></div>
 
     <!-- ── Vault Snapshot ──────────────────────────────────── -->
-    <div style="padding:20px 16px 0">
+    <div class="cv-auto" style="padding:20px 16px 0">
       <div class="sec-row">
         <span class="sec-title">Your Vault</span>
         <span class="sec-link" onclick="navigate('/app/pages/vault.html')">Open →</span>
@@ -2455,15 +2452,27 @@ function homeLoadVaultStats() {
   setCount('vsCountReceipts', Array.isArray(receipts) ? receipts.length : 0);
 }
 
+// ── Two-phase init ──
+// Phase 1 (sync, on DOMContentLoaded): paint above-the-fold from localStorage cache
+// Phase 2 (idle): cloud sync, system status, expensive bookkeeping
+function homeIdleInit() {
+  homeEnsureLeaseRenewalReminders();
+  homeUpdateBellBadge();
+  homePullTrackedFromCloud();
+  homeRunSystemStatusCheck();
+}
 document.addEventListener('DOMContentLoaded', function() {
+  // Critical above-the-fold renders — synchronous, fast
   homeRenderTracked();
   homeRenderUpcoming();
   homeCheckReminders();
   homeLoadVaultStats();
-  homeEnsureLeaseRenewalReminders();
-  homeUpdateBellBadge();
-  homePullTrackedFromCloud();
-  setTimeout(homeRunSystemStatusCheck, 500);
+  // Defer everything else until the browser is idle
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(homeIdleInit, { timeout: 1500 });
+  } else {
+    setTimeout(homeIdleInit, 200);
+  }
 });
 
 // Update header avatar with user initials
@@ -2481,5 +2490,16 @@ function updateHeaderAvatar(initials) {
   <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
   <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
 </nav>
+
+<!-- Firebase + auth load AFTER body so HTML parses without blocking on
+     ~200KB of vendor JS. The home page paints from localStorage cache
+     instantly; cloud sync wakes up in the background. -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
 </body>
 </html>

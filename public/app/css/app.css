@@ -3,6 +3,33 @@
    Single source of truth for all app pages.
    ============================================================ */
 
+/* ── Performance hints ──
+   Tell the browser it can skip rendering off-screen content and
+   isolate paint regions for big card sections. This is the single
+   biggest mobile win — long pages render their above-the-fold
+   content first, then paint the rest progressively as you scroll.
+
+   - content-visibility: auto → skip layout/paint for off-screen elements
+   - contain-intrinsic-size  → reserve a placeholder so scrollbars stay stable
+   - contain: layout style paint → isolate the element's box from the rest
+*/
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
+}
+.cv-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 320px;
+  contain: layout style paint;
+}
+.cv-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 80px;
+  contain: layout style paint;
+}
+img { content-visibility: auto; }
+
+
 /* ── Design Tokens ─────────────────────────────────────────── */
 :root {
   /* Brand Palette */

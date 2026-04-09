@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v10 — Share Target + Storage Helper
+// RenterIQ Service Worker v11 — Mobile Performance Pass
 // No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
 
-var CACHE_NAME = 'renteriq-shell-v10';
+var CACHE_NAME = 'renteriq-shell-v11';
 
 var APP_SHELL = [
   '/app/index.html',
