@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /app/
+Crawl-delay: 1
+
+# Allow major search engine crawlers explicitly
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /app/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /app/
+
+Sitemap: https://renteriq.com.au/sitemap.xml

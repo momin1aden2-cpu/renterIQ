@@ -3,7 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="RenterIQ — The complete renting companion for Australian tenants. From your first search to your final key handover.">
+<title>RenterIQ — Free Rental Inspection, Lease Review &amp; Bond Protection App for Australian Renters</title>
+<meta name="description" content="Free Australian renting app — entry condition reports, plain-English lease review, exit inspection & bond protection. Built for tenants in VIC, NSW, QLD, WA, SA, TAS, ACT & NT.">
+<meta name="keywords" content="rental inspection app, entry condition report australia, exit condition report, free lease review, rental cover letter, bond return checklist, renter rights australia, tenant rights, rental application, australian renters">
+<meta name="author" content="RenterIQ">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://renteriq.com.au/">
+
+<!-- Geo targeting (Australia) -->
+<meta name="geo.region" content="AU">
+<meta name="geo.placename" content="Australia">
+<meta name="geo.position" content="-25.2744;133.7751">
+<meta name="ICBM" content="-25.2744, 133.7751">
+
 <meta name="theme-color" content="#1B50C8">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,15 +25,114 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192.png">
 <link rel="manifest" href="/manifest.json?v=5">
-<meta property="og:title" content="RenterIQ — Your Complete Renting Companion">
-<meta property="og:description" content="From property search to bond return. Track inspections, store evidence, know your rights. Built for Australian renters.">
-<meta property="og:image" content="/assets/icons/icon-512.png">
+
+<!-- Open Graph -->
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="RenterIQ">
+<meta property="og:locale" content="en_AU">
+<meta property="og:url" content="https://renteriq.com.au/">
+<meta property="og:title" content="RenterIQ — Free Renting App for Australian Tenants">
+<meta property="og:description" content="Inspection reports, plain-English lease review, exit condition comparison & bond protection. Free for Australian renters in every state.">
+<meta property="og:image" content="https://renteriq.com.au/assets/icons/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+
+<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<title>RenterIQ — Your Complete Renting Companion</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="twitter:title" content="RenterIQ — Free Renting App for Australian Tenants">
+<meta name="twitter:description" content="Inspection reports, plain-English lease review, exit condition comparison & bond protection.">
+<meta name="twitter:image" content="https://renteriq.com.au/assets/icons/icon-512.png">
+
+<!-- Structured data — Organization, WebSite + sitelinks search, SoftwareApplication, FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://renteriq.com.au/#organization",
+      "name": "RenterIQ",
+      "url": "https://renteriq.com.au/",
+      "logo": "https://renteriq.com.au/assets/icons/icon-512.png",
+      "description": "Free renting companion app for Australian tenants — inspection reports, lease review, bond protection and renter rights.",
+      "areaServed": { "@type": "Country", "name": "Australia" },
+      "knowsAbout": ["rental inspection","tenancy law","bond refund","lease review","renter rights","entry condition report","exit condition report"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://renteriq.com.au/#website",
+      "url": "https://renteriq.com.au/",
+      "name": "RenterIQ",
+      "description": "Free Australian renting app — inspection, lease review, bond protection",
+      "publisher": { "@id": "https://renteriq.com.au/#organization" },
+      "inLanguage": "en-AU",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": { "@type": "EntryPoint", "urlTemplate": "https://renteriq.com.au/?q={search_term_string}" },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://renteriq.com.au/#app",
+      "name": "RenterIQ",
+      "operatingSystem": "Web, iOS, Android",
+      "applicationCategory": "LifestyleApplication",
+      "applicationSubCategory": "Renting & Tenancy",
+      "url": "https://renteriq.com.au/app",
+      "description": "Free progressive web app for Australian renters: rental inspection reports, plain-English lease review, exit condition comparison, bond protection and state-specific renter rights.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "AUD" },
+      "featureList": [
+        "Rental inspection checklist with timestamped photos",
+        "Entry condition report PDF export",
+        "Plain-English lease review",
+        "Exit condition comparison",
+        "Bond return checklist",
+        "Renter rights hub for every Australian state",
+        "Renter resume & cover letter builder",
+        "Maintenance request log",
+        "Document vault"
+      ],
+      "publisher": { "@id": "https://renteriq.com.au/#organization" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is RenterIQ free for Australian renters?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes — RenterIQ is completely free for Australian tenants. You can do unlimited inspection reports, lease reviews, exit walkthroughs and bond protection records at no cost." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which Australian states does RenterIQ cover?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Every state and territory: Victoria (VIC), New South Wales (NSW), Queensland (QLD), Western Australia (WA), South Australia (SA), Tasmania (TAS), Australian Capital Territory (ACT) and Northern Territory (NT). Tenancy info auto-detects your state." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I generate an entry condition report with RenterIQ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes — RenterIQ guides you through a room-by-room inspection with timestamped photos and produces a professional PDF entry condition report you can save, email or print. It's designed to protect your bond from day one." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does RenterIQ replace a lawyer for lease review?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No — RenterIQ is not a legal service. It produces a plain-English summary of your lease and flags clauses that may need attention. For binding legal advice, contact your state tenancy authority or a tenancy legal service." }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is my data stored?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Your photos and documents stay on your device by default. When you sign in, they sync securely to your private cloud account. Only you can access your records." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap"></noscript>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
@@ -1126,20 +1237,26 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
         <p>The complete renting companion for Australian tenants — from the first search to the final key handover.</p>
       </div>
       <div class="footer-col">
+        <h4>Free Tools</h4>
+        <a href="/rental-inspection-checklist.html">Rental Inspection Checklist</a>
+        <a href="/entry-condition-report.html">Entry Condition Report</a>
+        <a href="/exit-condition-report.html">Exit Condition Report</a>
+        <a href="/free-lease-review.html">Free Lease Review</a>
+        <a href="/rental-cover-letter.html">Rental Cover Letter</a>
+        <a href="/bond-return-checklist.html">Bond Return Checklist</a>
+      </div>
+      <div class="footer-col">
         <h4>Quick Links</h4>
         <a href="#how-it-works">How It Works</a>
         <a href="#features">Features</a>
         <a href="#rights">Renter Rights</a>
         <a href="#pwa">Get the App</a>
-      </div>
-      <div class="footer-col">
-        <h4>Support</h4>
-        <a href="mailto:support@renteriq.com.au">support@renteriq.com.au</a>
-        <a href="mailto:support@renteriq.com.au?subject=Feedback">Send Feedback</a>
         <a href="/about.html">About RenterIQ</a>
       </div>
       <div class="footer-col">
-        <h4>Legal</h4>
+        <h4>Support &amp; Legal</h4>
+        <a href="mailto:support@renteriq.com.au">support@renteriq.com.au</a>
+        <a href="mailto:support@renteriq.com.au?subject=Feedback">Send Feedback</a>
         <a href="/privacy.html">Privacy Policy</a>
         <a href="/terms.html">Terms of Use</a>
         <a href="/disclaimer.html">Disclaimer</a>
