@@ -89,32 +89,6 @@
   display: none;
   box-shadow: 0 0 0 2px var(--blue);
 }
-.hdr-sys-dot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.10);
-  border: 1px solid rgba(255,255,255,.14);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background .15s;
-}
-.hdr-sys-dot:active { background: rgba(255,255,255,.20); }
-.hdr-sys-dot::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #9AA4B8;
-  box-shadow: 0 0 0 2px rgba(154,164,184,.25);
-  transition: all .25s;
-}
-.hdr-sys-dot.sys-ok::before     { background: #00C896; box-shadow: 0 0 0 2px rgba(0,200,150,.30); }
-.hdr-sys-dot.sys-warn::before   { background: #F5A623; box-shadow: 0 0 0 2px rgba(245,166,35,.30); }
-.hdr-sys-dot.sys-down::before   { background: #FF3B30; box-shadow: 0 0 0 2px rgba(255,59,48,.30); }
 .hdr-avatar {
   width: 34px;
   height: 34px;
@@ -1131,13 +1105,16 @@
 <!-- Splash Screen (standalone PWA only) -->
 <div id="splashScreen" style="position:fixed;inset:0;z-index:9999;background:var(--blue-dk);display:flex;flex-direction:column;align-items:center;justify-content:center">
   <div style="width:72px;height:72px;border-radius:20px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
-    <svg width="40" height="46" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M11 0L21.5 5V13C21.5 20.18 17.16 26.36 11 28C4.84 26.36 0.5 20.18 0.5 13V5L11 0Z" fill="rgba(255,255,255,.90)"/>
-      <path d="M11 4L7 9.5V15.5H9.5V12H12.5V15.5H15V9.5L11 4Z" fill="#1B50C8"/>
+    <svg width="40" height="46" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 256 32 L 448 72 Q 452 72 452 76 L 452 240 C 452 340 380 420 256 492 C 132 420 60 340 60 240 L 60 76 Q 60 72 64 72 Z" fill="rgba(255,255,255,.90)"/>
+      <path d="M 256 130 L 148 222 L 172 222 L 172 340 L 254 340 L 254 270 L 290 270 L 290 340 L 340 340 L 340 222 L 364 222 Z" fill="#1B50C8"/>
+      <rect x="254" y="270" width="36" height="70" rx="2" fill="#1B50C8" fill-opacity="0.5"/>
+      <circle cx="380" cy="390" r="56" fill="#00C896"/>
+      <path d="M 355 390 L 372 407 L 408 368" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     </svg>
   </div>
   <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:28px;color:#fff;letter-spacing:-.3px">RenterIQ</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:2px;margin-top:6px">Rent Smart. Stay Protected.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:2px;margin-top:6px">Rent smarter. Live safer.</div>
   <div style="margin-top:40px;width:100px;height:2px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden">
     <div id="splashBar" style="height:100%;background:var(--teal);border-radius:100px;width:0%"></div>
   </div>
@@ -1179,14 +1156,18 @@
   <header class="screen-header">
     <div class="hdr-top">
       <a href="/index.html" class="hdr-brand">
-        <svg width="26" height="26" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11 0L21.5 5V13C21.5 20.18 17.16 26.36 11 28C4.84 26.36 0.5 20.18 0.5 13V5L11 0Z" fill="rgba(255,255,255,.85)"/>
-          <path d="M11 4L7 9.5V15.5H9.5V12H12.5V15.5H15V9.5L11 4Z" fill="#1B50C8"/>
+        <svg width="26" height="26" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 256 32 L 448 72 Q 452 72 452 76 L 452 240 C 452 340 380 420 256 492 C 132 420 60 340 60 240 L 60 76 Q 60 72 64 72 Z" fill="rgba(255,255,255,.85)"/>
+          <path d="M 256 130 L 148 222 L 172 222 L 172 340 L 254 340 L 254 270 L 290 270 L 290 340 L 340 340 L 340 222 L 364 222 Z" fill="#1B50C8"/>
+          <circle cx="380" cy="390" r="56" fill="#00C896"/>
+          <path d="M 355 390 L 372 407 L 408 368" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        <span class="hdr-brand-text">RenterIQ</span>
+        <div style="display:flex;flex-direction:column;gap:1px">
+          <span class="hdr-brand-text">RenterIQ</span>
+          <span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:9px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;white-space:nowrap">Rent smarter. Live safer.</span>
+        </div>
       </a>
       <div class="hdr-actions">
-        <span class="hdr-sys-dot" id="hdrSysDot" role="button" aria-label="System status" title="Checking system status…" onclick="homeShowSystemStatus()"></span>
         <span class="hdr-bell" role="button" aria-label="Notifications" onclick="navigate('/app/pages/notifications.html')">🔔<span class="hdr-bell-badge" id="hdrBellBadge"></span></span>
         <div class="hdr-avatar" id="hdrAvatar" role="button" aria-label="Profile" onclick="navigate('/app/pages/profile.html')">?</div>
       </div>
@@ -2258,81 +2239,6 @@ function homeSafeJSON(key, fallback) {
   catch (e) { return fallback; }
 }
 
-// ── System Status indicator (Firebase / Auth / Firestore health) ──
-var sysStatus = { firebase: false, auth: false, firestore: false, message: 'Checking…' };
-
-function homeSetSysDot(state, message) {
-  var el = document.getElementById('hdrSysDot');
-  if (!el) return;
-  el.classList.remove('sys-ok', 'sys-warn', 'sys-down');
-  if (state === 'ok') el.classList.add('sys-ok');
-  else if (state === 'warn') el.classList.add('sys-warn');
-  else if (state === 'down') el.classList.add('sys-down');
-  el.title = message || '';
-  sysStatus.message = message || '';
-}
-
-function homeRunSystemStatusCheck() {
-  // Stage 1: Firebase SDK loaded?
-  if (typeof firebase === 'undefined') {
-    homeSetSysDot('down', 'Firebase SDK not loaded — running in offline mode');
-    return;
-  }
-  if (!firebase.apps || firebase.apps.length === 0) {
-    homeSetSysDot('warn', 'Firebase initialising…');
-    setTimeout(homeRunSystemStatusCheck, 600);
-    return;
-  }
-  sysStatus.firebase = true;
-
-  // Stage 2: Auth state
-  try {
-    var user = firebase.auth().currentUser;
-    if (!user) {
-      homeSetSysDot('warn', 'Signed out — local data only');
-      // Re-check when auth resolves
-      firebase.auth().onAuthStateChanged(function(u) {
-        if (u) homeRunSystemStatusCheck();
-      });
-      return;
-    }
-    sysStatus.auth = true;
-  } catch (e) {
-    homeSetSysDot('warn', 'Auth unavailable: ' + (e.message || e));
-    return;
-  }
-
-  // Stage 3: Firestore reachable? (cheap read on user doc)
-  if (!firebase.firestore) {
-    homeSetSysDot('warn', 'Firestore SDK missing');
-    return;
-  }
-  try {
-    var uid = firebase.auth().currentUser.uid;
-    firebase.firestore().collection('users').doc(uid).get({ source: 'server' })
-      .then(function() {
-        sysStatus.firestore = true;
-        homeSetSysDot('ok', 'Connected · cloud sync active');
-      })
-      .catch(function(err) {
-        // Server unreachable but cache may work — degraded
-        homeSetSysDot('warn', 'Cloud sync degraded: ' + (err.code || err.message || 'unknown'));
-      });
-  } catch (e) {
-    homeSetSysDot('warn', 'Status check failed: ' + (e.message || e));
-  }
-}
-
-function homeShowSystemStatus() {
-  var lines = [
-    'Firebase SDK: ' + (sysStatus.firebase ? '✓' : '✗'),
-    'Authenticated: ' + (sysStatus.auth ? '✓' : '✗'),
-    'Cloud sync: ' + (sysStatus.firestore ? '✓ active' : '✗ offline'),
-    '',
-    sysStatus.message
-  ].join('\n');
-  alert('RenterIQ — System Status\n\n' + lines);
-}
 
 function homeEnsureLeaseRenewalReminders() {
   try {
@@ -2459,7 +2365,6 @@ function homeIdleInit() {
   homeEnsureLeaseRenewalReminders();
   homeUpdateBellBadge();
   homePullTrackedFromCloud();
-  homeRunSystemStatusCheck();
 }
 document.addEventListener('DOMContentLoaded', function() {
   // Critical above-the-fold renders — synchronous, fast

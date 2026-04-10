@@ -1,26 +1,45 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
-      <feDropShadow dx="2" dy="16" stdDeviation="12" flood-color="#0A2460" flood-opacity="0.4"/>
+    <linearGradient id="shieldGrad" x1="256" y1="32" x2="256" y2="492" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2E6BF0"/>
+      <stop offset="100%" stop-color="#0A2460"/>
+    </linearGradient>
+    <linearGradient id="checkGrad" x1="280" y1="280" x2="380" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00E6A8"/>
+      <stop offset="100%" stop-color="#00A870"/>
+    </linearGradient>
+    <filter id="innerGlow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
+      <feOffset dx="0" dy="4" result="offsetBlur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.15" result="color"/>
+      <feComposite in="color" in2="offsetBlur" operator="in" result="shadow"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
   </defs>
 
-  <!-- Blue Shield Background -->
-  <!-- Flat top, straight sides, curving to a crest point -->
-  <path d="M 256 40 L 440 75 L 440 250 C 440 390 340 460 256 490 C 172 460 72 390 72 250 L 72 75 Z" fill="#1B50C8"/>
-  <path d="M 256 40 L 256 490 C 172 460 72 390 72 250 L 72 75 Z" fill="#0A2460" fill-opacity="0.12"/> <!-- Subtle left side shading -->
+  <!-- Shield — refined crest shape -->
+  <path d="M 256 32 L 448 72 Q 452 72 452 76 L 452 240 C 452 340 380 420 256 492 C 132 420 60 340 60 240 L 60 76 Q 60 72 64 72 Z" fill="url(#shieldGrad)"/>
 
-  <g filter="url(#shadow)" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Left house wall & floor line -->
-    <path d="M 160 235 L 160 380 L 240 380" stroke="white" stroke-width="46"/>
-    
-    <!-- Right house wall (shorter to make room for tick) -->
-    <path d="M 352 235 L 352 300" stroke="white" stroke-width="46"/>
+  <!-- Subtle inner border for depth -->
+  <path d="M 256 56 L 428 90 L 428 244 C 428 332 364 404 256 468 C 148 404 84 332 84 244 L 84 90 Z" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="2"/>
 
-    <!-- Roof line extending past the walls -->
-    <path d="M 110 250 L 256 128 L 402 250" stroke="white" stroke-width="46"/>
-
-    <!-- Bold Green Tick Checkmark -->
-    <path d="M 260 360 L 320 420 L 420 280" stroke="#00C896" stroke-width="50"/>
+  <!-- House — clean geometric form -->
+  <g filter="url(#innerGlow)">
+    <!-- Roof -->
+    <path d="M 256 130 L 148 222 L 172 222 L 172 340 L 254 340 L 254 270 L 290 270 L 290 340 L 340 340 L 340 222 L 364 222 Z" fill="white"/>
+    <!-- Door -->
+    <rect x="254" y="270" width="36" height="70" rx="2" fill="#1B50C8" fill-opacity="0.25"/>
+    <!-- Window left -->
+    <rect x="190" y="240" width="42" height="36" rx="4" fill="#1B50C8" fill-opacity="0.18"/>
+    <!-- Window right grid -->
+    <rect x="306" y="240" width="18" height="36" rx="3" fill="#1B50C8" fill-opacity="0.18"/>
   </g>
+
+  <!-- Checkmark badge — bottom right -->
+  <circle cx="380" cy="390" r="56" fill="url(#checkGrad)"/>
+  <circle cx="380" cy="390" r="52" fill="none" stroke="white" stroke-width="3" stroke-opacity="0.3"/>
+  <path d="M 355 390 L 372 407 L 408 368" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>
