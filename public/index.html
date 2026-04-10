@@ -593,6 +593,8 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
   
   /* Sections */
   .how-it-works,.features,.vault-section,.exit-section,.rights-section,.pwa-section{padding:56px 0}
+  #pricing{padding:56px 0 !important}
+  #pricing .container > div:nth-child(2){grid-template-columns:1fr !important;max-width:400px !important}
   .steps-grid{grid-template-columns:1fr;gap:12px}
   .features-grid{grid-template-columns:1fr;gap:14px}
   .rights-grid{grid-template-columns:1fr}
@@ -647,6 +649,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
     <div class="nav-links" id="navLinks">
       <a href="#how-it-works">How It Works</a>
       <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
       <a href="#rights">Renter Rights</a>
       <a href="/about.html">About</a>
     </div>
@@ -1122,6 +1125,67 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
 </section>
 
+<!-- ========== PRICING ========== -->
+<section style="background:#fff;padding:88px 0" id="pricing">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <span class="section-eyebrow">Pricing</span>
+      <h2 class="section-h2">Pay only when you need it.<br>No subscriptions. Ever.</h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center;max-width:520px">RenterIQ is free to search, inspect, apply and track. You only pay a small one-off fee when you need a high-stakes report that protects your bond.</p>
+    </div>
+
+    <!-- FREE COLUMN -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px;margin:0 auto">
+      <div style="background:var(--blue-xl);border-radius:20px;padding:28px 24px;border:1.5px solid var(--border-lt)">
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Free forever</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;color:var(--blue-dk);margin-bottom:16px">$0</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Property Search &amp; Tracker</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Property Inspection</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Rental Application &amp; Cover Letter</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">1st Lease Review (always free)</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Renter Rights Hub (all states)</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Maintenance Log &amp; Document Vault</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Push Notifications &amp; Reminders</span></div>
+        </div>
+      </div>
+
+      <!-- PAID COLUMN -->
+      <div style="background:linear-gradient(135deg,var(--blue-dk),var(--blue-md));border-radius:20px;padding:28px 24px;color:#fff;position:relative;overflow:hidden">
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Pay per event</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;color:#fff;margin-bottom:16px">From $4.99</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px">
+            <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Lease Review (2nd+)</span>
+            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$4.99</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px">
+            <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Bond-Shield Move-In</span>
+            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$15.99</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px">
+            <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Routine Assist</span>
+            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$4.99</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px">
+            <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Exit-Guard Bond Shield</span>
+            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$19.99</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,200,150,.2);border-radius:10px;padding:10px 12px">
+            <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Cloud Sync (one-time)</span>
+            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$9.99</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.65);line-height:1.55;text-align:center">No subscription. No recurring charges. Credits never expire.</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:28px">
+      <p style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted);max-width:460px;margin:0 auto;line-height:1.65">Your bond is typically $1,500–$3,000. Our most comprehensive report (Exit-Guard) costs $19.99. That's less than 1% of what you're protecting.</p>
+    </div>
+  </div>
+</section>
+
 <!-- ========== RENTER RIGHTS ========== -->
 <section class="rights-section" id="rights">
   <div class="container">
@@ -1265,6 +1329,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
         <h4>Quick Links</h4>
         <a href="#how-it-works">How It Works</a>
         <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
         <a href="#rights">Renter Rights</a>
         <a href="/reviews.html">Reviews</a>
         <a href="#pwa">Get the App</a>
