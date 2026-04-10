@@ -885,10 +885,46 @@ function collectAndSave(){
   r.docs=docMeta;
   saveResume(r);
   updateQuickRef(r);
+
+  // ── Reverse sync: update profile cache from resume core identity ──
+  // So profile.html always shows the latest name/email/address without
+  // the user having to enter it in two places.
+  try {
+    if (r.fullName) {
+      localStorage.setItem('riq-user-name', r.fullName);
+      localStorage.setItem('riq-user-initials', r.fullName.charAt(0).toUpperCase());
+    }
+    if (r.currentAddress) localStorage.setItem('riq-user-address', r.currentAddress);
+  } catch (e) {}
 }
 
 function loadResume(){
   var r=getResume();
+
+  // ── Pre-fill core identity from profile / Firebase Auth if resume fields are empty ──
+  // This is the dedup bridge: profile.html is the source of truth for name/email/mobile;
+  // the resume reads from it on first load so the user never types their name twice.
+  try {
+    if (!r.fullName) {
+      var profileName = localStorage.getItem('riq-user-name') || '';
+      if (!profileName && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+        profileName = firebase.auth().currentUser.displayName || '';
+      }
+      if (profileName) r.fullName = profileName;
+    }
+    if (!r.email) {
+      var profileEmail = '';
+      if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+        profileEmail = firebase.auth().currentUser.email || '';
+      }
+      if (profileEmail) r.email = profileEmail;
+    }
+    if (!r.currentAddress) {
+      var profileAddr = localStorage.getItem('riq-user-address') || localStorage.getItem('riq-tenancy-address') || '';
+      if (profileAddr) r.currentAddress = profileAddr;
+    }
+  } catch (e) {}
+
   var fields=[
     'fullName','dob','email','mobile','currentAddress','timeAtAddress','reasonMoving',
     'employmentStatus','employer','jobTitle','empDuration','income',
@@ -1382,6 +1418,12 @@ document.addEventListener('DOMContentLoaded',function(){
 if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>
 
+
+<!-- Step journey navigation -->
+<div class="step-journey-cta" style="max-width:430px;margin:0 auto;padding:0 16px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Step 3 of 7</span>
+  <a href="/app/pages/lease.html" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:6px">📑 Next: Lease Review →</a>
+</div>
 <nav class="bottom-nav">
   <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
   <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
