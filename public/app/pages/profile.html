@@ -231,11 +231,11 @@
   <div class="settings-row" onclick="togglePushNotifs()"><span class="settings-icon">📱</span><div style="flex:1"><div class="settings-title">Push Notifications</div></div><div class="notif-toggle" id="pushMainToggle" style="background:var(--teal)"><div class="notif-toggle-dot" style="right:2px"></div></div><span class="settings-chevron" style="margin-left:8px">›</span></div>
 </div>
 
-<!-- SECTION 3: SUBSCRIPTION -->
-<div class="sec-label">Subscription</div>
+<!-- SECTION 3: CREDITS & PURCHASES -->
+<div class="sec-label">Credits &amp; Purchases</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">⭐</span><div style="flex:1"><div class="settings-title">Current Plan</div></div><span class="settings-right">Free Beta</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
-  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">💳</span><div style="flex:1"><div class="settings-title">Billing & Payments</div></div><span class="settings-right" style="color:var(--muted)">Not set up</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">✦</span><div style="flex:1"><div class="settings-title">Your Credits</div><div class="settings-sub" id="creditBalanceSub">Loading…</div></div><span class="settings-right" id="creditBalanceRight" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--blue)">—</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">☁️</span><div style="flex:1"><div class="settings-title">Cloud Sync</div><div class="settings-sub" id="cloudSyncSub">Local storage only — your data stays on this device</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 <!-- SECTION 3.5: QUICK CAPTURE -->
@@ -514,102 +514,86 @@
 </div>
 </div>
 
-<!-- VIEW E — SUBSCRIPTION & BILLING -->
+<!-- VIEW E — CREDITS & PURCHASES -->
 <div class="view" id="viewE" style="display:none">
 
 <header class="pr-header-sm">
   <div class="pr-row">
     <button class="pr-back" onclick="switchView('A')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">Profile</span></button>
   </div>
-  <div class="pr-title">Subscription</div>
-  <div class="pr-sub">Your RenterIQ plan</div>
+  <div class="pr-title">Credits &amp; Purchases</div>
+  <div class="pr-sub">Pay only when you need it — no subscriptions</div>
 </header>
 
 <div style="flex:1;padding:16px;padding-bottom:100px">
 
-<!-- CURRENT PLAN -->
+<!-- CREDIT BALANCE -->
 <div style="background:linear-gradient(135deg,var(--blue-dk),var(--blue-md));border-radius:18px;padding:22px;margin-bottom:16px">
   <div style="display:flex;justify-content:space-between;align-items:center">
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.6)">⭐ Your Plan</span>
-    <span style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Beta</span>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.6)">✦ Your Credits</span>
+    <span id="creditViewBadge" style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Beta User</span>
   </div>
-  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:28px;color:#fff;margin-top:10px">Free Beta</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.65);margin-top:6px;line-height:1.6">Full access to all RenterIQ features during the beta period. No credit card required.</div>
-  <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Unlimited property searches</span></div>
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Detailed inspection reports</span></div>
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Lease plain-English review</span></div>
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Move-in and exit audits</span></div>
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Full Vault access</span></div>
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Bond recovery tools</span></div>
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Renter Rights Hub</span></div>
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);flex-shrink:0">✓</div><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:#fff">Push notifications</span></div>
+  <div id="creditViewBalance" style="font-family:'Sora',sans-serif;font-weight:800;font-size:42px;color:#fff;margin-top:10px">0</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.65);margin-top:4px;line-height:1.6">Credits are used to unlock paid reports. They never expire. No hidden fees, no recurring charges.</div>
+  <button style="margin-top:16px;width:100%;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Coming soon','Credit purchases are being set up — check back shortly','✦')">Buy Credits →</button>
+</div>
+
+<!-- WHAT'S FREE, WHAT COSTS CREDITS -->
+<div class="sec-label">How it works</div>
+
+<!-- FREE FOREVER SECTION -->
+<div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px">Free forever — no credits needed</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Property Search &amp; Tracker</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Property Inspection (open homes)</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Rental Application &amp; Cover Letter</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">1st Lease Review (always free)</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Renter Rights Hub (all states)</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Maintenance Log</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Document Vault (local storage)</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Push Notifications &amp; Reminders</span></div>
   </div>
 </div>
 
-<!-- COMING SOON -->
-<div class="sec-label">Subscription Plans — Coming Soon</div>
-<div style="display:flex;flex-direction:column;gap:12px">
-
-  <!-- RENTER PLAN -->
-  <div style="background:#fff;border-radius:16px;padding:18px;border:2px solid var(--blue);position:relative">
-    <span style="position:absolute;top:14px;right:14px;background:var(--blue);color:#fff;border-radius:100px;padding:4px 10px;font-family:'Sora',sans-serif;font-weight:700;font-size:10px">Most Popular</span>
-    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Renter</div>
-    <div style="margin-top:4px"><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:var(--blue)">$4.99</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted)">/month</span></div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">or $39.99/year · Save 33%</div>
-    <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">All inspection and audit tools</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Plain-English lease review &amp; comparison</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Full Vault — unlimited storage</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Bond recovery tools</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Push notifications</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Renter Rights Hub — all states</span></div>
-    </div>
-  </div>
-
-  <!-- BASIC PLAN -->
-  <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt)">
-    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Basic</div>
-    <div style="margin-top:4px"><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:var(--blue)">Free</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted)"> forever</span></div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Core features only</div>
-    <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Property search and browsing</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Inspection booking</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Basic Vault (10 documents)</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--muted);font-size:13px">✗</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Lease review (Renter plan)</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--muted);font-size:13px">✗</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Bond recovery tools (Renter plan)</span></div>
-    </div>
-  </div>
-
-  <!-- FAMILY PLAN -->
-  <div style="background:var(--blue-xl);border-radius:16px;padding:18px;border:1px solid var(--border-lt);opacity:.5">
-    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Family</div>
-    <div style="margin-top:4px"><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;color:var(--blue)">TBA</span></div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">Multiple tenants and properties</div>
-    <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Everything in Renter</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Up to 3 tenants on one account</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Multiple active properties</span></div>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)">Shared Vault access</span></div>
-    </div>
-  </div>
-
-</div>
-
-<!-- NOTIFY ME -->
-<div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:16px;padding:16px;margin-top:16px">
-  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px">🔔 Be first to know when subscriptions launch</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:14px">We'll notify you when paid plans are available — and offer early beta users a discount.</div>
-  <div style="display:flex;gap:8px">
-    <input id="notifyEmail" type="email" placeholder="your@email.com" style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);outline:none">
-    <button style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent" onclick="notifyMe()">Notify Me</button>
+<!-- PAID FEATURES -->
+<div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px">Pay-per-event — only when you need it</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">No subscription. No recurring charges. Just one-off credits.</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Review</div><div style="font-weight:600;font-size:11px;color:var(--muted)">2nd review onwards</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">1 credit · $4.99</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond-Shield Move-In</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Entry Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">3 credits · $15.99</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Routine Assist</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Routine Inspection Response</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">1 credit · $4.99</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit-Guard Bond Shield</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Exit Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">4 credits · $19.99</span></div>
   </div>
 </div>
 
-<!-- RESTORE / MANAGE -->
-<div style="background:#fff;border-radius:14px;margin-top:14px;border:1px solid var(--border-lt);overflow:hidden">
-  <div class="settings-row" onclick="showToast('Restore','No active subscription to restore — you\'re on the free beta','🔄')"><span class="settings-icon">🔄</span><div style="flex:1"><div class="settings-title">Restore Purchase</div><div class="settings-sub">If you've already subscribed on another device</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms & Refund Policy</div><div class="settings-sub">View subscription terms</div></div><span class="settings-chevron">›</span></div>
+<!-- CLOUD SYNC -->
+<div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+  <div style="display:flex;gap:12px;align-items:flex-start">
+    <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--teal-dk));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">☁️</div>
+    <div style="flex:1">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Cloud Sync</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55">Sync your Vault, reports and photos across every device. One-time purchase — no recurring fees.</div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span id="cloudSyncStatus" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Local only</span>
+        <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--teal-dk)">$9.99 one-time</span>
+      </div>
+      <button style="margin-top:10px;width:100%;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Coming soon','Cloud sync purchase is being set up','☁️')">Unlock Cloud Sync →</button>
+    </div>
+  </div>
+</div>
+
+<!-- NO HIDDEN FEES -->
+<div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:16px;padding:16px;margin-bottom:14px">
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--teal-dk);margin-bottom:6px">No hidden fees. No recurring charges.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">RenterIQ only charges when you need a high-stakes report — lease reviews, condition reports, and bond protection. Credits never expire and there is no subscription.</div>
+</div>
+
+<!-- TRANSACTION HISTORY -->
+<div style="background:#fff;border-radius:14px;border:1px solid var(--border-lt);overflow:hidden">
+  <div class="settings-row" onclick="showToast('No purchases yet','Your transaction history will appear here','📜')"><span class="settings-icon">📜</span><div style="flex:1"><div class="settings-title">Transaction History</div><div class="settings-sub">View all purchases and credit usage</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms &amp; Refund Policy</div><div class="settings-sub">No refunds — all purchases are final</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 </div>
@@ -840,17 +824,65 @@ function toggleQuiet(){
   if(hours)hours.style.display=quietOn?'flex':'none';
 }
 
-/* --- SUBSCRIPTION & BILLING --- */
-// VIBE CHECK: Simple email validation for waitlist signup.
-// Uses toast feedback for user confirmation.
+/* --- CREDITS & BALANCE --- */
+function loadCreditBalance(){
+  var balEl=document.getElementById('creditBalanceRight');
+  var subEl=document.getElementById('creditBalanceSub');
+  var viewBalEl=document.getElementById('creditViewBalance');
+  var cloudSubEl=document.getElementById('cloudSyncSub');
+  var cloudStatusEl=document.getElementById('cloudSyncStatus');
 
-function notifyMe(){
-  var input=document.getElementById('notifyEmail');
-  var email=input?input.value:'';
-  if(email&&email.indexOf('@')!==-1){
-    showToast('Added to waitlist ✓','We\'ll email you when subscriptions launch','⭐');
-    if(input)input.value='';
-  }else{showToast('Enter a valid email','','⚠️')}
+  // Default state (local only, 0 credits)
+  var credits=0;
+  var cloudEnabled=false;
+  var leaseReviewCount=0;
+
+  // Try to read from Firestore via RIQStore, with localStorage fallback
+  if(window.RIQStore){
+    RIQStore.ready.then(function(){
+      if(!RIQStore.isAuthed())return;
+      RIQStore.read('state','credits').then(function(data){
+        if(!data)return;
+        credits=data.credits||0;
+        cloudEnabled=!!data.cloudSyncEnabled;
+        leaseReviewCount=data.leaseReviewCount||0;
+        renderCreditUI(credits,cloudEnabled,leaseReviewCount);
+      });
+    });
+  }
+
+  // Also check localStorage for cached credit state
+  try{
+    var cached=localStorage.getItem('riq_credit_state');
+    if(cached){
+      var c=JSON.parse(cached);
+      credits=c.credits||0;
+      cloudEnabled=!!c.cloudSyncEnabled;
+      leaseReviewCount=c.leaseReviewCount||0;
+    }
+  }catch(e){}
+
+  renderCreditUI(credits,cloudEnabled,leaseReviewCount);
+}
+
+function renderCreditUI(credits,cloudEnabled,leaseReviewCount){
+  var balEl=document.getElementById('creditBalanceRight');
+  var subEl=document.getElementById('creditBalanceSub');
+  var viewBalEl=document.getElementById('creditViewBalance');
+  var cloudSubEl=document.getElementById('cloudSyncSub');
+  var cloudStatusEl=document.getElementById('cloudSyncStatus');
+
+  if(balEl)balEl.textContent=String(credits);
+  if(subEl)subEl.textContent=credits===0?'No credits — buy when you need a report':credits+' credit'+(credits!==1?'s':'')+' available';
+  if(viewBalEl)viewBalEl.textContent=String(credits);
+
+  if(cloudEnabled){
+    if(cloudSubEl)cloudSubEl.textContent='☁️ Active — your data syncs across devices';
+    if(cloudStatusEl){cloudStatusEl.textContent='Active ✓';cloudStatusEl.style.color='var(--teal-dk)';}
+  } else {
+    if(cloudSubEl)cloudSubEl.textContent='Local storage only — your data stays on this device';
+    if(cloudStatusEl){cloudStatusEl.textContent='Local only';cloudStatusEl.style.color='var(--muted)';}
+  }
 }
 
 /* --- PASSWORD RESET --- */
@@ -1324,6 +1356,9 @@ document.addEventListener('DOMContentLoaded',function(){
   // Update the new top-level state row subtitle
   updateProfileStateRowSubtitle();
 
+  // Load credit balance for the Credits & Purchases section
+  loadCreditBalance();
+
   // Pull profile from cloud (will only fill empty local fields)
   pullProfileFromCloud();
 
@@ -1332,7 +1367,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
   var hash=window.location.hash;
   if(hash==='#notifications')switchView('D');
-  if(hash==='#subscription')switchView('E');
+  if(hash==='#credits'||hash==='#subscription')switchView('E');
   if(hash==='#privacy')switchView('F');
 
   if('Notification' in window&&Notification.permission==='granted'){

@@ -17,6 +17,7 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
+<script src="/app/js/credits.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1004,6 +1005,16 @@ function updateGenerateButton(){
 }
 
 function generateEntryReport(){
+  if(window.RIQCredits){
+    RIQCredits.gate('entry_condition').then(function(ok){
+      if(!ok)return;
+      generateEntryReportCore();
+    });
+    return;
+  }
+  generateEntryReportCore();
+}
+function generateEntryReportCore(){
   showToast('Generating report','Creating your entry condition report...','📄');
 
   var auditId='entry_audit_'+Date.now();
@@ -1070,6 +1081,8 @@ function generateEntryReport(){
   // Generate downloadable report (text version for now)
   var reportText=generateTextReport(reportData);
   downloadReport(reportText, 'entry-audit-report.txt');
+
+  if(window.RIQCredits)RIQCredits.consume('entry_condition');
 
   setTimeout(function(){
     showToast('Report generated',reportData.totalPhotos+' photos · '+reportData.completedRooms+' rooms documented','✓');

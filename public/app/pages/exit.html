@@ -17,6 +17,7 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
+<script src="/app/js/credits.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -665,6 +666,13 @@ var aiComparisonData=null;
 var tenantDecisions={};
 
 async function runExitGeneration(){
+  if(window.RIQCredits){
+    var ok=await RIQCredits.gate('exit_bond_shield');
+    if(!ok)return;
+  }
+  runExitGenerationCore();
+}
+async function runExitGenerationCore(){
   var delays=[600,1400,2200,3200,4400,5400];
   delays.forEach(function(delay,i){
     setTimeout(function(){
@@ -713,6 +721,7 @@ async function runExitGeneration(){
   }
 
   setTimeout(function(){
+    if(window.RIQCredits)RIQCredits.consume('exit_bond_shield');
     renderComparisonResults(aiComparisonData);
     switchView('F');
   },6200);
