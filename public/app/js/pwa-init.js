@@ -19,34 +19,22 @@
   // ─────────────────────────────────────────────────────────────────────────────
   // PHASE 1: THE EXTERMINATOR
   // ─────────────────────────────────────────────────────────────────────────────
+  // ── Service Worker registration ──
+  // Normal update-on-change pattern. The SW file includes a cache version
+  // constant — when it changes, the browser detects a byte-diff and installs
+  // the new SW automatically. No more destructive unregister-all.
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .getRegistrations()
-      .then(function (registrations) {
-        // Step 1 — Unregister every active / waiting / installing service worker
-        return Promise.all(
-          registrations.map(function (reg) {
-            return reg.unregister();
-          })
-        );
-      })
-      .then(function () {
-        // Step 2 — Nuke every cache in the CacheStorage
-        return caches.keys().then(function (keys) {
-          return Promise.all(
-            keys.map(function (k) { return caches.delete(k); })
-          );
-        });
-      })
-      .then(function () {
-        // Step 3 — Register the pristine new service worker
-        return navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' });
-      })
+      .register('/app/sw.js', { scope: '/app/' })
       .then(function (reg) {
         console.log('[RenterIQ] ✅ Service Worker registered. Scope:', reg.scope);
+        // Store the registration globally so FCM can use it
+        window.__RIQ_SW_REG__ = reg;
+        // Check for updates every 60 seconds (catches new deploys)
+        setInterval(function () { reg.update(); }, 60000);
       })
       .catch(function (err) {
-        console.warn('[RenterIQ] ⚠️ SW setup error:', err);
+        console.warn('[RenterIQ] ⚠️ SW registration error:', err);
       });
   }
 

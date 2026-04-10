@@ -10,6 +10,7 @@ var APP_SHELL = [
   '/app/js/pwa-init.js',
   '/app/js/storage.js',
   '/app/js/credits.js',
+  '/app/js/push-notifications.js',
   '/app/js/firebase-init.js',
   '/app/js/auth-guard.js',
   '/app/js/searchService.js',
@@ -95,6 +96,61 @@ self.addEventListener('fetch', function (event) {
         }
         return response;
       });
+    })
+  );
+});
+
+// ── Push notifications ──────────────────────────────────────────────────────
+// FCM sends a push message → SW wakes up → shows a native notification.
+// The payload can include: title, body, icon, url (click target).
+self.addEventListener('push', function (event) {
+  if (!event.data) return;
+
+  var payload = {};
+  try { payload = event.data.json(); } catch (e) {
+    // Plain text fallback
+    payload = { notification: { title: 'RenterIQ', body: event.data.text() } };
+  }
+
+  var n = payload.notification || payload.data || payload;
+  var title = n.title || 'RenterIQ';
+  var options = {
+    body: n.body || '',
+    icon: '/assets/icons/icon-192.png',
+    badge: '/assets/icons/icon-192.png',
+    tag: n.tag || 'riq-' + Date.now(),
+    data: { url: n.url || n.click_action || '/app/index.html' },
+    vibrate: [100, 50, 100],
+    actions: [
+      { action: 'open', title: 'Open' },
+      { action: 'dismiss', title: 'Dismiss' }
+    ]
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// ── Notification click → open the relevant page ──
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+
+  if (event.action === 'dismiss') return;
+
+  var url = (event.notification.data && event.notification.data.url) || '/app/index.html';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+      // If the app is already open, focus it and navigate
+      for (var i = 0; i < clientList.length; i++) {
+        var client = clientList[i];
+        if (client.url.indexOf('/app/') !== -1 && 'focus' in client) {
+          client.focus();
+          client.navigate(url);
+          return;
+        }
+      }
+      // Otherwise open a new window
+      if (clients.openWindow) return clients.openWindow(url);
     })
   );
 });

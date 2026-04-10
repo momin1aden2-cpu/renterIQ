@@ -17,6 +17,7 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
+<script src="/app/js/push-notifications.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -473,13 +474,29 @@ function dismissReminder(id) {
 }
 
 function requestPushPermission() {
-  if ('Notification' in window) {
+  if (!('Notification' in window)) {
+    showToast('Not supported', "Your browser doesn't support push notifications", '⚠️');
+    return;
+  }
+  // Use RIQPush if available (gets FCM token + stores in Firestore)
+  if (window.RIQPush) {
+    RIQPush.requestPermission().then(function(token) {
+      var banner = document.getElementById('pushBanner');
+      if (token || Notification.permission === 'granted') {
+        showToast('Push notifications enabled ✓', "You'll receive RenterIQ alerts on this device", '🔔');
+        if (banner) banner.style.display = 'none';
+      } else if (Notification.permission === 'denied') {
+        showToast('Notifications blocked', 'Enable in your browser or phone settings', '⚙');
+      }
+    });
+  } else {
+    // Fallback if push-notifications.js hasn't loaded
     Notification.requestPermission().then(function(perm) {
       var banner = document.getElementById('pushBanner');
       if (perm === 'granted') { showToast('Notifications enabled ✓', "You'll receive all RenterIQ alerts", '🔔'); if (banner) banner.style.display = 'none'; }
       else showToast('Notifications blocked', 'Enable in your browser or phone settings', '⚙');
     });
-  } else showToast('Not supported', "Your browser doesn't support push notifications", '⚠️');
+  }
 }
 
 function toggleNotifType(n) {
