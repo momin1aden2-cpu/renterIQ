@@ -7,8 +7,8 @@
 (function() {
   'use strict';
 
-  // Configuration
-  const REDIRECT_PATH = '../../index.html'; // Relative from /app/js/ to public/
+  // Configuration — redirect to in-app sign-in page (stays in PWA standalone mode)
+  const REDIRECT_PATH = '/app/pages/signin.html';
   const CHECK_INTERVAL = 1000; // Check every second if Firebase not ready
   const MAX_RETRIES = 10; // Maximum retries before giving up
 
@@ -101,14 +101,12 @@
    */
   function redirectToLanding() {
     // Prevent infinite redirect loops
-    if (window.location.pathname.includes(REDIRECT_PATH)) {
-      console.warn('[AuthGuard] Already on landing page, skipping redirect');
+    if (window.location.pathname.indexOf('signin') !== -1) {
+      console.warn('[AuthGuard] Already on sign-in page, skipping redirect');
       return;
     }
-    
-    console.log(`[AuthGuard] Redirecting to: ${REDIRECT_PATH}`);
-    
-    // Use replace to prevent back navigation to protected page
+
+    console.log('[AuthGuard] Redirecting to sign-in:', REDIRECT_PATH);
     window.location.replace(REDIRECT_PATH);
   }
 

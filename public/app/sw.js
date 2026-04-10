@@ -15,6 +15,7 @@ var APP_SHELL = [
   '/app/js/searchService.js',
   '/app/manifest.json',
   '/app/track-share.html',
+  '/app/pages/signin.html',
   '/app/pages/vault.html',
   '/app/pages/inspection.html',
   '/app/pages/entry-audit.html',
