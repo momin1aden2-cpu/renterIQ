@@ -300,6 +300,12 @@ function init(){
   var data = loadBond();
   if(data && data.amount && data.authority && data.referenceNumber && data.lodgeDate){
     renderSummary(data);
+  } else if(data) {
+    // Pre-fill form with partial data (e.g. from lease extraction)
+    var amtEl = document.getElementById('bondAmount');
+    var addrEl = document.getElementById('bondAddress');
+    if(amtEl && data.amount) amtEl.value = data.amount;
+    if(addrEl && data.address) addrEl.value = data.address;
   }
 }
 

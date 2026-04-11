@@ -275,6 +275,11 @@
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+    <!-- Disclaimer -->
+    <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.15);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start">
+      <span style="font-size:14px;flex-shrink:0">ℹ️</span>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:#7A5500;line-height:1.55">Personal summary only — not legal advice. Contact your state tenancy authority for legal questions.</div>
+    </div>
     <!-- Tenant Control Note -->
     <div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:13px 15px;margin-bottom:16px">
       <div style="font-weight:700;font-size:12.5px;color:var(--teal-dk);line-height:1.6">✓ You're in control — read each clause at your own pace. Mark it as understood when you're ready. Nothing is confirmed without you.</div>
@@ -432,6 +437,11 @@
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+    <!-- Disclaimer -->
+    <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.15);border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start">
+      <span style="font-size:14px;flex-shrink:0">ℹ️</span>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:#7A5500;line-height:1.55">This is a personal summary to help you understand your lease — it is not legal advice. For legal questions, contact your state tenancy authority.</div>
+    </div>
     <!-- Completion Card -->
     <div style="background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
       <div style="display:flex;gap:14px;align-items:center">
@@ -578,9 +588,15 @@
       <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--teal);margin-top:10px;display:block">Start Move-In Audit →</span>
     </div>
 
-    <!-- Action Buttons -->
+    <!-- Signed Lease → Post-Signing Setup -->
+    <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Signed the lease?</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Great — let's get everything set up for your new tenancy. We'll use the details from your lease so you don't have to enter them again.</div>
+      <button style="width:100%;background:linear-gradient(135deg,var(--teal),var(--teal-dk));color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer" onclick="startPostSigningSetup()">I've Signed — Set Everything Up →</button>
+    </div>
+
+    <!-- Not signing yet -->
     <div style="display:flex;flex-direction:column;gap:10px">
-      <button class="btn-blue-c btn-full" style="border-radius:14px" onclick="navigate('/app/pages/inspection.html')">Start Move-In Condition Audit</button>
       <button class="btn-outline-c btn-full" style="border-radius:14px" onclick="navigate('/app/pages/vault.html')">View in Vault</button>
       <button style="background:transparent;color:var(--muted);width:100%;padding:12px;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;text-align:center;min-height:44px" onclick="navigate('/app/index.html')">Back to Home</button>
     </div>
@@ -764,6 +780,8 @@ function startAnalysisCore(){
       }
       if(window.RIQPayments)RIQPayments.recordPurchase('lease_review');
       finishAnimation();
+      saveLeaseToVault(data);
+      extractLeaseKeyTerms(data);
       if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function') RIQPayments.promptCloudSync();
     })
     .catch(function(err){
@@ -1032,6 +1050,179 @@ document.addEventListener('DOMContentLoaded',function(){
     if(ld.pmPhone&&document.getElementById('ld-pmPhone'))document.getElementById('ld-pmPhone').value=ld.pmPhone;
   }catch(e){}
 });
+
+// Post-signing setup — pre-fill bond and rent from lease terms
+function startPostSigningSetup() {
+  var terms = {};
+  try { terms = JSON.parse(localStorage.getItem('riq_lease_terms') || '{}'); } catch(e) {}
+
+  // Update tracked property status to lease_signed
+  try {
+    var tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]');
+    var updated = false;
+    tracked.forEach(function(p) {
+      if (p && (p.status === 'lease_offered' || p.status === 'applied' || p.status === 'inspected')) {
+        var addr = (terms.address || '').toLowerCase();
+        var pAddr = (p.address || p.label || '').toLowerCase();
+        if (addr && pAddr && (addr.indexOf(pAddr.split(',')[0]) !== -1 || pAddr.indexOf(addr.split(',')[0]) !== -1)) {
+          p.status = 'lease_signed';
+          p.leaseSignedAt = Date.now();
+          updated = true;
+        }
+      }
+    });
+    // If no match found, update the most recently applied one
+    if (!updated) {
+      var applied = tracked.filter(function(p) { return p && (p.status === 'lease_offered' || p.status === 'applied'); });
+      if (applied.length) {
+        applied[0].status = 'lease_signed';
+        applied[0].leaseSignedAt = Date.now();
+      }
+    }
+    localStorage.setItem('renteriq_tracked_properties', JSON.stringify(tracked));
+  } catch(e) {}
+
+  // Pre-fill bond tracker from lease terms
+  if (terms.bondAmount) {
+    try {
+      var bondData = JSON.parse(localStorage.getItem('riq_bond_tracker') || '{}');
+      if (!bondData.amount) {
+        var amt = String(terms.bondAmount).replace(/[^0-9.]/g, '');
+        if (amt) bondData.amount = parseFloat(amt);
+        if (terms.address) bondData.address = terms.address;
+        localStorage.setItem('riq_bond_tracker', JSON.stringify(bondData));
+      }
+    } catch(e) {}
+  }
+
+  // Pre-fill rent tracker from lease terms
+  if (terms.rentWeekly) {
+    try {
+      var rentData = JSON.parse(localStorage.getItem('riq_rent_tracker') || '{}');
+      if (!rentData.amount) {
+        var rentAmt = String(terms.rentWeekly).replace(/[^0-9.]/g, '');
+        if (rentAmt) rentData.amount = parseFloat(rentAmt);
+        if (terms.rentFrequency) {
+          var freq = terms.rentFrequency.toLowerCase();
+          if (freq.indexOf('fortnight') !== -1) rentData.frequency = 'fortnightly';
+          else if (freq.indexOf('month') !== -1) rentData.frequency = 'monthly';
+          else rentData.frequency = 'weekly';
+        } else {
+          rentData.frequency = 'weekly';
+        }
+        if (!rentData.payments) rentData.payments = [];
+        localStorage.setItem('riq_rent_tracker', JSON.stringify(rentData));
+      }
+    } catch(e) {}
+  }
+
+  // Show guided setup modal
+  showPostSigningModal(terms);
+}
+
+function showPostSigningModal(terms) {
+  var existing = document.getElementById('riq-postsign-overlay');
+  if (existing) existing.remove();
+
+  var bondAmt = terms.bondAmount || '';
+  var rentAmt = terms.rentWeekly || '';
+  var addr = terms.address || '';
+
+  var overlay = document.createElement('div');
+  overlay.id = 'riq-postsign-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:100002;background:rgba(10,36,96,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .25s ease';
+
+  var card = document.createElement('div');
+  card.style.cssText = 'width:100%;max-width:430px;background:#fff;border-radius:22px 22px 0 0;padding:24px 20px calc(env(safe-area-inset-bottom,0px)+20px);transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.56,.64,1);max-height:85vh;overflow-y:auto';
+
+  card.innerHTML =
+    '<div style="width:40px;height:4px;background:var(--border);border-radius:100px;margin:0 auto 16px"></div>' +
+    '<div style="text-align:center;margin-bottom:20px"><div style="font-size:36px;margin-bottom:10px">🎉</div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Welcome to your new home</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6">Here\'s what to set up — we\'ve filled what we can from your lease.</div></div>' +
+
+    // Card 1: Bond
+    '<div style="background:var(--blue-xl);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="document.getElementById(\'riq-postsign-overlay\').remove();navigate(\'/app/pages/bond-tracker.html\')">' +
+      '<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🛡️</div>' +
+      '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond' + (bondAmt ? ' — ' + bondAmt : '') + '</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">' + (bondAmt ? 'Pre-filled — confirm and add receipt' : 'Set up your bond details') + '</div></div>' +
+      '<span style="color:var(--blue);font-size:14px">›</span>' +
+    '</div>' +
+
+    // Card 2: Rent
+    '<div style="background:var(--blue-xl);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="document.getElementById(\'riq-postsign-overlay\').remove();navigate(\'/app/pages/rent-tracker.html\')">' +
+      '<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-dk));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💰</div>' +
+      '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Rent Payments' + (rentAmt ? ' — ' + rentAmt + '/week' : '') + '</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">' + (rentAmt ? 'Pre-filled — set your rent day and start tracking' : 'Set up rent tracking and reminders') + '</div></div>' +
+      '<span style="color:var(--blue);font-size:14px">›</span>' +
+    '</div>' +
+
+    // Card 3: Move-in report
+    '<div style="background:rgba(0,200,150,.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="document.getElementById(\'riq-postsign-overlay\').remove();navigate(\'/app/pages/entry-audit.html\')">' +
+      '<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#065F46,#10B981);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📸</div>' +
+      '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Move-In Condition Report</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">Document everything before unpacking — protects your bond</div></div>' +
+      '<span style="color:var(--blue);font-size:14px">›</span>' +
+    '</div>' +
+
+    '<div style="margin-top:6px"><button style="width:100%;background:none;color:var(--muted);border:none;padding:12px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="this.closest(\'#riq-postsign-overlay\').remove();navigate(\'/app/index.html\')">I\'ll do this later — Go Home</button></div>';
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function() { overlay.style.opacity = '1'; requestAnimationFrame(function() { card.style.transform = 'translateY(0)'; }); });
+}
+
+// Save lease analysis to vault
+function saveLeaseToVault(data) {
+  try {
+    var leases = JSON.parse(localStorage.getItem('riq-vault-leases') || '[]');
+    var record = {
+      id: 'lease_' + Date.now(),
+      type: 'lease_review',
+      address: (data.summary && data.summary.property_address) || document.getElementById('setupAddress') && document.getElementById('setupAddress').value || '',
+      summary: data.summary || {},
+      clauseCount: data.clauses ? data.clauses.length : 0,
+      flaggedCount: data.clauses ? data.clauses.filter(function(c) { return c.rating !== 'standard'; }).length : 0,
+      date: Date.now()
+    };
+    leases.unshift(record);
+    localStorage.setItem('riq-vault-leases', JSON.stringify(leases));
+    if (window.RIQStore) {
+      RIQStore.ready.then(function() {
+        if (RIQStore.isAuthed()) RIQStore.write('leases', record.id, record);
+      });
+    }
+  } catch(e) {}
+}
+
+// Extract key terms from lease for post-signing setup
+function extractLeaseKeyTerms(data) {
+  try {
+    var terms = {};
+    if (data.summary) {
+      var s = data.summary;
+      if (s.weekly_rent || s.rent) terms.rentWeekly = s.weekly_rent || s.rent;
+      if (s.bond || s.bond_amount) terms.bondAmount = s.bond || s.bond_amount;
+      if (s.lease_start || s.start_date) terms.leaseStart = s.lease_start || s.start_date;
+      if (s.lease_end || s.end_date) terms.leaseEnd = s.lease_end || s.end_date;
+      if (s.property_address || s.address) terms.address = s.property_address || s.address;
+      if (s.landlord || s.landlord_name) terms.landlord = s.landlord || s.landlord_name;
+      if (s.agent || s.agency) terms.agent = s.agent || s.agency;
+      if (s.rent_frequency) terms.rentFrequency = s.rent_frequency;
+      if (s.break_clause) terms.breakClause = s.break_clause;
+    }
+    // Also scan clauses for key data
+    if (data.clauses) {
+      data.clauses.forEach(function(c) {
+        var t = (c.title || '').toLowerCase();
+        if (t.indexOf('rent') !== -1 && !terms.rentWeekly && c.explanation) {
+          var rentMatch = c.explanation.match(/\$[\d,]+(?:\.\d{2})?\s*(?:per|\/)\s*week/i);
+          if (rentMatch) terms.rentWeekly = rentMatch[0];
+        }
+        if (t.indexOf('bond') !== -1 && !terms.bondAmount && c.explanation) {
+          var bondMatch = c.explanation.match(/\$[\d,]+(?:\.\d{2})?/);
+          if (bondMatch) terms.bondAmount = bondMatch[0];
+        }
+      });
+    }
+    localStorage.setItem('riq_lease_terms', JSON.stringify(terms));
+  } catch(e) {}
+}
 
 // Service Worker
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}

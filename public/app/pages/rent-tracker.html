@@ -137,6 +137,13 @@
 
     <button class="mark-paid-btn" onclick="openMethodModal()">Mark as Paid</button>
 
+    <!-- Rent Total -->
+    <div id="rentTotalCard" style="display:none;background:linear-gradient(135deg,var(--blue-dk),var(--blue-md));border-radius:16px;padding:16px 18px;margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px">Total Rent Paid</div>
+      <div id="rentTotalAmount" style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;color:#fff;margin-top:6px">$0</div>
+      <div id="rentTotalSub" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.6);margin-top:4px"></div>
+    </div>
+
     <div class="history-section">
       <div class="history-title">Payment History</div>
       <div id="historyList"></div>
@@ -397,6 +404,19 @@ function renderHistory() {
   }).join('');
 
   container.innerHTML += '<button class="clear-btn" onclick="clearHistory()">Clear History</button>';
+  renderRentTotal();
+}
+
+function renderRentTotal() {
+  var card = document.getElementById('rentTotalCard');
+  var amountEl = document.getElementById('rentTotalAmount');
+  var subEl = document.getElementById('rentTotalSub');
+  if (!card || !data.payments || !data.payments.length) { if(card) card.style.display = 'none'; return; }
+  var total = data.payments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
+  var count = data.payments.length;
+  amountEl.textContent = '$' + total.toLocaleString('en-AU');
+  subEl.textContent = count + ' payment' + (count !== 1 ? 's' : '') + ' recorded';
+  card.style.display = 'block';
 }
 
 function clearHistory() {
@@ -410,11 +430,24 @@ function init() {
   renderDayOptions();
   loadData();
 
-  if (data && data.amount) {
+  if (data && data.amount && data.rentDay !== undefined) {
     renderTracker();
   } else {
     document.getElementById('setupView').style.display = '';
     document.getElementById('trackerView').style.display = 'none';
+    // Pre-fill setup if partial data from lease
+    if (data && data.amount) {
+      var amtInput = document.getElementById('amountInput');
+      if (amtInput) amtInput.value = data.amount;
+    }
+    if (data && data.frequency) {
+      var freqBtns = document.querySelectorAll('.freq-btn');
+      freqBtns.forEach(function(b) {
+        b.classList.toggle('active', b.dataset.freq === data.frequency);
+        if (b.dataset.freq === data.frequency) selectedFreq = data.frequency;
+      });
+      renderDayOptions();
+    }
   }
 }
 
