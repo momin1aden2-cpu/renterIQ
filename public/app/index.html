@@ -2080,15 +2080,25 @@ function homeDeleteTracked(id) {
   homeRenderUpcoming();
 }
 
-function homeToggleDateForm(id) {
-  var f = document.getElementById('tc-date-' + id);
+function homeShowBookingOptions(id) {
+  var f = document.getElementById('tc-booking-' + id);
   if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
 }
 
-function homeSaveInspection(id) {
-  var d = document.getElementById('tc-d-' + id);
-  var t = document.getElementById('tc-t-' + id);
-  if (!d || !d.value) return;
+function homeEditBooking(id) {
+  var f = document.getElementById('tc-booking-' + id);
+  if (f) f.style.display = 'block';
+  var el = f || document.body;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function homeSaveBooking(id) {
+  var d = document.getElementById('tc-bd-' + id);
+  var t = document.getElementById('tc-bt-' + id);
+  if (!d || !d.value) {
+    showToast('Enter a date', 'Set the inspection date for your reminder', '📅');
+    return;
+  }
   var updated = null;
   var props = homeGetTracked().map(function(p) {
     if (p.id === id) {
@@ -2102,6 +2112,73 @@ function homeSaveInspection(id) {
   homeRenderTracked();
   homeRenderUpcoming();
   homeCheckReminders();
+  showToast('Inspection saved', 'You\'ll be reminded before ' + homeInspDisplay(d.value, t ? t.value : ''), '📅');
+}
+
+// Hidden file input for booking confirmation uploads
+var _bookingUploadPropId = '';
+function homeUploadBookingConfirmation(id) {
+  _bookingUploadPropId = id;
+  var input = document.getElementById('homeBookingFileInput');
+  if (!input) {
+    input = document.createElement('input');
+    input.type = 'file';
+    input.id = 'homeBookingFileInput';
+    input.accept = 'image/*,.pdf,.heic,.heif';
+    input.style.display = 'none';
+    input.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      homeProcessBookingConfirmation(file, _bookingUploadPropId);
+      input.value = '';
+    });
+    document.body.appendChild(input);
+  }
+  input.click();
+}
+
+function homeProcessBookingConfirmation(file, propId) {
+  showToast('Reading confirmation…', 'Extracting inspection date and time', '📎');
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var base64 = ev.target.result;
+    // Try to get the property address for hint
+    var prop = homeGetTracked().find(function(p) { return p.id === propId; });
+    var hint = prop ? (prop.address || prop.label || '') : '';
+
+    fetch('/api/extract-inspection-details', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64, hint: hint })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.date) {
+        // Auto-fill the date/time fields
+        var dEl = document.getElementById('tc-bd-' + propId);
+        var tEl = document.getElementById('tc-bt-' + propId);
+        if (dEl) dEl.value = data.date;
+        if (tEl && data.time) tEl.value = data.time;
+
+        // Show the form so user can verify
+        var f = document.getElementById('tc-booking-' + propId);
+        if (f) f.style.display = 'block';
+
+        var dispTime = data.time_display || data.time || '';
+        showToast('Details extracted', (data.date ? homeInspDisplay(data.date, data.time) : '') + (dispTime ? ' at ' + dispTime : '') + ' — please verify and save', '✅');
+      } else {
+        showToast('Could not find date', 'Try entering it manually below', '⚠️');
+        var f = document.getElementById('tc-booking-' + propId);
+        if (f) f.style.display = 'block';
+      }
+    })
+    .catch(function() {
+      showToast('Could not read confirmation', 'Enter the date and time manually', '⚠️');
+      var f = document.getElementById('tc-booking-' + propId);
+      if (f) f.style.display = 'block';
+    });
+  };
+  reader.readAsDataURL(file);
 }
 
 function homeStartAudit(id) {
@@ -2181,10 +2258,39 @@ function homeRenderTracked() {
           '<div class="tc-insp-sub">Inspection ' + (urg ? '— very soon!' : 'booked') + '</div></div>' +
         '</div>'
       : '';
-    var inspInfo = '';
+    // Booking info or prompt
+    var bookingRow = '';
     if (p.inspectionDate) {
-      inspInfo = '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--blue);margin-top:4px">📅 ' + homeInspDisplay(p.inspectionDate, p.inspectionTime) + '</div>';
+      var dd = homeInspDisplay(p.inspectionDate, p.inspectionTime);
+      bookingRow = '<div style="background:rgba(27,80,200,.06);border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;align-items:center;gap:10px">' +
+        '<span style="font-size:16px">' + (urg ? '🔔' : '📅') + '</span>' +
+        '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">' + dd + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">' + (urg ? 'Inspection very soon!' : 'Inspection booked') + '</div></div>' +
+        '<button style="background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;padding:4px" onclick="event.stopPropagation();homeEditBooking(\'' + p.id + '\')" title="Change">✏️</button>' +
+      '</div>';
+    } else if (p.status !== 'applied' && p.status !== 'inspecting' && p.status !== 'inspected') {
+      bookingRow = '<div style="background:rgba(245,166,35,.05);border:1px dashed rgba(245,166,35,.3);border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="homeShowBookingOptions(\'' + p.id + '\')">' +
+        '<span style="font-size:16px">📎</span>' +
+        '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--text)">Booked an inspection?</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted)">Add your confirmation for a reminder</div></div>' +
+        '<span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:var(--blue)">Add →</span>' +
+      '</div>';
     }
+
+    // Booking input form (hidden by default)
+    var bookingForm = '<div id="tc-booking-' + p.id + '" style="display:none;margin-top:8px;background:#fff;border:1px solid var(--border-lt);border-radius:12px;padding:14px">' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">Add inspection details</div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:10px">' +
+        '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-bottom:4px">DATE</div><input type="date" id="tc-bd-' + p.id + '" value="' + (p.inspectionDate||'') + '" min="' + new Date().toISOString().split('T')[0] + '" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:\'Nunito\',sans-serif;font-size:13px;box-sizing:border-box"></div>' +
+        '<div style="width:120px"><div style="font-family:\'Sora\',sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-bottom:4px">TIME</div><input type="time" id="tc-bt-' + p.id + '" value="' + (p.inspectionTime||'') + '" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:\'Nunito\',sans-serif;font-size:13px;box-sizing:border-box"></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:8px">' +
+        '<button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="homeSaveBooking(\'' + p.id + '\')">Save &amp; Set Reminder</button>' +
+        '<button style="background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="homeUploadBookingConfirmation(\'' + p.id + '\')">📎 Upload Confirmation</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:10px;color:var(--muted);text-align:center">Or just tap "Inspect Property" below — booking is optional, only needed for reminders</div>' +
+    '</div>';
+
     var primaryBtn = (p.status === 'inspecting')
       ? '<button class="tc-btn-primary" onclick="homeStartAudit(\''+p.id+'\')">📋 Continue Audit</button>'
       : (p.status === 'applied')
@@ -2202,7 +2308,7 @@ function homeRenderTracked() {
         '</div>' +
         '<span class="tc-status" style="background:'+st.bg+';color:'+st.color+'">' + st.label + '</span>' +
       '</div>' +
-      inspInfo +
+      bookingRow + bookingForm +
       '<div class="tc-actions">' +
         primaryBtn + listingBtn +
         '<button class="tc-btn-ghost" style="flex:0;min-width:44px;padding:10px 0" title="Remove" onclick="homeDeleteTracked(\''+p.id+'\')">&#10005;</button>' +
