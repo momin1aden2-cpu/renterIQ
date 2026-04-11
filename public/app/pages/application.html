@@ -739,6 +739,39 @@
       </div>
     </div>
 
+    <!-- Agent Form Upload + AI Pre-fill -->
+    <div style="margin:20px 16px 0;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div>
+        <div style="flex:1">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Agent sent you a form?</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5">Upload it and we'll pre-fill your details automatically. You review, then send it back.</div>
+        </div>
+      </div>
+      <input type="file" id="agentFormInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.heic,image/*" style="display:none">
+      <div id="agentFormZone" style="border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;background:var(--blue-xl);cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="document.getElementById('agentFormInput').click()">
+        <div style="font-size:28px;margin-bottom:8px">📎</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Upload Agent's Form</div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">PDF, Word, or photo of the form</div>
+      </div>
+      <!-- Processing state -->
+      <div id="agentFormProcessing" style="display:none;text-align:center;padding:20px">
+        <div style="font-size:32px;margin-bottom:10px;animation:pulse 2s infinite">📄</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Reading form fields...</div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px">Pre-filling from your saved details</div>
+      </div>
+      <!-- Result -->
+      <div id="agentFormResult" style="display:none">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--teal-dk);margin-bottom:12px;text-align:center">Pre-filled from your profile</div>
+        <div id="agentFormFields" style="background:var(--blue-xl);border-radius:12px;padding:14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.8;max-height:300px;overflow-y:auto;white-space:pre-wrap"></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn-outline flex-1" onclick="resetAgentForm()">Upload Another</button>
+          <button class="btn-blue flex-1" onclick="copyAgentFormResult()">Copy All</button>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:8px;text-align:center">Review the details, then paste into the agent's form or email it back.</div>
+      </div>
+    </div>
+
     <!-- Portal checklist -->
     <div style="margin:20px 16px 0;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Tick each step as you go:</div>
@@ -1404,6 +1437,71 @@ function togglePortalCheck(idx){
 function openPortal(url){
   showToast('Opening portal','Have your details ready — it takes 2 minutes','🔗');
   setTimeout(function(){window.open(url,'_blank')},600);
+}
+
+/* ── Agent Form Upload + AI Pre-fill ─── */
+var agentFormResultText = '';
+
+document.getElementById('agentFormInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+
+  var zone = document.getElementById('agentFormZone');
+  var processing = document.getElementById('agentFormProcessing');
+  var result = document.getElementById('agentFormResult');
+
+  zone.style.display = 'none';
+  processing.style.display = 'block';
+  result.style.display = 'none';
+
+  var resume = {};
+  try { resume = JSON.parse(localStorage.getItem(RESUME_KEY) || '{}'); } catch(e) {}
+
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var base64 = ev.target.result;
+
+    fetch('/api/prefill-form', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64, resume: resume })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      processing.style.display = 'none';
+      if (data.error) {
+        showToast('Could not read form', data.error, '⚠️');
+        zone.style.display = 'block';
+        return;
+      }
+      agentFormResultText = data.prefilled || data.result || '';
+      document.getElementById('agentFormFields').textContent = agentFormResultText;
+      result.style.display = 'block';
+    })
+    .catch(function(err) {
+      processing.style.display = 'none';
+      zone.style.display = 'block';
+      showToast('Error', 'Could not process the form — try a clearer image', '⚠️');
+    });
+  };
+  reader.readAsDataURL(file);
+});
+
+function resetAgentForm() {
+  document.getElementById('agentFormZone').style.display = 'block';
+  document.getElementById('agentFormProcessing').style.display = 'none';
+  document.getElementById('agentFormResult').style.display = 'none';
+  document.getElementById('agentFormInput').value = '';
+  agentFormResultText = '';
+}
+
+function copyAgentFormResult() {
+  if (!agentFormResultText) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(agentFormResultText).then(function() {
+      showToast('Copied', 'Pre-filled details copied — paste into the form or email', '📋');
+    });
+  }
 }
 
 /* ── Init ─────────────────────────────────────────────────── */

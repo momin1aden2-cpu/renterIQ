@@ -325,33 +325,89 @@
     <div class="sh-sub" id="sumAddr">Your notes from today</div>
   </header>
   <div class="content" style="padding:16px 16px 120px">
+
     <!-- Verdict -->
-    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Overall Verdict</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">What's your verdict?</div>
     <div style="display:flex;gap:8px;margin-bottom:18px">
       <button class="verdict-btn" id="vYes" onclick="setVerdict('yes')"><span style="font-size:22px">😍</span>Would Apply</button>
       <button class="verdict-btn" id="vMaybe" onclick="setVerdict('maybe')"><span style="font-size:22px">🤔</span>Maybe</button>
       <button class="verdict-btn" id="vNo" onclick="setVerdict('no')"><span style="font-size:22px">❌</span>Pass</button>
     </div>
+
     <!-- Area summary -->
     <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Areas</div>
     <div class="card" style="margin-bottom:14px" id="sumAreas"></div>
+
     <!-- Red flags -->
     <div id="sumFlagsWrap" style="display:none;margin-bottom:14px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#991B1B;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚠️ Red Flags Noted</div>
       <div class="card" id="sumFlags"></div>
     </div>
-    <!-- Overall notes -->
+
+    <!-- Notes -->
     <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Extra Notes</div>
     <div class="card" style="margin-bottom:18px">
       <textarea class="notes-f" id="sumNotes" placeholder="Any other thoughts about this property…" style="min-height:80px"></textarea>
     </div>
-    <!-- Actions -->
-    <button class="btn-blue" style="margin-bottom:10px" onclick="navigate('/app/pages/application.html')">✍️ Apply for this Property →</button>
-    <button class="btn-outline" style="margin-bottom:10px" onclick="saveAndGoHome()">💾 Save &amp; Go Home</button>
-    <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:13px;padding:13px 15px;display:flex;gap:11px;align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/entry-audit.html')">
-      <span style="font-size:20px;flex-shrink:0">📸</span>
-      <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Moved in? Do your Move-In Inspection</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Document condition before you unpack — protects your bond.</div></div>
-      <span style="font-size:16px;color:var(--muted)">›</span>
+
+    <!-- VERDICT-DRIVEN ACTION AREA -->
+    <div id="verdictActions" style="display:none">
+
+      <!-- WOULD APPLY FLOW -->
+      <div id="verdictApply" style="display:none">
+        <div style="background:linear-gradient(135deg,#065F46,#10B981);border-radius:18px;padding:20px;margin-bottom:14px">
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:#fff;margin-bottom:8px">Let's get your application ready</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.8);line-height:1.6">Your inspection report will be saved to your Vault. Here's where your application stands:</div>
+        </div>
+
+        <!-- Readiness checklist -->
+        <div style="background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border-lt);margin-bottom:14px">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:14px">Application Readiness</div>
+          <div style="display:flex;flex-direction:column;gap:10px" id="readinessChecklist"></div>
+        </div>
+
+        <button class="btn-blue" style="margin-bottom:10px;font-size:15px;padding:16px" onclick="saveAndApply()">Start Application →</button>
+        <button class="btn-outline" style="margin-bottom:10px" onclick="saveAndGoHome()">Save for Later</button>
+      </div>
+
+      <!-- MAYBE FLOW -->
+      <div id="verdictMaybe" style="display:none">
+        <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:16px;padding:18px;margin-bottom:14px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:24px;flex-shrink:0">📌</span>
+            <div>
+              <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">Saved to your property list</div>
+              <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Your inspection notes and photos are saved. Come back anytime to review or start your application.</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-blue" style="margin-bottom:10px" onclick="saveAndGoHome()">Save &amp; Go Home</button>
+      </div>
+
+      <!-- PASS FLOW -->
+      <div id="verdictPass" style="display:none">
+        <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:16px;padding:18px;margin-bottom:14px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:24px;flex-shrink:0">🚫</span>
+            <div>
+              <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">Not the right fit</div>
+              <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">No problem. Want to keep this report for comparison, or remove it?</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-outline" style="margin-bottom:10px" onclick="saveAndGoHome()">Keep Report &amp; Go Home</button>
+        <button style="width:100%;background:none;border:2px solid rgba(239,68,68,.3);border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--red);cursor:pointer" onclick="deleteAndGoHome()">Delete Report &amp; Go Home</button>
+      </div>
+
+    </div>
+
+    <!-- Move-in link (always visible after save) -->
+    <div id="moveInLink" style="display:none;margin-top:14px">
+      <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:13px;padding:13px 15px;display:flex;gap:11px;align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="navigate('/app/pages/entry-audit.html')">
+        <span style="font-size:20px;flex-shrink:0">📸</span>
+        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Moved in? Do your Move-In Inspection</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Document condition before you unpack — protects your bond.</div></div>
+        <span style="font-size:16px;color:var(--muted)">›</span>
+      </div>
     </div>
   </div>
 </div>
@@ -1016,32 +1072,121 @@ function updateProgress(){var rated=0;AREAS.forEach(function(a){if(inspectionDat
 function toggleQ(i){var row=document.getElementById('q'+i);var wrap=document.getElementById('qa'+i);var tick=document.getElementById('qt'+i);var isOpen=wrap.classList.contains('open');wrap.classList.toggle('open');row.classList.toggle('asked');tick.textContent=isOpen?'':'✓'}
 function finishWalkthrough(){renderSummary();switchView('E')}
 function renderSummary(){var addr=inspectionData.address||'Property';document.getElementById('sumAddr').textContent=addr;var html='';AREAS.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.condition){html+='<div class="sum-area-row"><div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+area.icon+' '+area.name+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">'+{good:'Good',issues:'Issues',concern:'Concerns'}[d.condition]+'</div></div><span class="verdict-btn v-'+d.condition+'-sel" style="width:80px;cursor:default">'+{good:'✓ Good',issues:'⚠ Issues',concern:'❌ Concerns'}[d.condition]+'</span></div>'}});document.getElementById('sumAreas').innerHTML=html||'<div style="font-weight:600;font-size:13px;color:var(--muted);text-align:center;padding:20px">No areas rated yet</div>';var allFlags=[];AREAS.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.redFlags)allFlags=allFlags.concat(d.redFlags.map(function(f){return{area:area.name,flag:f}}))});if(allFlags.length){var fhtml='';allFlags.forEach(function(f){fhtml+='<div class="sum-area-row"><div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+f.flag+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">'+f.area+'</div></div></div>'});document.getElementById('sumFlags').innerHTML=fhtml;document.getElementById('sumFlagsWrap').style.display='block'}else{document.getElementById('sumFlagsWrap').style.display='none'}}
-function setVerdict(v){['yes','maybe','no'].forEach(function(x){document.getElementById('v'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('v-'+x+'-sel')});document.getElementById('v'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('v-'+v+'-sel');inspectionData.verdict=v}
+function setVerdict(v){
+  ['yes','maybe','no'].forEach(function(x){document.getElementById('v'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('v-'+x+'-sel')});
+  document.getElementById('v'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('v-'+v+'-sel');
+  inspectionData.verdict=v;
+
+  // Show verdict-driven actions
+  document.getElementById('verdictActions').style.display='block';
+  document.getElementById('verdictApply').style.display=v==='yes'?'block':'none';
+  document.getElementById('verdictMaybe').style.display=v==='maybe'?'block':'none';
+  document.getElementById('verdictPass').style.display=v==='no'?'block':'none';
+
+  // Show move-in link for "yes" verdict
+  document.getElementById('moveInLink').style.display=v==='yes'?'block':'none';
+
+  // Build readiness checklist for "Would Apply"
+  if(v==='yes') buildReadinessChecklist();
+
+  // Smooth scroll to actions
+  setTimeout(function(){ document.getElementById('verdictActions').scrollIntoView({behavior:'smooth',block:'start'}); },200);
+}
+
+function buildReadinessChecklist(){
+  var list=document.getElementById('readinessChecklist');
+  if(!list)return;
+
+  var resume={};
+  try{resume=JSON.parse(localStorage.getItem('riq-resume')||'{}');}catch(e){}
+
+  var personalDocs={};
+  try{personalDocs=JSON.parse(localStorage.getItem('riq_personal_docs')||'{}');}catch(e){}
+
+  var checks=[
+    {label:'Personal Details',sub:'Name, email, mobile, address',ready:!!(resume.fullName&&resume.email&&resume.mobile),icon:'👤'},
+    {label:'Employment Info',sub:'Employer, job title, income',ready:!!(resume.employer&&resume.jobTitle),icon:'💼'},
+    {label:'Rental History',sub:'Previous address and landlord/agent',ready:!!(resume.prevAddress&&resume.prevAgency),icon:'🏠'},
+    {label:'ID Documents',sub:'100-point ID check',ready:!!(personalDocs.idScore&&personalDocs.idScore>=100),icon:'🪪'},
+    {label:'Pay Slips',sub:'Recent pay evidence',ready:!!(personalDocs.uploadedDocs&&(personalDocs.uploadedDocs['payslip1']||personalDocs.uploadedDocs.payslip1)),icon:'💰'},
+    {label:'References',sub:'At least 2 references',ready:!!(resume.ref1Name&&resume.ref2Name),icon:'📞'},
+    {label:'Cover Letter',sub:'Personalised letter for this property',ready:!!(resume.coverLetter||personalDocs.coverLetter),icon:'✉️'}
+  ];
+
+  var readyCount=checks.filter(function(c){return c.ready}).length;
+
+  var html='';
+  checks.forEach(function(c){
+    html+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;'+(c!==checks[checks.length-1]?'border-bottom:1px solid var(--border-lt);':'')+'">'
+      +'<div style="width:36px;height:36px;border-radius:10px;background:'+(c.ready?'rgba(16,185,129,.1)':'rgba(239,68,68,.06)')+';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">'+(c.ready?'✓':c.icon)+'</div>'
+      +'<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+c.label+'</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:'+(c.ready?'var(--teal-dk)':'var(--muted)')+'">'+( c.ready?'Ready':'Not yet — add in your application')+'</div></div>'
+      +'<span style="font-size:16px">'+(c.ready?'<span style="color:var(--teal-dk)">✓</span>':'<span style="color:var(--border)">○</span>')+'</span>'
+    +'</div>';
+  });
+
+  html+='<div style="margin-top:12px;padding:10px 12px;background:'+(readyCount>=5?'rgba(16,185,129,.08)':'var(--blue-xl)')+';border-radius:10px;text-align:center;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:'+(readyCount>=5?'var(--teal-dk)':'var(--blue)')+'">'+readyCount+' of '+checks.length+' ready'+(readyCount<checks.length?' — the app will guide you through the rest':'')+'</div>';
+
+  list.innerHTML=html;
+}
+
+function saveAndApply(){
+  inspectionData.notes=document.getElementById('sumNotes').value;
+  var key='renteriq_openhome_insp_'+Date.now();
+  localStorage.setItem(key,JSON.stringify(inspectionData));
+  saveToConditionReportsVault(inspectionData);
+  updateTrackedPropertyStatus(key);
+  showToast('Report saved','Opening your application…','✓');
+  setTimeout(function(){
+    // Pass property context to application page
+    try{
+      localStorage.setItem('riq_apply_context',JSON.stringify({
+        address:inspectionData.address||'',
+        rent:inspectionData.rent||'',
+        beds:inspectionData.beds||'',
+        propertyType:inspectionData.propertyType||'',
+        trackedId:inspectionData.trackedId||'',
+        inspectionKey:key
+      }));
+    }catch(e){}
+    navigate('/app/pages/application.html');
+  },800);
+}
+
+function deleteAndGoHome(){
+  // Remove tracked property if linked
+  if(inspectionData.trackedId){
+    try{
+      var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+      tracked=tracked.filter(function(p){return p&&p.id!==inspectionData.trackedId});
+      localStorage.setItem('renteriq_tracked_properties',JSON.stringify(tracked));
+    }catch(e){}
+  }
+  showToast('Removed','Property inspection deleted','🗑️');
+  setTimeout(function(){navigate('/app/index.html')},1000);
+}
+
+function updateTrackedPropertyStatus(key){
+  if(!inspectionData.trackedId)return;
+  try{
+    var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+    var idx=tracked.findIndex(function(p){return p&&p.id===inspectionData.trackedId});
+    if(idx!==-1){
+      tracked[idx].status='inspected';
+      tracked[idx].verdict=inspectionData.verdict||'';
+      tracked[idx].inspectedAt=Date.now();
+      tracked[idx].inspectionKey=key;
+      localStorage.setItem('renteriq_tracked_properties',JSON.stringify(tracked));
+      if(window.RIQStore){RIQStore.ready.then(function(){if(RIQStore.isAuthed())RIQStore.write('tracked-properties',tracked[idx].id,tracked[idx]);});}
+    }
+  }catch(e){}
+}
+
 function saveAndGoHome(){
   inspectionData.notes=document.getElementById('sumNotes').value;
   var key='renteriq_openhome_insp_'+Date.now();
   localStorage.setItem(key,JSON.stringify(inspectionData));
   saveToConditionReportsVault(inspectionData);
-  // ── Update the tracked property status with the verdict ──
-  if(inspectionData.trackedId){
-    try{
-      var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
-      var idx=tracked.findIndex(function(p){return p&&p.id===inspectionData.trackedId});
-      if(idx!==-1){
-        tracked[idx].status='inspected';
-        tracked[idx].verdict=inspectionData.verdict||'';
-        tracked[idx].inspectedAt=Date.now();
-        tracked[idx].inspectionKey=key;
-        localStorage.setItem('renteriq_tracked_properties',JSON.stringify(tracked));
-        // Cloud sync if available
-        if(window.RIQStore){
-          RIQStore.ready.then(function(){
-            if(RIQStore.isAuthed())RIQStore.write('tracked-properties',tracked[idx].id,tracked[idx]);
-          });
-        }
-      }
-    }catch(e){}
-  }
+  updateTrackedPropertyStatus(key);
   showToast('Saved','Your inspection notes are saved to your device and Vault','💾');
   setTimeout(function(){navigate('/app/index.html')},1500)
 }
