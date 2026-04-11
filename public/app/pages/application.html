@@ -760,15 +760,23 @@
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Reading form fields...</div>
         <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px">Pre-filling from your saved details</div>
       </div>
-      <!-- Result -->
+      <!-- Result: Review & Confirm -->
       <div id="agentFormResult" style="display:none">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--teal-dk);margin-bottom:12px;text-align:center">Pre-filled from your profile</div>
-        <div id="agentFormFields" style="background:var(--blue-xl);border-radius:12px;padding:14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.8;max-height:300px;overflow-y:auto;white-space:pre-wrap"></div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn-outline flex-1" onclick="resetAgentForm()">Upload Another</button>
-          <button class="btn-blue flex-1" onclick="copyAgentFormResult()">Copy All</button>
+        <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:10px 12px;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start">
+          <span style="font-size:16px;flex-shrink:0">⚠️</span>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:#7A5500;line-height:1.5">Review every field carefully before using. Edit anything that looks wrong — tap the text below to make changes.</div>
         </div>
-        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:8px;text-align:center">Review the details, then paste into the agent's form or email it back.</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px">Verify your details</div>
+        <div id="agentFormFields"></div>
+        <textarea id="agentFormEdit" style="width:100%;min-height:200px;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.8;resize:vertical;box-sizing:border-box;display:none" oninput="agentFormResultText=this.value"></textarea>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn-outline" style="flex:1" onclick="toggleFormEdit()">Edit</button>
+          <button class="btn-blue" style="flex:1" onclick="confirmAndCopyForm()">Confirm &amp; Copy</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn-outline" style="flex:1;font-size:12px" onclick="resetAgentForm()">Upload Different Form</button>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5">This output contains only your personal data. No RenterIQ branding or metadata is included.</div>
       </div>
     </div>
 
@@ -1476,21 +1484,20 @@ document.getElementById('agentFormInput').addEventListener('change', function(e)
       }
 
       if (data.type === 'filled_pdf' && data.pdf) {
-        // PDF was filled directly — show download button
         agentFormResultText = '';
         var fieldsEl = document.getElementById('agentFormFields');
         fieldsEl.innerHTML =
           '<div style="text-align:center;padding:16px">' +
             '<div style="font-size:36px;margin-bottom:12px">✅</div>' +
             '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">' + data.message + '</div>' +
-            '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:16px">The PDF has been filled with your profile data. Download it, review, and email it back to the agent.</div>' +
-            '<a href="' + data.pdf + '" download="RenterIQ-Application-Filled.pdf" style="display:inline-block;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer">Download Filled PDF</a>' +
+            '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px">Download, open the PDF, and review every field before sending to the agent.</div>' +
+            '<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:8px 12px;margin-bottom:16px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:#7A5500">⚠️ Check every field — some may need correction or completion.</div>' +
+            '<a href="' + data.pdf + '" download="Application-Filled.pdf" style="display:inline-block;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer">Download Filled PDF</a>' +
           '</div>';
         result.style.display = 'block';
       } else {
-        // Text fallback — show pre-filled text to copy
         agentFormResultText = data.prefilled || data.result || '';
-        document.getElementById('agentFormFields').textContent = agentFormResultText;
+        showFormReviewFields(agentFormResultText);
         result.style.display = 'block';
       }
     })
@@ -1503,19 +1510,65 @@ document.getElementById('agentFormInput').addEventListener('change', function(e)
   reader.readAsDataURL(file);
 });
 
+var agentFormEditMode = false;
+
 function resetAgentForm() {
   document.getElementById('agentFormZone').style.display = 'block';
   document.getElementById('agentFormProcessing').style.display = 'none';
   document.getElementById('agentFormResult').style.display = 'none';
   document.getElementById('agentFormInput').value = '';
   agentFormResultText = '';
+  agentFormEditMode = false;
 }
 
-function copyAgentFormResult() {
+function showFormReviewFields(text) {
+  var fieldsEl = document.getElementById('agentFormFields');
+  var lines = text.split('\n').filter(function(l) { return l.trim(); });
+  var html = '';
+  lines.forEach(function(line) {
+    var parts = line.split(':');
+    var label = parts[0] || '';
+    var value = parts.slice(1).join(':').trim();
+    var isMissing = value.indexOf('[NOT IN PROFILE') !== -1 || !value;
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border-lt);gap:8px">'
+      + '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--muted);min-width:100px;flex-shrink:0">' + label.trim() + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:' + (isMissing ? 'var(--red)' : 'var(--text)') + ';text-align:right;word-break:break-word">' + (value || '<span style="color:var(--red)">Missing</span>') + '</div>'
+      + '</div>';
+  });
+  fieldsEl.innerHTML = html;
+}
+
+function toggleFormEdit() {
+  var fieldsEl = document.getElementById('agentFormFields');
+  var editEl = document.getElementById('agentFormEdit');
+  agentFormEditMode = !agentFormEditMode;
+  if (agentFormEditMode) {
+    fieldsEl.style.display = 'none';
+    editEl.style.display = 'block';
+    editEl.value = agentFormResultText;
+    editEl.focus();
+  } else {
+    agentFormResultText = editEl.value;
+    showFormReviewFields(agentFormResultText);
+    fieldsEl.style.display = 'block';
+    editEl.style.display = 'none';
+  }
+}
+
+function confirmAndCopyForm() {
   if (!agentFormResultText) return;
+  // Strip any accidental RenterIQ references from the output
+  var clean = agentFormResultText
+    .replace(/RenterIQ/gi, '')
+    .replace(/renteriq\.com\.au/gi, '')
+    .replace(/Generated by.*$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  agentFormResultText = clean;
+
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(agentFormResultText).then(function() {
-      showToast('Copied', 'Pre-filled details copied — paste into the form or email', '📋');
+    navigator.clipboard.writeText(clean).then(function() {
+      showToast('Copied', 'Verified details copied — paste into the agent\'s form or email', '✓');
     });
   }
 }
