@@ -2128,6 +2128,8 @@ function homeStatusStyle(status) {
     tracked:          { label:'Saved',           bg:'rgba(90,107,138,.1)',   color:'var(--muted)' },
     inspection_booked:{ label:'Inspection Set',  bg:'rgba(27,80,200,.1)',    color:'var(--blue)' },
     inspecting:       { label:'Inspecting',      bg:'rgba(0,200,150,.1)',    color:'var(--teal-dk)' },
+    inspected:        { label:'Inspected',       bg:'rgba(27,80,200,.1)',    color:'var(--blue)' },
+    applied:          { label:'Applied',         bg:'rgba(0,200,150,.15)',   color:'var(--teal-dk)' },
     leasing:          { label:'Reviewing Lease', bg:'rgba(245,166,35,.1)',   color:'#7A5500' },
     moved_in:         { label:'Moved In',        bg:'rgba(0,200,150,.15)',   color:'var(--teal-dk)' }
   };
@@ -2179,20 +2181,17 @@ function homeRenderTracked() {
           '<div class="tc-insp-sub">Inspection ' + (urg ? '— very soon!' : 'booked') + '</div></div>' +
         '</div>'
       : '';
-    var dateForm =
-      '<div class="tc-date-form" id="tc-date-' + p.id + '" style="display:none">' +
-        '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:2px">Set Inspection Date & Time</div>' +
-        '<div class="tc-date-row">' +
-          '<input class="tc-date-input" type="date" id="tc-d-' + p.id + '" value="' + (p.inspectionDate||'') + '" min="' + new Date().toISOString().split('T')[0] + '">' +
-          '<input class="tc-date-input" type="time" id="tc-t-' + p.id + '" value="' + (p.inspectionTime||'') + '" style="max-width:130px">' +
-          '<button class="tc-date-save" onclick="homeSaveInspection(\''+p.id+'\')">✓ Save</button>' +
-        '</div>' +
-      '</div>';
+    var inspInfo = '';
+    if (p.inspectionDate) {
+      inspInfo = '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--blue);margin-top:4px">📅 ' + homeInspDisplay(p.inspectionDate, p.inspectionTime) + '</div>';
+    }
     var primaryBtn = (p.status === 'inspecting')
       ? '<button class="tc-btn-primary" onclick="homeStartAudit(\''+p.id+'\')">📋 Continue Audit</button>'
-      : '<button class="tc-btn-primary" onclick="homeToggleDateForm(\''+p.id+'\')">' + (p.inspectionDate ? '📅 Change Date' : '📅 Book Inspection') + '</button>';
-    var auditBtn = (p.status !== 'inspecting')
-      ? '<button class="tc-btn-ghost" onclick="homeStartAudit(\''+p.id+'\')">📋 Start Audit</button>'
+      : (p.status === 'applied')
+        ? '<button class="tc-btn-primary" style="background:var(--teal);color:#fff" disabled>✓ Applied</button>'
+        : '<button class="tc-btn-primary" onclick="homeStartAudit(\''+p.id+'\')">📋 Inspect Property</button>';
+    var listingBtn = p.url
+      ? '<button class="tc-btn-ghost" onclick="window.open(\''+p.url+'\',\'_blank\')">View Listing ↗</button>'
       : '';
     return '<div class="tracked-card" style="' + border + '">' +
       '<div class="tc-header">' +
@@ -2203,9 +2202,9 @@ function homeRenderTracked() {
         '</div>' +
         '<span class="tc-status" style="background:'+st.bg+';color:'+st.color+'">' + st.label + '</span>' +
       '</div>' +
-      inspRow + dateForm +
+      inspInfo +
       '<div class="tc-actions">' +
-        primaryBtn + auditBtn +
+        primaryBtn + listingBtn +
         '<button class="tc-btn-ghost" style="flex:0;min-width:44px;padding:10px 0" title="Remove" onclick="homeDeleteTracked(\''+p.id+'\')">&#10005;</button>' +
       '</div>' +
       '<a href="' + p.url + '" target="_blank" rel="noopener" class="tc-link">' + p.sourceName + ' <span style="font-size:10px">↗</span></a>' +

@@ -180,6 +180,18 @@
 
   <div style="flex:1;overflow-y:auto;padding-bottom:100px">
 
+    <!-- Property Context (shown when coming from inspection) -->
+    <div id="applyContextCard" style="display:none;margin:16px 16px 0">
+      <div style="background:linear-gradient(135deg,#065F46,#10B981);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏠</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px">Applying for</div>
+          <div id="applyContextAddr" style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;margin-top:2px"></div>
+          <div id="applyContextDetails" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.7);margin-top:2px"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Checklist -->
     <div style="margin:16px;background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text)">Your Application Checklist</div>
@@ -366,9 +378,22 @@
 
   </div>
 
+    <!-- Confirmation -->
+    <div style="margin:16px 0;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:14px 16px">
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+        <input type="checkbox" id="detailsConfirmCheck" style="width:20px;height:20px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;margin-top:2px">
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">I've reviewed all details above</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5">Everything is accurate and ready to be used in my application.</div>
+        </div>
+      </label>
+    </div>
+
+  </div>
+
   <div class="sticky-footer">
     <button class="btn-outline-c" onclick="switchView('A')">← Back</button>
-    <button class="btn-blue-c flex-1" style="border-radius:12px" onclick="saveAndNext('check-details','status-details','Details saved ✓','C')">Save & Next →</button>
+    <button class="btn-blue-c flex-1" style="border-radius:12px" onclick="confirmAndSaveDetails()">Save & Next →</button>
   </div>
 </div>
 
@@ -1437,9 +1462,78 @@ function togglePortalCheck(idx){
   var total=9;var done=Object.keys(portalChecked).length;
   var el=document.getElementById('portalProgress');
   if(el){
-    if(done===total){el.textContent='✓ All steps complete — application submitted!';el.style.color='var(--teal-dk)';showToast('Application submitted! 🎉','Save confirmation to your Vault','✅')}
+    if(done===total){
+      el.textContent='✓ All steps complete — application submitted!';
+      el.style.color='var(--teal-dk)';
+      onApplicationSubmitted();
+    }
     else{el.textContent=done+' of '+total+' steps complete';el.style.color='var(--muted)'}
   }
+}
+
+function onApplicationSubmitted(){
+  // Update tracked property status to "applied"
+  try{
+    var ctx=window._applyContext;
+    if(ctx&&ctx.trackedId){
+      var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+      var idx=tracked.findIndex(function(p){return p&&p.id===ctx.trackedId});
+      if(idx!==-1){
+        tracked[idx].status='applied';
+        tracked[idx].appliedAt=Date.now();
+        localStorage.setItem('renteriq_tracked_properties',JSON.stringify(tracked));
+        if(window.RIQStore){RIQStore.ready.then(function(){if(RIQStore.isAuthed())RIQStore.write('tracked-properties',tracked[idx].id,tracked[idx])});}
+      }
+    }
+    // Clear the apply context
+    localStorage.removeItem('riq_apply_context');
+  }catch(e){}
+
+  // Show post-submission modal
+  showSubmittedModal();
+}
+
+function showSubmittedModal(){
+  var existing=document.getElementById('riq-submitted-overlay');
+  if(existing)existing.remove();
+
+  var overlay=document.createElement('div');
+  overlay.id='riq-submitted-overlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:100002;background:rgba(10,36,96,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .25s ease';
+
+  var card=document.createElement('div');
+  card.style.cssText='width:100%;max-width:380px;background:#fff;border-radius:22px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.25);transform:scale(.9);transition:transform .3s cubic-bezier(.34,1.56,.64,1)';
+
+  var addr=window._applyContext?window._applyContext.address:'this property';
+
+  card.innerHTML=
+    '<div style="text-align:center;margin-bottom:20px">'+
+      '<div style="font-size:48px;margin-bottom:12px">🎉</div>'+
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:20px;color:var(--text)">Application Submitted</div>'+
+      '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6">Well done. Your application for '+addr+' is in the agent\'s hands now.</div>'+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;gap:10px">'+
+      '<button style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;cursor:pointer" onclick="navigate(\'/app/pages/vault.html\')">Save Confirmation to Vault</button>'+
+      '<button style="width:100%;background:var(--blue-xl);color:var(--blue);border:none;border-radius:12px;padding:14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;cursor:pointer" onclick="navigate(\'/app/pages/lease.html\')">Got a Lease? Review It</button>'+
+      '<button style="width:100%;background:none;color:var(--muted);border:none;padding:12px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="this.closest(\'#riq-submitted-overlay\').remove();navigate(\'/app/index.html\')">Go Home</button>'+
+    '</div>'+
+    '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5">Agents typically respond within 1–3 business days. If you receive a lease, upload it to RenterIQ for a free review before you sign.</div>';
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){overlay.style.opacity='1';requestAnimationFrame(function(){card.style.transform='scale(1)'})});
+}
+
+function confirmAndSaveDetails(){
+  var check=document.getElementById('detailsConfirmCheck');
+  if(!check||!check.checked){
+    showToast('Please confirm','Review your details and tick the confirmation box','⚠️');
+    check.closest('label').style.animation='shake 0.4s ease';
+    setTimeout(function(){check.closest('label').style.animation=''},400);
+    check.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  saveAndNext('check-details','status-details','Details saved ✓','C');
 }
 
 function openPortal(url){
@@ -1580,7 +1674,37 @@ document.addEventListener('DOMContentLoaded',function(){
     if(el){el.style.display=v==='A'?'flex':'none';el.style.flexDirection='column';el.style.minHeight='100vh'}
   });
   loadResume();
+  loadApplyContext();
 });
+
+function loadApplyContext(){
+  try{
+    var raw=localStorage.getItem('riq_apply_context');
+    if(!raw)return;
+    var ctx=JSON.parse(raw);
+    if(!ctx||!ctx.address)return;
+    // Show property context card
+    var card=document.getElementById('applyContextCard');
+    var addr=document.getElementById('applyContextAddr');
+    var details=document.getElementById('applyContextDetails');
+    if(card&&addr){
+      addr.textContent=ctx.address;
+      var parts=[];
+      if(ctx.rent)parts.push(ctx.rent+'/week');
+      if(ctx.beds)parts.push(ctx.beds+' bed');
+      if(ctx.propertyType&&ctx.propertyType!=='other')parts.push(ctx.propertyType);
+      if(details)details.textContent=parts.join(' · ');
+      card.style.display='block';
+    }
+    // Pre-fill cover letter "why this property" if empty
+    var whyEl=document.getElementById('cl-whyProperty');
+    if(whyEl&&!whyEl.value){
+      whyEl.value='I inspected '+ctx.address+' and it suits my needs perfectly.';
+    }
+    // Store context for portal status update
+    window._applyContext=ctx;
+  }catch(e){}
+}
 
 if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>
