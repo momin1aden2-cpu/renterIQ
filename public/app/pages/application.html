@@ -1474,9 +1474,25 @@ document.getElementById('agentFormInput').addEventListener('change', function(e)
         zone.style.display = 'block';
         return;
       }
-      agentFormResultText = data.prefilled || data.result || '';
-      document.getElementById('agentFormFields').textContent = agentFormResultText;
-      result.style.display = 'block';
+
+      if (data.type === 'filled_pdf' && data.pdf) {
+        // PDF was filled directly — show download button
+        agentFormResultText = '';
+        var fieldsEl = document.getElementById('agentFormFields');
+        fieldsEl.innerHTML =
+          '<div style="text-align:center;padding:16px">' +
+            '<div style="font-size:36px;margin-bottom:12px">✅</div>' +
+            '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">' + data.message + '</div>' +
+            '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:16px">The PDF has been filled with your profile data. Download it, review, and email it back to the agent.</div>' +
+            '<a href="' + data.pdf + '" download="RenterIQ-Application-Filled.pdf" style="display:inline-block;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer">Download Filled PDF</a>' +
+          '</div>';
+        result.style.display = 'block';
+      } else {
+        // Text fallback — show pre-filled text to copy
+        agentFormResultText = data.prefilled || data.result || '';
+        document.getElementById('agentFormFields').textContent = agentFormResultText;
+        result.style.display = 'block';
+      }
     })
     .catch(function(err) {
       processing.style.display = 'none';

@@ -728,7 +728,36 @@ async function runExitGenerationCore(){
     renderComparisonResults(aiComparisonData);
     switchView('F');
     if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function') RIQPayments.promptCloudSync();
+    if(window.RIQExport) exportExitReportPDF(aiComparisonData);
   },6200);
+}
+
+function exportExitReportPDF(data){
+  if(!window.RIQExport||!data)return;
+  var sections=[];
+  if(data.areas&&data.areas.length){
+    data.areas.forEach(function(area){
+      var content='';
+      if(area.entryCondition)content+='Entry: '+area.entryCondition+'\n';
+      if(area.exitCondition)content+='Exit: '+area.exitCondition+'\n';
+      if(area.comparison)content+=area.comparison+'\n';
+      if(area.suggestion)content+='Suggestion: '+area.suggestion;
+      sections.push({
+        heading:area.name||'Area',
+        badge:area.status||area.match||'',
+        content:content||'No comparison data'
+      });
+    });
+  }
+  if(data.summary)sections.push({heading:'Summary',content:data.summary});
+  if(data.bondRecovery)sections.push({heading:'Bond Recovery',content:data.bondRecovery});
+  RIQExport.generate({
+    title:'Exit-Guard Bond Shield Report',
+    subtitle:'Exit Condition Comparison',
+    date:new Date(),
+    sections:sections,
+    filename:'RenterIQ-ExitGuard-Report-'+new Date().toISOString().split('T')[0]+'.pdf'
+  });
 }
 
 function renderComparisonResults(data){
@@ -954,6 +983,7 @@ document.addEventListener('DOMContentLoaded',function(){
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>
 <script src="/app/js/sidebar.js"></script>
+<script src="/app/js/pdf-export.js" defer></script>
 
 
 <!-- Step journey navigation -->

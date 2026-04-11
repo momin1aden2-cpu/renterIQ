@@ -10,6 +10,7 @@ var APP_SHELL = [
   '/app/js/pwa-init.js',
   '/app/js/storage.js',
   '/app/js/payments.js',
+  '/app/js/pdf-export.js',
   '/app/js/push-notifications.js',
   '/app/js/firebase-init.js',
   '/app/js/auth-guard.js',

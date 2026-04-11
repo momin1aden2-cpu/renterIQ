@@ -367,6 +367,7 @@
         </div>
 
         <button class="btn-blue" style="margin-bottom:10px;font-size:15px;padding:16px" onclick="saveAndApply()">Start Application →</button>
+        <button class="btn-outline" style="margin-bottom:10px" onclick="exportInspectionPDF()">📄 Download PDF Report</button>
         <button class="btn-outline" style="margin-bottom:10px" onclick="saveAndGoHome()">Save for Later</button>
       </div>
 
@@ -382,6 +383,7 @@
           </div>
         </div>
         <button class="btn-blue" style="margin-bottom:10px" onclick="saveAndGoHome()">Save &amp; Go Home</button>
+        <button class="btn-outline" style="margin-bottom:10px" onclick="exportInspectionPDF()">📄 Download PDF Report</button>
       </div>
 
       <!-- PASS FLOW -->
@@ -1191,6 +1193,38 @@ function saveAndGoHome(){
   setTimeout(function(){navigate('/app/index.html')},1500)
 }
 
+function exportInspectionPDF(){
+  if(!window.RIQExport){showToast('Loading…','PDF library loading, try again in a moment','📄');return;}
+  var areas=window.AREAS||[];
+  var sections=[];
+  areas.forEach(function(area){
+    var d=inspectionData.areas[area.id]||{};
+    if(!d.condition)return;
+    var content='';
+    if(d.notes)content+=d.notes;
+    if(d.redFlags&&d.redFlags.length)content+=(content?'\n':'')+'Red flags: '+d.redFlags.join(', ');
+    sections.push({
+      heading:area.icon+' '+area.name,
+      badge:{good:'Good',issues:'Issues',concern:'Concerns'}[d.condition]||'',
+      content:content||'No notes',
+      photos:(d.photos||[]).slice(0,4)
+    });
+  });
+  var allFlags=[];
+  areas.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.redFlags)d.redFlags.forEach(function(f){allFlags.push(area.name+': '+f)})});
+  var verdictLabel={yes:'Would Apply',maybe:'Maybe',no:'Pass'}[inspectionData.verdict]||'';
+  if(verdictLabel)sections.unshift({heading:'Verdict',content:verdictLabel});
+  if(inspectionData.notes)sections.push({heading:'Additional Notes',content:inspectionData.notes});
+  RIQExport.generate({
+    title:'Open Home Inspection Report',
+    subtitle:inspectionData.address||'Property Inspection',
+    date:new Date(),
+    sections:sections,
+    redFlags:allFlags.length?allFlags:null,
+    filename:'RenterIQ-Inspection-'+(inspectionData.address||'Report').replace(/[^a-zA-Z0-9]/g,'-').replace(/-+/g,'-')+'.pdf'
+  });
+}
+
 function saveToConditionReportsVault(data){
   try{
     var raw=localStorage.getItem('riq_condition_reports')||'[]';
@@ -1468,6 +1502,7 @@ document.addEventListener('DOMContentLoaded', loadUserData);
 </script>
 
 <script src="/app/js/sidebar.js"></script>
+<script src="/app/js/pdf-export.js" defer></script>
 
 
 <!-- Step journey navigation -->
