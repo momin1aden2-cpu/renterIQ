@@ -18,7 +18,7 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
-<script src="/app/js/credits.js" defer></script>
+<script src="/app/js/payments.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -690,13 +690,6 @@ function renumberItems() {
 
 // ── Inspection Analysis ──
 function startAnalysis() {
-  if(window.RIQCredits){
-    RIQCredits.gate('routine_assist').then(function(ok){
-      if(!ok)return;
-      startAnalysisCore();
-    });
-    return;
-  }
   startAnalysisCore();
 }
 function startAnalysisCore() {
@@ -792,7 +785,6 @@ function tickStep(id) {
 }
 
 function onAnalysisComplete(data) {
-  if(window.RIQCredits)RIQCredits.consume('routine_assist');
   analysisData = data;
   taskCompleted = {};
   taskPhotos = {};

@@ -197,7 +197,7 @@
   <span style="font-size:16px">🛡️</span>
   <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#fff">Pay As You Go</span>
   <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.4)">·</span>
-  <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.55)">No subscription — buy credits when you need them</span>
+  <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.55)">No subscription — pay only when you need a report</span>
 </div>
 
 <div style="flex:1;padding-bottom:100px">
@@ -228,10 +228,10 @@
   <div class="settings-row" onclick="togglePushNotifs()"><span class="settings-icon">📱</span><div style="flex:1"><div class="settings-title">Push Notifications</div></div><div class="notif-toggle" id="pushMainToggle" style="background:var(--teal)"><div class="notif-toggle-dot" style="right:2px"></div></div><span class="settings-chevron" style="margin-left:8px">›</span></div>
 </div>
 
-<!-- SECTION 3: CREDITS & PURCHASES -->
-<div class="sec-label">Credits &amp; Purchases</div>
+<!-- SECTION 3: PURCHASES -->
+<div class="sec-label">Purchases</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
-  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">✦</span><div style="flex:1"><div class="settings-title">Your Credits</div><div class="settings-sub" id="creditBalanceSub">Loading…</div></div><span class="settings-right" id="creditBalanceRight" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--blue)">—</span><span class="settings-chevron" style="margin-left:8px">›</span></div>
+  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">💳</span><div style="flex:1"><div class="settings-title">Pricing &amp; Purchases</div><div class="settings-sub">See what's free, what's paid, and your history</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">☁️</span><div style="flex:1"><div class="settings-title">Cloud Sync</div><div class="settings-sub" id="cloudSyncSub">Local storage only — your data stays on this device</div></div><span class="settings-chevron">›</span></div>
 </div>
 
@@ -504,57 +504,51 @@
 </div>
 </div>
 
-<!-- VIEW E — CREDITS & PURCHASES -->
+<!-- VIEW E — PRICING & PURCHASES -->
 <div class="view" id="viewE" style="display:none">
 
 <header class="pr-header-sm">
   <div class="pr-row">
     <button class="pr-back" onclick="switchView('A')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">Profile</span></button>
   </div>
-  <div class="pr-title">Credits &amp; Purchases</div>
+  <div class="pr-title">Pricing &amp; Purchases</div>
   <div class="pr-sub">Pay only when you need it — no subscriptions</div>
 </header>
 
 <div style="flex:1;padding:16px;padding-bottom:100px">
 
-<!-- CREDIT BALANCE -->
+<!-- HOW IT WORKS -->
 <div style="background:linear-gradient(135deg,var(--blue-dk),var(--blue-md));border-radius:18px;padding:22px;margin-bottom:16px">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.6)">✦ Your Credits</span>
-    <span id="creditViewBadge" style="background:rgba(0,200,150,.25);color:var(--teal);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Beta User</span>
-  </div>
-  <div id="creditViewBalance" style="font-family:'Sora',sans-serif;font-weight:800;font-size:42px;color:#fff;margin-top:10px">0</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.65);margin-top:4px;line-height:1.6">Credits are used to unlock paid reports. They never expire. No hidden fees, no recurring charges.</div>
-  <button style="margin-top:16px;width:100%;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Coming soon','Credit purchases are being set up — check back shortly','✦')">Buy Credits →</button>
+  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff">Most of RenterIQ is free.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.65">You only pay when you need a high-value report to protect your bond. No subscription, no recurring fees, no surprises.</div>
 </div>
-
-<!-- WHAT'S FREE, WHAT COSTS CREDITS -->
-<div class="sec-label">How it works</div>
 
 <!-- FREE FOREVER SECTION -->
 <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
-  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px">Free forever — no credits needed</div>
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px">Free forever</div>
   <div style="display:flex;flex-direction:column;gap:8px">
     <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Property Search &amp; Tracker</span></div>
     <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Property Inspection (open homes)</span></div>
     <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Rental Application &amp; Cover Letter</span></div>
     <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">1st Lease Review (always free)</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Routine Inspection Assist</span></div>
     <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Renter Rights Hub (all states)</span></div>
     <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Maintenance Log</span></div>
     <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Document Vault (local storage)</span></div>
     <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Push Notifications &amp; Reminders</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Rent Payment Tracker</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Bond Tracker</span></div>
   </div>
 </div>
 
 <!-- PAID FEATURES -->
 <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
-  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px">Pay-per-event — only when you need it</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">No subscription. No recurring charges. Just one-off credits.</div>
+  <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px">Pay per report — only when you need it</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">One-time payment per report. No subscription. No recurring charges.</div>
   <div style="display:flex;flex-direction:column;gap:10px">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Review</div><div style="font-weight:600;font-size:11px;color:var(--muted)">2nd review onwards</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">1 credit · $4.99</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond-Shield Move-In</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Entry Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">3 credits · $15.99</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Routine Assist</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Routine Inspection Response</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">1 credit · $4.99</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit-Guard Bond Shield</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Exit Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">4 credits · $19.99</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Review</div><div style="font-weight:600;font-size:11px;color:var(--muted)">2nd review onwards</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">$4.99</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond-Shield Move-In</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Entry Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">$14.99</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit-Guard Bond Shield</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Exit Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">$19.99</span></div>
   </div>
 </div>
 
@@ -577,13 +571,13 @@
 <!-- NO HIDDEN FEES -->
 <div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:16px;padding:16px;margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--teal-dk);margin-bottom:6px">No hidden fees. No recurring charges.</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">RenterIQ only charges when you need a high-stakes report — lease reviews, condition reports, and bond protection. Credits never expire and there is no subscription.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">RenterIQ only charges when you need a high-stakes report — lease reviews, condition reports, and bond protection. You pay per report, not per month. No surprises.</div>
 </div>
 
-<!-- TRANSACTION HISTORY -->
+<!-- TRANSACTION HISTORY + TERMS -->
 <div style="background:#fff;border-radius:14px;border:1px solid var(--border-lt);overflow:hidden">
-  <div class="settings-row" onclick="showToast('No purchases yet','Your transaction history will appear here','📜')"><span class="settings-icon">📜</span><div style="flex:1"><div class="settings-title">Transaction History</div><div class="settings-sub">View all purchases and credit usage</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms &amp; Refund Policy</div><div class="settings-sub">Purchase terms, credits, and support</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="showToast('No purchases yet','Your purchase history will appear here','📜')"><span class="settings-icon">📜</span><div style="flex:1"><div class="settings-title">Purchase History</div><div class="settings-sub">View all past purchases</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="switchView('G')"><span class="settings-icon">📋</span><div style="flex:1"><div class="settings-title">Terms &amp; Refund Policy</div><div class="settings-sub">Purchase terms and support</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 </div>
@@ -650,17 +644,17 @@
 <!-- REFUND POLICY -->
 <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px">Refund Policy</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:10px">All credit purchases within RenterIQ are <strong style="color:var(--text)">final and non-refundable</strong>. Because credits are consumed instantly when you generate a report, we cannot reverse or undo usage.</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:10px">Credits never expire and carry no recurring charges. You only pay when you choose to use a premium feature.</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75">If you believe a charge was made in error or you experienced a technical issue that prevented delivery of your report, contact us at <strong style="color:var(--blue)">support@renteriq.com.au</strong> within 7 days. We review every case individually.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:10px">Each report purchase is a <strong style="color:var(--text)">one-time payment</strong> for that specific report. Because reports are generated and delivered instantly, purchases are final.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:10px">You always see the exact price before confirming. No recurring charges, no hidden fees.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75">If you believe a charge was made in error or a technical issue prevented delivery of your report, contact us at <strong style="color:var(--blue)">support@renteriq.com.au</strong> within 7 days. We review every case individually.</div>
 </div>
 
 <!-- PURCHASE TERMS -->
 <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px">Purchase Terms</div>
   <div style="display:flex;flex-direction:column;gap:10px">
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Credits</strong> — Purchased in packs via secure payment. Each premium tool lists its credit cost before you confirm. No hidden fees.</div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Cloud Sync</strong> — A one-time purchase that syncs your Vault across devices. Non-refundable once activated.</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Reports</strong> — Paid per report via secure Stripe checkout. Each tool shows the price before you confirm.</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Cloud Sync</strong> — A one-time $9.99 purchase that syncs your Vault across devices. Non-refundable once activated.</div>
     <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">No subscriptions</strong> — RenterIQ does not charge recurring fees. You will never be auto-billed.</div>
   </div>
 </div>
@@ -837,57 +831,35 @@ function toggleQuiet(){
   if(hours)hours.style.display=quietOn?'flex':'none';
 }
 
-/* --- CREDITS & BALANCE --- */
-function loadCreditBalance(){
-  var balEl=document.getElementById('creditBalanceRight');
-  var subEl=document.getElementById('creditBalanceSub');
-  var viewBalEl=document.getElementById('creditViewBalance');
+/* --- PURCHASES & CLOUD SYNC STATUS --- */
+function loadPurchaseState(){
   var cloudSubEl=document.getElementById('cloudSyncSub');
   var cloudStatusEl=document.getElementById('cloudSyncStatus');
-
-  // Default state (local only, 0 credits)
-  var credits=0;
   var cloudEnabled=false;
-  var leaseReviewCount=0;
 
-  // Try to read from Firestore via RIQStore, with localStorage fallback
-  if(window.RIQStore){
-    RIQStore.ready.then(function(){
-      if(!RIQStore.isAuthed())return;
-      RIQStore.read('state','credits').then(function(data){
-        if(!data)return;
-        credits=data.credits||0;
-        cloudEnabled=!!data.cloudSyncEnabled;
-        leaseReviewCount=data.leaseReviewCount||0;
-        renderCreditUI(credits,cloudEnabled,leaseReviewCount);
-      });
-    });
+  // Check payments state
+  if(window.RIQPayments){
+    var state=RIQPayments.getState();
+    if(state) cloudEnabled=!!state.cloudSyncEnabled;
   }
 
-  // Also check localStorage for cached credit state
-  try{
-    var cached=localStorage.getItem('riq_credit_state');
-    if(cached){
-      var c=JSON.parse(cached);
-      credits=c.credits||0;
-      cloudEnabled=!!c.cloudSyncEnabled;
-      leaseReviewCount=c.leaseReviewCount||0;
+  // Also check localStorage fallback
+  if(!cloudEnabled){
+    try{
+      var cached=localStorage.getItem('riq_payment_state');
+      if(cached){
+        var c=JSON.parse(cached);
+        cloudEnabled=!!c.cloudSyncEnabled;
+      }
+    }catch(e){}
+    // Legacy fallback
+    if(!cloudEnabled){
+      try{
+        var old=localStorage.getItem('riq_credit_state');
+        if(old) cloudEnabled=!!JSON.parse(old).cloudSyncEnabled;
+      }catch(e){}
     }
-  }catch(e){}
-
-  renderCreditUI(credits,cloudEnabled,leaseReviewCount);
-}
-
-function renderCreditUI(credits,cloudEnabled,leaseReviewCount){
-  var balEl=document.getElementById('creditBalanceRight');
-  var subEl=document.getElementById('creditBalanceSub');
-  var viewBalEl=document.getElementById('creditViewBalance');
-  var cloudSubEl=document.getElementById('cloudSyncSub');
-  var cloudStatusEl=document.getElementById('cloudSyncStatus');
-
-  if(balEl)balEl.textContent=String(credits);
-  if(subEl)subEl.textContent=credits===0?'No credits — buy when you need a report':credits+' credit'+(credits!==1?'s':'')+' available';
-  if(viewBalEl)viewBalEl.textContent=String(credits);
+  }
 
   if(cloudEnabled){
     if(cloudSubEl)cloudSubEl.textContent='☁️ Active — your data syncs across devices';
@@ -1447,8 +1419,8 @@ document.addEventListener('DOMContentLoaded',function(){
   // Update the new top-level state row subtitle
   updateProfileStateRowSubtitle();
 
-  // Load credit balance for the Credits & Purchases section
-  loadCreditBalance();
+  // Load purchase and cloud sync state
+  loadPurchaseState();
 
   // Pull profile from cloud (will only fill empty local fields)
   pullProfileFromCloud();

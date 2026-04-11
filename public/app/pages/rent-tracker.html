@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1B50C8">
+<meta name="description" content="Track your rent payments, due dates, and history — RenterIQ">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RenterIQ">
+<title>Rent Tracker — RenterIQ</title>
+<link rel="manifest" href="/app/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/app/css/app.css?v=5">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
+<script src="/app/js/pwa-init.js" defer></script>
+<style>
+
+.rt-header{background:linear-gradient(180deg,#0A2460 0%,#143388 100%);padding:16px 20px 28px;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 2px 16px rgba(10,36,96,.18)}
+.rt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.rt-back{background:none;border:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0;-webkit-tap-highlight-color:transparent}
+.rt-back-arrow{font-size:20px}
+.rt-gear{background:none;border:none;color:rgba(255,255,255,.8);font-size:22px;cursor:pointer;padding:6px;border-radius:8px;transition:background .2s}
+.rt-gear:active{background:rgba(255,255,255,.1)}
+.rt-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px}
+.rt-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.65);margin-top:3px}
+
+.content{padding:20px 16px 120px;max-width:600px;margin:0 auto}
+
+.setup-card{background:#fff;border-radius:20px;padding:32px 24px;border:1.5px solid var(--border-lt);box-shadow:var(--shadow-card)}
+.setup-title{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:4px}
+.setup-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:24px}
+.field-group{margin-bottom:20px}
+.field-label{display:block;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+.field-input{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-weight:600;font-size:16px;color:var(--text);background:#FAFCFF;outline:none;transition:border-color .2s,box-shadow .2s;box-sizing:border-box}
+.field-input:focus{border-color:var(--blue-md);box-shadow:0 0 0 3px rgba(46,99,224,.12)}
+.freq-group{display:flex;gap:8px}
+.freq-btn{flex:1;padding:12px 8px;border:1.5px solid var(--border);border-radius:12px;background:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);cursor:pointer;transition:all .2s;text-align:center}
+.freq-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 4px 12px rgba(27,80,200,.25)}
+.day-select{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:#FAFCFF;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7B99' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.save-btn{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-md) 100%);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:8px;transition:transform .15s,box-shadow .2s;box-shadow:0 4px 16px rgba(27,80,200,.3)}
+.save-btn:active{transform:scale(.97)}
+
+.due-card{background:#fff;border-radius:20px;padding:28px 24px;border:1.5px solid var(--border-lt);box-shadow:var(--shadow-card);text-align:center;margin-bottom:16px}
+.due-amount{font-family:'Sora',sans-serif;font-weight:800;font-size:32px;color:var(--text)}
+.due-label{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:4px}
+.due-countdown{display:inline-block;margin-top:12px;padding:6px 14px;border-radius:100px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px}
+.due-countdown.upcoming{background:rgba(0,200,150,.1);color:var(--teal-dk)}
+.due-countdown.today{background:rgba(27,80,200,.1);color:var(--blue)}
+.due-countdown.overdue{background:rgba(232,64,64,.1);color:var(--red)}
+
+.mark-paid-btn{width:100%;padding:18px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--teal) 0%,#00E5A8 100%);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-bottom:24px;transition:transform .15s,box-shadow .2s;box-shadow:0 4px 16px rgba(0,200,150,.3)}
+.mark-paid-btn:active{transform:scale(.97)}
+
+.method-modal-backdrop{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.method-modal-backdrop.active{display:flex}
+.method-modal{background:#fff;border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;animation:slideUp .25s ease-out}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.method-modal-title{font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:4px}
+.method-modal-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px}
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.method-opt{padding:14px;border:1.5px solid var(--border);border-radius:12px;background:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);cursor:pointer;text-align:center;transition:all .2s}
+.method-opt:active,.method-opt.selected{border-color:var(--teal);background:rgba(0,200,150,.08);color:var(--teal-dk)}
+.method-cancel{width:100%;padding:14px;border:1.5px solid var(--border);border-radius:12px;background:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer;text-align:center}
+
+.history-section{margin-top:8px}
+.history-title{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.history-empty{text-align:center;padding:32px 16px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted)}
+.history-item{background:#fff;border-radius:14px;padding:16px 18px;margin-bottom:10px;border:1.5px solid var(--border-lt);display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(10,36,96,.04)}
+.history-check{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#00E5A8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.history-check svg{width:14px;height:14px}
+.history-info{flex:1;min-width:0}
+.history-date{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.history-meta{font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px}
+.history-amount{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);flex-shrink:0}
+.method-badge{display:inline-block;padding:3px 8px;border-radius:6px;background:var(--blue-xl);font-family:'Sora',sans-serif;font-weight:600;font-size:10px;color:var(--blue);text-transform:capitalize}
+.clear-btn{display:block;margin:24px auto 0;padding:10px 20px;border:1.5px solid rgba(232,64,64,.3);border-radius:10px;background:none;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--red);cursor:pointer;transition:all .2s}
+.clear-btn:active{background:rgba(232,64,64,.06)}
+
+.hdr-avatar-mobile{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)}
+@media(min-width:900px){.hdr-avatar-mobile{display:none!important}}
+
+</style>
+</head>
+<body>
+<div class="app-shell">
+<div class="app-main">
+
+<header class="rt-header">
+  <div class="rt-row">
+    <button class="rt-back" onclick="navigate('/app/pages/tools.html')"><span class="rt-back-arrow">‹</span> Tools</button>
+    <button class="rt-gear" id="editSettingsBtn" style="display:none" onclick="showSetup()">⚙</button>
+  </div>
+  <div class="rt-title">Rent Tracker</div>
+  <div class="rt-sub">Stay on top of your payments</div>
+</header>
+
+<div class="content">
+
+  <div id="setupView">
+    <div class="setup-card">
+      <div class="setup-title">Set Up Your Rent</div>
+      <div class="setup-sub">Enter your rent details to start tracking payments</div>
+
+      <div class="field-group">
+        <label class="field-label">Rent Amount (AUD)</label>
+        <input type="number" class="field-input" id="rentAmount" placeholder="e.g. 520" inputmode="decimal" min="1">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Frequency</label>
+        <div class="freq-group">
+          <button class="freq-btn active" data-freq="weekly" onclick="setFreq(this)">Weekly</button>
+          <button class="freq-btn" data-freq="fortnightly" onclick="setFreq(this)">Fortnightly</button>
+          <button class="freq-btn" data-freq="monthly" onclick="setFreq(this)">Monthly</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" id="dayLabel">Rent Day (Day of Week)</label>
+        <select class="day-select" id="rentDay"></select>
+      </div>
+
+      <button class="save-btn" onclick="saveSetup()">Save &amp; Start Tracking</button>
+    </div>
+  </div>
+
+  <div id="trackerView" style="display:none">
+    <div class="due-card">
+      <div class="due-amount" id="dueAmount">$0</div>
+      <div class="due-label" id="dueDate">Next due: —</div>
+      <div class="due-countdown upcoming" id="dueCountdown">—</div>
+    </div>
+
+    <button class="mark-paid-btn" onclick="openMethodModal()">Mark as Paid</button>
+
+    <div class="history-section">
+      <div class="history-title">Payment History</div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="method-modal-backdrop" id="methodModal">
+  <div class="method-modal">
+    <div class="method-modal-title">Payment Method</div>
+    <div class="method-modal-sub">How did you pay this time?</div>
+    <div class="method-grid">
+      <button class="method-opt" data-method="bank_transfer" onclick="selectMethod(this)">Bank Transfer</button>
+      <button class="method-opt" data-method="cash" onclick="selectMethod(this)">Cash</button>
+      <button class="method-opt" data-method="card" onclick="selectMethod(this)">Card</button>
+      <button class="method-opt" data-method="other" onclick="selectMethod(this)">Other</button>
+    </div>
+    <button class="method-cancel" onclick="closeMethodModal()">Cancel</button>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab active" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+</nav>
+
+</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'riq_rent_tracker';
+const DAYS_OF_WEEK = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+let selectedFreq = 'weekly';
+let data = null;
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) data = JSON.parse(raw);
+  } catch(e) { data = null; }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function navigate(path) {
+  window.location.href = path;
+}
+
+function setFreq(btn) {
+  document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedFreq = btn.dataset.freq;
+  renderDayOptions();
+}
+
+function renderDayOptions() {
+  const sel = document.getElementById('rentDay');
+  const label = document.getElementById('dayLabel');
+  sel.innerHTML = '';
+
+  if (selectedFreq === 'monthly') {
+    label.textContent = 'Day of Month';
+    for (let i = 1; i <= 28; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = i + getSuffix(i);
+      sel.appendChild(opt);
+    }
+  } else {
+    label.textContent = 'Day of Week';
+    DAYS_OF_WEEK.forEach((d, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = d;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+function getSuffix(n) {
+  if (n >= 11 && n <= 13) return 'th';
+  switch (n % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+}
+
+function saveSetup() {
+  const amount = parseFloat(document.getElementById('rentAmount').value);
+  if (!amount || amount <= 0) {
+    document.getElementById('rentAmount').style.borderColor = 'var(--red)';
+    return;
+  }
+
+  const rentDay = parseInt(document.getElementById('rentDay').value);
+
+  if (!data) {
+    data = { amount, frequency: selectedFreq, rentDay, payments: [] };
+  } else {
+    data.amount = amount;
+    data.frequency = selectedFreq;
+    data.rentDay = rentDay;
+  }
+
+  saveData();
+  renderTracker();
+}
+
+function showSetup() {
+  document.getElementById('setupView').style.display = '';
+  document.getElementById('trackerView').style.display = 'none';
+  document.getElementById('editSettingsBtn').style.display = 'none';
+
+  if (data) {
+    document.getElementById('rentAmount').value = data.amount;
+    selectedFreq = data.frequency;
+    document.querySelectorAll('.freq-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.freq === selectedFreq);
+    });
+    renderDayOptions();
+    document.getElementById('rentDay').value = data.rentDay;
+  }
+}
+
+function renderTracker() {
+  document.getElementById('setupView').style.display = 'none';
+  document.getElementById('trackerView').style.display = '';
+  document.getElementById('editSettingsBtn').style.display = '';
+
+  document.getElementById('dueAmount').textContent = '$' + data.amount.toLocaleString('en-AU');
+
+  const nextDue = getNextDueDate();
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const diffDays = Math.round((nextDue - today) / (1000 * 60 * 60 * 24));
+  const formatted = nextDue.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+
+  document.getElementById('dueDate').textContent = 'Next due: ' + formatted;
+
+  const countdown = document.getElementById('dueCountdown');
+  if (diffDays > 0) {
+    countdown.textContent = 'Due in ' + diffDays + ' day' + (diffDays !== 1 ? 's' : '');
+    countdown.className = 'due-countdown upcoming';
+  } else if (diffDays === 0) {
+    countdown.textContent = 'Due today';
+    countdown.className = 'due-countdown today';
+  } else {
+    countdown.textContent = 'Overdue by ' + Math.abs(diffDays) + ' day' + (Math.abs(diffDays) !== 1 ? 's' : '');
+    countdown.className = 'due-countdown overdue';
+  }
+
+  renderHistory();
+}
+
+function getNextDueDate() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const lastPayment = data.payments.length > 0
+    ? new Date(data.payments[data.payments.length - 1].date + 'T00:00:00')
+    : null;
+
+  if (data.frequency === 'monthly') {
+    let candidate = new Date(today.getFullYear(), today.getMonth(), data.rentDay);
+    if (candidate <= today) {
+      candidate = new Date(today.getFullYear(), today.getMonth() + 1, data.rentDay);
+    }
+    if (lastPayment && candidate <= lastPayment) {
+      candidate = new Date(lastPayment.getFullYear(), lastPayment.getMonth() + 1, data.rentDay);
+    }
+    return candidate;
+  }
+
+  const intervalDays = data.frequency === 'fortnightly' ? 14 : 7;
+
+  let candidate = new Date(today);
+  const currentDay = candidate.getDay();
+  let diff = data.rentDay - currentDay;
+  if (diff < 0) diff += 7;
+  candidate.setDate(candidate.getDate() + diff);
+
+  if (candidate <= today) {
+    candidate.setDate(candidate.getDate() + intervalDays);
+  }
+
+  if (lastPayment) {
+    while (candidate <= lastPayment) {
+      candidate.setDate(candidate.getDate() + intervalDays);
+    }
+  }
+
+  return candidate;
+}
+
+function openMethodModal() {
+  document.getElementById('methodModal').classList.add('active');
+  document.querySelectorAll('.method-opt').forEach(b => b.classList.remove('selected'));
+}
+
+function closeMethodModal() {
+  document.getElementById('methodModal').classList.remove('active');
+}
+
+function selectMethod(btn) {
+  document.querySelectorAll('.method-opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+
+  const method = btn.dataset.method;
+  recordPayment(method);
+  closeMethodModal();
+}
+
+function recordPayment(method) {
+  const payment = {
+    date: new Date().toISOString().split('T')[0],
+    amount: data.amount,
+    method: method,
+    id: 'pay_' + Date.now().toString(36)
+  };
+
+  data.payments.push(payment);
+  saveData();
+  renderTracker();
+}
+
+function renderHistory() {
+  const container = document.getElementById('historyList');
+
+  if (!data.payments.length) {
+    container.innerHTML = '<div class="history-empty">No payments recorded yet</div>';
+    return;
+  }
+
+  const sorted = [...data.payments].reverse();
+  const methodLabels = { bank_transfer: 'Bank Transfer', cash: 'Cash', card: 'Card', other: 'Other' };
+
+  container.innerHTML = sorted.map(p => {
+    const d = new Date(p.date + 'T00:00:00');
+    const dateStr = d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+    return `
+      <div class="history-item">
+        <div class="history-check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="history-info">
+          <div class="history-date">${dateStr}</div>
+          <div class="history-meta"><span class="method-badge">${methodLabels[p.method] || p.method}</span></div>
+        </div>
+        <div class="history-amount">$${p.amount.toLocaleString('en-AU')}</div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML += '<button class="clear-btn" onclick="clearHistory()">Clear History</button>';
+}
+
+function clearHistory() {
+  if (!confirm('Clear all payment history? This cannot be undone.')) return;
+  data.payments = [];
+  saveData();
+  renderTracker();
+}
+
+function init() {
+  renderDayOptions();
+  loadData();
+
+  if (data && data.amount) {
+    renderTracker();
+  } else {
+    document.getElementById('setupView').style.display = '';
+    document.getElementById('trackerView').style.display = 'none';
+  }
+}
+
+init();
+</script>
+
+<script src="/app/js/sidebar.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/payments.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
+</body>
+</html>

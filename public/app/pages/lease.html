@@ -17,7 +17,7 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
-<script src="/app/js/credits.js" defer></script>
+<script src="/app/js/payments.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -708,8 +708,8 @@ var totalClauses=12;
 var understood={};
 
 function startAnalysis(){
-  if(window.RIQCredits){
-    RIQCredits.gate('lease_review').then(function(ok){
+  if(window.RIQPayments){
+    RIQPayments.gate('lease_review').then(function(ok){
       if(!ok)return;
       startAnalysisCore();
     });
@@ -762,8 +762,9 @@ function startAnalysisCore(){
         renderClauses(data);
         renderSummary(data);
       }
-      if(window.RIQCredits)RIQCredits.consume('lease_review');
+      if(window.RIQPayments)RIQPayments.recordPurchase('lease_review');
       finishAnimation();
+      if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function') RIQPayments.promptCloudSync();
     })
     .catch(function(err){
       console.error('Lease analysis error:',err);

@@ -1330,6 +1330,30 @@
     <!-- ── Contextual: Lease Expiry Reminder ──────────────── -->
     <div id="renewalCard" style="display:none;padding:16px 16px 0"></div>
 
+    <!-- ── Contextual: Rent Due Card ─────────────────────── -->
+    <div id="rentDueCard" style="display:none;padding:16px 16px 0">
+      <div style="background:#fff;border-radius:18px;padding:16px 18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="navigate('/app/pages/rent-tracker.html')">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--teal-dk));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💰</div>
+        <div style="flex:1">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)" id="rentDueTitle">Rent due soon</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px" id="rentDueSub"></div>
+        </div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal);white-space:nowrap">Track →</span>
+      </div>
+    </div>
+
+    <!-- ── Contextual: Bond Summary Card ─────────────────── -->
+    <div id="bondCard" style="display:none;padding:8px 16px 0">
+      <div style="background:#fff;border-radius:18px;padding:16px 18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="navigate('/app/pages/bond-tracker.html')">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛡️</div>
+        <div style="flex:1">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)" id="bondCardTitle">Bond Lodged</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px" id="bondCardSub"></div>
+        </div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);white-space:nowrap">Details →</span>
+      </div>
+    </div>
+
     <!-- ── Vault Snapshot ──────────────────────────────────── -->
     <div class="cv-auto" style="padding:20px 16px 0">
       <div class="sec-row">
@@ -2358,9 +2382,105 @@ function homeLoadVaultStats() {
   setCount('vsCountReceipts', Array.isArray(receipts) ? receipts.length : 0);
 }
 
+// ── Rent & Bond contextual cards ──
+function homeRenderRentCard() {
+  try {
+    var raw = localStorage.getItem('riq_rent_tracker');
+    if (!raw) return;
+    var data = JSON.parse(raw);
+    if (!data || !data.amount || !data.frequency) return;
+
+    var card = document.getElementById('rentDueCard');
+    var title = document.getElementById('rentDueTitle');
+    var sub = document.getElementById('rentDueSub');
+    if (!card) return;
+
+    var nextDue = calcNextRentDue(data);
+    if (!nextDue) return;
+
+    var now = new Date(); now.setHours(0,0,0,0);
+    var diff = Math.round((nextDue.getTime() - now.getTime()) / 86400000);
+    var amtStr = '$' + Number(data.amount).toLocaleString('en-AU');
+    var freqLabel = data.frequency === 'weekly' ? '/week' : data.frequency === 'fortnightly' ? '/fortnight' : '/month';
+
+    if (diff < 0) {
+      title.textContent = 'Rent overdue';
+      title.style.color = 'var(--red)';
+      sub.textContent = amtStr + freqLabel + ' · Overdue by ' + Math.abs(diff) + ' day' + (Math.abs(diff) !== 1 ? 's' : '');
+    } else if (diff === 0) {
+      title.textContent = 'Rent due today';
+      title.style.color = 'var(--red)';
+      sub.textContent = amtStr + freqLabel;
+    } else if (diff <= 3) {
+      title.textContent = 'Rent due in ' + diff + ' day' + (diff !== 1 ? 's' : '');
+      sub.textContent = amtStr + freqLabel + ' · ' + nextDue.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+    } else {
+      title.textContent = 'Next rent: ' + nextDue.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+      title.style.color = 'var(--text)';
+      sub.textContent = amtStr + freqLabel;
+    }
+    card.style.display = 'block';
+  } catch (e) {}
+}
+
+function calcNextRentDue(data) {
+  var now = new Date(); now.setHours(0,0,0,0);
+  var day = data.rentDay || 1;
+  var d;
+  if (data.frequency === 'monthly') {
+    d = new Date(now.getFullYear(), now.getMonth(), day);
+    if (d < now) d = new Date(now.getFullYear(), now.getMonth() + 1, day);
+  } else {
+    var interval = data.frequency === 'fortnightly' ? 14 : 7;
+    d = new Date(now);
+    var currentDay = d.getDay();
+    var daysUntil = (day - currentDay + 7) % 7;
+    if (daysUntil === 0 && data.payments && data.payments.length > 0) {
+      var lastPay = new Date(data.payments[data.payments.length - 1].date);
+      lastPay.setHours(0,0,0,0);
+      if (lastPay.getTime() === now.getTime()) daysUntil = interval;
+    }
+    d.setDate(d.getDate() + daysUntil);
+    if (data.frequency === 'fortnightly') {
+      var lastPayDate = data.payments && data.payments.length > 0 ? new Date(data.payments[data.payments.length - 1].date) : null;
+      if (lastPayDate) {
+        var daysSinceLast = Math.round((now.getTime() - lastPayDate.getTime()) / 86400000);
+        if (daysSinceLast < 14 && daysUntil < 7) d.setDate(d.getDate() + 7);
+      }
+    }
+  }
+  return d;
+}
+
+function homeRenderBondCard() {
+  try {
+    var raw = localStorage.getItem('riq_bond_tracker');
+    if (!raw) return;
+    var data = JSON.parse(raw);
+    if (!data || !data.amount) return;
+
+    var card = document.getElementById('bondCard');
+    var title = document.getElementById('bondCardTitle');
+    var sub = document.getElementById('bondCardSub');
+    if (!card) return;
+
+    var amtStr = '$' + Number(data.amount).toLocaleString('en-AU');
+    title.textContent = amtStr + ' Bond Lodged';
+    var parts = [];
+    if (data.authority) parts.push(data.authority);
+    if (data.lodgeDate) {
+      var lodge = new Date(data.lodgeDate);
+      var months = Math.round((Date.now() - lodge.getTime()) / (30.44 * 86400000));
+      if (months > 0) parts.push('Held for ' + months + ' month' + (months !== 1 ? 's' : ''));
+    }
+    sub.textContent = parts.join(' · ') || 'Tap to view details';
+    card.style.display = 'block';
+  } catch (e) {}
+}
+
 // ── Two-phase init ──
 // Phase 1 (sync, on DOMContentLoaded): paint above-the-fold from localStorage cache
-// Phase 2 (idle): cloud sync, system status, expensive bookkeeping
+// Phase 2 (idle): cloud sync, expensive bookkeeping
 function homeIdleInit() {
   homeEnsureLeaseRenewalReminders();
   homeUpdateBellBadge();
@@ -2372,6 +2492,8 @@ document.addEventListener('DOMContentLoaded', function() {
   homeRenderUpcoming();
   homeCheckReminders();
   homeLoadVaultStats();
+  homeRenderRentCard();
+  homeRenderBondCard();
   // Defer everything else until the browser is idle
   if ('requestIdleCallback' in window) {
     requestIdleCallback(homeIdleInit, { timeout: 1500 });
@@ -2405,7 +2527,7 @@ function updateHeaderAvatar(initials) {
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
-<script src="/app/js/credits.js" defer></script>
+<script src="/app/js/payments.js" defer></script>
 <script src="/app/js/push-notifications.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 </body>

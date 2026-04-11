@@ -17,7 +17,7 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
-<script src="/app/js/credits.js" defer></script>
+<script src="/app/js/payments.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1005,8 +1005,8 @@ function updateGenerateButton(){
 }
 
 function generateEntryReport(){
-  if(window.RIQCredits){
-    RIQCredits.gate('entry_condition').then(function(ok){
+  if(window.RIQPayments){
+    RIQPayments.gate('entry_condition').then(function(ok){
       if(!ok)return;
       generateEntryReportCore();
     });
@@ -1082,11 +1082,16 @@ function generateEntryReportCore(){
   var reportText=generateTextReport(reportData);
   downloadReport(reportText, 'entry-audit-report.txt');
 
-  if(window.RIQCredits)RIQCredits.consume('entry_condition');
+  if(window.RIQPayments)RIQPayments.recordPurchase('entry_condition');
 
   setTimeout(function(){
     showToast('Report generated',reportData.totalPhotos+' photos · '+reportData.completedRooms+' rooms documented','✓');
-    navigate('/app/pages/vault.html');
+    // Prompt cloud sync if not purchased
+    if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function'){
+      RIQPayments.promptCloudSync().then(function(){ navigate('/app/pages/vault.html'); });
+    } else {
+      navigate('/app/pages/vault.html');
+    }
   },2000);
 }
 

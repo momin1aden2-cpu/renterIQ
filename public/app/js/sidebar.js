@@ -11,6 +11,11 @@
     { label: 'Vault',   icon: '🗄️', path: '/app/pages/vault.html' },
   ];
 
+  var RENTING = [
+    { label: 'Rent Tracker',  icon: '💰', path: '/app/pages/rent-tracker.html' },
+    { label: 'Bond Tracker',  icon: '🛡️', path: '/app/pages/bond-tracker.html' },
+  ];
+
   var TOOLS = [
     { label: 'Move-In Inspector',  icon: '📸', path: '/app/pages/entry-audit.html' },
     { label: 'Lease Review',  icon: '📑', path: '/app/pages/lease.html' },
@@ -41,6 +46,7 @@
     aside.className = 'desktop-sidebar';
 
     var navItems = NAV_ITEMS.map(tabHTML).join('');
+    var rentingItems = RENTING.map(tabHTML).join('');
     var toolItems = TOOLS.map(tabHTML).join('');
     
     aside.innerHTML =
@@ -63,6 +69,8 @@
       '<nav class="ds-nav">' +
         '<div class="ds-section-label">Navigation</div>' +
         navItems +
+        '<div class="ds-section-label" style="margin-top:8px">Renting</div>' +
+        rentingItems +
         '<div class="ds-section-label" style="margin-top:8px">Tools</div>' +
         toolItems +
       '</nav>';
@@ -187,6 +195,8 @@
       '/app/pages/inspection.html': '/inspect',
       '/app/pages/entry-audit.html': '/move-in',
       '/app/pages/vault.html': '/vault',
+      '/app/pages/rent-tracker.html': '/rent-tracker',
+      '/app/pages/bond-tracker.html': '/bond-tracker',
       '/app/pages/tracked.html': '/tracked',
       '/app/pages/lease.html': '/lease',
       '/app/pages/routine-inspection.html': '/routine-inspection',
@@ -253,6 +263,8 @@
       '/app/index.html',
       '/app/pages/inspection.html',
       '/app/pages/vault.html',
+      '/app/pages/rent-tracker.html',
+      '/app/pages/bond-tracker.html',
       '/app/pages/entry-audit.html',
       '/app/pages/lease.html',
       '/app/pages/routine-inspection.html',

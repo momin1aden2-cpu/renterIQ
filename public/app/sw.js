@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v11 — Mobile Performance Pass
+// RenterIQ Service Worker v12 — Direct Pay + New Features
 // No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
 
-var CACHE_NAME = 'renteriq-shell-v11';
+var CACHE_NAME = 'renteriq-shell-v12';
 
 var APP_SHELL = [
   '/app/index.html',
@@ -9,7 +9,7 @@ var APP_SHELL = [
   '/app/js/sidebar.js',
   '/app/js/pwa-init.js',
   '/app/js/storage.js',
-  '/app/js/credits.js',
+  '/app/js/payments.js',
   '/app/js/push-notifications.js',
   '/app/js/firebase-init.js',
   '/app/js/auth-guard.js',
@@ -28,6 +28,8 @@ var APP_SHELL = [
   '/app/pages/notifications.html',
   '/app/pages/application.html',
   '/app/pages/tools.html',
+  '/app/pages/rent-tracker.html',
+  '/app/pages/bond-tracker.html',
   '/app/pages/routine-inspection.html',
   '/app/pages/tracked.html',
   '/app/pages/webview.html',

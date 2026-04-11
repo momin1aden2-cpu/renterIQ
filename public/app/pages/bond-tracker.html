@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1B50C8">
+<meta name="description" content="RenterIQ Bond Tracker — Track your rental bond details and know your rights.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RenterIQ">
+<title>Bond Tracker — RenterIQ</title>
+<link rel="manifest" href="/app/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="prefetch" href="/app/index.html">
+<link rel="prefetch" href="/app/pages/tools.html">
+<link rel="stylesheet" href="/app/css/app.css?v=5">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
+<script src="/app/js/pwa-init.js" defer></script>
+<style>
+:root{--blue:#1B50C8;--blue-dk:#0A2460;--blue-md:#2E63E0;--blue-lt:#D5E2F8;--blue-xl:#EEF3FF;--teal:#00C896;--teal-dk:#008F68;--text:#1A2B4A;--muted:#6B7B99;--border:#D5E2F8;--border-lt:#E8EFF8;--red:#E84040;--shadow-card:0 2px 12px rgba(10,36,96,.06)}
+body{margin:0;background:#EEF3FF;font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+
+.sh{background:linear-gradient(180deg,#0A2460 0%,#143388 100%);padding:16px 20px 24px;color:#fff}
+.sh-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sh-back{background:none;border:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0}
+.sh-back-arrow{font-size:20px}
+.sh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;margin-bottom:4px}
+.sh-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.7)}
+
+.hdr-avatar-mobile{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)}
+@media(min-width:900px){.hdr-avatar-mobile{display:none!important}}
+
+.content{padding:20px 16px 120px}
+
+.bond-form{background:#fff;border-radius:20px;padding:28px 24px;border:1.5px solid var(--border-lt);box-shadow:var(--shadow-card)}
+.form-title{font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--text);margin:0 0 6px}
+.form-desc{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin:0 0 24px;line-height:1.5}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.form-input,.form-select{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:var(--text);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus,.form-select:focus{border-color:var(--blue-md);box-shadow:0 0 0 3px rgba(46,99,224,.12)}
+.form-input::placeholder{color:var(--muted);opacity:.7}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7B99' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+
+.btn-save{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-md) 100%);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(27,80,200,.3);margin-top:8px}
+.btn-save:active{transform:scale(.97)}
+
+.bond-card{background:linear-gradient(135deg,#0A2460 0%,#1B50C8 50%,#2E63E0 100%);border-radius:22px;padding:32px 28px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(10,36,96,.18)}
+.bond-card::before{content:'';position:absolute;top:-40%;right:-20%;width:260px;height:260px;background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);border-radius:50%}
+.bond-card::after{content:'';position:absolute;bottom:-30%;left:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(0,200,150,.08) 0%,transparent 70%);border-radius:50%}
+.bond-label{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px;position:relative;z-index:1}
+.bond-amount{font-family:'Sora',sans-serif;font-weight:800;font-size:40px;margin-bottom:4px;position:relative;z-index:1}
+.bond-duration{font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:rgba(255,255,255,.65);position:relative;z-index:1}
+.bond-edit{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;z-index:2}
+.bond-edit:hover{background:rgba(255,255,255,.2)}
+.bond-edit svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.details-card{background:#fff;border-radius:18px;padding:24px;margin-top:16px;border:1.5px solid var(--border-lt);box-shadow:var(--shadow-card)}
+.detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border-lt)}
+.detail-row:last-child{border-bottom:none;padding-bottom:0}
+.detail-row:first-child{padding-top:0}
+.detail-label{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted)}
+.detail-value{font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:var(--text);text-align:right;max-width:60%}
+
+.info-card{background:linear-gradient(135deg,var(--blue-xl) 0%,#fff 100%);border-radius:16px;padding:20px;margin-top:16px;border:1.5px solid var(--blue-lt)}
+.info-card p{margin:0;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.6}
+
+.rights-section{margin-top:24px}
+.rights-title{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin:0 0 14px}
+.rights-card{background:#fff;border-radius:16px;padding:20px;border:1.5px solid var(--border-lt);box-shadow:var(--shadow-card)}
+.rights-fact{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.6;margin-bottom:14px;padding-left:20px;position:relative}
+.rights-fact::before{content:'';position:absolute;left:0;top:7px;width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.rights-fact:last-child{margin-bottom:0}
+.rights-link{display:inline-flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);text-decoration:none;margin-top:14px;padding:10px 16px;background:var(--blue-xl);border-radius:10px;transition:background .2s}
+.rights-link:hover{background:var(--blue-lt)}
+
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="app-shell">
+<div class="app-main">
+
+<header class="sh">
+  <div class="sh-row">
+    <button class="sh-back" onclick="navigate('/app/pages/tools.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">Back</span></button>
+    <div class="hdr-avatar-mobile" id="hdrAvatar" onclick="navigate('/app/pages/profile.html')">?</div>
+  </div>
+  <div class="sh-title">Bond Tracker</div>
+  <div class="sh-sub">Track your rental bond and know your rights</div>
+</header>
+
+<div class="content">
+
+  <div id="bondForm" class="bond-form">
+    <h2 class="form-title">Bond Details</h2>
+    <p class="form-desc">Enter your bond information to keep track of your deposit and access your state authority when needed.</p>
+
+    <div class="form-group">
+      <label class="form-label" for="bondAmount">Bond Amount (AUD)</label>
+      <input class="form-input" type="number" id="bondAmount" placeholder="2,080" min="0" step="1">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="bondAuthority">Bond Authority</label>
+      <select class="form-select" id="bondAuthority">
+        <option value="" disabled selected>Select your state</option>
+        <option value="NSW">NSW — Rental Bond Board</option>
+        <option value="VIC">VIC — RTBA (Residential Tenancies Bond Authority)</option>
+        <option value="QLD">QLD — RTA (Residential Tenancies Authority)</option>
+        <option value="SA">SA — Consumer &amp; Business Services</option>
+        <option value="WA">WA — Bond Administrator</option>
+        <option value="TAS">TAS — Rental Deposit Authority</option>
+        <option value="NT">NT — NT Consumer Affairs</option>
+        <option value="ACT">ACT — Office of Rental Bonds</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="bondRef">Bond Reference Number</label>
+      <input class="form-input" type="text" id="bondRef" placeholder="RB12345678">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="bondDate">Lodge Date</label>
+      <input class="form-input" type="date" id="bondDate">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="bondAddress">Property Address <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
+      <input class="form-input" type="text" id="bondAddress" placeholder="42 Smith St, Richmond VIC 3121">
+    </div>
+
+    <button class="btn-save" id="btnSave" onclick="saveBond()">Save Bond Details</button>
+  </div>
+
+  <div id="bondSummary" class="hidden">
+    <div class="bond-card">
+      <div class="bond-label">Your Rental Bond</div>
+      <div class="bond-amount" id="displayAmount">$0</div>
+      <div class="bond-duration" id="displayDuration">Bond held for 0 months</div>
+      <div class="bond-edit" onclick="showForm()">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+    </div>
+
+    <div class="details-card">
+      <div class="detail-row">
+        <span class="detail-label">Authority</span>
+        <span class="detail-value" id="displayAuthority">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Reference</span>
+        <span class="detail-value" id="displayRef">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Lodge Date</span>
+        <span class="detail-value" id="displayDate">—</span>
+      </div>
+      <div class="detail-row" id="addressRow">
+        <span class="detail-label">Property</span>
+        <span class="detail-value" id="displayAddress">—</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <p id="infoText">Your bond is held securely and earns interest. You can claim it back when your tenancy ends.</p>
+    </div>
+
+    <div class="rights-section">
+      <h3 class="rights-title">Know Your Rights</h3>
+      <div class="rights-card">
+        <div class="rights-fact" id="rightsFact1"></div>
+        <div class="rights-fact" id="rightsFact2"></div>
+        <a class="rights-link" id="rightsLink" href="#" target="_blank" rel="noopener">Visit your bond authority ›</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+var STORAGE_KEY = 'riq_bond_tracker';
+
+var AUTHORITIES = {
+  NSW: { name: 'Rental Bond Board (NSW)', url: 'https://www.fairtrading.nsw.gov.au/housing-and-property/renting/rental-bonds', days: 10, fact: 'In NSW, your landlord must lodge your bond within 10 days of receiving it.', fact2: 'Interest earned on your bond is used to fund tenant services in NSW.' },
+  VIC: { name: 'RTBA (VIC)', url: 'https://www.rtba.vic.gov.au/', days: 10, fact: 'In VIC, your landlord must lodge your bond with RTBA within 10 business days.', fact2: 'You can check the status of your bond online via the RTBA portal.' },
+  QLD: { name: 'RTA (QLD)', url: 'https://www.rta.qld.gov.au/renting/during-a-tenancy/bond', days: 10, fact: 'In QLD, your bond must be lodged with the RTA within 10 days.', fact2: 'The RTA holds bonds in trust and provides free dispute resolution.' },
+  SA: { name: 'Consumer & Business Services (SA)', url: 'https://www.cbs.sa.gov.au/rental-bonds', days: 14, fact: 'In SA, your landlord must lodge your bond within 14 days of receiving it.', fact2: 'SA bonds are held by Consumer & Business Services on your behalf.' },
+  WA: { name: 'Bond Administrator (WA)', url: 'https://www.commerce.wa.gov.au/consumer-protection/bond-administration', days: 14, fact: 'In WA, your bond must be lodged within 14 days of the tenancy start.', fact2: 'You will receive a receipt confirming your bond has been lodged.' },
+  TAS: { name: 'Rental Deposit Authority (TAS)', url: 'https://www.cbos.tas.gov.au/topics/housing/renting/rental-deposit-authority', days: 14, fact: 'In TAS, your rental deposit must be lodged within 14 days.', fact2: 'The Rental Deposit Authority holds your bond securely until the end of tenancy.' },
+  NT: { name: 'NT Consumer Affairs', url: 'https://nt.gov.au/property/renters/bonds-and-rent', days: 14, fact: 'In the NT, your bond must be lodged within 14 days of payment.', fact2: 'NT Consumer Affairs can assist with bond disputes at no cost.' },
+  ACT: { name: 'Office of Rental Bonds (ACT)', url: 'https://www.revenue.act.gov.au/rental-bonds', days: 10, fact: 'In the ACT, your bond must be lodged within 10 working days.', fact2: 'The Office of Rental Bonds provides online bond status checking.' }
+};
+
+function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
+
+function loadBond(){
+  var raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return null;
+  try{ return JSON.parse(raw); }catch(e){ return null; }
+}
+
+function saveBond(){
+  var amount = parseFloat(document.getElementById('bondAmount').value);
+  var authority = document.getElementById('bondAuthority').value;
+  var ref = document.getElementById('bondRef').value.trim();
+  var date = document.getElementById('bondDate').value;
+  var address = document.getElementById('bondAddress').value.trim();
+
+  if(!amount || amount <= 0){ shakeField('bondAmount'); return; }
+  if(!authority){ shakeField('bondAuthority'); return; }
+  if(!ref){ shakeField('bondRef'); return; }
+  if(!date){ shakeField('bondDate'); return; }
+
+  var data = { amount: amount, authority: authority, referenceNumber: ref, lodgeDate: date, address: address };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  renderSummary(data);
+}
+
+function shakeField(id){
+  var el = document.getElementById(id);
+  el.style.borderColor = 'var(--red)';
+  el.style.animation = 'shake .4s ease';
+  setTimeout(function(){ el.style.borderColor = ''; el.style.animation = ''; }, 500);
+}
+
+function showForm(){
+  var data = loadBond();
+  document.getElementById('bondSummary').classList.add('hidden');
+  document.getElementById('bondForm').classList.remove('hidden');
+  if(data){
+    document.getElementById('bondAmount').value = data.amount;
+    document.getElementById('bondAuthority').value = data.authority;
+    document.getElementById('bondRef').value = data.referenceNumber;
+    document.getElementById('bondDate').value = data.lodgeDate;
+    document.getElementById('bondAddress').value = data.address || '';
+  }
+}
+
+function renderSummary(data){
+  document.getElementById('bondForm').classList.add('hidden');
+  document.getElementById('bondSummary').classList.remove('hidden');
+
+  document.getElementById('displayAmount').textContent = '$' + Number(data.amount).toLocaleString('en-AU');
+
+  var months = calcMonths(data.lodgeDate);
+  var durationText = months === 0 ? 'Lodged this month' : 'Bond held for ' + months + ' month' + (months > 1 ? 's' : '');
+  document.getElementById('displayDuration').textContent = durationText;
+
+  var auth = AUTHORITIES[data.authority];
+  document.getElementById('displayAuthority').textContent = auth ? auth.name : data.authority;
+  document.getElementById('displayRef').textContent = data.referenceNumber;
+  document.getElementById('displayDate').textContent = formatDate(data.lodgeDate);
+
+  var addressRow = document.getElementById('addressRow');
+  if(data.address){
+    addressRow.style.display = '';
+    document.getElementById('displayAddress').textContent = data.address;
+  } else {
+    addressRow.style.display = 'none';
+  }
+
+  if(auth){
+    document.getElementById('infoText').textContent = 'Your bond is held by ' + auth.name + ' and earns interest. You can claim it back when your tenancy ends.';
+    document.getElementById('rightsFact1').textContent = auth.fact;
+    document.getElementById('rightsFact2').textContent = auth.fact2;
+    document.getElementById('rightsLink').href = auth.url;
+  }
+}
+
+function calcMonths(dateStr){
+  var lodge = new Date(dateStr);
+  var now = new Date();
+  var diff = (now.getFullYear() - lodge.getFullYear()) * 12 + (now.getMonth() - lodge.getMonth());
+  return Math.max(0, diff);
+}
+
+function formatDate(dateStr){
+  var d = new Date(dateStr);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function loadUserData(){
+  var initials = localStorage.getItem('riq-user-initials') || '?';
+  var hdrAvatar = document.getElementById('hdrAvatar');
+  if(hdrAvatar) hdrAvatar.textContent = initials;
+}
+
+function init(){
+  loadUserData();
+  var data = loadBond();
+  if(data && data.amount && data.authority && data.referenceNumber && data.lodgeDate){
+    renderSummary(data);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+<script src="/app/js/sidebar.js"></script>
+<style>@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}</style>
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
+</nav>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/payments.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
+</body>
+</html>

@@ -107,7 +107,7 @@
 <body>
 <div class="app-shell">
 
-<!-- VIEW A: LIST -->
+<!-- VIEW A: PROPERTY HUB -->
 <div class="view" id="viewA" style="display:flex;flex-direction:column;min-height:100vh">
   <header class="sh">
     <div class="sh-row">
@@ -115,27 +115,54 @@
       <div id="hdrAvatar" onclick="navigate('/app/pages/profile.html')" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-md),#4A90D9);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.3)">?</div>
     </div>
     <div class="sh-title">Property Inspection</div>
-    <div class="sh-sub" id="inspSubtitle">Your upcoming open homes</div>
+    <div class="sh-sub" id="inspSubtitle">Add, track, and inspect properties</div>
   </header>
   <div class="content" style="padding:16px 16px 120px">
-    <div style="background:linear-gradient(135deg,#0A2460,#1B50C8);border-radius:18px;padding:18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="startQuickInspection()">
-      <div style="width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏡</div>
-      <div style="flex:1">
-        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:#fff">Start Quick Inspection</div>
-        <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.7);margin-top:2px">At an open home right now? Jump straight in →</div>
+
+    <!-- ADD PROPERTY -->
+    <div style="background:#fff;border-radius:18px;padding:18px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Add a Property</div>
+      <!-- URL Input -->
+      <div style="margin-bottom:12px">
+        <div style="display:flex;gap:8px">
+          <input class="input-f" id="inspUrlInput" type="url" placeholder="Paste listing URL from any site…" style="flex:1;font-size:13px" autocomplete="off">
+          <button style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0" onclick="inspTrackFromUrl()">Track</button>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:6px">realestate.com.au · domain.com.au · reiwa.com.au · rent.com.au</div>
       </div>
-    </div>
-    
-    <div style="background:linear-gradient(135deg,#00C896,#00A87E);border-radius:18px;padding:18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="openBookingUpload()">
-      <div style="width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📸</div>
-      <div style="flex:1">
-        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:#fff">Add from Booking Screenshot</div>
-        <div style="font-weight:600;font-size:12px;color:rgba(255,255,255,.7);margin-top:2px">Upload confirmation → details extracted automatically</div>
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="flex:1;height:1px;background:var(--border-lt)"></div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">or</span>
+        <div style="flex:1;height:1px;background:var(--border-lt)"></div>
       </div>
+      <!-- Screenshot Upload -->
+      <button style="width:100%;background:var(--blue-xl);border:1.5px dashed var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="openBookingUpload()">
+        <span style="font-size:20px">📸</span>
+        <div style="flex:1;text-align:left">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Upload Screenshot</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">From any listing page or booking email</div>
+        </div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">Upload →</span>
+      </button>
     </div>
+
+    <!-- MY PROPERTIES LIST -->
     <div id="inspList"></div>
+
+    <!-- QUICK INSPECTION (no saved property) -->
+    <div style="margin-top:8px">
+      <div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="startQuickInspection()">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--blue-dk),var(--blue));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏡</div>
+        <div style="flex:1">
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Quick Inspection</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">At an open home? Start without a saved property</div>
+        </div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue)">Go →</span>
+      </div>
+    </div>
+
   </div>
-  
 </div>
 
 <!-- VIEW B: SETUP -->
@@ -162,15 +189,23 @@
       </div>
     </div>
     
-    <!-- Optional Areas -->
+    <!-- Property Type -->
     <div class="card" style="margin-bottom:13px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:13px">Optional Areas</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border-radius:10px;background:rgba(27,80,200,.04);-webkit-tap-highlight-color:transparent"><input type="checkbox" id="optStudy" style="width:18px;height:18px;accent-color:var(--blue);cursor:pointer"><span style="font-weight:600;font-size:13px;color:var(--text)">💻 Study/Office</span></label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border-radius:10px;background:rgba(27,80,200,.04);-webkit-tap-highlight-color:transparent"><input type="checkbox" id="optGarage" style="width:18px;height:18px;accent-color:var(--blue);cursor:pointer"><span style="font-weight:600;font-size:13px;color:var(--text)">🚗 Garage</span></label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border-radius:10px;background:rgba(27,80,200,.04);-webkit-tap-highlight-color:transparent"><input type="checkbox" id="optCarport" style="width:18px;height:18px;accent-color:var(--blue);cursor:pointer"><span style="font-weight:600;font-size:13px;color:var(--text)">🚙 Carport</span></label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px;border-radius:10px;background:rgba(27,80,200,.04);-webkit-tap-highlight-color:transparent"><input type="checkbox" id="optStorage" style="width:18px;height:18px;accent-color:var(--blue);cursor:pointer"><span style="font-weight:600;font-size:13px;color:var(--text)">📦 Storage/Shed</span></label>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:13px">Property Type</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px" id="propTypeSelector">
+        <button class="priority-pill" data-type="house" onclick="selectPropertyType('house')">🏠 House</button>
+        <button class="priority-pill" data-type="apartment" onclick="selectPropertyType('apartment')">🏢 Apartment</button>
+        <button class="priority-pill" data-type="unit" onclick="selectPropertyType('unit')">🏘 Unit</button>
+        <button class="priority-pill" data-type="townhouse" onclick="selectPropertyType('townhouse')">🏡 Townhouse</button>
+        <button class="priority-pill" data-type="studio" onclick="selectPropertyType('studio')">🛏 Studio</button>
       </div>
+    </div>
+
+    <!-- Areas to Inspect -->
+    <div class="card" style="margin-bottom:13px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px">Areas to Inspect</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">Pre-selected for your property type. Toggle areas on or off.</div>
+      <div id="areaToggles" style="display:flex;flex-direction:column;gap:6px"></div>
       <div style="margin-top:12px">
         <div class="fsl">Custom Areas (comma separated)</div>
         <input class="input-f" id="setupCustom" type="text" placeholder="e.g. Pool, Balcony, Gym" autocomplete="off">
@@ -379,6 +414,94 @@
 /* Open Home Inspection — RenterIQ */
 function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
 function showToast(t,s,i){var el=document.getElementById('appToast');if(!el){el=document.createElement('div');el.id='appToast';el.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';el.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(el)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';el.style.transform='translateY(0)';el.style.opacity='1';clearTimeout(el._timer);el._timer=setTimeout(function(){el.style.transform='translateY(-90px)';el.style.opacity='0'},3200)}
+
+// ========== URL TRACKING ==========
+function inspTrackFromUrl() {
+  var input = document.getElementById('inspUrlInput');
+  var url = (input.value || '').trim();
+  if (!url) { showToast('Paste a URL', 'Enter a listing URL to track a property', '📎'); return; }
+  if (!url.match(/^https?:\/\//)) url = 'https://' + url;
+
+  var tracked = [];
+  try { tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]'); } catch(e) {}
+  if (!Array.isArray(tracked)) tracked = [];
+
+  var exists = tracked.some(function(p) { return p && (p.url === url || p.originalLink === url); });
+  if (exists) { showToast('Already tracked', 'This property is already in your list', '📎'); input.value = ''; return; }
+
+  showToast('Tracking…', 'Extracting property details', '🔍');
+
+  fetch('/api/extract-metadata', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: url }) })
+    .then(function(r) { return r.json(); })
+    .then(function(meta) {
+      var srcMap = { 'realestate.com.au': { key: 'realestate', name: 'realestate.com.au', icon: '🏠', color: '#E4002B' }, 'domain.com.au': { key: 'domain', name: 'Domain', icon: '🟣', color: '#2B1D54' }, 'reiwa.com.au': { key: 'reiwa', name: 'REIWA', icon: '🔵', color: '#003DA5' }, 'rent.com.au': { key: 'rent', name: 'Rent.com.au', icon: '🟢', color: '#00A562' } };
+      var src = {};
+      for (var domain in srcMap) { if (url.indexOf(domain) !== -1) { src = srcMap[domain]; break; } }
+
+      var prop = {
+        id: 'tracked_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        url: url, originalLink: url,
+        label: meta.address || meta.title || url.split('/').pop(),
+        address: meta.address || meta.title || '',
+        price: meta.price || '',
+        description: meta.description || '',
+        imageUrl: meta.image || '', image: meta.image || '',
+        source: src.key || 'other', sourceSite: src.key || 'other', sourceName: src.name || 'Property', sourceIcon: src.icon || '🏠', sourceColor: src.color || '#6B7B99',
+        suburb: '', state: '', postcode: '',
+        savedAt: new Date().toISOString(),
+        status: 'tracked'
+      };
+
+      tracked.unshift(prop);
+      localStorage.setItem('renteriq_tracked_properties', JSON.stringify(tracked));
+
+      if (window.RIQStore) {
+        RIQStore.ready.then(function() {
+          if (RIQStore.isAuthed()) RIQStore.write('tracked-properties', prop.id, prop);
+        });
+      }
+
+      input.value = '';
+      renderInspectionList();
+      showToast('Property saved', prop.address || 'Tracked successfully', '✓');
+    })
+    .catch(function(err) {
+      var prop = {
+        id: 'tracked_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        url: url, originalLink: url, label: url.split('/').pop(), address: '',
+        price: '', description: '', imageUrl: '', image: '',
+        source: 'other', sourceSite: 'other', sourceName: 'Property', sourceIcon: '🏠', sourceColor: '#6B7B99',
+        suburb: '', state: '', postcode: '',
+        savedAt: new Date().toISOString(), status: 'tracked'
+      };
+      tracked.unshift(prop);
+      localStorage.setItem('renteriq_tracked_properties', JSON.stringify(tracked));
+      input.value = '';
+      renderInspectionList();
+      showToast('Property saved', 'Could not extract details — you can add them manually', '📎');
+    });
+}
+
+function inspDeleteProperty(id, e) {
+  if (e) e.stopPropagation();
+  var tracked = [];
+  try { tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]'); } catch(e) {}
+  tracked = tracked.filter(function(p) { return p && p.id !== id; });
+  localStorage.setItem('renteriq_tracked_properties', JSON.stringify(tracked));
+  if (window.RIQStore) { RIQStore.ready.then(function() { if (RIQStore.isAuthed()) RIQStore.write('tracked-properties', id, null); }); }
+  renderInspectionList();
+  showToast('Removed', 'Property removed from tracking', '🗑️');
+}
+
+function inspDeleteScheduled(id, e) {
+  if (e) e.stopPropagation();
+  var scheduled = [];
+  try { scheduled = JSON.parse(localStorage.getItem('renteriq_scheduled_inspections') || '[]'); } catch(e) {}
+  scheduled = scheduled.filter(function(s) { return s && s.id !== id; });
+  localStorage.setItem('renteriq_scheduled_inspections', JSON.stringify(scheduled));
+  renderInspectionList();
+  showToast('Removed', 'Inspection removed', '🗑️');
+}
 
 // ========== BOOKING UPLOAD FUNCTIONALITY ==========
 var selectedBookingFile = null;
@@ -599,20 +722,30 @@ function createInspectionFromExtraction() {
   
   // Store extracted data for later use
   inspectionData.bookingData = data;
-  
+
   // Create scheduled inspection entry
   createScheduledInspection(data);
-  
+
   // Set up reminders if we have date/time
   if (data.date && data.time) {
     setupInspectionReminders(data);
   }
-  
+
+  // Auto-select property type from extracted data
+  var pType = (data.property_type || 'other').toLowerCase();
+  if (pType === 'other' && data.notes) {
+    var n = data.notes.toLowerCase();
+    if (n.indexOf('apartment') !== -1) pType = 'apartment';
+    else if (n.indexOf('townhouse') !== -1) pType = 'townhouse';
+    else if (n.indexOf('unit') !== -1) pType = 'unit';
+  }
+  selectPropertyType(pType);
+
   // Close modal and go to setup
   closeBookingUpload();
   switchView('B');
-  
-  showToast('Inspection Scheduled!', 'Reminders set • Review details before starting', '✅');
+
+  showToast('Property loaded', data.address || 'Review details before starting', '✅');
 }
 
 function createScheduledInspection(data) {
@@ -868,7 +1001,7 @@ document.addEventListener('DOMContentLoaded',function(){
   for(var i=0;i<QUESTIONS.length;i++){var el=document.getElementById('qa'+i);if(el){el.querySelector('textarea').addEventListener('input',function(i){return function(){inspectionData.questions[i]=el.querySelector('textarea').value}}(i))}}
 });
 
-function startQuickInspection(){switchView('B')}
+function startQuickInspection(){selectPropertyType('house');switchView('B')}
 function startWalkthrough(){inspectionData.address=document.getElementById('setupAddress').value;inspectionData.rent=document.getElementById('setupRent').value;inspectionData.beds=document.getElementById('setupBeds').value;renderAreas();switchView('C');updateProgress()}
 function renderAreas(){var html='';AREAS.forEach(function(area,i){var d=inspectionData.areas[area.id]||{};html+='<div class="area-card'+(d.open?' open':'')+'" id="area-'+area.id+'"><div class="area-hdr" onclick="toggleArea(\''+area.id+'\')"><div class="area-icon">'+area.icon+'</div><div><div class="area-name">'+area.name+'</div><div class="area-hint">'+(d.condition?{good:'Good',issues:'Issues',concern:'Concerns'}[d.condition]:'Tap to inspect')+'</div></div><div class="area-badge'+(d.condition?' '+d.condition:'')+'">'+(d.condition?'✓':'')+'</div></div><div class="area-body"><div class="fsl">Condition</div><div class="cond-row"><button class="cond-btn'+(d.condition==='good'?' good-sel':'')+'" onclick="setCond(\''+area.id+'\',\'good\')"><span style="font-size:20px">😊</span>Good</button><button class="cond-btn'+(d.condition==='issues'?' issues-sel':'')+'" onclick="setCond(\''+area.id+'\',\'issues\')"><span style="font-size:20px">😐</span>Issues</button><button class="cond-btn'+(d.condition==='concern'?' concern-sel':'')+'" onclick="setCond(\''+area.id+'\',\'concern\')"><span style="font-size:20px">😟</span>Concerns</button></div><div class="tips-toggle" onclick="toggleTips(\''+area.id+'\')"><div class="tips-lbl">💡 What to check</div><div class="tips-arr" id="tips-arr-'+area.id+'">›</div></div><div class="tips-panel" id="tips-'+area.id+'"><div class="tip-item"><div class="tip-dot"></div><div class="tip-txt">'+area.tips+'</div></div></div><div class="fsl">Photos</div><div class="photos-grid" id="photos-'+area.id+'"><div class="ph-add" onclick="addPhoto(\''+area.id+'\')"><span style="font-size:20px">📷</span><span style="font-size:9px;font-family:\'Sora\',sans-serif;font-weight:700;color:var(--muted)">Add</span></div></div><div class="fsl">Quick Notes</div><div class="qchips" id="chips-'+area.id+'"><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'✓ Walls OK\',this)">✓ Walls OK</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'✓ Floor OK\',this)">✓ Floor OK</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'✓ Windows OK\',this)">✓ Windows OK</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'✓ Lights OK\',this)">✓ Lights OK</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'Staining\',this)">Staining</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'Damage noted\',this)">Damage noted</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'Needs repair\',this)">Needs repair</span></div><textarea class="notes-f" id="notes-'+area.id+'" placeholder="Add a note… e.g. scuff mark on south wall, approx 5cm, pre-existing" oninput="saveAreaNote(\''+area.id+'\')"></textarea><div class="fsl">Red Flags</div><div id="rf-'+area.id+'">'+RED_FLAGS.map(function(f,i){return'<div class="rf-row" onclick="toggleRedFlag(\''+area.id+'\',\''+f+'\',this)"><div class="rf-cb'+(d.redFlags&&d.redFlags.indexOf(f)!==-1?' flagged':'')+'" id="rfcb-'+area.id+'-'+i+'">'+(d.redFlags&&d.redFlags.indexOf(f)!==-1?'✓':'')+'</div><div class="rf-lbl">'+f+'</div></div>'}).join('')+'</div></div></div>'});document.getElementById('areasList').innerHTML=html;AREAS.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.photos){d.photos.forEach(function(p,i){addPhotoThumb(area.id,p)})}if(d.notes){document.getElementById('notes-'+area.id).value=d.notes}})}
 function toggleArea(id){var card=document.getElementById('area-'+id);var isOpen=card.classList.contains('open');card.classList.toggle('open');var d=inspectionData.areas[id]=inspectionData.areas[id]||{};d.open=!isOpen}
@@ -947,138 +1080,120 @@ function renderInspectionList(){
   var list=document.getElementById('inspList');
   if(!list)return;
 
-  // ── Source 1: Tracked properties from the home tracker ──
-  // These are properties the user has saved but not yet inspected.
-  // This is the bridge from Step 1 (search/track) → Step 2 (inspect).
   var tracked=[];
-  try{
-    tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
-    if(!Array.isArray(tracked))tracked=[];
-  }catch(e){}
+  try{tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');if(!Array.isArray(tracked))tracked=[];}catch(e){}
 
-  // ── Source 2: Scheduled inspections (from booking screenshot uploads) ──
   var scheduled=[];
-  try{
-    scheduled=JSON.parse(localStorage.getItem('renteriq_scheduled_inspections')||'[]');
-  }catch(e){}
+  try{scheduled=JSON.parse(localStorage.getItem('renteriq_scheduled_inspections')||'[]');}catch(e){}
 
-  // ── Source 3: Completed inspection reports ──
   var saved=[];
   for(var i=0;i<localStorage.length;i++){
     var key=localStorage.key(i);
     if(key&&key.startsWith('renteriq_openhome_insp_')){
-      try{
-        var data=JSON.parse(localStorage.getItem(key)||'{}');
-        saved.push({key:key,data:data,type:'completed'});
-      }catch(e){}
+      try{saved.push({key:key,data:JSON.parse(localStorage.getItem(key)||'{}'),type:'completed'});}catch(e){}
     }
   }
 
-  // Build a set of inspected property URLs so we can mark tracked items as "inspected"
   var inspectedUrls={};
-  saved.forEach(function(s){
-    if(s.data&&s.data.sourceUrl)inspectedUrls[s.data.sourceUrl]=s.key;
-  });
+  saved.forEach(function(s){if(s.data&&s.data.sourceUrl)inspectedUrls[s.data.sourceUrl]=s.key;});
 
+  var totalProps=tracked.length+scheduled.length+saved.length;
   var html='';
 
-  // ── Tracked properties section ──
-  // Show ones that are NOT yet inspected first; inspected ones at the bottom of this section.
+  // ── Section header ──
+  if(totalProps>0){
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">My Properties</span><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">'+totalProps+'</span></div>';
+  }
+
+  // ── Tracked properties ──
   if(tracked.length>0){
     var notInspected=tracked.filter(function(p){return p&&!inspectedUrls[(p.url||p.originalLink||'')]});
     var alreadyInspected=tracked.filter(function(p){return p&&inspectedUrls[(p.url||p.originalLink||'')]});
 
-    if(notInspected.length>0){
-      html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--blue);text-transform:uppercase;margin-bottom:10px">🏠 Your Tracked Properties · Tap to inspect</div>';
-      notInspected.slice().reverse().forEach(function(p){
-        var addr=p.address||p.label||'Property listing';
-        var srcKey=(p.source||p.sourceSite||'unknown');
-        var srcName=p.sourceName||({realestate:'realestate.com.au',domain:'Domain',reiwa:'REIWA',rent:'Rent.com.au'}[srcKey])||'Property';
-        var srcIcon=p.sourceIcon||'🏠';
-        var price=p.price||'';
-        var inspDate='';
-        if(p.inspectionDate){
-          var d=new Date(p.inspectionDate);
-          if(!isNaN(d.getTime())){
-            inspDate=d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})+(p.inspectionTime?' · '+p.inspectionTime:'');
-          }
-        }
-        html+='<div class="card" style="margin-bottom:10px;cursor:pointer;border-left:3px solid var(--blue)" onclick="startInspectionForTracked(\''+escAttr(p.id||'')+'\')">'
-          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">'
-            +'<div style="flex:1;min-width:0">'
-              +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);line-height:1.35">'+escAttr(addr)+'</div>'
-              +'<div style="font-weight:600;font-size:11.5px;color:var(--muted);margin-top:4px">'+srcIcon+' '+escAttr(srcName)+(price?' · '+escAttr(price):'')+'</div>'
-              +(inspDate?'<div style="font-weight:600;font-size:11.5px;color:var(--blue);margin-top:4px">📅 '+escAttr(inspDate)+'</div>':'')
-            +'</div>'
-            +'<span style="background:var(--blue);color:#fff;padding:7px 12px;border-radius:100px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;flex-shrink:0;align-self:flex-start">Inspect →</span>'
-          +'</div>'
-        +'</div>';
-      });
-      html+='<div style="margin-bottom:18px"></div>';
-    }
+    notInspected.slice().reverse().forEach(function(p){
+      var addr=p.address||p.label||'Property listing';
+      var srcKey=(p.source||p.sourceSite||'unknown');
+      var srcName=p.sourceName||({realestate:'realestate.com.au',domain:'Domain',reiwa:'REIWA',rent:'Rent.com.au'}[srcKey])||'Property';
+      var srcIcon=p.sourceIcon||'🏠';
+      var price=p.price||'';
+      var inspDate='';
+      if(p.inspectionDate){var d=new Date(p.inspectionDate);if(!isNaN(d.getTime())){inspDate=d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})+(p.inspectionTime?' · '+p.inspectionTime:'');}}
 
-    if(alreadyInspected.length>0){
-      html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--teal-dk);text-transform:uppercase;margin-bottom:10px">✓ Already Inspected · Tap to view</div>';
-      alreadyInspected.slice().reverse().forEach(function(p){
-        var addr=p.address||p.label||'Property';
-        var srcIcon=p.sourceIcon||'🏠';
-        var key=inspectedUrls[(p.url||p.originalLink||'')];
-        html+='<div class="card" style="margin-bottom:10px;cursor:pointer;border-left:3px solid var(--teal)" onclick="loadSavedInspection(\''+escAttr(key)+'\')">'
-          +'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">'
-            +'<div style="flex:1;min-width:0">'
-              +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+escAttr(addr)+'</div>'
-              +'<div style="font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">'+srcIcon+' Inspected · tap to view report</div>'
-            +'</div>'
-            +'<span style="color:var(--teal-dk);font-size:18px;flex-shrink:0">✓</span>'
+      html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);margin-bottom:10px;box-shadow:var(--shadow-card)">'
+        +'<div style="display:flex;align-items:flex-start;gap:12px">'
+          +'<div style="flex:1;min-width:0">'
+            +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);line-height:1.35">'+escAttr(addr)+'</div>'
+            +'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:4px">'+srcIcon+' '+escAttr(srcName)+(price?' · '+escAttr(price):'')+'</div>'
+            +(inspDate?'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--blue);margin-top:3px">📅 '+escAttr(inspDate)+'</div>':'')
           +'</div>'
-        +'</div>';
-      });
-      html+='<div style="margin-bottom:18px"></div>';
-    }
+        +'</div>'
+        +'<div style="display:flex;gap:8px;margin-top:12px">'
+          +'<button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="startInspectionForTracked(\''+escAttr(p.id||'')+'\')">Inspect →</button>'
+          +(p.url?'<button style="background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="event.stopPropagation();window.open(\''+escAttr(p.url)+'\',\'_blank\')">View</button>':'')
+          +'<button style="background:none;border:none;color:var(--muted);font-size:16px;padding:8px;cursor:pointer;border-radius:8px" onclick="inspDeleteProperty(\''+escAttr(p.id||'')+'\',event)" title="Remove">🗑️</button>'
+        +'</div>'
+      +'</div>';
+    });
+
+    alreadyInspected.slice().reverse().forEach(function(p){
+      var addr=p.address||p.label||'Property';
+      var srcIcon=p.sourceIcon||'🏠';
+      var repKey=inspectedUrls[(p.url||p.originalLink||'')];
+      html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);margin-bottom:10px;border-left:3px solid var(--teal);box-shadow:var(--shadow-card)">'
+        +'<div style="display:flex;align-items:center;gap:12px">'
+          +'<div style="flex:1;min-width:0">'
+            +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+escAttr(addr)+'</div>'
+            +'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--teal-dk);margin-top:3px">✓ Inspected</div>'
+          +'</div>'
+          +'<button style="background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:8px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;cursor:pointer" onclick="loadSavedInspection(\''+escAttr(repKey)+'\')">View Report</button>'
+          +'<button style="background:none;border:none;color:var(--muted);font-size:14px;padding:6px;cursor:pointer" onclick="inspDeleteProperty(\''+escAttr(p.id||'')+'\',event)">🗑️</button>'
+        +'</div>'
+      +'</div>';
+    });
   }
 
-  // ── Scheduled inspections (from booking screenshots) ──
+  // ── Scheduled inspections (from screenshots) ──
   if(scheduled.length>0){
-    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--teal-dk);text-transform:uppercase;margin-bottom:10px">📅 Upcoming Inspections</div>';
-
     scheduled.forEach(function(insp){
       var isToday=isInspectionToday(insp.date);
       var isTomorrow=isInspectionTomorrow(insp.date);
       var isPast=isInspectionPast(insp.date,insp.time);
-
       var dateLabel=isPast?'Past':isToday?'Today':isTomorrow?'Tomorrow':formatInspectionDate(insp.date);
-      var cardStyle=isPast?'opacity:0.6;':isToday?'border-left:4px solid #10B981;':'';
+      var borderColor=isPast?'var(--muted)':isToday?'#10B981':'var(--blue)';
 
-      html+='<div class="card" style="margin-bottom:10px;cursor:pointer;'+cardStyle+'" onclick="'+(isPast?'':'loadScheduledInspection(\''+insp.id+'\')')+'">';
-      html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">';
-      html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+(insp.address||'Property')+'</div>';
-      html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:'+(isPast?'var(--muted)':isToday?'#10B981':'var(--blue)')+'">'+dateLabel+'</div>';
-      html+='</div>';
-      if(insp.time_display)html+='<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:3px">⏰ '+insp.time_display+'</div>';
-      if(insp.agent_name)html+='<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:3px">👤 '+insp.agent_name+'</div>';
-      var details=[];
-      if(insp.bedrooms)details.push(insp.bedrooms+' bed');
-      if(insp.rent_weekly)details.push(insp.rent_weekly+'/week');
-      if(details.length>0)html+='<div style="font-weight:600;font-size:12px;color:var(--muted)">'+details.join(' • ')+'</div>';
-      html+='</div>';
+      html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);margin-bottom:10px;border-left:3px solid '+borderColor+';box-shadow:var(--shadow-card);'+(isPast?'opacity:.55;':'')+'">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+          +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+(insp.address||'Property')+'</div>'
+          +'<span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:#fff;background:'+borderColor+';padding:3px 8px;border-radius:100px">'+dateLabel+'</span>'
+        +'</div>';
+      if(insp.time_display)html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:2px">⏰ '+insp.time_display+'</div>';
+      if(insp.agent_name)html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:2px">👤 '+insp.agent_name+'</div>';
+      var details=[];if(insp.bedrooms)details.push(insp.bedrooms+' bed');if(insp.rent_weekly)details.push(insp.rent_weekly+'/week');
+      if(details.length>0)html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">'+details.join(' · ')+'</div>';
+      html+='<div style="display:flex;gap:8px;margin-top:10px">';
+      if(!isPast)html+='<button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="loadScheduledInspection(\''+insp.id+'\')">Inspect →</button>';
+      html+='<button style="background:none;border:none;color:var(--muted);font-size:14px;padding:6px;cursor:pointer" onclick="inspDeleteScheduled(\''+escAttr(insp.id)+'\',event)">🗑️</button>';
+      html+='</div></div>';
     });
-    html+='<div style="margin-bottom:18px"></div>';
   }
 
-  // ── Other completed reports (no matching tracked property) ──
+  // ── Completed reports without tracked property ──
   var orphanSaved=saved.filter(function(s){return !s.data||!s.data.sourceUrl||!tracked.some(function(t){return(t.url||t.originalLink||'')===s.data.sourceUrl})});
   if(orphanSaved.length>0){
-    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">📋 Other Completed Reports</div>';
-    html+=orphanSaved.map(function(item){
+    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin:16px 0 10px">Past Inspections</div>';
+    orphanSaved.forEach(function(item){
       var ts=parseInt((item.key.split('_')[3]||'0'),10);
       var dateStr=ts?new Date(ts).toLocaleDateString('en-AU'):'';
-      return '<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\''+item.key+'\')"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+(item.data.address||'Property')+'</div><div style="font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds+' bed':'')+(dateStr?' · '+dateStr:'')+'</div></div>';
-    }).join('');
+      html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-card)" onclick="loadSavedInspection(\''+item.key+'\')">'
+        +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+(item.data.address||'Property')+'</div>'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds+' bed':'')+(dateStr?' · '+dateStr:'')+'</div>'
+      +'</div>';
+    });
   }
 
   // ── Empty state ──
   if(!tracked.length && !scheduled.length && !saved.length){
-    html='<div style="text-align:center;padding:48px 16px"><div style="font-size:48px;margin-bottom:12px">🏠</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:17px;color:var(--blue-dk);margin-bottom:8px">No properties yet</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.65;max-width:280px;margin-left:auto;margin-right:auto">Track properties from realestate.com.au, Domain, REIWA or Rent.com.au — they\'ll appear here ready to inspect.</div><button class="btn-blue" style="max-width:280px;margin:0 auto" onclick="navigate(\'/app/index.html\')">Track a Property →</button></div>';
+    html='<div style="text-align:center;padding:40px 16px"><div style="font-size:44px;margin-bottom:12px">🏠</div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:16px;color:var(--blue-dk);margin-bottom:8px">No properties yet</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto">Paste a listing URL above or upload a screenshot to start tracking properties.</div></div>';
   }
 
   list.innerHTML=html;
@@ -1091,19 +1206,40 @@ function startInspectionForTracked(propId){
     var prop=tracked.find(function(p){return p&&p.id===propId});
     if(!prop){showToast('Not found','That property is no longer tracked','⚠️');return;}
 
-    // Stash the property reference so the saved report links back to the tracked record
     inspectionData.sourceUrl=prop.url||prop.originalLink||'';
     inspectionData.trackedId=prop.id;
 
-    // Pre-fill the setup view fields with what we already know
     var addrField=document.getElementById('setupAddress');
     var rentField=document.getElementById('setupRent');
+    var bedsField=document.getElementById('setupBeds');
     if(addrField)addrField.value=prop.address||prop.label||'';
     if(rentField){
       var p=prop.price||'';
-      // Clean up "$550 per week" / "$550/wk" → "$550"
       rentField.value=p.replace(/\s*(per\s*week|p\/?w|\/wk|\/week)\s*$/i,'').trim();
     }
+
+    // Auto-detect property type from tracked data or booking data
+    var pType = 'other';
+    if(prop.property_type) pType = prop.property_type;
+    else if(prop.booking_data && prop.booking_data.property_type) pType = prop.booking_data.property_type;
+    // Try to detect from description or URL
+    if(pType === 'other' && prop.description){
+      var desc = prop.description.toLowerCase();
+      if(desc.indexOf('apartment') !== -1 || desc.indexOf('apt') !== -1) pType = 'apartment';
+      else if(desc.indexOf('townhouse') !== -1) pType = 'townhouse';
+      else if(desc.indexOf('studio') !== -1) pType = 'studio';
+      else if(desc.indexOf('unit') !== -1) pType = 'unit';
+      else if(desc.indexOf('house') !== -1) pType = 'house';
+    }
+
+    // Auto-set bedrooms if available
+    var beds = prop.bedrooms || (prop.booking_data && prop.booking_data.bedrooms) || '';
+    if(beds && bedsField){
+      var bedNum = parseInt(beds);
+      if(bedNum >= 1 && bedNum <= 5) bedsField.value = bedNum.toString();
+    }
+
+    selectPropertyType(pType);
     switchView('B');
     showToast('Property loaded',(prop.address||'Inspection ready'),'🏠');
   }catch(e){
@@ -1205,59 +1341,90 @@ document.addEventListener('DOMContentLoaded', loadUserData);
 <script>
 /* DYNAMIC AREAS + CUSTOM AREAS UPDATE */
 (function(){
-// Base areas (always included)
-var BASE_AREAS = [
-  {id:'living',name:'Living Area',icon:'🛋',tips:'Check floor condition, wall marks, power points, windows, blinds/curtains, heating/cooling, light switches'},
-  {id:'kitchen',name:'Kitchen',icon:'🍳',tips:'Check benchtops, cupboards (open them), appliances, sink/taps, splashback, floor, power points, storage space'},
-  {id:'bathroom',name:'Main Bathroom',icon:'🚿',tips:'Check taps, water pressure, hot water, shower head, tiles, grout, fan, ventilation, storage, toilet flush'},
-  {id:'laundry',name:'Laundry',icon:'🧺',tips:'Check washing machine space, dryer vent, sink, taps, drainage, storage, floor condition'},
-  {id:'frontyard',name:'Front Yard/Entry',icon:'🚪',tips:'Check path, steps, lighting, letterbox, fence, gates, mailbox, front door/lock'},
-  {id:'backyard',name:'Back Yard',icon:'🌿',tips:'Check lawn, garden, fence, gates, shed, outdoor taps, drainage, clothesline, patio/deck condition'}
-];
 
-// Optional areas
-var OPTIONAL_AREAS = [
-  {id:'study',name:'Study/Office',icon:'💻',tips:'Check power points, internet/NBN ports, natural light, noise level, door/lock, storage'},
-  {id:'garage',name:'Garage',icon:'🚗',tips:'Check door (remote/manual), power points, lighting, storage space, ceiling height, condition'},
-  {id:'carport',name:'Carport',icon:'🚙',tips:'Check roof condition, drainage, power points, lighting, number of vehicles'},
-  {id:'storage',name:'Storage/Shed',icon:'📦',tips:'Check size, lock/security, roof condition, floor, weatherproofing, accessibility'}
-];
+// All possible areas — toggled on/off in the setup
+var ALL_AREAS = {
+  // Core living
+  living:    {id:'living',    name:'Living Area',     icon:'🛋', tips:'Check floor condition, wall marks, power points, windows, blinds/curtains, heating/cooling, light switches', group:'core'},
+  dining:    {id:'dining',    name:'Dining Area',     icon:'🍽', tips:'Check floor, walls, light fitting, power points, windows, space for furniture', group:'core'},
+  kitchen:   {id:'kitchen',   name:'Kitchen',         icon:'🍳', tips:'Check benchtops, cupboards (open them), appliances, sink/taps, splashback, floor, power points, rangehood, oven, cooktop', group:'core'},
+  // Wet areas
+  bathroom:  {id:'bathroom',  name:'Main Bathroom',   icon:'🚿', tips:'Check taps, water pressure, hot water, shower head, tiles, grout, fan, ventilation, storage, toilet flush, mirror, towel rails', group:'wet'},
+  bathroom2: {id:'bathroom2', name:'2nd Bathroom',     icon:'🚿', tips:'Check taps, water pressure, shower/bath, tiles, grout, exhaust fan, ventilation, toilet, vanity', group:'wet'},
+  ensuite:   {id:'ensuite',   name:'Ensuite',          icon:'🛁', tips:'Check shower, taps, tiles, grout, exhaust fan, vanity, mirror, toilet, towel rails, water pressure', group:'wet'},
+  toilet:    {id:'toilet',    name:'Separate Toilet',  icon:'🚽', tips:'Check flush, seat, cistern, floor, walls, ventilation, door lock', group:'wet'},
+  laundry:   {id:'laundry',   name:'Laundry',          icon:'🧺', tips:'Check washing machine space, dryer vent, sink, taps, drainage, storage, floor condition', group:'wet'},
+  // Outdoor
+  frontyard: {id:'frontyard', name:'Front Yard/Entry', icon:'🚪', tips:'Check path, steps, lighting, letterbox, fence, gates, mailbox, front door/lock, intercom/buzzer', group:'outdoor'},
+  backyard:  {id:'backyard',  name:'Back Yard',        icon:'🌿', tips:'Check lawn, garden, fence, gates, shed, outdoor taps, drainage, clothesline, patio/deck condition', group:'outdoor'},
+  balcony:   {id:'balcony',   name:'Balcony/Terrace',  icon:'🌇', tips:'Check railing, floor, drainage, waterproofing, privacy, lighting, power points, plants/planter boxes', group:'outdoor'},
+  courtyard: {id:'courtyard', name:'Courtyard',        icon:'🏡', tips:'Check paving, drainage, fence/walls, lighting, gate, plants, outdoor tap', group:'outdoor'},
+  pool:      {id:'pool',      name:'Pool/Spa',         icon:'🏊', tips:'Check pool fencing compliance, pump, filter, surface condition, surrounds, safety signage, gate latch', group:'outdoor'},
+  // Utility & parking
+  garage:    {id:'garage',    name:'Garage',            icon:'🚗', tips:'Check door (remote/manual), power points, lighting, storage space, ceiling height, floor condition, staining', group:'parking'},
+  carport:   {id:'carport',   name:'Carport',           icon:'🚙', tips:'Check roof condition, drainage, power points, lighting, number of vehicles it fits', group:'parking'},
+  driveway:  {id:'driveway',  name:'Driveway/Parking',  icon:'🅿️', tips:'Check surface condition, cracks, staining, width, access, lighting', group:'parking'},
+  storage:   {id:'storage',   name:'Storage/Shed',      icon:'📦', tips:'Check size, lock/security, roof condition, floor, weatherproofing, accessibility', group:'parking'},
+  // Interior extras
+  study:     {id:'study',     name:'Study/Office',      icon:'💻', tips:'Check power points, internet/NBN ports, natural light, noise level, door/lock, storage, desk space', group:'extras'},
+  hallway:   {id:'hallway',   name:'Hallway/Entrance',  icon:'🚶', tips:'Check floor, walls, lighting, smoke detector, linen cupboard, coat hooks, carpet/tiles', group:'extras'},
+  stairs:    {id:'stairs',    name:'Staircase',          icon:'🪜', tips:'Check handrail, carpet/treads, lighting, condition of steps, balusters, under-stair storage', group:'extras'},
+  attic:     {id:'attic',     name:'Attic/Roof Space',   icon:'🏚', tips:'Check access, insulation, pests, leaks, ventilation, stored items', group:'extras'},
+  basement:  {id:'basement',  name:'Basement/Cellar',    icon:'🪨', tips:'Check dampness, ventilation, lighting, power points, floor condition, access', group:'extras'},
+  communal:  {id:'communal',  name:'Common Areas',       icon:'🏢', tips:'Check foyer, lift, stairwell, mailbox area, garbage room, bike storage, building security', group:'extras'}
+};
 
-// Store custom areas
+// Default areas for each property type
+var TYPE_DEFAULTS = {
+  house:     ['living','kitchen','dining','bathroom','laundry','hallway','frontyard','backyard','garage'],
+  apartment: ['living','kitchen','bathroom','laundry','balcony','communal'],
+  unit:      ['living','kitchen','bathroom','laundry','courtyard'],
+  townhouse: ['living','kitchen','dining','bathroom','bathroom2','laundry','hallway','stairs','frontyard','backyard','garage'],
+  studio:    ['living','kitchen','bathroom','laundry','balcony'],
+  other:     ['living','kitchen','bathroom','laundry','frontyard','backyard']
+};
+
 function getAreas() {
   var bedCount = parseInt(inspectionData.beds || 2);
-  var areas = BASE_AREAS.slice();
-  
-  // Add bedrooms
-  for(var i=1; i<=bedCount; i++){
-    areas.push({
-      id: 'bedroom'+i,
-      name: bedCount===1 ? 'Bedroom' : (i===1 ? 'Master Bedroom' : 'Bedroom '+i),
-      icon: i===1 ? '🛏' : '🛏️',
-      tips: 'Check windows, '+(i===1?'built-ins/':'')+'closet, power points, floor, walls, ceiling, light, door/lock, size, natural light'
-    });
-  }
-  
-  // Add optional areas if selected in data
-  OPTIONAL_AREAS.forEach(function(opt){
-    if(inspectionData.optionalAreas && inspectionData.optionalAreas[opt.id]){
-      areas.push(opt);
+  var propType = (inspectionData.propertyType || 'other').toLowerCase();
+  var selected = inspectionData.selectedAreas || {};
+  var areas = [];
+
+  // If user explicitly selected areas, use those
+  if (Object.keys(selected).length > 0) {
+    for (var aId in selected) {
+      if (selected[aId] && ALL_AREAS[aId]) areas.push(ALL_AREAS[aId]);
     }
-  });
-  
+  } else {
+    // Use defaults for property type
+    var defaults = TYPE_DEFAULTS[propType] || TYPE_DEFAULTS['other'];
+    defaults.forEach(function(aId) { if (ALL_AREAS[aId]) areas.push(ALL_AREAS[aId]); });
+  }
+
+  // Add bedrooms
+  for (var i = 1; i <= bedCount; i++) {
+    areas.push({
+      id: 'bedroom' + i,
+      name: bedCount === 1 ? 'Bedroom' : (i === 1 ? 'Master Bedroom' : 'Bedroom ' + i),
+      icon: '🛏',
+      tips: 'Check windows, ' + (i === 1 ? 'built-ins/walk-in robe, ' : '') + 'wardrobe, power points, floor, walls, ceiling, light, door/lock, size, natural light',
+      group: 'bedrooms'
+    });
+    // Add ensuite for master bedroom if 2+ beds and property is house/townhouse
+    if (i === 1 && bedCount >= 2 && (propType === 'house' || propType === 'townhouse')) {
+      if (!areas.some(function(a) { return a.id === 'ensuite'; })) {
+        areas.push(ALL_AREAS['ensuite']);
+      }
+    }
+  }
+
   // Add custom areas
-  if(inspectionData.customAreas){
-    inspectionData.customAreas.forEach(function(cust, idx){
-      areas.push({
-        id: 'custom_'+idx,
-        name: cust.name,
-        icon: cust.icon || '📍',
-        tips: cust.tips || 'Check condition, cleanliness, any damage or issues',
-        isCustom: true
-      });
+  if (inspectionData.customAreas) {
+    inspectionData.customAreas.forEach(function(cust, idx) {
+      areas.push({ id: 'custom_' + idx, name: cust.name, icon: cust.icon || '📍', tips: cust.tips || 'Check condition, cleanliness, any damage or issues', isCustom: true });
     });
   }
-  
+
   return areas;
 }
 
@@ -1332,24 +1499,60 @@ window.showAddCustomArea = function(){
   updateProgress();
 };
 
-// Optional areas selector on setup
+// Property type selector
+window.selectPropertyType = function(type) {
+  inspectionData.propertyType = type;
+  // Update buttons
+  var btns = document.querySelectorAll('#propTypeSelector .priority-pill');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-type') === type);
+  }
+  // Rebuild area toggles with defaults for this type
+  renderAreaToggles(type);
+};
+
+window.renderAreaToggles = function(propType) {
+  var container = document.getElementById('areaToggles');
+  if (!container) return;
+  var defaults = TYPE_DEFAULTS[propType] || TYPE_DEFAULTS['other'];
+  var groups = {core:'Living',wet:'Wet Areas',outdoor:'Outdoor',parking:'Parking & Storage',extras:'Extras'};
+  var html = '';
+  for (var gKey in groups) {
+    var groupAreas = [];
+    for (var aId in ALL_AREAS) { if (ALL_AREAS[aId].group === gKey) groupAreas.push(ALL_AREAS[aId]); }
+    if (!groupAreas.length) continue;
+    html += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px">' + groups[gKey] + '</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    groupAreas.forEach(function(a) {
+      var isOn = defaults.indexOf(a.id) !== -1;
+      html += '<button class="priority-pill area-toggle' + (isOn ? ' active' : '') + '" data-area="' + a.id + '" onclick="toggleAreaSelection(\'' + a.id + '\',this)">' + a.icon + ' ' + a.name + '</button>';
+    });
+    html += '</div>';
+  }
+  container.innerHTML = html;
+};
+
+window.toggleAreaSelection = function(areaId, btn) {
+  btn.classList.toggle('active');
+};
+
 window.startWalkthrough = function(){
-  inspectionData.address=document.getElementById('setupAddress').value;
-  inspectionData.rent=document.getElementById('setupRent').value;
-  inspectionData.beds=document.getElementById('setupBeds').value;
-  // Read optional areas from checkboxes
-  inspectionData.optionalAreas={};
-  if(document.getElementById('optStudy').checked) inspectionData.optionalAreas['study']=true;
-  if(document.getElementById('optGarage').checked) inspectionData.optionalAreas['garage']=true;
-  if(document.getElementById('optCarport').checked) inspectionData.optionalAreas['carport']=true;
-  if(document.getElementById('optStorage').checked) inspectionData.optionalAreas['storage']=true;
+  inspectionData.address = document.getElementById('setupAddress').value;
+  inspectionData.rent = document.getElementById('setupRent').value;
+  inspectionData.beds = document.getElementById('setupBeds').value;
+  // Read selected areas from toggles
+  inspectionData.selectedAreas = {};
+  var toggles = document.querySelectorAll('.area-toggle.active');
+  for (var i = 0; i < toggles.length; i++) {
+    inspectionData.selectedAreas[toggles[i].getAttribute('data-area')] = true;
+  }
   // Parse custom areas from text input
-  var customInput=document.getElementById('setupCustom').value;
-  if(customInput){
-    inspectionData.customAreas=[];
-    customInput.split(',').forEach(function(s){
-      var trimmed=s.trim();
-      if(trimmed) inspectionData.customAreas.push({name:trimmed,icon:'📍',tips:'Check condition, cleanliness, any damage or issues'});
+  var customInput = document.getElementById('setupCustom').value;
+  if (customInput) {
+    inspectionData.customAreas = [];
+    customInput.split(',').forEach(function(s) {
+      var trimmed = s.trim();
+      if (trimmed) inspectionData.customAreas.push({ name: trimmed, icon: '📍', tips: 'Check condition, cleanliness, any damage or issues' });
     });
   }
   renderAreas();

@@ -17,7 +17,7 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
-<script src="/app/js/credits.js" defer></script>
+<script src="/app/js/payments.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,9 +205,12 @@
     </div>
   </div>
 
-  <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);display:flex;gap:10px;z-index:10">
-    <button class="btn-outline-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="switchView('A')">← Back</button>
-    <button class="btn-blue-c flex-1" id="startExitBtn" style="border-radius:12px;opacity:.5;pointer-events:none" onclick="switchView('C')">Start Exit Walkthrough →</button>
+  <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10">
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px">Exit-Guard Bond Shield — $19.99 one-time · Compares entry vs exit photos</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-outline-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="switchView('A')">← Back</button>
+      <button class="btn-blue-c flex-1" id="startExitBtn" style="border-radius:12px;opacity:.5;pointer-events:none" onclick="switchView('C')">Generate Bond Shield Report →</button>
+    </div>
   </div>
 </div>
 
@@ -666,8 +669,8 @@ var aiComparisonData=null;
 var tenantDecisions={};
 
 async function runExitGeneration(){
-  if(window.RIQCredits){
-    var ok=await RIQCredits.gate('exit_bond_shield');
+  if(window.RIQPayments){
+    var ok=await RIQPayments.gate('exit_bond_shield');
     if(!ok)return;
   }
   runExitGenerationCore();
@@ -721,9 +724,10 @@ async function runExitGenerationCore(){
   }
 
   setTimeout(function(){
-    if(window.RIQCredits)RIQCredits.consume('exit_bond_shield');
+    if(window.RIQPayments)RIQPayments.recordPurchase('exit_bond_shield');
     renderComparisonResults(aiComparisonData);
     switchView('F');
+    if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function') RIQPayments.promptCloudSync();
   },6200);
 }
 
