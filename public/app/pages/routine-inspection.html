@@ -1430,15 +1430,29 @@ function saveToCommsVault(emailText, agency) {
   try {
     var raw = localStorage.getItem('riq_communications') || '[]';
     var comms = JSON.parse(raw);
-    comms.unshift({
+    var record = {
+      id: 'comm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
       type: 'routine_inspection_response',
       to: agency || 'Agent',
       subject: 'Routine Inspection Response — ' + new Date().toLocaleDateString('en-AU'),
       body: emailText,
       date: Date.now(),
-      source: 'routine-inspection'
-    });
+      source: 'routine-inspection',
+      threadId: (analysisData && analysisData.threadId) || null,
+      propertyAddress: (analysisData && analysisData.propertyAddress) || ''
+    };
+    comms.unshift(record);
     localStorage.setItem('riq_communications', JSON.stringify(comms));
+
+    // Cloud sync — mirror to Firestore so comms survive device changes.
+    if (window.RIQStore) {
+      RIQStore.ready.then(function() {
+        if (!RIQStore.isAuthed()) return;
+        RIQStore.write('communications', record.id, record).catch(function(err) {
+          console.warn('Communications cloud sync failed:', err);
+        });
+      });
+    }
   } catch(e) { console.error('saveToCommsVault:', e); }
 }
 

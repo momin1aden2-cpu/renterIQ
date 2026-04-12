@@ -307,6 +307,45 @@ function init(){
     if(amtEl && data.amount) amtEl.value = data.amount;
     if(addrEl && data.address) addrEl.value = data.address;
   }
+
+  // Friendly nudge: if the user arrived here from the post-move-in filing
+  // sheet (?prompt=receipt) and hasn't lodged a receipt yet, greet them.
+  try {
+    var url = new URL(window.location.href);
+    if (url.searchParams.get('prompt') === 'receipt'){
+      var hasLodgement = data && data.referenceNumber && data.lodgeDate;
+      if (!hasLodgement) setTimeout(showBondReceiptPrompt, 250);
+    }
+  } catch(e) {}
+}
+
+function showBondReceiptPrompt(){
+  if(document.getElementById('bondReceiptPrompt'))return;
+  var el=document.createElement('div');
+  el.id='bondReceiptPrompt';
+  el.style.cssText='position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .2s ease';
+  el.innerHTML=''+
+    '<div style="background:#fff;border-radius:22px;max-width:380px;width:100%;padding:24px 22px;transform:translateY(12px) scale(.98);transition:all .28s cubic-bezier(.34,1.56,.64,1);text-align:center">'+
+      '<div style="font-size:46px;line-height:1;margin-bottom:10px">🛡️</div>'+
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:19px;color:var(--text);letter-spacing:-.3px;margin-bottom:8px">Got your bond receipt?</div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:20px">Your agent should hand over a lodgement receipt from the bond authority. Add the reference number and amount now so you can prove it later.</div>'+
+      '<button id="bondPromptNowBtn" class="btn-blue" style="margin-bottom:10px">Add the details now</button>'+
+      '<button id="bondPromptLaterBtn" style="width:100%;background:none;border:none;font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--muted);padding:10px;cursor:pointer">I\'ll do it later</button>'+
+    '</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(function(){
+    el.style.opacity='1';
+    var inner=el.firstElementChild; if(inner){inner.style.transform='translateY(0) scale(1)';}
+  });
+  var close=function(){ el.style.opacity='0'; setTimeout(function(){ if(el.parentNode)el.parentNode.removeChild(el); },200); };
+  document.getElementById('bondPromptLaterBtn').onclick=close;
+  document.getElementById('bondPromptNowBtn').onclick=function(){
+    close();
+    setTimeout(function(){
+      var amtEl=document.getElementById('bondAmount');
+      if(amtEl){amtEl.focus();amtEl.scrollIntoView({behavior:'smooth',block:'center'});}
+    },220);
+  };
 }
 
 document.addEventListener('DOMContentLoaded', init);

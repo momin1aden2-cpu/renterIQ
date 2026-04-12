@@ -311,7 +311,7 @@
 <div class="modal-overlay" id="signatureModal">
   <div class="modal-content" style="max-width:420px">
     <div class="modal-title">Sign & Finalise</div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.55">Your signature confirms this report reflects the property's condition at move-in. This is your legal record if bond is disputed at exit.</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.55">Your signature confirms this report reflects the property's condition at move-in. Keep a copy — it's the record that helps protect your bond at exit.</div>
 
     <div style="margin-bottom:12px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px">Full Name (tenant)</div>
@@ -1361,19 +1361,75 @@ function generateEntryReportCore(){
   if(window.RIQPayments)RIQPayments.recordPurchase('entry_condition');
 
   setTimeout(function(){
-    showToast('Report generated',reportData.totalPhotos+' photos · '+reportData.completedRooms+' rooms documented','✓');
+    showToast('Move-in record saved ✓',reportData.totalPhotos+' photos · '+reportData.completedRooms+' rooms','🏠');
     // Export PDF
     if(window.RIQExport){
       exportEntryReportPDF(reportData);
     }
     // Prompt cloud sync if not purchased
     if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function'){
-      RIQPayments.promptCloudSync().then(function(){ navigate('/app/pages/vault.html'); });
+      RIQPayments.promptCloudSync().then(function(){ openFilingSheet(reportData); });
     } else {
-      setTimeout(function(){ navigate('/app/pages/vault.html'); },1500);
+      setTimeout(function(){ openFilingSheet(reportData); },800);
     }
   },2000);
 }
+
+// ── Post-save Filing Sheet ────────────────────────────────────────
+// After the move-in record is saved, nudge the renter to file the other
+// two bits that matter most: bond receipt + a copy of the lease. Keeps
+// everything together before they unpack and forget.
+function openFilingSheet(reportData){
+  var overlay=document.createElement('div');
+  overlay.id='filingSheet';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;padding:0;opacity:0;transition:opacity .2s ease';
+  overlay.innerHTML=''+
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(20px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">'+
+      '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px"></div>'+
+      '<div style="text-align:center;margin-bottom:18px">'+
+        '<div style="font-size:40px;line-height:1;margin-bottom:8px">📂</div>'+
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:19px;color:var(--text);letter-spacing:-.3px">Before you unpack</div>'+
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.55;margin-top:6px;max-width:300px;margin-left:auto;margin-right:auto">Let\'s file the three things that matter most. Takes a minute — saves heartache later.</div>'+
+      '</div>'+
+      '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">'+
+        '<div style="display:flex;align-items:center;gap:12px;padding:14px 14px;background:rgba(0,200,150,.08);border:1px solid var(--teal);border-radius:14px">'+
+          '<div style="width:40px;height:40px;border-radius:10px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0">✓</div>'+
+          '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Move-in record</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--teal-dk);margin-top:2px">Just saved — you\'re set</div></div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:12px;padding:14px 14px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:14px;cursor:pointer" onclick="filingGoBondReceipt()">'+
+          '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🛡️</div>'+
+          '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Got your bond receipt?</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Lodge it in your Bond Tracker now</div></div>'+
+          '<span style="color:var(--blue);font-size:18px;font-weight:800">›</span>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:12px;padding:14px 14px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:14px;cursor:pointer" onclick="filingGoLease()">'+
+          '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📑</div>'+
+          '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Save a copy of your lease</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Upload the signed PDF — review in plain English</div></div>'+
+          '<span style="color:var(--blue);font-size:18px;font-weight:800">›</span>'+
+        '</div>'+
+      '</div>'+
+      '<button id="filingSkipBtn" style="width:100%;background:none;border:none;font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--muted);padding:12px;cursor:pointer;min-height:44px">I\'ll do this later →</button>'+
+    '</div>';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    overlay.style.opacity='1';
+    var sheet=overlay.firstElementChild;
+    if(sheet)sheet.style.transform='translateY(0)';
+  });
+  document.getElementById('filingSkipBtn').onclick=function(){
+    filingClose(); setTimeout(function(){ navigate('/app/pages/vault.html'); },180);
+  };
+}
+
+function filingClose(){
+  var el=document.getElementById('filingSheet');
+  if(!el)return;
+  el.style.opacity='0';
+  setTimeout(function(){ if(el.parentNode)el.parentNode.removeChild(el); },200);
+}
+
+function filingGoBondReceipt(){ filingClose(); setTimeout(function(){ navigate('/app/pages/bond-tracker.html?prompt=receipt'); },180); }
+function filingGoLease(){ filingClose(); setTimeout(function(){ navigate('/app/pages/lease.html?upload=1'); },180); }
+
 
 function exportEntryReportPDF(data){
   if(!window.RIQExport||!RIQExport.generateConditionReport)return;

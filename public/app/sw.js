@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v16 — Routine inspection hardening
+// RenterIQ Service Worker v22 — Journey strip + active waiting + follow-up sheet
 // No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
 
-var CACHE_NAME = 'renteriq-shell-v16';
+var CACHE_NAME = 'renteriq-shell-v22';
 
 var APP_SHELL = [
   '/app/index.html',
@@ -32,6 +32,7 @@ var APP_SHELL = [
   '/app/pages/rent-tracker.html',
   '/app/pages/bond-tracker.html',
   '/app/pages/routine-inspection.html',
+  '/app/pages/report-issue.html',
   '/app/pages/tracked.html',
   '/app/pages/webview.html',
   '/assets/icons/icon-192.png',

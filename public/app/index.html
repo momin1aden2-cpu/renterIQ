@@ -1206,6 +1206,17 @@
       </div>
     </div>
 
+    <!-- ── Your Journey — progress strip ────────────────────── -->
+    <div id="journeyStrip" style="display:none;padding:18px 16px 0">
+      <div style="background:#fff;border:1px solid var(--border-lt);border-radius:18px;padding:14px 14px 12px;box-shadow:var(--shadow-card)">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+          <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--text);letter-spacing:-.2px">Your journey</span>
+          <span id="journeyCaption" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div id="journeyTrack" style="display:flex;align-items:center;gap:4px"></div>
+      </div>
+    </div>
+
     <!-- ── What's On ─────────────────────────────────────────── -->
     <div style="padding:20px 16px 0">
       <div class="sec-row" style="margin-bottom:12px">
@@ -1354,6 +1365,18 @@
           <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px" id="bondCardSub"></div>
         </div>
         <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);white-space:nowrap">Details →</span>
+      </div>
+    </div>
+
+    <!-- ── Report an Issue — tile for in-tenancy maintenance problems ── -->
+    <div style="padding:8px 16px 0">
+      <div style="background:linear-gradient(135deg,#FFF4E6,#FFE8CC);border:1px solid #FFD699;border-radius:18px;padding:16px 18px;box-shadow:var(--shadow-card);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="navigate('/app/pages/report-issue.html')">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#F59E0B,#F97316);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔧</div>
+        <div style="flex:1">
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:#7A4A00">Report an issue</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:#8A5A1A;margin-top:2px;line-height:1.4">Something broken or not working? We'll draft the email and track the follow-up.</div>
+        </div>
+        <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#C2410C">→</span>
       </div>
     </div>
 
@@ -2604,20 +2627,41 @@ function homeRenderFollowups() {
 
     if (p.status === 'applied') {
       var daysSince = p.appliedAt ? Math.round((Date.now() - p.appliedAt) / 86400000) : 0;
-      var waitText = daysSince <= 1 ? 'Applied today' : daysSince <= 3 ? 'Applied ' + daysSince + ' days ago — agents usually respond within 1–3 days' : 'Applied ' + daysSince + ' days ago — consider following up with the agent';
-      html += '<div style="background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);margin-bottom:10px">' +
-        '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">Any update on ' + addr + '?</div>' +
-        '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:12px">' + waitText + '</div>' +
+      var waitHeadline, waitLine, tone;
+      if (daysSince <= 1) {
+        waitHeadline = 'Applied — now we wait ⏳';
+        waitLine = 'Most agents come back within 3–5 days. No action needed yet.';
+        tone = 'calm';
+      } else if (daysSince <= 4) {
+        waitHeadline = daysSince + ' days since you applied';
+        waitLine = 'Agents usually respond within 5–7 days. Hang tight.';
+        tone = 'calm';
+      } else if (daysSince <= 8) {
+        waitHeadline = daysSince + ' days — might be time to nudge';
+        waitLine = 'A friendly follow-up now often moves things along.';
+        tone = 'nudge';
+      } else {
+        waitHeadline = daysSince + ' days in — time to follow up';
+        waitLine = 'It\'s been a while. A quick call or message keeps you on their radar.';
+        tone = 'push';
+      }
+      var canFollowUp = tone === 'nudge' || tone === 'push';
+      var bannerBg = tone === 'push' ? 'linear-gradient(135deg,#FFF4E6,#FFE8CC)' : (tone === 'nudge' ? 'var(--blue-xl)' : '#fff');
+      var bannerBorder = tone === 'push' ? '#FFD699' : (tone === 'nudge' ? 'var(--border-lt)' : 'var(--border-lt)');
+      html += '<div style="background:' + bannerBg + ';border-radius:16px;padding:16px;border:1px solid ' + bannerBorder + ';box-shadow:var(--shadow-card);margin-bottom:10px">' +
+        '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">' + waitHeadline + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.55">' + waitLine + '</div>' +
+        (canFollowUp ? '<button style="width:100%;background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;border:none;border-radius:10px;padding:11px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px" onclick="homeOpenFollowUpSheet(\'' + p.id + '\')">✦ Help me follow up</button>' : '') +
         '<div style="display:flex;gap:8px">' +
           '<button style="flex:1;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="homeAppOutcome(\'' + p.id + '\',\'successful\')">I Got It!</button>' +
-          '<button style="flex:1;background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="homeAppOutcome(\'' + p.id + '\',\'waiting\')">Still Waiting</button>' +
+          '<button style="flex:1;background:#fff;color:var(--blue);border:1px solid var(--border-lt);border-radius:10px;padding:10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="homeAppOutcome(\'' + p.id + '\',\'waiting\')">Still Waiting</button>' +
           '<button style="flex:1;background:rgba(239,68,68,.08);color:var(--red);border:none;border-radius:10px;padding:10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="homeAppOutcome(\'' + p.id + '\',\'unsuccessful\')">Didn\'t Get It</button>' +
         '</div>' +
       '</div>';
     } else if (p.status === 'lease_offered') {
-      html += '<div style="background:linear-gradient(135deg,#065F46,#10B981);border-radius:16px;padding:18px;margin-bottom:10px">' +
-        '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:16px;color:#fff;margin-bottom:6px">🎉 Lease offered — ' + addr + '</div>' +
-        '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.8);margin-bottom:14px;line-height:1.6">Upload your lease for a plain-English review before you sign. We\'ll extract the key terms so you know exactly what you\'re agreeing to.</div>' +
+      html += '<div style="background:linear-gradient(135deg,#065F46,#10B981);border-radius:16px;padding:18px;margin-bottom:10px;box-shadow:0 6px 18px rgba(16,185,129,.22)">' +
+        '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:16.5px;color:#fff;margin-bottom:6px;letter-spacing:-.2px">🎉 You got it — ' + addr + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.85);margin-bottom:14px;line-height:1.6">Before you sign, upload the lease and we\'ll break it down in plain English so nothing sneaks up on you.</div>' +
         '<div style="display:flex;gap:8px">' +
           '<button style="flex:1;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:12px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="navigate(\'/app/pages/lease.html\')">Upload &amp; Review Lease →</button>' +
         '</div>' +
@@ -2626,8 +2670,8 @@ function homeRenderFollowups() {
       var setupDone = p.bondSetup && p.rentSetup;
       if (!setupDone) {
         html += '<div style="background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);margin-bottom:10px">' +
-          '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">Getting ready for ' + addr + '</div>' +
-          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:12px">A few things to set up before you move in</div>' +
+          '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:14.5px;color:var(--text);margin-bottom:4px">🏡 Welcome to ' + addr + '!</div>' +
+          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.55">Let\'s get a few things in place before you unpack — takes a few minutes and saves heartache later.</div>' +
           '<div style="display:flex;flex-direction:column;gap:8px">' +
             (!p.bondSetup ? '<button style="width:100%;background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px" onclick="navigate(\'/app/pages/bond-tracker.html\')"><span>🛡️</span>Set up bond tracker</button>' : '') +
             (!p.rentSetup ? '<button style="width:100%;background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px" onclick="navigate(\'/app/pages/rent-tracker.html\')"><span>💰</span>Set up rent payments</button>' : '') +
@@ -2644,6 +2688,170 @@ function homeRenderFollowups() {
   } else {
     container.style.display = 'none';
   }
+  // Keep the journey strip in sync with any status change
+  if (typeof homeRenderJourney === 'function') homeRenderJourney();
+}
+
+// ── Journey progress strip ─────────────────────────────────────
+function homeRenderJourney(){
+  var strip = document.getElementById('journeyStrip');
+  var track = document.getElementById('journeyTrack');
+  var caption = document.getElementById('journeyCaption');
+  if(!strip || !track) return;
+
+  var props = homeGetTracked();
+  var phases = [
+    { id:'search',  label:'Search',   icon:'🔍', route:'/app/pages/inspection.html' },
+    { id:'inspect', label:'Inspect',  icon:'📋', route:'/app/pages/inspection.html' },
+    { id:'apply',   label:'Apply',    icon:'✍️', route:'/app/pages/application.html' },
+    { id:'lease',   label:'Lease',    icon:'📑', route:'/app/pages/lease.html' },
+    { id:'movein',  label:'Move in',  icon:'🏠', route:'/app/pages/entry-audit.html' },
+    { id:'living',  label:'Living',   icon:'🌿', route:'/app/pages/vault.html' }
+  ];
+
+  // Work out the furthest-progressed phase across all tracked properties
+  var rank = { search:0, inspect:1, apply:2, lease:3, movein:4, living:5 };
+  var current = 'search';
+  var captionText = 'Start by tracking a property';
+
+  if(!props.length){
+    strip.style.display = 'none';
+    return;
+  }
+
+  props.forEach(function(p){
+    if(!p) return;
+    var phase;
+    if(p.status === 'lease_signed'){
+      phase = (p.bondSetup && p.rentSetup) ? 'living' : 'movein';
+    } else if(p.status === 'lease_offered'){
+      phase = 'lease';
+    } else if(p.status === 'applied'){
+      phase = 'apply';
+    } else if(p.status === 'inspected' || p.verdict){
+      phase = 'apply'; // ready to apply (inspection done)
+    } else {
+      phase = 'inspect'; // tracked, not yet inspected
+    }
+    if(rank[phase] > rank[current]) current = phase;
+  });
+
+  // Caption copy per phase
+  var captions = {
+    search:  'Track more places to compare',
+    inspect: 'Inspect to decide which to apply for',
+    apply:   'You\'re applying — waiting on the agent',
+    lease:   'Lease offered — review before you sign',
+    movein:  'Signed! Time to set up for move-in',
+    living:  'You\'re settled — we\'ll keep things tidy'
+  };
+  captionText = captions[current] || '';
+
+  // Build the strip
+  var html = '';
+  phases.forEach(function(ph, i){
+    var reached = rank[ph.id] <= rank[current];
+    var isCurrent = ph.id === current;
+    var dotBg = isCurrent
+      ? 'linear-gradient(135deg,var(--blue),var(--blue-md))'
+      : (reached ? 'var(--teal)' : 'var(--border-lt)');
+    var dotColor = (reached || isCurrent) ? '#fff' : 'var(--muted)';
+    var dotScale = isCurrent ? '1.08' : '1';
+    var ring = isCurrent ? 'box-shadow:0 0 0 3px rgba(27,80,200,.18);' : '';
+    var labelColor = isCurrent ? 'var(--blue)' : (reached ? 'var(--teal-dk)' : 'var(--muted)');
+    var labelWeight = isCurrent ? '800' : '700';
+
+    html += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer" onclick="navigate(\'' + ph.route + '\')">' +
+      '<div style="width:34px;height:34px;border-radius:50%;background:' + dotBg + ';color:' + dotColor + ';display:flex;align-items:center;justify-content:center;font-size:15px;transform:scale(' + dotScale + ');transition:transform .2s;' + ring + '">' + (reached && !isCurrent ? '✓' : ph.icon) + '</div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:' + labelWeight + ';font-size:9.5px;color:' + labelColor + ';letter-spacing:.3px;text-align:center">' + ph.label + '</div>' +
+    '</div>';
+    if(i < phases.length - 1){
+      var segReached = rank[phases[i+1].id] <= rank[current];
+      var segColor = segReached ? 'var(--teal)' : 'var(--border-lt)';
+      html += '<div style="flex:0 0 8px;height:2px;background:' + segColor + ';margin-top:-14px;transition:background .3s"></div>';
+    }
+  });
+
+  track.innerHTML = html;
+  caption.textContent = captionText;
+  strip.style.display = 'block';
+}
+
+function homeOpenFollowUpSheet(propId){
+  var props = homeGetTracked();
+  var p = props.find(function(x){return x && x.id===propId;});
+  if(!p){ return; }
+  var addr = p.address || p.label || 'the property';
+  var agentName = p.agent_name || (p.booking_data && p.booking_data.agent_name) || '';
+  var agentPhone = p.agent_phone || (p.booking_data && p.booking_data.agent_phone) || '';
+  var agentEmail = p.agent_email || (p.booking_data && p.booking_data.agent_email) || '';
+  var daysSince = p.appliedAt ? Math.round((Date.now() - p.appliedAt) / 86400000) : 0;
+
+  var userName = '';
+  try { var prof = JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}'); userName = prof.fullName || ''; } catch(e){}
+
+  var emailSubject = 'Following up on my application — ' + addr;
+  var emailBody =
+    'Hi ' + (agentName || 'there') + ',\n\n' +
+    'I hope you\'re well. I submitted an application for ' + addr + ' ' + daysSince + ' days ago and wanted to check in on where things are at.\n\n' +
+    'I\'m still really keen on the place and happy to answer anything else you need from me. Let me know if there\'s any update.\n\n' +
+    'Thanks for your time.\n\n' +
+    'Kind regards,\n' +
+    (userName || '[Your name]');
+
+  var mailto = 'mailto:' + encodeURIComponent(agentEmail) + '?subject=' + encodeURIComponent(emailSubject) + '&body=' + encodeURIComponent(emailBody);
+  var tel = agentPhone ? 'tel:' + String(agentPhone).replace(/[^0-9+]/g,'') : '';
+
+  var overlay = document.createElement('div');
+  overlay.id='homeFollowUpSheet';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease';
+  overlay.innerHTML = ''+
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">'+
+      '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px"></div>'+
+      '<div style="text-align:center;margin-bottom:18px">'+
+        '<div style="font-size:40px;line-height:1;margin-bottom:8px">✉️</div>'+
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:19px;color:var(--text);letter-spacing:-.3px">Nudge the agent</div>'+
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.55;margin-top:6px;max-width:310px;margin-left:auto;margin-right:auto">A short, friendly message usually does the trick.</div>'+
+      '</div>'+
+      '<div style="display:flex;flex-direction:column;gap:10px">'+
+        (agentPhone
+          ? '<a href="' + tel + '" style="text-decoration:none"><div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:14px"><div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📞</div><div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Call ' + (agentName || 'the agent') + '</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">' + agentPhone + '</div></div><span style="color:var(--blue);font-size:18px;font-weight:800">›</span></div></a>'
+          : '<div style="display:flex;align-items:center;gap:12px;padding:14px;background:#F8F9FB;border:1.5px solid var(--border-lt);border-radius:14px;opacity:.55"><div style="width:40px;height:40px;border-radius:10px;background:var(--border-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📞</div><div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--muted)">No agent phone saved</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Add one in your property to enable calling</div></div></div>') +
+        '<div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:14px;cursor:pointer" onclick="homeCopyFollowUpDraft(this)" data-body="' + encodeURIComponent(emailBody) + '" data-subject="' + encodeURIComponent(emailSubject) + '">'+
+          '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📋</div>'+
+          '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Copy the draft message</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Paste into SMS, WhatsApp, or your email</div></div>'+
+          '<span style="color:var(--blue);font-size:18px;font-weight:800">›</span>'+
+        '</div>'+
+        (agentEmail
+          ? '<a href="' + mailto + '" style="text-decoration:none"><div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:14px"><div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✉️</div><div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Open email with draft</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">' + agentEmail + '</div></div><span style="color:var(--blue);font-size:18px;font-weight:800">›</span></div></a>'
+          : '<div style="display:flex;align-items:center;gap:12px;padding:14px;background:#F8F9FB;border:1.5px solid var(--border-lt);border-radius:14px;opacity:.55"><div style="width:40px;height:40px;border-radius:10px;background:var(--border-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✉️</div><div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--muted)">No agent email saved</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Copy the draft above and paste into your own email</div></div></div>') +
+      '</div>'+
+      '<div style="margin-top:16px;padding:12px 14px;background:#FEF9E7;border:1px solid #F5D57A;border-radius:12px;font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:#7A5A00;line-height:1.55">💡 Keep it short and polite — just a check-in, not a chase.</div>'+
+      '<button id="followUpCloseBtn" style="width:100%;background:none;border:none;font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--muted);padding:14px 12px 4px;cursor:pointer;min-height:44px;margin-top:6px">Close</button>'+
+    '</div>';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    overlay.style.opacity='1';
+    var sheet=overlay.firstElementChild; if(sheet)sheet.style.transform='translateY(0)';
+  });
+  var close=function(){
+    overlay.style.opacity='0';
+    setTimeout(function(){ if(overlay.parentNode)overlay.parentNode.removeChild(overlay); },200);
+  };
+  document.getElementById('followUpCloseBtn').onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay)close(); };
+}
+
+function homeCopyFollowUpDraft(el){
+  try {
+    var body = decodeURIComponent(el.getAttribute('data-body')||'');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(body).then(function(){ showToast('Copied','Paste it anywhere to send','📋'); });
+    } else {
+      var ta=document.createElement('textarea'); ta.value=body; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      showToast('Copied','Paste it anywhere to send','📋');
+    }
+  } catch(e){ showToast('Could not copy','Select the draft manually','⚠️'); }
 }
 
 function homeAppOutcome(propId, outcome) {
@@ -2694,6 +2902,7 @@ document.addEventListener('DOMContentLoaded', function() {
   homeRenderRentCard();
   homeRenderBondCard();
   homeRenderFollowups();
+  homeRenderJourney();
   // Defer everything else until the browser is idle
   if ('requestIdleCallback' in window) {
     requestIdleCallback(homeIdleInit, { timeout: 1500 });

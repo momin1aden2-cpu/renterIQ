@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="/app/manifest.json">
+<meta name="theme-color" content="#1B50C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RenterIQ">
+<link rel="stylesheet" href="/app/css/app.css?v=5">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<script src="/app/js/storage.js" defer></script>
+<script src="/app/js/auth-guard.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
+<title>Report an Issue — RenterIQ</title>
+<script src="/app/js/pwa-init.js" defer></script>
+<style>
+.cat-pill{background:#fff;border:1.5px solid var(--border);border-radius:100px;padding:10px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;display:inline-flex;align-items:center;gap:6px;margin:0 6px 8px 0}
+.cat-pill.sel{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(27,80,200,.25)}
+.urg-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.urg-btn{background:#fff;border:2px solid var(--border);border-radius:14px;padding:12px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;transition:all .18s var(--ease-smooth);text-align:center}
+.urg-btn .urg-emoji{font-size:22px}
+.urg-btn .urg-label{font-family:'Sora',sans-serif;font-weight:800;font-size:12.5px;color:var(--text);line-height:1.2}
+.urg-btn .urg-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:10.5px;color:var(--muted);line-height:1.35;margin-top:2px}
+.urg-btn[data-v="emergency"].sel{background:rgba(232,64,64,.08);border-color:var(--red)}
+.urg-btn[data-v="urgent"].sel{background:rgba(245,166,35,.08);border-color:var(--amber)}
+.urg-btn[data-v="routine"].sel{background:rgba(0,200,150,.08);border-color:var(--teal)}
+.photo-grid-ri{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.ri-photo{aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;background:var(--border-lt)}
+.ri-photo img{width:100%;height:100%;object-fit:cover}
+.ri-photo .rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+.ri-add{aspect-ratio:1;border:2px dashed var(--border);background:var(--blue-xl);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ri-add-icon{font-size:22px}
+.ri-add-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted)}
+.ai-tip-box{background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.ai-tip-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:1.3px;margin-bottom:6px}
+.ai-tip-row{display:flex;gap:8px;align-items:flex-start;font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.55;margin-top:6px}
+.sev-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;letter-spacing:.3px}
+.sev-chip.emergency{background:rgba(232,64,64,.12);color:var(--red)}
+.sev-chip.urgent{background:rgba(245,166,35,.12);color:#8A5500}
+.sev-chip.routine{background:rgba(0,200,150,.12);color:var(--teal-dk)}
+.draft-area{width:100%;min-height:280px;background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);line-height:1.7;resize:vertical;outline:none;box-sizing:border-box}
+.draft-area:focus{border-color:var(--blue)}
+.disclaimer-chip{display:flex;gap:8px;align-items:flex-start;background:#FEF9E7;border:1px solid #F5D57A;border-radius:10px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:600;color:#7A5A00;line-height:1.55;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- VIEW A — DESCRIBE -->
+<div class="view" id="viewA" style="display:flex;flex-direction:column;min-height:100vh">
+  <header class="sh">
+    <div class="sh-row"><button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">HOME</span></button></div>
+    <div class="sh-title">Report an Issue</div>
+    <div class="sh-sub">Describe what's going on — we'll help you tell the agent</div>
+  </header>
+
+  <div style="flex:1;overflow-y:auto;padding:14px 16px 160px">
+
+    <!-- Address -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="fsl">Property</div>
+      <input class="input-f" id="riAddress" type="text" placeholder="e.g. 12 Smith St, Fitzroy VIC 3065">
+    </div>
+
+    <!-- Describe -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="fsl">What's the issue?</div>
+      <textarea class="input-f" id="riDescription" rows="5" style="min-height:110px;line-height:1.55;resize:vertical" placeholder="e.g. The kitchen tap has been leaking steadily for 3 days. Water is pooling under the sink. The cupboard floor is getting soft."></textarea>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+        <span class="qn-chip" onclick="appendDesc('Started today.')">Started today</span>
+        <span class="qn-chip" onclick="appendDesc('Getting worse over time.')">Getting worse</span>
+        <span class="qn-chip" onclick="appendDesc('Affecting daily use of the room.')">Affects daily use</span>
+        <span class="qn-chip" onclick="appendDesc('Safety concern.')">Safety concern</span>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="fsl">Category</div>
+      <div id="catRow" style="display:flex;flex-wrap:wrap;margin-top:6px">
+        <span class="cat-pill" data-c="plumbing"        onclick="selCat('plumbing')">🚿 Plumbing</span>
+        <span class="cat-pill" data-c="electrical"      onclick="selCat('electrical')">💡 Electrical</span>
+        <span class="cat-pill" data-c="heating_cooling" onclick="selCat('heating_cooling')">🌡️ Heating / Cooling</span>
+        <span class="cat-pill" data-c="appliance"       onclick="selCat('appliance')">🍳 Appliance</span>
+        <span class="cat-pill" data-c="structural"      onclick="selCat('structural')">🏠 Structural</span>
+        <span class="cat-pill" data-c="pest"            onclick="selCat('pest')">🐀 Pest</span>
+        <span class="cat-pill" data-c="locks_security"  onclick="selCat('locks_security')">🔒 Locks / Security</span>
+        <span class="cat-pill" data-c="water_damage"    onclick="selCat('water_damage')">💧 Water damage</span>
+        <span class="cat-pill" data-c="mould"           onclick="selCat('mould')">🦠 Mould</span>
+        <span class="cat-pill" data-c="other"           onclick="selCat('other')">📌 Other</span>
+      </div>
+    </div>
+
+    <!-- Urgency -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="fsl">How urgent is it?</div>
+      <div class="urg-row">
+        <div class="urg-btn" data-v="emergency" onclick="selUrg('emergency')">
+          <span class="urg-emoji">🚨</span>
+          <div class="urg-label">Emergency</div>
+          <div class="urg-sub">Unsafe or unlivable right now</div>
+        </div>
+        <div class="urg-btn" data-v="urgent" onclick="selUrg('urgent')">
+          <span class="urg-emoji">⚠️</span>
+          <div class="urg-label">Urgent</div>
+          <div class="urg-sub">Serious inconvenience</div>
+        </div>
+        <div class="urg-btn sel" data-v="routine" onclick="selUrg('routine')">
+          <span class="urg-emoji">📝</span>
+          <div class="urg-label">Routine</div>
+          <div class="urg-sub">When convenient</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photos -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="fsl">Photos <span style="font-weight:600;color:var(--muted);margin-left:4px">(up to 4, optional)</span></div>
+      <div class="photo-grid-ri" id="riPhotoGrid">
+        <div class="ri-add" onclick="addRiPhoto()"><span class="ri-add-icon">📷</span><span class="ri-add-label">Add</span></div>
+      </div>
+    </div>
+
+    <!-- Agent details -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="fsl">Who should we send this to?</div>
+      <input class="input-f" id="riAgentName" type="text" placeholder="Agent or landlord name (optional)" style="margin-bottom:8px">
+      <input class="input-f" id="riAgentEmail" type="email" placeholder="Agent email" autocomplete="email" inputmode="email">
+    </div>
+
+    <div class="disclaimer-chip">
+      <span style="flex-shrink:0">💡</span>
+      <div>RenterIQ drafts a friendly, clear message for you. You review and send it. This is a helper, not legal advice.</div>
+    </div>
+  </div>
+
+  <div style="position:sticky;bottom:0;background:linear-gradient(transparent,var(--blue-xl) 28%);padding:20px 16px 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5">
+    <button class="btn-blue" id="riNextBtn" onclick="goDraft()" style="opacity:.5;pointer-events:none">Draft my message ✦</button>
+    <div id="riNextHint" style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-top:7px">Describe the issue and pick a category to continue</div>
+  </div>
+</div>
+
+<!-- VIEW B — DRAFT REVIEW -->
+<div class="view" id="viewB" style="display:none">
+  <header class="sh">
+    <div class="sh-row"><button class="sh-back" onclick="switchView('A')"><span class="sh-back-arrow">‹</span><span class="sh-label">EDIT</span></button></div>
+    <div class="sh-title">Review & Send</div>
+    <div class="sh-sub">Read it, tweak it, then send</div>
+  </header>
+
+  <div style="flex:1;overflow-y:auto;padding:14px 16px 160px">
+    <div id="aiStatusBox" class="card" style="margin-bottom:12px;text-align:center">
+      <div style="font-size:34px;line-height:1;margin-bottom:10px" id="aiStatusIcon">🤖</div>
+      <div id="aiStatusTitle" style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--text);margin-bottom:4px">Drafting your message…</div>
+      <div id="aiStatusSub" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);line-height:1.5">Assessing the issue and writing a clear, friendly email</div>
+    </div>
+
+    <div id="draftBlock" style="display:none">
+      <div class="ai-tip-box">
+        <div class="ai-tip-label">Assessment</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0">
+          <span class="sev-chip" id="sevChip">—</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:var(--muted)" id="catChip">—</span>
+        </div>
+        <div id="sevReason" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.55;margin-top:4px"></div>
+      </div>
+
+      <div class="ai-tip-box" id="tipsBox" style="display:none">
+        <div class="ai-tip-label">💡 While you wait for a response</div>
+        <div id="tenantTips"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div class="fsl">Subject</div>
+        <input class="input-f" id="emailSubject" type="text">
+        <div class="fsl" style="margin-top:12px">Email</div>
+        <textarea class="draft-area" id="emailBody"></textarea>
+        <div class="disclaimer-chip"><span style="flex-shrink:0">✏️</span><div>Auto-drafted to sound professional and friendly. Edit anything before sending — it's your voice.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="draftActions" style="display:none;position:sticky;bottom:0;background:linear-gradient(transparent,var(--blue-xl) 28%);padding:20px 16px 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5">
+    <button class="btn-blue" onclick="saveAndSend()">📧 Send Email & Save to Vault</button>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn-outline" style="flex:1" onclick="copyDraft()">📋 Copy</button>
+      <button class="btn-outline" style="flex:1" onclick="saveWithoutSending()">💾 Save without sending</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW C — DONE -->
+<div class="view" id="viewC" style="display:none">
+  <header class="sh">
+    <div class="sh-row"><button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">HOME</span></button></div>
+    <div class="sh-title">Saved to Vault ✓</div>
+    <div class="sh-sub">Tracking this issue for you</div>
+  </header>
+  <div style="flex:1;overflow-y:auto;padding:20px 16px 120px">
+    <div style="text-align:center;padding:28px 16px">
+      <div style="font-size:56px;margin-bottom:12px">✅</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:6px">All set.</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13.5px;color:var(--muted);line-height:1.6;max-width:300px;margin:0 auto">Your issue is logged in the <strong>Maintenance Log</strong> and the email is saved in <strong>Communications</strong>. We'll nudge you to follow up if the agent doesn't respond in time.</div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="fsl">Follow-up reminder set</div>
+      <div id="followUpInfo" style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-top:4px">—</div>
+    </div>
+
+    <button class="btn-blue" onclick="navigate('/app/pages/vault.html#maintenance')">View in Maintenance Log →</button>
+    <div style="height:10px"></div>
+    <button class="btn-outline" onclick="navigate('/app/index.html')">Back to Home</button>
+  </div>
+</div>
+
+</div><!-- /app-shell -->
+
+<script>
+function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
+function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:var(--text);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:var(--muted);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
+
+function switchView(v){
+  ['A','B','C'].forEach(function(x){var el=document.getElementById('view'+x);if(el)el.style.display=x===v?'flex':'none';});
+  window.scrollTo(0,0);
+}
+
+// ── State ──
+var issue = { description:'', category:'', urgency:'routine', photos:[], address:'', agentName:'', agentEmail:'', tenantName:'' };
+var draft = null;
+var threadId = 'thread_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+
+// ── Prefill from saved lease / tracked property / profile ──
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record') || '{}');
+    if(lease.address)document.getElementById('riAddress').value=lease.address;
+    if(lease.agencyName)document.getElementById('riAgentName').value=lease.agencyName;
+    if(lease.agentEmail)document.getElementById('riAgentEmail').value=lease.agentEmail;
+  } catch(e){}
+  try {
+    if(!document.getElementById('riAddress').value){
+      var active = JSON.parse(localStorage.getItem('riq-active-property')||'{}');
+      if(active.label)document.getElementById('riAddress').value=active.label;
+    }
+  } catch(e){}
+  try {
+    var profile = JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}');
+    if(profile.fullName)issue.tenantName=profile.fullName;
+  } catch(e){}
+
+  document.getElementById('riDescription').addEventListener('input', updateNextBtn);
+});
+
+function appendDesc(txt){
+  var f=document.getElementById('riDescription');
+  f.value=(f.value.trim()?f.value.trim()+' ':'')+txt;
+  f.dispatchEvent(new Event('input'));
+}
+
+function selCat(c){
+  issue.category=c;
+  document.querySelectorAll('#catRow .cat-pill').forEach(function(el){
+    el.classList.toggle('sel', el.getAttribute('data-c')===c);
+  });
+  updateNextBtn();
+}
+
+function selUrg(v){
+  issue.urgency=v;
+  document.querySelectorAll('.urg-btn').forEach(function(el){
+    el.classList.toggle('sel', el.getAttribute('data-v')===v);
+  });
+}
+
+function addRiPhoto(){
+  if(issue.photos.length>=4){ showToast('Max 4 photos','Keep it short — photos make your point','📷'); return; }
+  var input=document.createElement('input');
+  input.type='file'; input.accept='image/*'; input.capture='environment';
+  input.onchange=function(e){
+    var file=e.target.files[0]; if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      issue.photos.push({ url:ev.target.result, file:file });
+      renderPhotos();
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function removeRiPhoto(i){ issue.photos.splice(i,1); renderPhotos(); }
+
+function renderPhotos(){
+  var grid=document.getElementById('riPhotoGrid');
+  var html='';
+  issue.photos.forEach(function(p,i){
+    html+='<div class="ri-photo"><img src="'+p.url+'" alt=""><span class="rm" onclick="removeRiPhoto('+i+')">×</span></div>';
+  });
+  if(issue.photos.length<4){
+    html+='<div class="ri-add" onclick="addRiPhoto()"><span class="ri-add-icon">📷</span><span class="ri-add-label">Add</span></div>';
+  }
+  grid.innerHTML=html;
+}
+
+function updateNextBtn(){
+  var hasDesc=document.getElementById('riDescription').value.trim().length>=12;
+  var hasCat=!!issue.category;
+  var btn=document.getElementById('riNextBtn');
+  var hint=document.getElementById('riNextHint');
+  if(hasDesc && hasCat){
+    btn.style.opacity='1'; btn.style.pointerEvents='auto';
+    hint.textContent='RenterIQ will draft a message you can review and send';
+  } else {
+    btn.style.opacity='.5'; btn.style.pointerEvents='none';
+    hint.textContent=!hasDesc ? 'Tell us a bit more about the issue' : 'Pick a category to continue';
+  }
+}
+
+function goDraft(){
+  issue.description=document.getElementById('riDescription').value.trim();
+  issue.address=document.getElementById('riAddress').value.trim();
+  issue.agentName=document.getElementById('riAgentName').value.trim();
+  issue.agentEmail=document.getElementById('riAgentEmail').value.trim();
+  switchView('B');
+  runDraft();
+}
+
+function runDraft(){
+  document.getElementById('aiStatusBox').style.display='block';
+  document.getElementById('draftBlock').style.display='none';
+  document.getElementById('draftActions').style.display='none';
+  document.getElementById('aiStatusIcon').textContent='🤖';
+  document.getElementById('aiStatusTitle').textContent='Drafting your message…';
+  document.getElementById('aiStatusSub').textContent='Assessing the issue and writing a clear, friendly email';
+
+  var fd=new FormData();
+  fd.append('description', issue.description);
+  fd.append('category', issue.category);
+  fd.append('urgency', issue.urgency);
+  fd.append('address', issue.address);
+  fd.append('tenantName', issue.tenantName);
+  fd.append('agentName', issue.agentName);
+  issue.photos.forEach(function(p){ if(p.file)fd.append('photos', p.file, p.file.name||'photo.jpg'); });
+
+  fetch('/api/maintenance-issue', { method:'POST', body:fd })
+    .then(function(r){ return r.json().then(function(j){ j.__status=r.status; return j; }); })
+    .then(function(data){
+      if(data && data.error && !data.body){
+        showToast('Couldn\'t draft', data.error, '⚠️');
+        document.getElementById('aiStatusIcon').textContent='⚠️';
+        document.getElementById('aiStatusTitle').textContent='Draft failed';
+        document.getElementById('aiStatusSub').textContent=data.error;
+        return;
+      }
+      if(data && data._warning){ showToast('Template draft used', 'Live AI unavailable — review carefully', 'ℹ️'); }
+      draft=data;
+      renderDraft(data);
+    })
+    .catch(function(err){
+      console.error(err);
+      document.getElementById('aiStatusIcon').textContent='⚠️';
+      document.getElementById('aiStatusTitle').textContent='Couldn\'t reach the drafting service';
+      document.getElementById('aiStatusSub').textContent='Check your connection and try again.';
+    });
+}
+
+function renderDraft(d){
+  document.getElementById('aiStatusBox').style.display='none';
+  document.getElementById('draftBlock').style.display='block';
+  document.getElementById('draftActions').style.display='block';
+
+  var sev=(d.severity||'routine').toLowerCase();
+  var sevLabel={emergency:'🚨 Emergency',urgent:'⚠️ Urgent',routine:'📝 Routine'}[sev]||sev;
+  var sevChip=document.getElementById('sevChip');
+  sevChip.className='sev-chip '+sev;
+  sevChip.textContent=sevLabel;
+
+  var catLabel={plumbing:'🚿 Plumbing',electrical:'💡 Electrical',heating_cooling:'🌡️ Heating/Cooling',appliance:'🍳 Appliance',structural:'🏠 Structural',pest:'🐀 Pest',locks_security:'🔒 Security',water_damage:'💧 Water damage',mould:'🦠 Mould',safety:'🛡 Safety',other:'📌 Other'}[d.category]||d.category;
+  document.getElementById('catChip').textContent=catLabel;
+  document.getElementById('sevReason').textContent=d.severity_reason||'';
+
+  if(Array.isArray(d.tenant_tips) && d.tenant_tips.length){
+    var th='';
+    d.tenant_tips.forEach(function(t){ th+='<div class="ai-tip-row"><span>•</span><span>'+escHtml(t)+'</span></div>'; });
+    document.getElementById('tenantTips').innerHTML=th;
+    document.getElementById('tipsBox').style.display='block';
+  }
+
+  document.getElementById('emailSubject').value=d.subject||'Maintenance request';
+  document.getElementById('emailBody').value=d.body||'';
+}
+
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function copyDraft(){
+  var body=document.getElementById('emailBody').value;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(body).then(function(){ showToast('Copied','Paste into your email app','📋'); });
+  } else {
+    var f=document.getElementById('emailBody'); f.select(); document.execCommand('copy');
+    showToast('Copied','Paste into your email app','📋');
+  }
+}
+
+function saveAndSend(){
+  var subject=document.getElementById('emailSubject').value;
+  var body=document.getElementById('emailBody').value;
+  var to=issue.agentEmail || '';
+
+  // Save to vault first so the record exists regardless of whether they send
+  saveRecords({ subject:subject, body:body, sent:true });
+
+  // Open mailto
+  var mailto='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  window.open(mailto,'_self');
+
+  goDone();
+}
+
+function saveWithoutSending(){
+  var subject=document.getElementById('emailSubject').value;
+  var body=document.getElementById('emailBody').value;
+  saveRecords({ subject:subject, body:body, sent:false });
+  goDone();
+}
+
+function saveRecords(opts){
+  var now=Date.now();
+  var followUpDays=(draft && draft.follow_up_days) || (issue.urgency==='emergency'?2:issue.urgency==='urgent'?5:10);
+  var expectDays=(draft && draft.expected_response_days) || (issue.urgency==='emergency'?1:issue.urgency==='urgent'?3:7);
+
+  // Photos — base64 for local, could be uploaded by sync
+  var photoData=issue.photos.map(function(p){return p.url;});
+
+  // Maintenance item
+  var maintId='maint_'+now+'_'+Math.random().toString(36).slice(2,6);
+  var maint={
+    id:maintId,
+    threadId:threadId,
+    issueType:draft?draft.category:issue.category,
+    description:issue.description,
+    priority:(draft&&draft.severity)||issue.urgency,
+    status:'pending',
+    source:'issue_report',
+    address:issue.address,
+    agentName:issue.agentName,
+    agentEmail:issue.agentEmail,
+    expectedResponseDays:expectDays,
+    followUpDays:followUpDays,
+    lastContactAt:opts.sent?now:null,
+    photos:photoData,
+    date:now
+  };
+  try {
+    var mList=JSON.parse(localStorage.getItem('riq_maintenance_items')||'[]');
+    mList.unshift(maint);
+    localStorage.setItem('riq_maintenance_items', JSON.stringify(mList));
+  } catch(e){ console.error(e); }
+  if(window.RIQStore){
+    RIQStore.ready.then(function(){
+      if(!RIQStore.isAuthed())return;
+      RIQStore.write('maintenance-items', maint.id, maint).catch(function(err){ console.warn('Maint sync failed:',err); });
+    });
+  }
+
+  // Communication record (only if they're sending)
+  if(opts.sent){
+    var commId='comm_'+now+'_'+Math.random().toString(36).slice(2,6);
+    var comm={
+      id:commId,
+      threadId:threadId,
+      type:'maintenance_issue_report',
+      to:issue.agentEmail||issue.agentName||'Agent',
+      subject:opts.subject,
+      body:opts.body,
+      date:now,
+      source:'report-issue',
+      propertyAddress:issue.address,
+      linkedMaintenanceId:maintId
+    };
+    try {
+      var cList=JSON.parse(localStorage.getItem('riq_communications')||'[]');
+      cList.unshift(comm);
+      localStorage.setItem('riq_communications', JSON.stringify(cList));
+    } catch(e){ console.error(e); }
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(!RIQStore.isAuthed())return;
+        RIQStore.write('communications', comm.id, comm).catch(function(err){ console.warn('Comms sync failed:',err); });
+      });
+    }
+  }
+
+  // Schedule follow-up reminder
+  scheduleFollowUpReminder(maint, opts.sent);
+}
+
+function scheduleFollowUpReminder(maint, wasSent){
+  if(!wasSent)return; // no follow-up if not sent
+  try {
+    var reminders=JSON.parse(localStorage.getItem('renteriq_reminders')||'[]');
+    var when=Date.now() + (maint.followUpDays * 86400000);
+    var reminder={
+      id:'maint_followup_'+maint.id,
+      datetime:new Date(when).toISOString(),
+      title:'Follow up with agent',
+      body:maint.description.slice(0,80)+(maint.description.length>80?'…':'')+' — no reply yet?',
+      icon:'🔔',
+      data:{type:'maintenance_followup',maintId:maint.id,threadId:maint.threadId},
+      fired:false
+    };
+    var ix=reminders.findIndex(function(r){return r&&r.id===reminder.id;});
+    if(ix>=0)reminders[ix]=reminder; else reminders.push(reminder);
+    localStorage.setItem('renteriq_reminders', JSON.stringify(reminders));
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(!RIQStore.isAuthed())return;
+        RIQStore.write('reminders', reminder.id, reminder).catch(function(){});
+      });
+    }
+  } catch(e){ console.error('Follow-up reminder failed:',e); }
+}
+
+function goDone(){
+  var days=(draft && draft.follow_up_days) || (issue.urgency==='emergency'?2:issue.urgency==='urgent'?5:10);
+  var when=new Date(Date.now()+days*86400000);
+  document.getElementById('followUpInfo').textContent=days+' days ('+when.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})+')';
+  switchView('C');
+}
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
+</script>
+<script src="/app/js/sidebar.js"></script>
+
+<nav class="bottom-nav">
+  <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
+  <button class="nav-tab active"><div class="tab-icon">🔧</div><span class="tab-label">Report</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+</nav>
+</body>
+</html>

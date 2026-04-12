@@ -320,8 +320,8 @@
 <!-- VIEW E: SUMMARY -->
 <div class="view" id="viewE" style="display:none">
   <header class="sh">
-    <div class="sh-row"><button class="sh-back" onclick="switchView('C')"><span class="sh-back-arrow">‹</span><span class="sh-label">Walkthrough</span></button></div>
-    <div class="sh-title">Inspection Summary</div>
+    <div class="sh-row"><button class="sh-back" id="sumBackBtn" onclick="sumBack()"><span class="sh-back-arrow">‹</span><span class="sh-label" id="sumBackLabel">Walkthrough</span></button></div>
+    <div class="sh-title" id="sumHeadTitle">Inspection Summary</div>
     <div class="sh-sub" id="sumAddr">Your notes from today</div>
   </header>
   <div class="content" style="padding:16px 16px 120px">
@@ -363,9 +363,10 @@
 
       <!-- WOULD APPLY FLOW -->
       <div id="verdictApply" style="display:none">
-        <div style="background:linear-gradient(135deg,#065F46,#10B981);border-radius:18px;padding:20px;margin-bottom:14px">
-          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:#fff;margin-bottom:8px">Let's get your application ready</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.8);line-height:1.6">Your inspection report will be saved to your Vault. Here's where your application stands:</div>
+        <div style="background:linear-gradient(135deg,#065F46,#10B981);border-radius:18px;padding:22px 20px;margin-bottom:14px;text-align:center;box-shadow:0 6px 20px rgba(16,185,129,.25)">
+          <div style="font-size:38px;line-height:1;margin-bottom:8px">🎉</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff;letter-spacing:-.3px">You've decided — let's apply!</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.85);line-height:1.55;margin-top:6px">Your inspection is saved. Here's what you've got ready for the application.</div>
         </div>
 
         <!-- Readiness checklist -->
@@ -385,12 +386,13 @@
           <div style="display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:24px;flex-shrink:0">📌</span>
             <div>
-              <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">Saved to your property list</div>
-              <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Your inspection notes and photos are saved. Come back anytime to review or start your application.</div>
+              <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">Keeping it on your list</div>
+              <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">No rush. Compare it with other places you see this week — we'll keep these notes ready whenever you're back.</div>
             </div>
           </div>
         </div>
         <button class="btn-blue" style="margin-bottom:10px" onclick="saveAndGoHome()">Save &amp; Go Home</button>
+        <button class="btn-outline" style="margin-bottom:10px" onclick="saveAndApply()">Actually, let's apply →</button>
         <button class="btn-outline" style="margin-bottom:10px" onclick="exportInspectionPDF()">📄 Download PDF Report</button>
       </div>
 
@@ -400,13 +402,13 @@
           <div style="display:flex;gap:12px;align-items:flex-start">
             <span style="font-size:24px;flex-shrink:0">🚫</span>
             <div>
-              <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">Not the right fit</div>
-              <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">No problem. Want to keep this report for comparison, or remove it?</div>
+              <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">Not the right fit — no worries</div>
+              <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">We'll clear this one off your list so your inspections stay tidy. You can undo right after.</div>
             </div>
           </div>
         </div>
-        <button class="btn-outline" style="margin-bottom:10px" onclick="saveAndGoHome()">Keep Report &amp; Go Home</button>
-        <button style="width:100%;background:none;border:2px solid rgba(239,68,68,.3);border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--red);cursor:pointer" onclick="deleteAndGoHome()">Delete Report &amp; Go Home</button>
+        <button class="btn-blue" style="margin-bottom:10px;background:var(--red)" onclick="cleanOutPassedProperty()">Remove from my list ✓</button>
+        <button class="btn-outline" onclick="saveAndGoHome()">Actually, keep the notes</button>
       </div>
 
     </div>
@@ -1101,6 +1103,10 @@ function startWalkthrough(){
   inspectionData.address=document.getElementById('setupAddress').value;
   inspectionData.rent=document.getElementById('setupRent').value;
   inspectionData.beds=document.getElementById('setupBeds').value;
+  viewingSavedKey=null; // entering a fresh flow
+  // Reset summary header in case user just came from a saved-view
+  var t=document.getElementById('sumHeadTitle'); if(t)t.textContent='Inspection Summary';
+  var backLbl=document.getElementById('sumBackLabel'); if(backLbl)backLbl.textContent='Walkthrough';
   var sub=document.getElementById('wcAddr');
   if(sub && inspectionData.address)sub.textContent=inspectionData.address;
   renderQuickScan();
@@ -1340,6 +1346,7 @@ function saveAndApply(){
   localStorage.setItem(key,JSON.stringify(inspectionData));
   saveToConditionReportsVault(inspectionData);
   updateTrackedPropertyStatus(key);
+  removeScheduledOnCompletion();
   showToast('Report saved','Opening your application…','✓');
   setTimeout(function(){
     // Pass property context to application page
@@ -1370,6 +1377,104 @@ function deleteAndGoHome(){
   setTimeout(function(){navigate('/app/index.html')},1000);
 }
 
+// Pass-verdict cleanup: removes the property from tracking + any scheduled
+// booking + any saved inspection record in one tap, with a 5s undo window.
+function cleanOutPassedProperty(){
+  var addrKey=normAddr(inspectionData.address);
+  var snapshot={
+    tracked:null, trackedId:inspectionData.trackedId||'',
+    scheduled:null, scheduledId:inspectionData.scheduledId||'',
+    savedKey:null, savedRecord:null
+  };
+
+  // Take snapshots before removing so undo can restore
+  try{
+    var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+    if(snapshot.trackedId){
+      var ti=tracked.findIndex(function(p){return p&&p.id===snapshot.trackedId;});
+      if(ti!==-1){ snapshot.tracked=tracked[ti]; tracked.splice(ti,1); }
+    } else if(addrKey){
+      var ti2=tracked.findIndex(function(p){return p && normAddr(p.address||p.label)===addrKey;});
+      if(ti2!==-1){ snapshot.tracked=tracked[ti2]; snapshot.trackedId=tracked[ti2].id||''; tracked.splice(ti2,1); }
+    }
+    localStorage.setItem('renteriq_tracked_properties',JSON.stringify(tracked));
+    if(snapshot.trackedId && window.RIQStore){
+      RIQStore.ready.then(function(){ if(RIQStore.isAuthed())RIQStore.delete('tracked-properties',snapshot.trackedId); });
+    }
+  }catch(e){}
+
+  try{
+    var scheduled=JSON.parse(localStorage.getItem('renteriq_scheduled_inspections')||'[]');
+    var kept=[];
+    scheduled.forEach(function(insp){
+      if(!insp){return;}
+      var match=(snapshot.scheduledId && insp.id===snapshot.scheduledId) || (addrKey && normAddr(insp.address)===addrKey);
+      if(match){ snapshot.scheduled=snapshot.scheduled||insp; snapshot.scheduledId=snapshot.scheduledId||insp.id; }
+      else kept.push(insp);
+    });
+    localStorage.setItem('renteriq_scheduled_inspections',JSON.stringify(kept));
+  }catch(e){}
+
+  // Remove any saved inspection record for this property
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(!k||!k.indexOf('renteriq_openhome_insp_')===0)continue;
+      if(k && k.indexOf('renteriq_openhome_insp_')===0){
+        try{
+          var rec=JSON.parse(localStorage.getItem(k)||'{}');
+          if(addrKey && normAddr(rec.address)===addrKey){
+            snapshot.savedKey=k; snapshot.savedRecord=rec;
+            localStorage.removeItem(k);
+            break;
+          }
+        }catch(e){}
+      }
+    }
+  }catch(e){}
+
+  // Show undo toast
+  showUndoToast('Removed ' + (inspectionData.address ? '"'+inspectionData.address+'"' : 'the property'), function(){
+    if(snapshot.tracked){
+      try{
+        var list=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+        list.push(snapshot.tracked);
+        localStorage.setItem('renteriq_tracked_properties',JSON.stringify(list));
+        if(window.RIQStore){RIQStore.ready.then(function(){if(RIQStore.isAuthed())RIQStore.write('tracked-properties',snapshot.tracked.id,snapshot.tracked);});}
+      }catch(e){}
+    }
+    if(snapshot.scheduled){
+      try{
+        var slist=JSON.parse(localStorage.getItem('renteriq_scheduled_inspections')||'[]');
+        slist.push(snapshot.scheduled);
+        localStorage.setItem('renteriq_scheduled_inspections',JSON.stringify(slist));
+      }catch(e){}
+    }
+    if(snapshot.savedKey && snapshot.savedRecord){
+      try{ localStorage.setItem(snapshot.savedKey, JSON.stringify(snapshot.savedRecord)); }catch(e){}
+    }
+    showToast('Restored','The property is back on your list','↩️');
+  });
+
+  setTimeout(function(){ navigate('/app/index.html'); }, 5500);
+}
+
+// Reusable undo toast — stays 5s, tap to undo
+function showUndoToast(title, undoFn){
+  var existing=document.getElementById('undoToast');
+  if(existing)existing.remove();
+  var el=document.createElement('div');
+  el.id='undoToast';
+  el.style.cssText='position:fixed;bottom:90px;left:14px;right:14px;max-width:402px;margin:0 auto;background:#1A2B4A;color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;z-index:9999;box-shadow:0 8px 28px rgba(0,0,0,.3);opacity:0;transform:translateY(10px);transition:all .2s ease';
+  el.innerHTML='<span style="flex:1;font-family:Nunito,sans-serif;font-weight:600;font-size:13px">'+title+'</span><button style="background:rgba(255,255,255,.15);border:none;color:#fff;font-family:Sora,sans-serif;font-weight:800;font-size:12px;padding:8px 14px;border-radius:10px;cursor:pointer;letter-spacing:.3px" id="undoBtn">UNDO</button>';
+  document.body.appendChild(el);
+  requestAnimationFrame(function(){ el.style.opacity='1'; el.style.transform='translateY(0)'; });
+  var btn=el.querySelector('#undoBtn');
+  var done=false;
+  btn.onclick=function(){ if(done)return; done=true; undoFn(); el.remove(); };
+  setTimeout(function(){ if(!done){ el.style.opacity='0'; el.style.transform='translateY(10px)'; setTimeout(function(){el.remove();},250); } }, 5000);
+}
+
 function updateTrackedPropertyStatus(key){
   if(!inspectionData.trackedId)return;
   try{
@@ -1392,6 +1497,7 @@ function saveAndGoHome(){
   localStorage.setItem(key,JSON.stringify(inspectionData));
   saveToConditionReportsVault(inspectionData);
   updateTrackedPropertyStatus(key);
+  removeScheduledOnCompletion();
   showToast('Saved','Your inspection notes are saved to your device and Vault','💾');
   setTimeout(function(){navigate('/app/index.html')},1500)
 }
@@ -1441,9 +1547,11 @@ function exportInspectionPDF(){
 }
 
 function saveToConditionReportsVault(data){
+  // Kept under the original name to avoid breaking callers, but open-home
+  // Quick Scans now live on the inspection page only — not in the vault.
+  // We still cloud-sync the record so it's available across devices via the
+  // same inspection list.
   try{
-    var raw=localStorage.getItem('riq_condition_reports')||'[]';
-    var reports=JSON.parse(raw);
     var record={
       id:'open_home_'+Date.now(),
       type:'open_home_inspection',
@@ -1456,9 +1564,6 @@ function saveToConditionReportsVault(data){
       scan:data.scan||{},
       date:Date.now()
     };
-    reports.unshift(record);
-    localStorage.setItem('riq_condition_reports',JSON.stringify(reports));
-    // ── Cloud sync (background) — text only, no files ──
     if(window.RIQStore){
       RIQStore.ready.then(function(){
         if(!RIQStore.isAuthed())return;
@@ -1489,8 +1594,29 @@ function renderInspectionList(){
     }
   }
 
+  // Build lookup tables of inspected properties so the same property never
+  // shows in both "Upcoming" and "Past" at the same time.
   var inspectedUrls={};
-  saved.forEach(function(s){if(s.data&&s.data.sourceUrl)inspectedUrls[s.data.sourceUrl]=s.key;});
+  var inspectedAddrs={};
+  var inspectedScheduledIds={};
+  saved.forEach(function(s){
+    if(!s||!s.data)return;
+    if(s.data.sourceUrl)inspectedUrls[s.data.sourceUrl]=s.key;
+    if(s.data.address){
+      var ak=normAddr(s.data.address);
+      if(ak)inspectedAddrs[ak]=s.key;
+    }
+    if(s.data.scheduledId)inspectedScheduledIds[s.data.scheduledId]=s.key;
+  });
+
+  // Drop any scheduled-booking entries that already have a saved inspection
+  scheduled=scheduled.filter(function(insp){
+    if(!insp)return false;
+    if(inspectedScheduledIds[insp.id])return false;
+    var ak=normAddr(insp.address);
+    if(ak && inspectedAddrs[ak])return false;
+    return true;
+  });
 
   var totalProps=tracked.length+scheduled.length+saved.length;
   var html='';
@@ -1502,8 +1628,18 @@ function renderInspectionList(){
 
   // ── Tracked properties ──
   if(tracked.length>0){
-    var notInspected=tracked.filter(function(p){return p&&!inspectedUrls[(p.url||p.originalLink||'')]});
-    var alreadyInspected=tracked.filter(function(p){return p&&inspectedUrls[(p.url||p.originalLink||'')]});
+    var isTrackedInspected=function(p){
+      if(!p)return false;
+      var url=p.url||p.originalLink||'';
+      if(url && inspectedUrls[url])return true;
+      var ak=normAddr(p.address||p.label);
+      if(ak && inspectedAddrs[ak])return true;
+      // Tracked record itself may already carry a status/verdict from a save
+      if(p.status==='inspected' && p.inspectionKey)return true;
+      return false;
+    };
+    var notInspected=tracked.filter(function(p){return p && !isTrackedInspected(p);});
+    var alreadyInspected=tracked.filter(isTrackedInspected);
 
     notInspected.slice().reverse().forEach(function(p){
       var addr=p.address||p.label||'Property listing';
@@ -1532,15 +1668,24 @@ function renderInspectionList(){
 
     alreadyInspected.slice().reverse().forEach(function(p){
       var addr=p.address||p.label||'Property';
-      var srcIcon=p.sourceIcon||'🏠';
-      var repKey=inspectedUrls[(p.url||p.originalLink||'')];
+      var repKey=inspectedUrls[(p.url||p.originalLink||'')] || inspectedAddrs[normAddr(addr)] || p.inspectionKey || '';
+      var repData={};
+      try{repData=JSON.parse(localStorage.getItem(repKey)||'{}');}catch(e){}
+      var vibe=(repData.scan&&repData.scan.vibe)||'';
+      var verdict=repData.verdict||'';
+      var vibeMap={love:{t:'😍 Loved it',c:'#065F46',bg:'rgba(16,185,129,.14)'},would:{t:'🙂 Would do',c:'var(--blue)',bg:'var(--blue-xl)'},backup:{t:'😐 Backup',c:'#78350F',bg:'rgba(245,158,11,.14)'},pass:{t:'👎 Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
+      var verdictMap={yes:{t:'Would apply',c:'var(--teal-dk)',bg:'rgba(0,200,150,.14)'},maybe:{t:'Maybe',c:'#78350F',bg:'rgba(245,158,11,.12)'},no:{t:'Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
+      var chipHtml='';
+      var chip=vibeMap[vibe]||verdictMap[verdict];
+      if(chip){chipHtml='<span style="display:inline-block;font-family:\'Sora\',sans-serif;font-weight:700;font-size:10.5px;color:'+chip.c+';background:'+chip.bg+';border-radius:100px;padding:3px 10px;margin-top:6px">'+chip.t+'</span>';}
       html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);margin-bottom:10px;border-left:3px solid var(--teal);box-shadow:var(--shadow-card)">'
-        +'<div style="display:flex;align-items:center;gap:12px">'
+        +'<div style="display:flex;align-items:flex-start;gap:12px">'
           +'<div style="flex:1;min-width:0">'
             +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+escAttr(addr)+'</div>'
             +'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--teal-dk);margin-top:3px">✓ Inspected</div>'
+            +chipHtml
           +'</div>'
-          +'<button style="background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:8px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;cursor:pointer" onclick="loadSavedInspection(\''+escAttr(repKey)+'\')">View Report</button>'
+          +'<button style="background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:8px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;cursor:pointer;flex-shrink:0" onclick="loadSavedInspection(\''+escAttr(repKey)+'\')">View Report</button>'
           +'<button style="background:none;border:none;color:var(--muted);font-size:14px;padding:6px;cursor:pointer" onclick="inspDeleteProperty(\''+escAttr(p.id||'')+'\',event)">🗑️</button>'
         +'</div>'
       +'</div>';
@@ -1572,16 +1717,42 @@ function renderInspectionList(){
     });
   }
 
-  // ── Completed reports without tracked property ──
-  var orphanSaved=saved.filter(function(s){return !s.data||!s.data.sourceUrl||!tracked.some(function(t){return(t.url||t.originalLink||'')===s.data.sourceUrl})});
+  // ── Completed reports without a matching tracked property ──
+  // Exclude saved inspections that are already shown under a tracked card,
+  // by URL or by address.
+  var trackedUrlSet={};
+  var trackedAddrSet={};
+  tracked.forEach(function(t){
+    if(!t)return;
+    var u=t.url||t.originalLink||'';
+    if(u)trackedUrlSet[u]=true;
+    var ak=normAddr(t.address||t.label);
+    if(ak)trackedAddrSet[ak]=true;
+  });
+  var orphanSaved=saved.filter(function(s){
+    if(!s||!s.data)return true;
+    var u=s.data.sourceUrl||'';
+    if(u && trackedUrlSet[u])return false;
+    var ak=normAddr(s.data.address);
+    if(ak && trackedAddrSet[ak])return false;
+    return true;
+  });
   if(orphanSaved.length>0){
     html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin:16px 0 10px">Past Inspections</div>';
+    var vibeMap2={love:{t:'😍 Loved it',c:'#065F46',bg:'rgba(16,185,129,.14)'},would:{t:'🙂 Would do',c:'var(--blue)',bg:'var(--blue-xl)'},backup:{t:'😐 Backup',c:'#78350F',bg:'rgba(245,158,11,.14)'},pass:{t:'👎 Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
     orphanSaved.forEach(function(item){
       var ts=parseInt((item.key.split('_')[3]||'0'),10);
       var dateStr=ts?new Date(ts).toLocaleDateString('en-AU'):'';
+      var vibe=(item.data.scan&&item.data.scan.vibe)||'';
+      var vChip=vibeMap2[vibe];
       html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-card)" onclick="loadSavedInspection(\''+item.key+'\')">'
-        +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+(item.data.address||'Property')+'</div>'
-        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds+' bed':'')+(dateStr?' · '+dateStr:'')+'</div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">'
+          +'<div style="flex:1;min-width:0">'
+            +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+(item.data.address||'Property')+'</div>'
+            +'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds+' bed':'')+(dateStr?' · '+dateStr:'')+'</div>'
+          +'</div>'
+          +(vChip?'<span style="display:inline-block;font-family:\'Sora\',sans-serif;font-weight:700;font-size:10.5px;color:'+vChip.c+';background:'+vChip.bg+';border-radius:100px;padding:4px 10px;white-space:nowrap;flex-shrink:0">'+vChip.t+'</span>':'')
+        +'</div>'
       +'</div>';
     });
   }
@@ -1677,11 +1848,11 @@ function loadScheduledInspection(id) {
   try {
     var scheduled = JSON.parse(localStorage.getItem('renteriq_scheduled_inspections') || '[]');
     var inspection = scheduled.find(function(insp) { return insp.id === id; });
-    
+
     if (inspection && inspection.booking_data) {
       // Pre-populate form with booking data
       var data = inspection.booking_data;
-      
+
       if (data.address) document.getElementById('setupAddress').value = data.address;
       if (data.rent_weekly) {
         var rent = data.rent_weekly.replace(/[$\/week]/g, '').trim();
@@ -1693,7 +1864,10 @@ function loadScheduledInspection(id) {
           document.getElementById('setupBeds').value = beds.toString();
         }
       }
-      
+
+      // Remember we came from a scheduled booking so the save flow can
+      // move it from "Upcoming" into "Past inspections" without duplicates.
+      inspectionData.scheduledId = id;
       inspectionData.bookingData = data;
       switchView('B');
       showToast('Inspection Loaded', 'Details from booking confirmation', '📋');
@@ -1704,18 +1878,86 @@ function loadScheduledInspection(id) {
     showToast('Error', 'Could not load inspection', '❌');
   }
 }
+
+// Normalise an address for fuzzy match (case-insensitive, strip punctuation/space)
+function normAddr(s){
+  return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+}
+
+// When an inspection is saved/completed, move any matching scheduled
+// booking off the "Upcoming" list so it only appears under "Past".
+function removeScheduledOnCompletion(){
+  try{
+    var scheduled=JSON.parse(localStorage.getItem('renteriq_scheduled_inspections')||'[]');
+    if(!Array.isArray(scheduled)||scheduled.length===0)return;
+    var before=scheduled.length;
+    var addrKey=normAddr(inspectionData.address);
+    scheduled=scheduled.filter(function(insp){
+      if(!insp)return false;
+      if(inspectionData.scheduledId && insp.id===inspectionData.scheduledId)return false;
+      if(addrKey && normAddr(insp.address)===addrKey)return false;
+      return true;
+    });
+    if(scheduled.length!==before){
+      localStorage.setItem('renteriq_scheduled_inspections',JSON.stringify(scheduled));
+    }
+  }catch(e){}
+}
+// Track whether the currently-displayed summary is a replay of a saved
+// inspection (read-only mode) vs a fresh save flow. Back + header adapt.
+var viewingSavedKey=null;
+
 function loadSavedInspection(key){
   try{
     var loaded=JSON.parse(localStorage.getItem(key)||'{}');
-    // Normalise shape — older records may only carry the legacy "areas" map
     if(!loaded.scan)loaded.scan={vibe:'',items:{},liked:'',worried:'',photos:[]};
     if(!loaded.questionsAsked)loaded.questionsAsked={};
     inspectionData=loaded;
-    document.getElementById('setupAddress').value=inspectionData.address||'';
-    document.getElementById('setupRent').value=inspectionData.rent||'';
-    document.getElementById('setupBeds').value=inspectionData.beds||'2';
-    switchView('B');
-  }catch(e){showToast('Error','Could not load inspection','❌')}
+    viewingSavedKey=key;
+
+    // Also mirror the fields so back-nav to Setup stays consistent if used
+    var addrField=document.getElementById('setupAddress');
+    var rentField=document.getElementById('setupRent');
+    var bedsField=document.getElementById('setupBeds');
+    if(addrField)addrField.value=inspectionData.address||'';
+    if(rentField)rentField.value=inspectionData.rent||'';
+    if(bedsField)bedsField.value=inspectionData.beds||'2';
+
+    // Jump straight to the summary — this inspection is already done.
+    // Render first so the DOM reflects saved scan + notes, then select
+    // the verdict if one was set.
+    renderSummary();
+    var sumNotes=document.getElementById('sumNotes');
+    if(sumNotes)sumNotes.value=inspectionData.notes||'';
+
+    // Flip the summary header into "already done" mode
+    var t=document.getElementById('sumHeadTitle');
+    var sub=document.getElementById('sumAddr');
+    var backLbl=document.getElementById('sumBackLabel');
+    if(t)t.textContent='Your Inspection';
+    if(sub)sub.textContent=inspectionData.address||'Saved inspection';
+    if(backLbl)backLbl.textContent='Inspections';
+
+    // If a verdict was saved, reselect it so the action block shows
+    if(inspectionData.verdict)setVerdict(inspectionData.verdict);
+
+    switchView('E');
+  }catch(e){
+    console.error('loadSavedInspection:',e);
+    showToast('Error','Could not load inspection','❌');
+  }
+}
+
+function sumBack(){
+  if(viewingSavedKey){
+    // Read-only replay → back to the inspections list
+    viewingSavedKey=null;
+    renderInspectionList();
+    switchView('A');
+  } else {
+    // Fresh flow → back to the walkthrough
+    switchView('C');
+  }
 }
 
 // Load user data from localStorage
