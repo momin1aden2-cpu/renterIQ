@@ -450,7 +450,7 @@
 
     <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:16px;padding:16px;margin-bottom:14px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:8px">💡 When will you get your bond back?</div>
-      <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">After handing back the keys, the agency has 14 days to lodge a bond claim with the RTBA. If no claim is made, your bond is automatically returned. If a claim is made, you have the right to dispute it. Your RenterIQ reports are your evidence.</div>
+      <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Once you hand the keys back, the agency usually has up to 14 days to lodge any bond claim with the bond authority. If nothing's lodged, your bond comes back automatically. If something is lodged, your RenterIQ move-in and move-out records are the evidence you'll reach for first. Check your state's tenancy authority site for the exact timeframes.</div>
       <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;display:block;cursor:pointer" onclick="navigate('/app/pages/rights.html')">Know your bond rights →</span>
     </div>
 
@@ -504,25 +504,55 @@ function updateExitCheckProgress(){
 // ── Load entry audit data from localStorage ──
 var entryAuditRooms=[];
 function loadEntryAuditData(){
+  // The entry audit now saves an itemised shape: rooms[].items[] with
+  // {clean, undamaged, working, comment, photos}. We normalise both the
+  // new and legacy shapes into something the exit walkthrough can compare.
   try{
     var reports=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
     var entry=reports.filter(function(r){return r.type==='entry-audit'}).pop();
     if(entry&&entry.data&&entry.data.rooms){
-      entryAuditRooms=entry.data.rooms.filter(function(r){return r.completed});
+      entryAuditRooms=entry.data.rooms.map(function(r){
+        var items=Array.isArray(r.items)?r.items:[];
+        var okCount=items.filter(function(it){return it.clean===true && it.undamaged===true && (it.working===true || it.working==='na');}).length;
+        var issueCount=items.filter(function(it){return it.clean===false || it.undamaged===false || it.working===false;}).length;
+        // Consolidate comments across items
+        var comments=items.map(function(it){ return it.comment?it.label+': '+it.comment:null; }).filter(Boolean).join(' · ');
+        // Total photos across items
+        var photoCount=items.reduce(function(n,it){return n+((it.photos||[]).length);},0);
+        // Back-compat for older shape (room.photos / room.notes)
+        if(!items.length && (r.photos || r.notes)){
+          return {
+            id:r.id, name:r.name, emoji:r.emoji,
+            condition:r.condition||'good',
+            notes:r.notes||'',
+            photos:r.photos||[],
+            items:[]
+          };
+        }
+        return {
+          id:r.id,
+          name:r.name,
+          emoji:r.emoji,
+          condition:r.condition || (issueCount?'issues':'good'),
+          notes:comments,
+          photoCount:photoCount,
+          items:items
+        };
+      });
       return entry.data.propertyAddress||'';
     }
-  }catch(e){}
+  }catch(e){ console.warn('loadEntryAuditData:',e); }
   return '';
 }
 
 function buildEntryContext(roomName){
-  var match=entryAuditRooms.find(function(r){return r.name&&r.name.toLowerCase()===roomName.toLowerCase()});
+  var match=entryAuditRooms.find(function(r){return r.name&&r.name.toLowerCase()===roomName.toLowerCase();});
   if(!match)return 'No move-in data recorded';
-  var condMap={good:'Good condition',fair:'Minor issues noted',poor:'Issues noted'};
-  var cond=condMap[match.condition]||'Good condition';
-  var photoCount=(match.photos||[]).length;
-  var notes=match.notes?(' · '+match.notes.substring(0,60)):'';
-  return cond+(photoCount?' · '+photoCount+' photo'+(photoCount!==1?'s':'')+notes:notes);
+  var condMap={good:'All good at move-in',issues:'Some issues noted at move-in',fair:'Minor issues at move-in',poor:'Issues noted at move-in'};
+  var cond=condMap[match.condition]||'Good at move-in';
+  var photoCount=match.photoCount || (match.photos||[]).length || 0;
+  var notes=match.notes?(' · '+match.notes.substring(0,80)+(match.notes.length>80?'…':'')):'';
+  return cond+(photoCount?' · '+photoCount+' photo'+(photoCount!==1?'s':''):'')+notes;
 }
 
 // ── Room State ──

@@ -828,15 +828,24 @@ function loadMaintenanceItems(){
       pending.forEach(function(item) {
         var date = new Date(item.date).toLocaleDateString('en-AU', {day: 'numeric', month: 'short'});
         var pColor = {Urgent: 'var(--red)', 'Non-urgent': 'var(--amber)', Cosmetic: 'var(--teal)'}[item.priority] || 'var(--muted)';
-        html += '<div class="folder-card" style="margin-bottom:10px;flex-direction:column;align-items:flex-start;gap:8px">' +
+        // Stale detection — if last contact was before (lastContactAt + followUpDays), nudge user
+        var lastContact = item.lastContactAt || item.date;
+        var followUpDays = item.followUpDays || 7;
+        var daysSince = Math.round((Date.now() - lastContact) / 86400000);
+        var isStale = daysSince >= followUpDays;
+        var threadCount = maintThreadCount(item.threadId);
+        html += '<div class="folder-card" style="margin-bottom:10px;flex-direction:column;align-items:flex-start;gap:8px' + (isStale ? ';border-left:3px solid var(--amber)' : '') + '">' +
           '<div style="display:flex;align-items:flex-start;gap:12px;width:100%">' +
           '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#7A5500,var(--amber));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔧</div>' +
           '<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">' + (item.issueType || 'Maintenance') + '</div>' +
-          '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">' + date + ' · ' + (item.source === 'routine_inspection' ? 'From inspection' : 'Manual entry') + '</div></div>' +
+          '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">' + date + ' · ' + (item.source === 'routine_inspection' ? 'From inspection' : item.source === 'issue_report' ? 'Reported via RenterIQ' : 'Manual entry') + (threadCount ? ' · ' + threadCount + ' message' + (threadCount !== 1 ? 's' : '') : '') + '</div></div>' +
           '<span style="font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;color:' + pColor + ';background:' + pColor.replace(')', '').replace('var(--', 'rgba(') + ',.1);border-radius:8px;padding:3px 8px">' + item.priority + '</span></div>' +
-          '<div style="font-weight:600;font-size:13px;color:var(--text);padding-left:52px">' + item.description + '</div>' +
-          '<div style="display:flex;gap:8px;padding-left:52px">' +
-          '<button onclick="resolveItem(\'' + item.id + '\')" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">Mark Resolved</button>' +
+          '<div style="font-weight:600;font-size:13px;color:var(--text);padding-left:52px">' + vaultEsc(item.description) + '</div>' +
+          (isStale ? '<div style="padding-left:52px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:#7A5500;line-height:1.4">⚠️ ' + daysSince + ' days since your last message — might be time for a friendly nudge.</div>' : '') +
+          '<div style="display:flex;gap:8px;padding-left:52px;flex-wrap:wrap">' +
+            (item.threadId ? '<button onclick="openThreadSheet(\'' + item.threadId + '\')" style="background:var(--blue-xl);color:var(--blue);border:none;border-radius:8px;padding:6px 12px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">💬 View thread</button>' : '') +
+            (isStale && item.threadId ? '<button onclick="generateFollowUp(\'' + item.id + '\')" style="background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">✦ Send follow-up</button>' : '') +
+            '<button onclick="resolveItem(\'' + item.id + '\')" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">Mark resolved</button>' +
           '</div></div>';
       });
     }
@@ -861,6 +870,212 @@ function loadMaintenanceItems(){
     var sub = document.getElementById('maintenanceSubtitle');
     if (sub) sub.textContent = items.length + ' item' + (items.length !== 1 ? 's' : '') + ' logged';
   } catch(e) { console.error('loadMaintenanceItems:', e); }
+}
+
+function maintThreadCount(threadId){
+  if(!threadId)return 0;
+  try {
+    var comms=JSON.parse(localStorage.getItem('riq_communications')||'[]');
+    return comms.filter(function(c){return c && c.threadId===threadId;}).length;
+  } catch(e){ return 0; }
+}
+
+/* ── Thread view: all comms tied to a maintenance item's threadId ── */
+function openThreadSheet(threadId){
+  var comms=[];
+  try { comms=JSON.parse(localStorage.getItem('riq_communications')||'[]'); } catch(e){}
+  var thread=comms.filter(function(c){return c && c.threadId===threadId;}).sort(function(a,b){return (a.date||0)-(b.date||0);});
+
+  var items=[];
+  try { items=JSON.parse(localStorage.getItem('riq_maintenance_items')||'[]'); } catch(e){}
+  var maint=items.find(function(i){return i && i.threadId===threadId;});
+
+  var overlay=document.createElement('div');
+  overlay.id='threadSheet';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease';
+
+  var headerAddr = maint && maint.address ? maint.address : '';
+  var headerIssue = maint && maint.description ? maint.description : '';
+
+  var threadHtml='';
+  if(!thread.length){
+    threadHtml='<div style="text-align:center;padding:40px 16px;color:var(--muted);font-family:Nunito,sans-serif;font-weight:600;font-size:13.5px;line-height:1.55">No messages yet for this issue.<br>Start a follow-up to open the thread.</div>';
+  } else {
+    thread.forEach(function(c,idx){
+      var d=new Date(c.date||Date.now());
+      var dateStr=d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+      var typeLabel={
+        'maintenance_issue_report':'Initial report',
+        'maintenance_followup':'Follow-up',
+        'routine_inspection_response':'Routine inspection response'
+      }[c.type] || 'Message';
+      threadHtml += '<div style="border-left:3px solid var(--blue);padding:10px 12px 10px 14px;margin-bottom:10px;background:var(--blue-xl);border-radius:0 10px 10px 0">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px"><span style="font-family:Sora,sans-serif;font-weight:800;font-size:11px;color:var(--blue);letter-spacing:.5px;text-transform:uppercase">' + typeLabel + '</span><span style="font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:var(--muted)">' + dateStr + '</span></div>' +
+        '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:4px">' + vaultEsc(c.subject || 'No subject') + '</div>' +
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55;white-space:pre-wrap">' + vaultEsc((c.body || '').slice(0, 240)) + ((c.body || '').length > 240 ? '…' : '') + '</div>' +
+        '</div>';
+    });
+  }
+
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:82vh;display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">' +
+      '<div style="padding:14px 20px 8px;border-bottom:1px solid var(--border-lt);flex-shrink:0">' +
+        '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px"></div>' +
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:var(--text);letter-spacing:-.2px">💬 Conversation thread</div>' +
+        (headerIssue ? '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5">' + vaultEsc(headerIssue.slice(0, 100)) + (headerIssue.length > 100 ? '…' : '') + '</div>' : '') +
+        (headerAddr ? '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px">' + vaultEsc(headerAddr) + '</div>' : '') +
+      '</div>' +
+      '<div style="flex:1;overflow-y:auto;padding:16px 20px">' + threadHtml + '</div>' +
+      '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0">' +
+        '<button id="threadCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer">Close</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    overlay.style.opacity='1';
+    var sheet=overlay.firstElementChild; if(sheet)sheet.style.transform='translateY(0)';
+  });
+  var close=function(){ overlay.style.opacity='0'; setTimeout(function(){ if(overlay.parentNode)overlay.parentNode.removeChild(overlay); },200); };
+  document.getElementById('threadCloseBtn').onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay)close(); };
+}
+
+/* ── AI-drafted follow-up email for a stale pending item ── */
+function generateFollowUp(itemId){
+  var items=[], comms=[];
+  try { items=JSON.parse(localStorage.getItem('riq_maintenance_items')||'[]'); } catch(e){}
+  try { comms=JSON.parse(localStorage.getItem('riq_communications')||'[]'); } catch(e){}
+  var item=items.find(function(i){return i && i.id===itemId;});
+  if(!item){ showToast('Not found','Maintenance item missing','⚠️'); return; }
+
+  var priorMessages=comms.filter(function(c){return c && c.threadId===item.threadId;})
+    .sort(function(a,b){return (a.date||0)-(b.date||0);})
+    .map(function(c){return {subject:c.subject||'', body:c.body||'', date:c.date||0};});
+
+  var lastContact=item.lastContactAt||item.date;
+  var daysSince=Math.round((Date.now()-lastContact)/86400000);
+
+  var tenantName='';
+  try { var prof=JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}'); tenantName=prof.fullName||''; } catch(e){}
+
+  showToast('Drafting follow-up…','Hang on, writing your message','🤖');
+
+  fetch('/api/maintenance-followup', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      originalDescription: item.description||'',
+      originalCategory: item.issueType||'',
+      originalUrgency: item.priority||'',
+      daysSinceContact: daysSince,
+      priorMessages: priorMessages,
+      address: item.address||'',
+      tenantName: tenantName,
+      agentName: item.agentName||''
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(!data || data.error){
+      showToast('Draft failed', (data && data.error) || 'Could not draft the follow-up','⚠️');
+      return;
+    }
+    openFollowUpReviewSheet(item, data);
+  })
+  .catch(function(err){
+    console.error(err);
+    showToast('Draft failed','Check your connection and try again','⚠️');
+  });
+}
+
+function openFollowUpReviewSheet(item, draft){
+  var overlay=document.createElement('div');
+  overlay.id='followUpReview';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease';
+  var subject = draft.subject || 'Checking in on my maintenance request';
+  var body = draft.body || '';
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:86vh;display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">' +
+      '<div style="padding:14px 20px 12px;border-bottom:1px solid var(--border-lt);flex-shrink:0">' +
+        '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px"></div>' +
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:var(--text);letter-spacing:-.2px">✦ Follow-up draft</div>' +
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5">Review and tweak before sending — it\'s your voice.</div>' +
+      '</div>' +
+      '<div style="flex:1;overflow-y:auto;padding:16px 20px">' +
+        '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Subject</div>' +
+        '<input id="fuSubject" type="text" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:Nunito,sans-serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;box-sizing:border-box;outline:none" value="' + vaultEsc(subject) + '">' +
+        '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Message</div>' +
+        '<textarea id="fuBody" style="width:100%;min-height:260px;border:1.5px solid var(--border);border-radius:10px;padding:12px;font-family:Nunito,sans-serif;font-size:14px;font-weight:600;color:var(--text);line-height:1.6;resize:vertical;outline:none;box-sizing:border-box">' + vaultEsc(body) + '</textarea>' +
+      '</div>' +
+      '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0;display:flex;gap:10px">' +
+        '<button id="fuCancelBtn" style="flex:0 0 auto;background:transparent;border:1.5px solid var(--border);color:var(--muted);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px 16px;border-radius:12px;cursor:pointer">Cancel</button>' +
+        '<button id="fuSendBtn" style="flex:1;background:var(--blue);color:#fff;border:none;font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer">📧 Send &amp; save to thread</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    overlay.style.opacity='1';
+    var sheet=overlay.firstElementChild; if(sheet)sheet.style.transform='translateY(0)';
+  });
+  var close=function(){ overlay.style.opacity='0'; setTimeout(function(){ if(overlay.parentNode)overlay.parentNode.removeChild(overlay); },200); };
+  document.getElementById('fuCancelBtn').onclick=close;
+  document.getElementById('fuSendBtn').onclick=function(){
+    var finalSubject=document.getElementById('fuSubject').value;
+    var finalBody=document.getElementById('fuBody').value;
+
+    // Open mailto first so the email draft launches while records save in background
+    var to = item.agentEmail || '';
+    var mailto='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(finalSubject)+'&body='+encodeURIComponent(finalBody);
+    window.open(mailto,'_self');
+
+    // Save comm record with shared threadId
+    var now=Date.now();
+    var commRecord={
+      id:'comm_'+now+'_'+Math.random().toString(36).slice(2,6),
+      threadId:item.threadId,
+      type:'maintenance_followup',
+      to: item.agentEmail || item.agentName || 'Agent',
+      subject: finalSubject,
+      body: finalBody,
+      date: now,
+      source: 'vault-followup',
+      propertyAddress: item.address || '',
+      linkedMaintenanceId: item.id
+    };
+    try {
+      var cList=JSON.parse(localStorage.getItem('riq_communications')||'[]');
+      cList.unshift(commRecord);
+      localStorage.setItem('riq_communications', JSON.stringify(cList));
+    } catch(e){}
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(!RIQStore.isAuthed())return;
+        RIQStore.write('communications', commRecord.id, commRecord).catch(function(){});
+      });
+    }
+
+    // Bump lastContactAt on the maintenance item so the stale flag clears
+    try {
+      var mList=JSON.parse(localStorage.getItem('riq_maintenance_items')||'[]');
+      var mi=mList.findIndex(function(x){return x && x.id===item.id;});
+      if(mi!==-1){
+        mList[mi].lastContactAt = now;
+        localStorage.setItem('riq_maintenance_items', JSON.stringify(mList));
+        if(window.RIQStore){
+          RIQStore.ready.then(function(){
+            if(!RIQStore.isAuthed())return;
+            RIQStore.write('maintenance-items', mList[mi].id, mList[mi]).catch(function(){});
+          });
+        }
+      }
+    } catch(e){}
+
+    showToast('Follow-up sent ✓','Saved to your thread and Communications','📧');
+    close();
+    setTimeout(function(){ loadMaintenanceItems(); loadComms(); loadVaultCounts(); }, 200);
+  };
+  overlay.onclick=function(e){ if(e.target===overlay)close(); };
 }
 
 /* ── Load Communications from localStorage ── */

@@ -1206,6 +1206,9 @@
       </div>
     </div>
 
+    <!-- ── Resume-in-progress card (surfaces saved renter profile drafts) ── -->
+    <div id="resumeDraftCard" style="display:none;padding:14px 16px 0"></div>
+
     <!-- ── Your Journey — progress strip ────────────────────── -->
     <div id="journeyStrip" style="display:none;padding:18px 16px 0">
       <div style="background:#fff;border:1px solid var(--border-lt);border-radius:18px;padding:14px 14px 12px;box-shadow:var(--shadow-card)">
@@ -1392,12 +1395,12 @@
           <span class="vs-label">Lease Agreements</span>
         </div>
         <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
-          <div class="vs-top"><span class="vs-icon">📸</span><span class="vs-count" id="vsCountReports">0</span></div>
-          <span class="vs-label">Condition Reports</span>
+          <div class="vs-top"><span class="vs-icon">🏠</span><span class="vs-count" id="vsCountReports">0</span></div>
+          <span class="vs-label">Move-in Records</span>
         </div>
         <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
           <div class="vs-top"><span class="vs-icon">🔧</span><span class="vs-count" id="vsCountMaint">0</span></div>
-          <span class="vs-label">Maintenance Logs</span>
+          <span class="vs-label">Maintenance Log</span>
         </div>
         <div class="vault-stat" onclick="navigate('/app/pages/vault.html')">
           <div class="vs-top"><span class="vs-icon">🧾</span><span class="vs-count" id="vsCountReceipts">0</span></div>
@@ -2492,20 +2495,18 @@ function homeLoadVaultStats() {
   var leases = homeSafeJSON('riq-vault-leases', []);
   setCount('vsCountLeases', Array.isArray(leases) ? leases.length : 0);
 
-  // Condition Reports — entry audits + exit audits + open-home inspection reports
+  // Move-in Records — only what vault.html's loadConditionReports actually renders.
+  // Open-home Quick Scans live on the inspection page now and no longer count here.
   var vaultReports = homeSafeJSON('renteriq_vault_reports', []);
-  var conditionReports = homeSafeJSON('riq_condition_reports', []);
-  var entryPast = homeSafeJSON('riq_entry_audit_past', []);
-  var reportCount = 0;
-  if (Array.isArray(vaultReports)) reportCount += vaultReports.filter(function(r){return r && (r.type==='entry-audit'||r.type==='exit-audit')}).length;
-  if (Array.isArray(conditionReports)) reportCount += conditionReports.length;
-  if (Array.isArray(entryPast)) reportCount += entryPast.length;
-  setCount('vsCountReports', reportCount);
+  var moveInCount = Array.isArray(vaultReports)
+    ? vaultReports.filter(function(r){return r && r.type==='entry-audit';}).length
+    : 0;
+  setCount('vsCountReports', moveInCount);
 
-  // Maintenance Logs — maintenance items + routine inspection records
+  // Maintenance Log — only the maintenance items collection (vault's folder D).
+  // Routine inspections live in their own folder and have their own badge.
   var maint = homeSafeJSON('riq_maintenance_items', []);
-  var routinePast = homeSafeJSON('riq_routine_inspection_past', []);
-  var maintCount = (Array.isArray(maint) ? maint.length : 0) + (Array.isArray(routinePast) ? routinePast.length : 0);
+  var maintCount = Array.isArray(maint) ? maint.length : 0;
   setCount('vsCountMaint', maintCount);
 
   // Receipts Saved
@@ -2690,6 +2691,57 @@ function homeRenderFollowups() {
   }
   // Keep the journey strip in sync with any status change
   if (typeof homeRenderJourney === 'function') homeRenderJourney();
+}
+
+// ── Resume-in-progress card — surfaces abandoned renter-profile drafts
+function homeRenderResumeDraft(){
+  var container = document.getElementById('resumeDraftCard');
+  if(!container) return;
+
+  var r = null;
+  try { r = JSON.parse(localStorage.getItem('riq-resume') || 'null'); } catch(e) {}
+  if(!r || typeof r !== 'object'){ container.style.display='none'; return; }
+
+  // Mirror the completeness calc from application.html so the two always agree.
+  var required = ['fullName','dob','email','mobile','currentAddress','employmentStatus','employer','jobTitle','income','prevAddress','ref1Name','ref1Phone','ref2Name'];
+  var filled = required.filter(function(f){ return r[f] && String(r[f]).trim().length > 0; }).length;
+  var hasLetter = r.coverLetter ? 1 : 0;
+  var hasDocs = (r.docs && Object.keys(r.docs).length > 0) ? 1 : 0;
+  var total = required.length + 2;
+  var pct = Math.round(((filled + hasLetter + hasDocs) / total) * 100);
+
+  // Only show the nudge if there's meaningful progress but not finished.
+  if(pct < 10){ container.style.display='none'; return; }
+  if(pct >= 95){ container.style.display='none'; return; }
+
+  // If an apply-context is set (coming from a specific inspection), show the address
+  var ctxAddr = '';
+  try {
+    var ctx = JSON.parse(localStorage.getItem('riq_apply_context') || '{}');
+    if(ctx && ctx.address) ctxAddr = ctx.address;
+  } catch(e){}
+
+  var headline = ctxAddr ? 'Finish applying for ' + ctxAddr : 'Pick up your renter profile';
+  var sub = ctxAddr
+    ? "You're " + pct + '% through — a few more details and you\'re ready to submit.'
+    : 'Save time on every application. You\'re ' + pct + '% done.';
+
+  container.innerHTML =
+    '<div style="background:#fff;border:1px solid var(--border-lt);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-card);cursor:pointer" onclick="navigate(\'/app/pages/application.html\')">' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">' +
+        '<div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✍️</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:14px;color:var(--text);letter-spacing:-.2px">' + headline + '</div>' +
+          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45">' + sub + '</div>' +
+        '</div>' +
+        '<span style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;color:var(--blue)">›</span>' +
+      '</div>' +
+      '<div style="height:6px;background:var(--border-lt);border-radius:100px;overflow:hidden">' +
+        '<div style="width:' + pct + '%;height:100%;background:linear-gradient(90deg,#7C3AED,#A855F7);border-radius:100px;transition:width .4s ease"></div>' +
+      '</div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-top:8px">' + pct + '% complete</div>' +
+    '</div>';
+  container.style.display='block';
 }
 
 // ── Journey progress strip ─────────────────────────────────────
@@ -2903,6 +2955,7 @@ document.addEventListener('DOMContentLoaded', function() {
   homeRenderBondCard();
   homeRenderFollowups();
   homeRenderJourney();
+  homeRenderResumeDraft();
   // Defer everything else until the browser is idle
   if ('requestIdleCallback' in window) {
     requestIdleCallback(homeIdleInit, { timeout: 1500 });

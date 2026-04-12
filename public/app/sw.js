@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v22 — Journey strip + active waiting + follow-up sheet
+// RenterIQ Service Worker v28 — Report-issue prefills from lease + tracked records
 // No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
 
-var CACHE_NAME = 'renteriq-shell-v22';
+var CACHE_NAME = 'renteriq-shell-v28';
 
 var APP_SHELL = [
   '/app/index.html',

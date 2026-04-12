@@ -24,6 +24,13 @@
 <title>Report an Issue — RenterIQ</title>
 <script src="/app/js/pwa-init.js" defer></script>
 <style>
+/* Page-local form primitives (matched to inspection.html conventions) */
+.input-f{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:11px;padding:11px 13px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);outline:none;box-sizing:border-box;-webkit-appearance:none;appearance:none}
+.input-f:focus{border-color:var(--blue)}
+.input-f::placeholder{color:var(--muted)}
+.qn-chip{background:var(--blue-xl);border:1px solid var(--border);border-radius:100px;padding:6px 12px;font-family:'Sora',sans-serif;font-size:11.5px;font-weight:700;color:var(--blue);cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-block;transition:all .15s}
+.qn-chip:active{transform:scale(.96)}
+
 .cat-pill{background:#fff;border:1.5px solid var(--border);border-radius:100px;padding:10px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;display:inline-flex;align-items:center;gap:6px;margin:0 6px 8px 0}
 .cat-pill.sel{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(27,80,200,.25)}
 .urg-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
@@ -65,6 +72,8 @@
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:14px 16px 160px">
+
+    <div id="prefillHint" style="display:none;background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.25);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--teal-dk);line-height:1.55"></div>
 
     <!-- Address -->
     <div class="card" style="margin-bottom:12px">
@@ -240,25 +249,80 @@ var issue = { description:'', category:'', urgency:'routine', photos:[], address
 var draft = null;
 var threadId = 'thread_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
 
-// ── Prefill from saved lease / tracked property / profile ──
-document.addEventListener('DOMContentLoaded', function(){
+// ── Prefill from saved records ──
+// The renter lives in the property, so the authoritative source is the signed
+// lease. We layer tracked-property booking data on top (agent name/email/phone
+// captured during the booking screenshot extraction), then active-property,
+// then the user profile. First non-empty value wins for each field.
+function prefillFromRecords(){
+  var addr='', agentName='', agentEmail='', tenantName='';
+
   try {
     var lease = JSON.parse(localStorage.getItem('riq-lease-record') || '{}');
-    if(lease.address)document.getElementById('riAddress').value=lease.address;
-    if(lease.agencyName)document.getElementById('riAgentName').value=lease.agencyName;
-    if(lease.agentEmail)document.getElementById('riAgentEmail').value=lease.agentEmail;
-  } catch(e){}
-  try {
-    if(!document.getElementById('riAddress').value){
-      var active = JSON.parse(localStorage.getItem('riq-active-property')||'{}');
-      if(active.label)document.getElementById('riAddress').value=active.label;
-    }
-  } catch(e){}
-  try {
-    var profile = JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}');
-    if(profile.fullName)issue.tenantName=profile.fullName;
+    if(lease.address) addr = lease.address;
+    if(lease.agencyName) agentName = lease.agencyName;
+    if(lease.agentEmail) agentEmail = lease.agentEmail;
+    if(lease.agentName && !agentName) agentName = lease.agentName;
   } catch(e){}
 
+  // Tracked properties — the "living in" one would have status lease_signed
+  try {
+    var tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]');
+    if(Array.isArray(tracked)){
+      var signed = tracked.filter(function(p){return p && p.status==='lease_signed';});
+      var living = signed[0] || tracked.find(function(p){return p && (p.status==='inspected' || p.verdict);});
+      if(living){
+        if(!addr) addr = living.address || living.label || '';
+        if(!agentName) agentName = living.agent_name || (living.booking_data && living.booking_data.agent_name) || '';
+        if(!agentEmail) agentEmail = living.agent_email || (living.booking_data && living.booking_data.agent_email) || '';
+      }
+    }
+  } catch(e){}
+
+  // Fallback: active property
+  if(!addr){
+    try {
+      var active = JSON.parse(localStorage.getItem('riq-active-property')||'{}');
+      if(active.label) addr = active.label;
+    } catch(e){}
+  }
+
+  // Tenant name — from profile or the saved resume
+  try {
+    var profile = JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}');
+    if(profile.fullName) tenantName = profile.fullName;
+  } catch(e){}
+  if(!tenantName){
+    try {
+      var resume = JSON.parse(localStorage.getItem('riq-resume')||'{}');
+      if(resume.fullName) tenantName = resume.fullName;
+    } catch(e){}
+  }
+  if(!tenantName){
+    try { tenantName = localStorage.getItem('riq-user-name') || ''; } catch(e){}
+  }
+
+  if(addr) document.getElementById('riAddress').value = addr;
+  if(agentName) document.getElementById('riAgentName').value = agentName;
+  if(agentEmail) document.getElementById('riAgentEmail').value = agentEmail;
+  issue.tenantName = tenantName;
+
+  // Friendly hint showing where the details came from, so the renter knows
+  // they can overwrite anything that's stale.
+  var hints = [];
+  if(addr) hints.push('address');
+  if(agentName || agentEmail) hints.push('agent details');
+  if(hints.length){
+    var el = document.getElementById('prefillHint');
+    if(el){
+      el.textContent = '✓ Pulled ' + hints.join(' and ') + ' from your saved records. Edit if anything needs updating.';
+      el.style.display = 'block';
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  prefillFromRecords();
   document.getElementById('riDescription').addEventListener('input', updateNextBtn);
 });
 
@@ -546,8 +610,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
 <nav class="bottom-nav">
   <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
   <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
-  <button class="nav-tab active"><div class="tab-icon">🔧</div><span class="tab-label">Report</span></button>
   <button class="nav-tab" onclick="navigate('/app/pages/vault.html')"><div class="tab-icon">🗄️</div><span class="tab-label">Vault</span></button>
+  <button class="nav-tab" onclick="navigate('/app/pages/tools.html')"><div class="tab-icon">🛠️</div><span class="tab-label">Tools</span></button>
 </nav>
 </body>
 </html>

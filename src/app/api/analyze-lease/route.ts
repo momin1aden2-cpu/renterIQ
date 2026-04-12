@@ -39,12 +39,13 @@ Respond ONLY with valid JSON in this exact format:
 }
 
 Rules:
-- Analyse against Australian Residential Tenancies law (default to VIC if state not specified)
-- Flag any clause that attempts to waive tenant rights
-- Flag excessive break fees, unreasonable inspection access, or non-standard cleaning requirements
-- Flag any clause requiring tenant to pay for normal wear and tear
+- Compare clauses to common Australian tenancy practice (default to VIC if state not specified)
+- Flag clauses that look unusual, one-sided, or worth double-checking with the state tenancy authority — but phrase it as a flag, never as advice. Use soft language: "looks unusual", "worth asking the agent about", "check with [state] Consumer Affairs before signing" — never "this is illegal", "you cannot be required to", "you are entitled to", or similar absolute legal claims
+- Flag excessive break fees, unreasonable inspection access, or non-standard cleaning requirements as "worth a closer look" rather than legally invalid
+- Flag clauses about tenant paying for normal wear and tear as unusual — suggest the renter asks the agent about it
 - Be practical and fair — most standard lease terms are fine
 - Always provide the plain-English explanation even for standard clauses
+- This is a plain-English understanding helper, NEVER legal advice. Do not cite specific Act section numbers inline in explanations. law_reference may name the Act in passing ("Residential Tenancies Act 1997 (Vic)") but never quote specific section numbers that sound prescriptive
 - Limit to the 12 most important clauses if the lease is very long`;
 
 type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } };
