@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v31 — Network-first for HTML so new deploys show up
+// RenterIQ Service Worker v33 — Journey strip gains Move-out phase (7 dots), tightened spacing
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v31';
+var CACHE_NAME = 'renteriq-shell-v33';
 
 var APP_SHELL = [
   '/app/index.html',

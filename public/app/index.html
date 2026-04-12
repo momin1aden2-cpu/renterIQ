@@ -1241,87 +1241,9 @@
       </div>
     </div>
 
-    <!-- ── Renting Journey Timeline ────────────────────────── -->
-    <div class="cv-auto" style="padding:20px 16px 0">
-      <div class="sec-row" style="margin-bottom:14px">
-        <span class="sec-title">Your Renting Journey</span>
-        <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer" onclick="navigate('/app/pages/tools.html')">All tools →</span>
-      </div>
-      <div style="background:#fff;border-radius:20px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);overflow:hidden">
-
-        <!-- Step rows — all visible, no scroll required -->
-        <div class="jrn-row" onclick="document.getElementById('homeSearchInput').focus();document.getElementById('homeSearchInput').scrollIntoView({behavior:'smooth'})">
-          <div class="jrn-icon" style="background:linear-gradient(135deg,var(--blue),var(--blue-md))">🔍</div>
-          <div class="jrn-body">
-            <div class="jrn-title">Property Search &amp; Tracker</div>
-            <div class="jrn-sub">Save listings from REA, Domain, REIWA &amp; Rent.com.au</div>
-          </div>
-          <div class="jrn-step-num">1</div>
-          <span class="jrn-chev">›</span>
-        </div>
-
-        <div class="jrn-row" onclick="navigate('/app/pages/inspection.html')">
-          <div class="jrn-icon" style="background:linear-gradient(135deg,#2E63E0,#4A7FF0)">📋</div>
-          <div class="jrn-body">
-            <div class="jrn-title">Property Inspection</div>
-            <div class="jrn-sub">Walk through your tracked properties with a guided checklist</div>
-          </div>
-          <div class="jrn-step-num">2</div>
-          <span class="jrn-chev">›</span>
-        </div>
-
-        <div class="jrn-row" onclick="navigate('/app/pages/application.html')">
-          <div class="jrn-icon" style="background:linear-gradient(135deg,#E88A00,#F5A623)">📝</div>
-          <div class="jrn-body">
-            <div class="jrn-title">Rental Application</div>
-            <div class="jrn-sub">Build your renter resume &amp; auto-draft a cover letter</div>
-          </div>
-          <div class="jrn-step-num">3</div>
-          <span class="jrn-chev">›</span>
-        </div>
-
-        <div class="jrn-row" onclick="navigate('/app/pages/lease.html')">
-          <div class="jrn-icon" style="background:linear-gradient(135deg,#0A2460,#1B50C8)">📑</div>
-          <div class="jrn-body">
-            <div class="jrn-title">Lease Review</div>
-            <div class="jrn-sub">Plain-English breakdown of every clause before you sign</div>
-          </div>
-          <div class="jrn-step-num">4</div>
-          <span class="jrn-chev">›</span>
-        </div>
-
-        <div class="jrn-row" onclick="navigate('/app/pages/entry-audit.html')">
-          <div class="jrn-icon" style="background:linear-gradient(135deg,var(--teal),#00DBA6)">🏠</div>
-          <div class="jrn-body">
-            <div class="jrn-title">Entry Condition Report</div>
-            <div class="jrn-sub">Document the property at move-in to protect your bond</div>
-          </div>
-          <div class="jrn-step-num">5</div>
-          <span class="jrn-chev">›</span>
-        </div>
-
-        <div class="jrn-row" onclick="navigate('/app/pages/routine-inspection.html')">
-          <div class="jrn-icon" style="background:linear-gradient(135deg,#1B50C8,#2E63E0)">🛡️</div>
-          <div class="jrn-body">
-            <div class="jrn-title">Routine Inspection Response</div>
-            <div class="jrn-sub">Respond professionally to your agent's quarterly checks</div>
-          </div>
-          <div class="jrn-step-num">6</div>
-          <span class="jrn-chev">›</span>
-        </div>
-
-        <div class="jrn-row" style="border-bottom:none" onclick="navigate('/app/pages/exit.html')">
-          <div class="jrn-icon" style="background:linear-gradient(135deg,#009E78,var(--teal))">💰</div>
-          <div class="jrn-body">
-            <div class="jrn-title">Exit Condition Report</div>
-            <div class="jrn-sub">Document the property at move-out &amp; recover your full bond</div>
-          </div>
-          <div class="jrn-step-num">7</div>
-          <span class="jrn-chev">›</span>
-        </div>
-
-      </div>
-    </div>
+    <!-- Renting Journey timeline removed — top progress strip is the single
+         source of truth for where the renter is. All step pages remain
+         reachable from the journey strip, the tools hub, and contextual cards. -->
 
     <!-- ── Contextual: Tracked Properties ─────────────────── -->
     <div id="trackedSection" style="padding:20px 16px 0;display:none">
@@ -2780,13 +2702,34 @@ function homeRenderJourney(){
     { id:'apply',   label:'Apply',    icon:'✍️', route:'/app/pages/application.html' },
     { id:'lease',   label:'Lease',    icon:'📑', route:'/app/pages/lease.html' },
     { id:'movein',  label:'Move in',  icon:'🏠', route:'/app/pages/entry-audit.html' },
-    { id:'living',  label:'Living',   icon:'🌿', route:'/app/pages/vault.html' }
+    { id:'living',  label:'Living',   icon:'🌿', route:'/app/pages/vault.html' },
+    { id:'moveout', label:'Move out', icon:'🚪', route:'/app/pages/exit.html' }
   ];
 
   // Work out the furthest-progressed phase across all tracked properties
-  var rank = { search:0, inspect:1, apply:2, lease:3, movein:4, living:5 };
+  var rank = { search:0, inspect:1, apply:2, lease:3, movein:4, living:5, moveout:6 };
   var current = 'search';
   var captionText = 'Start by tracking a property';
+
+  // Detect move-out phase from either a saved exit audit or a lease end date
+  // inside the next 45 days — either signal flips the journey to moveout.
+  var movingOut = false;
+  try {
+    var vaultReports = JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+    if(Array.isArray(vaultReports)){
+      movingOut = vaultReports.some(function(r){return r && r.type==='exit-audit';});
+    }
+  } catch(e){}
+  if(!movingOut){
+    try {
+      var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}');
+      if(lease && lease.endDate){
+        var endT = new Date(lease.endDate).getTime();
+        var daysLeft = Math.round((endT - Date.now())/86400000);
+        if(!isNaN(daysLeft) && daysLeft >= 0 && daysLeft <= 45) movingOut = true;
+      }
+    } catch(e){}
+  }
 
   // Strip is ALWAYS visible once the user is signed in — it's how they see
   // where they are in the journey. Empty state just sits at "Search".
@@ -2801,12 +2744,15 @@ function homeRenderJourney(){
     } else if(p.status === 'applied'){
       phase = 'apply';
     } else if(p.status === 'inspected' || p.verdict){
-      phase = 'apply'; // ready to apply (inspection done)
+      phase = 'apply';
     } else {
-      phase = 'inspect'; // tracked, not yet inspected
+      phase = 'inspect';
     }
     if(rank[phase] > rank[current]) current = phase;
   });
+
+  // Move-out beats Living once we've detected it
+  if(movingOut) current = 'moveout';
 
   // Caption copy per phase — two variants for Search depending on whether
   // the user already has tracked properties or none yet.
@@ -2816,7 +2762,8 @@ function homeRenderJourney(){
     apply:   'You\'re applying — waiting on the agent',
     lease:   'Lease offered — review before you sign',
     movein:  'Signed! Time to set up for move-in',
-    living:  'You\'re settled — we\'ll keep things tidy'
+    living:  'You\'re settled — we\'ll keep things tidy',
+    moveout: 'Wrapping up — exit report + bond return'
   };
   captionText = captions[current] || '';
 
@@ -2834,14 +2781,14 @@ function homeRenderJourney(){
     var labelColor = isCurrent ? 'var(--blue)' : (reached ? 'var(--teal-dk)' : 'var(--muted)');
     var labelWeight = isCurrent ? '800' : '700';
 
-    html += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer" onclick="navigate(\'' + ph.route + '\')">' +
-      '<div style="width:34px;height:34px;border-radius:50%;background:' + dotBg + ';color:' + dotColor + ';display:flex;align-items:center;justify-content:center;font-size:15px;transform:scale(' + dotScale + ');transition:transform .2s;' + ring + '">' + (reached && !isCurrent ? '✓' : ph.icon) + '</div>' +
-      '<div style="font-family:\'Sora\',sans-serif;font-weight:' + labelWeight + ';font-size:9.5px;color:' + labelColor + ';letter-spacing:.3px;text-align:center">' + ph.label + '</div>' +
+    html += '<div style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer" onclick="navigate(\'' + ph.route + '\')">' +
+      '<div style="width:30px;height:30px;border-radius:50%;background:' + dotBg + ';color:' + dotColor + ';display:flex;align-items:center;justify-content:center;font-size:14px;transform:scale(' + dotScale + ');transition:transform .2s;' + ring + '">' + (reached && !isCurrent ? '✓' : ph.icon) + '</div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:' + labelWeight + ';font-size:9px;color:' + labelColor + ';letter-spacing:.2px;text-align:center;white-space:nowrap">' + ph.label + '</div>' +
     '</div>';
     if(i < phases.length - 1){
       var segReached = rank[phases[i+1].id] <= rank[current];
       var segColor = segReached ? 'var(--teal)' : 'var(--border-lt)';
-      html += '<div style="flex:0 0 8px;height:2px;background:' + segColor + ';margin-top:-14px;transition:background .3s"></div>';
+      html += '<div style="flex:0 0 6px;height:2px;background:' + segColor + ';margin-top:-13px;transition:background .3s"></div>';
     }
   });
 
