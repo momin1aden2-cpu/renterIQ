@@ -28,14 +28,28 @@
       .register('/app/sw.js', { scope: '/app/' })
       .then(function (reg) {
         console.log('[RenterIQ] ✅ Service Worker registered. Scope:', reg.scope);
-        // Store the registration globally so FCM can use it
         window.__RIQ_SW_REG__ = reg;
-        // Check for updates every 60 seconds (catches new deploys)
+        // Poll for updates frequently so new deploys land fast
         setInterval(function () { reg.update(); }, 60000);
+        // Also trigger an update check when the tab regains focus — this is
+        // the usual path (user foregrounds the PWA after a deploy shipped).
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'visible') { reg.update(); }
+        });
       })
       .catch(function (err) {
         console.warn('[RenterIQ] ⚠️ SW registration error:', err);
       });
+
+    // When a new SW takes over, the page should reload so it renders the
+    // updated HTML/CSS/JS — not the stale copy currently on screen. Only
+    // triggers after the first controller (avoids reload loop on first visit).
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────────

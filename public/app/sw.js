@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v30 — Journey gaps + onboarding refresh (6 steps, no legal framing)
-// No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
+// RenterIQ Service Worker v31 — Network-first for HTML so new deploys show up
+// No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v30';
+var CACHE_NAME = 'renteriq-shell-v31';
 
 var APP_SHELL = [
   '/app/index.html',
@@ -86,11 +86,45 @@ self.addEventListener('fetch', function (event) {
   // instead of forcing a network round-trip on every share.
   var matchOpts = url.includes('/app/track-share.html') ? { ignoreSearch: true } : undefined;
 
-  // Cache-first: serve from cache, fallback to network and cache the response
+  // For HTML documents, use NETWORK-FIRST so newly-deployed pages always show
+  // up on the next visit. Falls back to cache offline. This fixes the "pushed
+  // commits not visible on phone" problem. Static assets (CSS, JS, images,
+  // manifest) stay cache-first with background refresh.
+  var isHTML = event.request.mode === 'navigate'
+    || (event.request.headers.get('accept') || '').includes('text/html');
+
+  if (isHTML) {
+    event.respondWith(
+      fetch(event.request).then(function (response) {
+        if (response && response.status === 200) {
+          var clone = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(event.request, clone);
+          });
+        }
+        return response;
+      }).catch(function () {
+        return caches.match(event.request, matchOpts);
+      })
+    );
+    return;
+  }
+
+  // Non-HTML: cache-first, update cache in the background on hit
   event.respondWith(
     caches.match(event.request, matchOpts).then(function (cached) {
-      if (cached) { return cached; }
-
+      if (cached) {
+        // Background refresh so the next load has the newest asset
+        fetch(event.request).then(function (response) {
+          if (response && response.status === 200) {
+            var clone = response.clone();
+            caches.open(CACHE_NAME).then(function (cache) {
+              cache.put(event.request, clone);
+            });
+          }
+        }).catch(function () {});
+        return cached;
+      }
       return fetch(event.request).then(function (response) {
         if (response && response.status === 200) {
           var clone = response.clone();

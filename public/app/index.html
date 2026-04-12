@@ -2788,10 +2788,8 @@ function homeRenderJourney(){
   var current = 'search';
   var captionText = 'Start by tracking a property';
 
-  if(!props.length){
-    strip.style.display = 'none';
-    return;
-  }
+  // Strip is ALWAYS visible once the user is signed in — it's how they see
+  // where they are in the journey. Empty state just sits at "Search".
 
   props.forEach(function(p){
     if(!p) return;
@@ -2810,9 +2808,10 @@ function homeRenderJourney(){
     if(rank[phase] > rank[current]) current = phase;
   });
 
-  // Caption copy per phase
+  // Caption copy per phase — two variants for Search depending on whether
+  // the user already has tracked properties or none yet.
   var captions = {
-    search:  'Track more places to compare',
+    search:  props.length ? 'Track more places to compare' : 'Paste a listing URL above to get started',
     inspect: 'Inspect to decide which to apply for',
     apply:   'You\'re applying — waiting on the agent',
     lease:   'Lease offered — review before you sign',

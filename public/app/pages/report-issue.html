@@ -26,6 +26,10 @@
 <style>
 /* Page-local form primitives (matched to inspection.html conventions) */
 .input-f{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:11px;padding:11px 13px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);outline:none;box-sizing:border-box;-webkit-appearance:none;appearance:none}
+
+/* Fixed bottom action bar sits above the bottom-nav safely on all devices */
+.ri-action-bar{position:fixed;left:0;right:0;bottom:calc(56px + env(safe-area-inset-bottom,0px));max-width:430px;margin:0 auto;padding:14px 16px 14px;background:linear-gradient(transparent,rgba(240,246,255,.95) 30%,var(--blue-xl));z-index:50;pointer-events:none}
+.ri-action-bar > *{pointer-events:auto}
 .input-f:focus{border-color:var(--blue)}
 .input-f::placeholder{color:var(--muted)}
 .qn-chip{background:var(--blue-xl);border:1px solid var(--border);border-radius:100px;padding:6px 12px;font-family:'Sora',sans-serif;font-size:11.5px;font-weight:700;color:var(--blue);cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-block;transition:all .15s}
@@ -153,7 +157,7 @@
     </div>
   </div>
 
-  <div style="position:sticky;bottom:0;background:linear-gradient(transparent,var(--blue-xl) 28%);padding:20px 16px 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5">
+  <div class="ri-action-bar" id="riActionBarA">
     <button class="btn-blue" id="riNextBtn" onclick="goDraft()" style="opacity:.5;pointer-events:none">Draft my message ✦</button>
     <div id="riNextHint" style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-top:7px">Describe the issue and pick a category to continue</div>
   </div>
@@ -199,7 +203,7 @@
     </div>
   </div>
 
-  <div id="draftActions" style="display:none;position:sticky;bottom:0;background:linear-gradient(transparent,var(--blue-xl) 28%);padding:20px 16px 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5">
+  <div id="draftActions" class="ri-action-bar" style="display:none">
     <button class="btn-blue" onclick="saveAndSend()">📧 Send Email & Save to Vault</button>
     <div style="display:flex;gap:10px;margin-top:10px">
       <button class="btn-outline" style="flex:1" onclick="copyDraft()">📋 Copy</button>

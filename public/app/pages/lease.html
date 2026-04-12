@@ -144,13 +144,9 @@
         </div>
       </div>
 
-      <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
-        <div style="flex:1;height:1px;background:var(--border-lt)"></div>
-        <span style="font-weight:600;font-size:13px;color:var(--muted)">or</span>
-        <div style="flex:1;height:1px;background:var(--border-lt)"></div>
+      <div style="text-align:center;margin-top:14px">
+        <button onclick="loadDemoLease()" style="background:transparent;border:none;padding:8px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);cursor:pointer;min-height:36px;letter-spacing:.3px">Just exploring? Try with a sample lease</button>
       </div>
-
-      <button class="btn-muted-c btn-full" onclick="loadDemoLease()">Use Demo Lease for This Walkthrough</button>
     </div>
 
     <!-- Lease Details Form (reveals after file selected) -->
@@ -1232,13 +1228,6 @@ function extractLeaseKeyTerms(data) {
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
 </script>
 <script src="/app/js/sidebar.js"></script>
-
-
-<!-- Step journey navigation -->
-<div class="step-journey-cta" style="max-width:430px;margin:0 auto;padding:0 16px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-  <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Step 4 of 7</span>
-  <a href="/app/pages/entry-audit.html" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:6px">🏠 Next: Entry Condition Report →</a>
-</div>
 <nav class="bottom-nav">
   <button class="nav-tab" onclick="navigate('/app/index.html')"><div class="tab-icon">🏠</div><span class="tab-label">Home</span></button>
   <button class="nav-tab" onclick="navigate('/app/pages/inspection.html')"><div class="tab-icon">📋</div><span class="tab-label">Inspect</span></button>
