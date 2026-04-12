@@ -34,7 +34,8 @@ Rules:
 - Extract as much as possible — leave fields as null if not found
 - This could be a listing page, not just a booking confirmation — extract property details even without a booked inspection
 - For dates, interpret Australian date formats (DD/MM/YYYY)
-- If you see a date range (e.g. "Sat 12 Apr, 10:00 - 10:30"), use the start time
+- TIMES are critical. Search the entire image for "Inspection", "Open Home", "Open for inspection", "Inspect" sections — the time is usually directly next to the date. If you see a range like "Sat 12 Apr, 10:00 - 10:30" or "10:30am–11:00am", extract the START time.
+- ALWAYS populate BOTH \`time\` (24-hour HH:MM) AND \`time_display\` (12-hour with AM/PM) whenever you see any time at all — derive one from the other if needed. e.g. if you see "2:30pm" return time="14:30" and time_display="2:30 PM".
 - If the image is unclear, set confidence to "low" and extract what you can
 - For address, include suburb, state, and postcode if visible
 - If rent is shown as per month, convert to weekly (divide by 4.33 and round)
@@ -56,10 +57,22 @@ export async function POST(request: Request) {
       if (file) {
         const buffer = await file.arrayBuffer();
         const base64 = Buffer.from(buffer).toString('base64');
-        imageData = {
-          data: base64,
-          mimeType: file.type || 'image/jpeg',
-        };
+        let mimeType = file.type || 'image/jpeg';
+        // Gemini only accepts a specific list of inline mime types.
+        // Normalise common screenshot formats and reject unsupported ones
+        // early with a useful message instead of letting the API 500 out.
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'];
+        if (!allowed.includes(mimeType)) {
+          if (mimeType.startsWith('image/')) mimeType = 'image/jpeg';
+          else {
+            return NextResponse.json(
+              { error: `Unsupported file type "${mimeType}". Please upload a JPG, PNG or PDF screenshot.` },
+              { status: 400 }
+            );
+          }
+        }
+        imageData = { data: base64, mimeType };
+        console.log('[extract-inspection-details] received', { mimeType, bytes: buffer.byteLength });
       }
     } else {
       const body = await request.json();
@@ -90,7 +103,7 @@ export async function POST(request: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const parts: Array<{ text: string } | { inlineData: { data: string; mimeType: string } }> = [];
 
@@ -131,9 +144,13 @@ export async function POST(request: Request) {
       );
     }
   } catch (error) {
-    console.error('Inspection extraction error:', error);
+    const err = error as Error;
+    console.error('[extract-inspection-details] fatal:', err?.stack || err);
     return NextResponse.json(
-      { error: 'Failed to process screenshot', details: String(error) },
+      {
+        error: err?.message ? `Extraction failed: ${err.message}` : 'Failed to process screenshot',
+        details: err?.stack || String(error),
+      },
       { status: 500 }
     );
   }

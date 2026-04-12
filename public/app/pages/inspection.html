@@ -102,6 +102,33 @@
 .verdict-btn.v-maybe-sel{border-color:#F59E0B!important;background:rgba(245,158,11,.1)!important;color:#78350F!important}
 .verdict-btn.v-no-sel{border-color:#EF4444!important;background:rgba(239,68,68,.1)!important;color:#7F1D1D!important}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
+
+/* Quick Scan styles */
+.scan-group-title{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.3px;margin:0 4px 10px}
+.vibe-btn{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth);font-family:'Sora',sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);min-height:68px}
+.vibe-btn .vibe-emoji{font-size:22px;line-height:1}
+.vibe-btn.sel[data-vibe="love"]{background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(16,185,129,.05));border-color:#10B981;color:#065F46}
+.vibe-btn.sel[data-vibe="would"]{background:rgba(59,130,246,.08);border-color:var(--blue);color:var(--blue)}
+.vibe-btn.sel[data-vibe="backup"]{background:rgba(245,158,11,.08);border-color:var(--amber);color:#78350F}
+.vibe-btn.sel[data-vibe="pass"]{background:rgba(239,68,68,.08);border-color:var(--red);color:#7F1D1D}
+.scan-item{background:#fff;border:1.5px solid var(--border-lt);border-radius:12px;padding:11px 12px;display:flex;align-items:center;gap:10px;margin-bottom:6px;transition:border-color .15s}
+.scan-item.ok{border-color:var(--teal);background:rgba(0,200,150,.04)}
+.scan-item.issue{border-color:var(--amber);background:rgba(245,166,35,.05)}
+.scan-icon{width:30px;height:30px;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.scan-label{flex:1;font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--text);line-height:1.3}
+.scan-label small{display:block;font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px;letter-spacing:0}
+.scan-toggle{display:flex;gap:6px;flex-shrink:0}
+.scan-toggle button{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;display:flex;align-items:center;justify-content:center;font-weight:700}
+.scan-toggle button.on-ok{background:var(--teal);border-color:var(--teal);color:#fff}
+.scan-toggle button.on-issue{background:var(--amber);border-color:var(--amber);color:#fff}
+.qsheet-row{display:flex;align-items:flex-start;gap:10px;padding:11px 6px;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.qsheet-row:last-child{border-bottom:none}
+.qsheet-tick{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;font-weight:800;background:#fff;margin-top:1px;transition:all .15s}
+.qsheet-row.done .qsheet-tick{background:var(--teal);border-color:var(--teal);color:#fff}
+.qsheet-row.done .qsheet-txt{color:var(--muted);text-decoration:line-through}
+.qsheet-txt{font-family:'Nunito',sans-serif;font-weight:600;font-size:13.5px;color:var(--text);line-height:1.5}
+.qsheet-cat{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin:12px 6px 4px}
+.qsheet-cat:first-child{margin-top:0}
 </style>
 </head>
 <body>
@@ -201,121 +228,94 @@
       </div>
     </div>
 
-    <!-- Areas to Inspect -->
     <div class="card" style="margin-bottom:13px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px">Areas to Inspect</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">Pre-selected for your property type. Toggle areas on or off.</div>
-      <div id="areaToggles" style="display:flex;flex-direction:column;gap:6px"></div>
-      <div style="margin-top:12px">
-        <div class="fsl">Custom Areas (comma separated)</div>
-        <input class="input-f" id="setupCustom" type="text" placeholder="e.g. Pool, Balcony, Gym" autocomplete="off">
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:13px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:13px">How it works</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:13px">How the Quick Scan works</div>
       <div style="display:flex;flex-direction:column;gap:11px">
-        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Walk each area — expand, rate condition (Good / Issues / Concern) and add photos or quick notes.</div></div>
-        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Each area has built-in tips — exactly what to check and red flags to watch for.</div></div>
-        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Tap "Questions 💬" at any time to see what to ask the agent — and record their answers.</div></div>
-        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Finish with your verdict and a notes summary. Decide to apply or move on.</div></div>
+        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Walk through — tap ✓ for things that look fine, ⚠ for anything off. Designed to take 2–3 minutes, not a full documentation exercise.</div></div>
+        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Tap "Ask the agent 💬" for a cheat-sheet of the right questions to bring up while you're there.</div></div>
+        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Leave the open home with a clear verdict — Apply, Maybe, or Pass. Compare later with the other places you saw that weekend.</div></div>
       </div>
     </div>
     <div class="tip-box" style="margin-bottom:16px">
       <span style="font-size:18px;flex-shrink:0;margin-top:1px">💡</span>
-      <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.6">Arrive 5 mins early. Open every door and cupboard. Test taps, light switches and the hot water. Don't be shy — that's what the inspection is for.</div>
+      <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.6">You'll do a full condition report <em>after</em> you sign the lease. This Quick Scan is just to help you decide whether to apply.</div>
     </div>
-    <button class="btn-blue" style="margin-bottom:10px" onclick="startWalkthrough()">Let's Inspect →</button>
+    <button class="btn-blue" style="margin-bottom:10px" onclick="startWalkthrough()">Start Quick Scan →</button>
     <button class="btn-outline" onclick="switchView('A')">Not yet — go back</button>
   </div>
 </div>
 
-<!-- VIEW C: WALKTHROUGH -->
+<!-- VIEW C: QUICK SCAN -->
 <div class="view" id="viewC" style="display:none">
   <header class="sh" style="padding-bottom:0">
     <div class="sh-row">
       <button class="sh-back" onclick="switchView('B')"><span class="sh-back-arrow">‹</span><span class="sh-label">Setup</span></button>
-      <button class="btn-ghost" onclick="switchView('D')">Questions 💬</button>
+      <button class="btn-ghost" onclick="openQuestionsSheet()">Ask the agent 💬</button>
     </div>
-    <div class="sh-title" style="margin-top:6px" id="wcTitle">Walkthrough</div>
-    <div class="sh-sub" id="wcAddr">Tap each area to inspect</div>
+    <div class="sh-title" style="margin-top:6px" id="wcTitle">Quick Scan</div>
+    <div class="sh-sub" id="wcAddr">Tap ✓ for OK, ⚠ for concerns. Skip anything that doesn't apply.</div>
   </header>
-  <div class="prog-wrap">
-    <div class="prog-top"><span class="prog-lbl" id="progLbl">0 of 0 areas rated</span><span class="prog-pct" id="progPct">0%</span></div>
-    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+
+  <div style="flex:1;overflow-y:auto;padding:14px 16px 180px">
+
+    <!-- Vibe rating (top) -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">First impression</div>
+      <div id="vibeRow" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        <button class="vibe-btn" data-vibe="love"  onclick="setVibe('love')"><span class="vibe-emoji">😍</span><span>Love it</span></button>
+        <button class="vibe-btn" data-vibe="would" onclick="setVibe('would')"><span class="vibe-emoji">🙂</span><span>Would do</span></button>
+        <button class="vibe-btn" data-vibe="backup" onclick="setVibe('backup')"><span class="vibe-emoji">😐</span><span>Backup</span></button>
+        <button class="vibe-btn" data-vibe="pass"  onclick="setVibe('pass')"><span class="vibe-emoji">👎</span><span>Pass</span></button>
+      </div>
+    </div>
+
+    <!-- Quick-check items -->
+    <div class="scan-group-title">Inside the property</div>
+    <div id="scanInside"></div>
+
+    <div class="scan-group-title" style="margin-top:18px">Around &amp; practical</div>
+    <div id="scanPractical"></div>
+
+    <!-- Liked / Worried -->
+    <div class="scan-group-title" style="margin-top:18px">Worth remembering</div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="fsl" style="color:var(--teal-dk)">💚 One thing I liked</div>
+      <textarea class="notes-f" id="scanLiked" rows="2" placeholder="e.g. lots of natural light in the kitchen"></textarea>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="fsl" style="color:var(--amber)">⚠️ One thing I'm worried about</div>
+      <textarea class="notes-f" id="scanWorried" rows="2" placeholder="e.g. small bedroom + street noise"></textarea>
+    </div>
+
+    <!-- Optional photos -->
+    <div class="scan-group-title">Photos (optional · max 3)</div>
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.55">Snap a couple of things you want to show a partner, flatmate, or remember later. No need to document everything.</div>
+      <div id="scanPhotos" class="photos-grid">
+        <div class="ph-add" onclick="addScanPhoto()"><span style="font-size:20px">📷</span><span style="font-size:9px;font-family:'Sora',sans-serif;font-weight:700;color:var(--muted)">Add</span></div>
+      </div>
+    </div>
   </div>
-  <div style="flex:1;overflow-y:auto;padding:14px 16px 160px" id="areasList"></div>
+
   <div style="position:sticky;bottom:0;background:linear-gradient(transparent,var(--blue-xl) 28%);padding:20px 16px 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5">
-    <button class="btn-blue" id="finishBtn" onclick="finishWalkthrough()">View My Summary →</button>
-    <div style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-top:7px" id="finishHint">Rate at least one area to finish</div>
+    <button class="btn-blue" id="finishBtn" onclick="finishWalkthrough()">See my summary →</button>
+    <div style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-top:7px" id="finishHint">Pick a vibe to continue</div>
   </div>
 </div>
 
-<!-- VIEW D: QUESTIONS TO ASK -->
-<div class="view" id="viewD" style="display:none">
-  <header class="sh">
-    <div class="sh-row"><button class="sh-back" onclick="switchView('C')"><span class="sh-back-arrow">‹</span><span class="sh-label">Walkthrough</span></button></div>
-    <div class="sh-title">Questions to Ask</div>
-    <div class="sh-sub">Tap each one to tick it off — add their answer below</div>
-  </header>
-  <div class="content" style="padding:16px 16px 32px">
-    <div class="tip-box" style="margin-bottom:16px">
-      <span style="font-size:16px;flex-shrink:0;margin-top:1px">💬</span>
-      <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.6">These are the most important questions to ask at an open home. Tap each one — record the agent's answers so you remember later.</div>
+<!-- QUESTIONS CHEAT-SHEET BOTTOM SHEET -->
+<div class="picker-overlay" id="questionsSheet" style="display:none" onclick="closeQuestionsSheet(event)">
+  <div class="picker-sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:4px">💬 Ask the agent</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted)">Tap each one once you've asked. No need to record answers — just trigger the memory.</div>
     </div>
-
-    <div style="margin-bottom:18px">
-      <div class="q-cat-title">📋 Property Basics</div>
-      <div class="q-row" id="q0" onclick="toggleQ(0)"><div class="q-tick" id="qt0"></div><div class="q-txt">How long has it been vacant?</div></div>
-      <div class="q-ans-wrap" id="qa0"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q1" onclick="toggleQ(1)"><div class="q-tick" id="qt1"></div><div class="q-txt">What's included — whitegoods, blinds, curtains, air con?</div></div>
-      <div class="q-ans-wrap" id="qa1"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q2" onclick="toggleQ(2)"><div class="q-tick" id="qt2"></div><div class="q-txt">Are pets allowed? (Any restrictions on breed/size?)</div></div>
-      <div class="q-ans-wrap" id="qa2"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q3" onclick="toggleQ(3)"><div class="q-tick" id="qt3"></div><div class="q-txt">When is the property available from?</div></div>
-      <div class="q-ans-wrap" id="qa3"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q4" onclick="toggleQ(4)"><div class="q-tick" id="qt4"></div><div class="q-txt">Are there any known maintenance issues or repairs pending?</div></div>
-      <div class="q-ans-wrap" id="qa4"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-    </div>
-
-    <div style="margin-bottom:18px">
-      <div class="q-cat-title">💰 Costs & Utilities</div>
-      <div class="q-row" id="q5" onclick="toggleQ(5)"><div class="q-tick" id="qt5"></div><div class="q-txt">Is water charged separately, or included in rent?</div></div>
-      <div class="q-ans-wrap" id="qa5"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q6" onclick="toggleQ(6)"><div class="q-tick" id="qt6"></div><div class="q-txt">Is NBN connected? What speed tier?</div></div>
-      <div class="q-ans-wrap" id="qa6"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q7" onclick="toggleQ(7)"><div class="q-tick" id="qt7"></div><div class="q-txt">Are there any strata / body corporate fees as a tenant?</div></div>
-      <div class="q-ans-wrap" id="qa7"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q8" onclick="toggleQ(8)"><div class="q-tick" id="qt8"></div><div class="q-txt">How is rubbish / recycling handled?</div></div>
-      <div class="q-ans-wrap" id="qa8"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-    </div>
-
-    <div style="margin-bottom:18px">
-      <div class="q-cat-title">📄 Lease & Application</div>
-      <div class="q-row" id="q9" onclick="toggleQ(9)"><div class="q-tick" id="qt9"></div><div class="q-txt">What lease lengths are preferred — 6 months or 12 months?</div></div>
-      <div class="q-ans-wrap" id="qa9"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q10" onclick="toggleQ(10)"><div class="q-tick" id="qt10"></div><div class="q-txt">How many applications have been received so far?</div></div>
-      <div class="q-ans-wrap" id="qa10"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q11" onclick="toggleQ(11)"><div class="q-tick" id="qt11"></div><div class="q-txt">Is a rent increase likely at renewal? What's the typical increase?</div></div>
-      <div class="q-ans-wrap" id="qa11"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q12" onclick="toggleQ(12)"><div class="q-tick" id="qt12"></div><div class="q-txt">What documents are needed to apply?</div></div>
-      <div class="q-ans-wrap" id="qa12"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-    </div>
-
-    <div style="margin-bottom:18px">
-      <div class="q-cat-title">🔑 Practical Living</div>
-      <div class="q-row" id="q13" onclick="toggleQ(13)"><div class="q-tick" id="qt13"></div><div class="q-txt">How many car parking spaces are included?</div></div>
-      <div class="q-ans-wrap" id="qa13"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q14" onclick="toggleQ(14)"><div class="q-tick" id="qt14"></div><div class="q-txt">Is there storage (shed, cage, lockup)?</div></div>
-      <div class="q-ans-wrap" id="qa14"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q15" onclick="toggleQ(15)"><div class="q-tick" id="qt15"></div><div class="q-txt">Who is responsible for lawn/garden maintenance?</div></div>
-      <div class="q-ans-wrap" id="qa15"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-      <div class="q-row" id="q16" onclick="toggleQ(16)"><div class="q-tick" id="qt16"></div><div class="q-txt">How quickly does maintenance get attended to?</div></div>
-      <div class="q-ans-wrap" id="qa16"><textarea class="q-ans-f" placeholder="Agent's answer…"></textarea></div>
-    </div>
-
-    <button class="btn-blue" onclick="switchView('C')">← Back to Walkthrough</button>
+    <div id="questionsList" style="max-height:60vh;overflow-y:auto;padding-bottom:12px"></div>
+    <button class="btn-outline" onclick="closeQuestionsSheet()">Done</button>
   </div>
 </div>
+
 
 <!-- VIEW E: SUMMARY -->
 <div class="view" id="viewE" style="display:none">
@@ -326,28 +326,36 @@
   </header>
   <div class="content" style="padding:16px 16px 120px">
 
+    <!-- Vibe recap -->
+    <div class="card" id="sumVibeCard" style="margin-bottom:14px;text-align:center">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.3px;margin-bottom:6px">Your first impression</div>
+      <div id="sumVibeDisplay" style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text)">—</div>
+    </div>
+
     <!-- Verdict -->
-    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">What's your verdict?</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Next step</div>
     <div style="display:flex;gap:8px;margin-bottom:18px">
       <button class="verdict-btn" id="vYes" onclick="setVerdict('yes')"><span style="font-size:22px">😍</span>Would Apply</button>
       <button class="verdict-btn" id="vMaybe" onclick="setVerdict('maybe')"><span style="font-size:22px">🤔</span>Maybe</button>
       <button class="verdict-btn" id="vNo" onclick="setVerdict('no')"><span style="font-size:22px">❌</span>Pass</button>
     </div>
 
-    <!-- Area summary -->
-    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Areas</div>
-    <div class="card" style="margin-bottom:14px" id="sumAreas"></div>
+    <!-- Quick scan highlights -->
+    <div id="sumHighlightsWrap" style="display:none;margin-bottom:14px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Your notes</div>
+      <div class="card" id="sumHighlights"></div>
+    </div>
 
-    <!-- Red flags -->
+    <!-- Red flags (auto-derived from ⚠ items) -->
     <div id="sumFlagsWrap" style="display:none;margin-bottom:14px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#991B1B;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚠️ Red Flags Noted</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#991B1B;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚠️ Flagged at inspection</div>
       <div class="card" id="sumFlags"></div>
     </div>
 
     <!-- Notes -->
-    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Extra Notes</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Extra thoughts</div>
     <div class="card" style="margin-bottom:18px">
-      <textarea class="notes-f" id="sumNotes" placeholder="Any other thoughts about this property…" style="min-height:80px"></textarea>
+      <textarea class="notes-f" id="sumNotes" placeholder="Anything else to remember about this property…" style="min-height:72px"></textarea>
     </div>
 
     <!-- VERDICT-DRIVEN ACTION AREA -->
@@ -546,7 +554,7 @@ function inspDeleteProperty(id, e) {
   try { tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]'); } catch(e) {}
   tracked = tracked.filter(function(p) { return p && p.id !== id; });
   localStorage.setItem('renteriq_tracked_properties', JSON.stringify(tracked));
-  if (window.RIQStore) { RIQStore.ready.then(function() { if (RIQStore.isAuthed()) RIQStore.write('tracked-properties', id, null); }); }
+  if (window.RIQStore) { RIQStore.ready.then(function() { if (RIQStore.isAuthed()) RIQStore.delete('tracked-properties', id); }); }
   renderInspectionList();
   showToast('Removed', 'Property removed from tracking', '🗑️');
 }
@@ -658,10 +666,11 @@ function processBookingImage() {
     body: formData
   })
   .then(function(response) {
-    return response.json();
+    return response.json().catch(function(){ return { error: 'Server returned a non-JSON response ('+response.status+')' }; });
   })
   .then(function(data) {
     if (data.error) {
+      if (data.details) console.error('Extraction server details:', data.details);
       throw new Error(data.error);
     }
     
@@ -673,6 +682,18 @@ function processBookingImage() {
     setTimeout(function() {
       extractedBookingData = data;
       showExtractedDetails(data);
+
+      // If we captured a date + time, schedule reminders now so the user
+      // doesn't have to reach the "confirm" step for the alerts to arm.
+      if (data && data.date && data.time) {
+        try {
+          setupInspectionReminders(data);
+          var when = formatInspectionDate(data.date) + ' at ' + (data.time_display || formatTimeDisplay(data.time));
+          showToast('Reminders set', '24h + 1h before · ' + when, '🔔');
+        } catch(err) {
+          console.error('Reminder scheduling failed:', err);
+        }
+      }
     }, 1000);
   })
   .catch(function(error) {
@@ -697,19 +718,28 @@ function showExtractedDetails(data) {
     html += '<div style="margin-bottom:8px"><strong>📍 Address:</strong><br>' + data.address + '</div>';
   }
   
-  if (data.date && data.time_display) {
-    html += '<div style="margin-bottom:8px"><strong>📅 Inspection:</strong><br>' + 
-            formatInspectionDate(data.date) + ' at ' + data.time_display + '</div>';
+  var timeLabel = data.time_display || (data.time ? formatTimeDisplay(data.time) : '');
+  if (data.date && timeLabel) {
+    html += '<div style="margin-bottom:8px"><strong>📅 Inspection:</strong><br>' +
+            formatInspectionDate(data.date) + ' at ' + timeLabel + '</div>';
   } else if (data.date) {
     html += '<div style="margin-bottom:8px"><strong>📅 Date:</strong><br>' + formatInspectionDate(data.date) + '</div>';
+  } else if (timeLabel) {
+    html += '<div style="margin-bottom:8px"><strong>⏰ Time:</strong><br>' + timeLabel + '</div>';
   }
   
-  if (data.agent_name) {
-    html += '<div style="margin-bottom:8px"><strong>👤 Agent:</strong><br>' + data.agent_name + '</div>';
-  }
-  
-  if (data.agent_phone) {
-    html += '<div style="margin-bottom:8px"><strong>📞 Phone:</strong><br>' + data.agent_phone + '</div>';
+  if (data.agent_name || data.agent_phone || data.agent_email) {
+    html += '<div style="margin-bottom:8px;padding:10px 12px;background:var(--blue-xl);border-radius:10px;border:1px solid var(--border-lt)">';
+    html += '<strong>👤 Agent contact</strong>';
+    if (data.agent_name) html += '<div style="margin-top:4px;font-weight:700;color:var(--text)">' + data.agent_name + '</div>';
+    if (data.agent_phone) {
+      var telHref = data.agent_phone.replace(/[^0-9+]/g, '');
+      html += '<div style="margin-top:2px"><a href="tel:' + telHref + '" style="color:var(--blue);text-decoration:none;font-weight:700">📞 ' + data.agent_phone + '</a></div>';
+    }
+    if (data.agent_email) {
+      html += '<div style="margin-top:2px"><a href="mailto:' + data.agent_email + '" style="color:var(--blue);text-decoration:none;font-weight:700;word-break:break-all">✉️ ' + data.agent_email + '</a></div>';
+    }
+    html += '</div>';
   }
   
   if (data.property_type || data.bedrooms || data.rent_weekly) {
@@ -737,6 +767,17 @@ function showExtractedDetails(data) {
   document.getElementById('extractedDetails').innerHTML = html;
   document.getElementById('uploadStep2').style.display = 'none';
   document.getElementById('uploadStep3').style.display = 'block';
+}
+
+function formatTimeDisplay(t) {
+  if (!t) return '';
+  var m = String(t).match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return t;
+  var h = parseInt(m[1], 10);
+  var min = m[2];
+  var ap = h >= 12 ? 'PM' : 'AM';
+  var h12 = h % 12; if (h12 === 0) h12 = 12;
+  return h12 + ':' + min + ' ' + ap;
 }
 
 function formatInspectionDate(dateStr) {
@@ -906,7 +947,10 @@ function scheduleLocalReminder(id, datetime, options) {
       fired: false
     };
     
-    reminders.push(reminder);
+    // Replace any existing reminder with the same id so we don't queue duplicates
+    var existing = reminders.findIndex(function(r){ return r && r.id === id; });
+    if (existing >= 0) reminders[existing] = reminder;
+    else reminders.push(reminder);
     localStorage.setItem('renteriq_reminders', JSON.stringify(reminders));
     
     // In a real app, you'd use the Notifications API or service workers
@@ -1008,72 +1052,231 @@ function switchView(v){
   currentView=v;
 }
 
-// Data
-var AREAS=[
-  {id:'living',name:'Living Area',icon:'🛋',tips:'Check floor condition, wall marks, power points, windows, blinds/curtains, heating/cooling, light switches'},
-  {id:'kitchen',name:'Kitchen',icon:'🍳',tips:'Check benchtops, cupboards (open them), appliances, sink/taps, splashback, floor, power points, storage space'},
-  {id:'master',name:'Master Bedroom',icon:'🛏',tips:'Check windows, built-ins, power points, floor, walls, ceiling, light, door/lock, closet space'},
-  {id:'bathroom',name:'Bathroom',icon:'🚿',tips:'Check taps, water pressure, hot water, shower head, tiles, grout, fan, ventilation, storage, toilet flush'},
-  {id:'bedroom2',name:'Bedroom 2',icon:'🛏',tips:'Check windows, power points, floor, walls, ceiling, light, door/lock, closet, size'},
-  {id:'outdoor',name:'Outdoor/Parking',icon:'🌿',tips:'Check garden condition, lawn, fence, gates, parking spaces, shed, storage, outdoor taps, drainage'}
-];
+// Quick Scan data — 12 high-value checks renters actually worry about
+// when walking through an open home. Each item has a `flag` — the red-flag
+// phrasing that gets auto-added to the summary if the renter taps ⚠.
+var SCAN_ITEMS={
+  inside:[
+    {id:'light',       icon:'💡', label:'Natural light',    hint:'Feels bright without lights on?',      flag:'Dark / poor natural light'},
+    {id:'mould',       icon:'🦠', label:'Mould / damp',     hint:'Any marks, bubbling paint or smell',   flag:'Signs of mould or damp'},
+    {id:'smell',       icon:'👃', label:'Smell',            hint:'Musty, smoke, pets, or chemicals',     flag:'Unpleasant smell'},
+    {id:'water',       icon:'💧', label:'Water pressure',   hint:'Run a tap — is the flow strong?',      flag:'Low water pressure'},
+    {id:'storage',     icon:'📦', label:'Storage',          hint:'Enough cupboards / wardrobes',         flag:'Not enough storage'},
+    {id:'security',    icon:'🔒', label:'Locks & windows',  hint:'Feels secure, windows latch',          flag:'Security concern (locks/windows)'}
+  ],
+  practical:[
+    {id:'noise',       icon:'🔊', label:'Street noise',     hint:'Traffic, neighbours, trains',          flag:'Noisy location'},
+    {id:'signal',      icon:'📶', label:'Phone signal',     hint:'Check bars in each room',              flag:'Poor mobile signal'},
+    {id:'parking',     icon:'🚗', label:'Parking reality',  hint:'As advertised? Street permit needed?', flag:'Parking issue'},
+    {id:'bathroom',    icon:'🛁', label:'Bathroom',         hint:'Clean, modern enough, exhaust works',  flag:'Bathroom condition concern'},
+    {id:'kitchen',     icon:'🍳', label:'Kitchen',          hint:'Appliance age, bench + cupboard look', flag:'Kitchen condition concern'},
+    {id:'outdoor',     icon:'🌿', label:'Outdoor / balcony',hint:'Useable? Skip if N/A',                 flag:'Outdoor area concern'}
+  ]
+};
+
 var QUESTIONS=[
-  'How long has it been vacant?',
-  'What is included — whitegoods, blinds, curtains, air con?',
-  'Are pets allowed? (Any restrictions on breed/size?)',
-  'When is the property available from?',
-  'Are there any known maintenance issues or repairs pending?',
-  'Is water charged separately, or included in rent?',
-  'Is NBN connected? What speed tier?',
-  'Are there any strata / body corporate fees as a tenant?',
-  'How is rubbish / recycling handled?',
-  'What lease lengths are preferred — 6 months or 12 months?',
-  'How many applications have been received so far?',
-  'Is a rent increase likely at renewal? What is the typical increase?',
-  'What documents are needed to apply?',
-  'How many car parking spaces are included?',
-  'Is there storage (shed, cage, lockup)?',
-  'Who is responsible for lawn/garden maintenance?',
-  'How quickly does maintenance get attended to?'
-];
-var RED_FLAGS=[
-  'Visible mould or damp patches',
-  'Strong odour (smoke, pets, damp)',
-  'Broken windows or doors',
-  'Faulty wiring (flickering lights, exposed wires)',
-  'Water stains on ceiling or walls',
-  'Poor water pressure or drainage',
-  'Broken appliances or fixtures',
-  'Pest evidence (droppings, traps)',
-  'Major cracks in walls/foundation',
-  'Non-functional heating/cooling',
-  'Missing smoke alarms',
-  'Unsafe stairs or railings'
+  {cat:'Property basics', q:'How long has it been vacant?'},
+  {cat:'Property basics', q:"What's included — whitegoods, blinds, air-con?"},
+  {cat:'Property basics', q:'Are pets allowed? Any restrictions?'},
+  {cat:'Property basics', q:'When is the property available from?'},
+  {cat:'Property basics', q:'Any maintenance issues or pending repairs?'},
+  {cat:'Costs & utilities', q:'Is water billed separately?'},
+  {cat:'Costs & utilities', q:'Is NBN connected? What speed tier?'},
+  {cat:'Application',     q:'How many applications so far?'},
+  {cat:'Application',     q:'Preferred lease length — 6 or 12 months?'},
+  {cat:'Application',     q:'What documents are needed to apply?'}
 ];
 
-var inspectionData={address:'',rent:'',beds:'',areas:{},questions:{},redFlags:[],verdict:'',notes:''};
+var inspectionData={
+  address:'', rent:'', beds:'', propertyType:'', trackedId:'',
+  scan:{ vibe:'', items:{}, liked:'', worried:'', photos:[] },
+  questionsAsked:{}, verdict:'', notes:''
+};
 
-// Init
-document.addEventListener('DOMContentLoaded',function(){
-  renderInspectionList();
-  for(var i=0;i<QUESTIONS.length;i++){var el=document.getElementById('qa'+i);if(el){el.querySelector('textarea').addEventListener('input',function(i){return function(){inspectionData.questions[i]=el.querySelector('textarea').value}}(i))}}
-});
+document.addEventListener('DOMContentLoaded',function(){ renderInspectionList(); });
 
-function startQuickInspection(){selectPropertyType('house');switchView('B')}
-function startWalkthrough(){inspectionData.address=document.getElementById('setupAddress').value;inspectionData.rent=document.getElementById('setupRent').value;inspectionData.beds=document.getElementById('setupBeds').value;renderAreas();switchView('C');updateProgress()}
-function renderAreas(){var html='';AREAS.forEach(function(area,i){var d=inspectionData.areas[area.id]||{};html+='<div class="area-card'+(d.open?' open':'')+'" id="area-'+area.id+'"><div class="area-hdr" onclick="toggleArea(\''+area.id+'\')"><div class="area-icon">'+area.icon+'</div><div><div class="area-name">'+area.name+'</div><div class="area-hint">'+(d.condition?{good:'Good',issues:'Issues',concern:'Concerns'}[d.condition]:'Tap to inspect')+'</div></div><div class="area-badge'+(d.condition?' '+d.condition:'')+'">'+(d.condition?'✓':'')+'</div></div><div class="area-body"><div class="fsl">Condition</div><div class="cond-row"><button class="cond-btn'+(d.condition==='good'?' good-sel':'')+'" onclick="setCond(\''+area.id+'\',\'good\')"><span style="font-size:20px">😊</span>Good</button><button class="cond-btn'+(d.condition==='issues'?' issues-sel':'')+'" onclick="setCond(\''+area.id+'\',\'issues\')"><span style="font-size:20px">😐</span>Issues</button><button class="cond-btn'+(d.condition==='concern'?' concern-sel':'')+'" onclick="setCond(\''+area.id+'\',\'concern\')"><span style="font-size:20px">😟</span>Concerns</button></div><div class="tips-toggle" onclick="toggleTips(\''+area.id+'\')"><div class="tips-lbl">💡 What to check</div><div class="tips-arr" id="tips-arr-'+area.id+'">›</div></div><div class="tips-panel" id="tips-'+area.id+'"><div class="tip-item"><div class="tip-dot"></div><div class="tip-txt">'+area.tips+'</div></div></div><div class="fsl">Photos</div><div class="photos-grid" id="photos-'+area.id+'"><div class="ph-add" onclick="addPhoto(\''+area.id+'\')"><span style="font-size:20px">📷</span><span style="font-size:9px;font-family:\'Sora\',sans-serif;font-weight:700;color:var(--muted)">Add</span></div></div><div class="fsl">Quick Notes</div><div class="qchips" id="chips-'+area.id+'"><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'✓ Walls OK\',this)">✓ Walls OK</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'✓ Floor OK\',this)">✓ Floor OK</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'✓ Windows OK\',this)">✓ Windows OK</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'✓ Lights OK\',this)">✓ Lights OK</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'Staining\',this)">Staining</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'Damage noted\',this)">Damage noted</span><span class="qchip" onclick="addQuickNote(\''+area.id+'\',\'Needs repair\',this)">Needs repair</span></div><textarea class="notes-f" id="notes-'+area.id+'" placeholder="Add a note… e.g. scuff mark on south wall, approx 5cm, pre-existing" oninput="saveAreaNote(\''+area.id+'\')"></textarea><div class="fsl">Red Flags</div><div id="rf-'+area.id+'">'+RED_FLAGS.map(function(f,i){return'<div class="rf-row" onclick="toggleRedFlag(\''+area.id+'\',\''+f+'\',this)"><div class="rf-cb'+(d.redFlags&&d.redFlags.indexOf(f)!==-1?' flagged':'')+'" id="rfcb-'+area.id+'-'+i+'">'+(d.redFlags&&d.redFlags.indexOf(f)!==-1?'✓':'')+'</div><div class="rf-lbl">'+f+'</div></div>'}).join('')+'</div></div></div>'});document.getElementById('areasList').innerHTML=html;AREAS.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.photos){d.photos.forEach(function(p,i){addPhotoThumb(area.id,p)})}if(d.notes){document.getElementById('notes-'+area.id).value=d.notes}})}
-function toggleArea(id){var card=document.getElementById('area-'+id);var isOpen=card.classList.contains('open');card.classList.toggle('open');var d=inspectionData.areas[id]=inspectionData.areas[id]||{};d.open=!isOpen}
-function setCond(id,cond){var d=inspectionData.areas[id]=inspectionData.areas[id]||{};d.condition=cond;renderAreas();updateProgress()}
-function toggleTips(id){var panel=document.getElementById('tips-'+id);var arr=document.getElementById('tips-arr-'+id);panel.classList.toggle('open');arr.style.transform=panel.classList.contains('open')?'rotate(90deg)':''}
-function addPhoto(id){var input=document.createElement('input');input.type='file';input.accept='image/*,.heic,.heif';input.capture='environment';input.onchange=function(e){var file=e.target.files[0];if(!file)return;var ext=file.name.split('.').pop().toLowerCase();if(['jpg','jpeg','png','heic','heif','gif','webp'].indexOf(ext)===-1&&!file.type.startsWith('image/')){showToast('Photos only','Use JPG, PNG or HEIC for inspection photos','⚠️');return;}var reader=new FileReader();reader.onload=function(e){var d=inspectionData.areas[id]=inspectionData.areas[id]||{};if(!d.photos)d.photos=[];var photo={url:e.target.result,ts:new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})};d.photos.push(photo);addPhotoThumb(id,photo)};reader.readAsDataURL(file)};input.click()}
-function addPhotoThumb(id,photo){var grid=document.getElementById('photos-'+id);if(!grid)return;var thumb=document.createElement('div');thumb.className='ph-thumb';thumb.innerHTML='<img src="'+photo.url+'" alt="Photo" loading="lazy" decoding="async"><span class="ph-ts">'+photo.ts+'</span>';thumb.onclick=function(){window.open(photo.url,'_blank')};grid.insertBefore(thumb,grid.querySelector('.ph-add'))}
-function addQuickNote(id,text,chip){var field=document.getElementById('notes-'+id);if(!field)return;field.value=(field.value?field.value+'; ':'')+text;field.dispatchEvent(new Event('input'));chip.style.opacity='0.5;pointer-events:none';setTimeout(function(){chip.style.opacity='1';chip.style.pointerEvents=''},200)}
-function saveAreaNote(id){var field=document.getElementById('notes-'+id);if(!field)return;var d=inspectionData.areas[id]=inspectionData.areas[id]||{};d.notes=field.value}
-function toggleRedFlag(id,flag,row){var d=inspectionData.areas[id]=inspectionData.areas[id]||{};if(!d.redFlags)d.redFlags=[];var idx=d.redFlags.indexOf(flag);var cb=row.querySelector('.rf-cb');if(idx===-1){d.redFlags.push(flag);cb.classList.add('flagged');cb.textContent='✓'}else{d.redFlags.splice(idx,1);cb.classList.remove('flagged');cb.textContent=''}}
-function updateProgress(){var rated=0;AREAS.forEach(function(a){if(inspectionData.areas[a.id]&&inspectionData.areas[a.id].condition)rated++});var pct=AREAS.length?Math.round(rated/AREAS.length*100):0;document.getElementById('progLbl').textContent=rated+' of '+AREAS.length+' areas rated';document.getElementById('progPct').textContent=pct+'%';document.getElementById('progFill').style.width=pct+'%';var finishBtn=document.getElementById('finishBtn');var finishHint=document.getElementById('finishHint');if(rated>0){finishBtn.style.opacity='1';finishBtn.style.pointerEvents='auto';finishHint.textContent='Tap to see your summary'}else{finishBtn.style.opacity='0.4';finishBtn.style.pointerEvents='none';finishHint.textContent='Rate at least one area to finish'}}
-function toggleQ(i){var row=document.getElementById('q'+i);var wrap=document.getElementById('qa'+i);var tick=document.getElementById('qt'+i);var isOpen=wrap.classList.contains('open');wrap.classList.toggle('open');row.classList.toggle('asked');tick.textContent=isOpen?'':'✓'}
-function finishWalkthrough(){renderSummary();switchView('E')}
-function renderSummary(){var addr=inspectionData.address||'Property';document.getElementById('sumAddr').textContent=addr;var html='';AREAS.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.condition){html+='<div class="sum-area-row"><div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+area.icon+' '+area.name+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">'+{good:'Good',issues:'Issues',concern:'Concerns'}[d.condition]+'</div></div><span class="verdict-btn v-'+d.condition+'-sel" style="width:80px;cursor:default">'+{good:'✓ Good',issues:'⚠ Issues',concern:'❌ Concerns'}[d.condition]+'</span></div>'}});document.getElementById('sumAreas').innerHTML=html||'<div style="font-weight:600;font-size:13px;color:var(--muted);text-align:center;padding:20px">No areas rated yet</div>';var allFlags=[];AREAS.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.redFlags)allFlags=allFlags.concat(d.redFlags.map(function(f){return{area:area.name,flag:f}}))});if(allFlags.length){var fhtml='';allFlags.forEach(function(f){fhtml+='<div class="sum-area-row"><div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+f.flag+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">'+f.area+'</div></div></div>'});document.getElementById('sumFlags').innerHTML=fhtml;document.getElementById('sumFlagsWrap').style.display='block'}else{document.getElementById('sumFlagsWrap').style.display='none'}}
+function startQuickInspection(){ selectPropertyType('house'); switchView('B'); }
+
+function startWalkthrough(){
+  inspectionData.address=document.getElementById('setupAddress').value;
+  inspectionData.rent=document.getElementById('setupRent').value;
+  inspectionData.beds=document.getElementById('setupBeds').value;
+  var sub=document.getElementById('wcAddr');
+  if(sub && inspectionData.address)sub.textContent=inspectionData.address;
+  renderQuickScan();
+  renderScanPhotos();
+  switchView('C');
+  updateScanFinishState();
+}
+
+function renderQuickScan(){
+  ['inside','practical'].forEach(function(group){
+    var container=document.getElementById(group==='inside'?'scanInside':'scanPractical');
+    if(!container)return;
+    var html='';
+    SCAN_ITEMS[group].forEach(function(item){
+      var state=(inspectionData.scan.items[item.id])||'';
+      html+='<div class="scan-item '+(state==='ok'?'ok':state==='issue'?'issue':'')+'" id="scan-'+item.id+'">'+
+        '<div class="scan-icon">'+item.icon+'</div>'+
+        '<div class="scan-label">'+item.label+'<small>'+item.hint+'</small></div>'+
+        '<div class="scan-toggle">'+
+          '<button class="'+(state==='ok'?'on-ok':'')+'" onclick="setScanItem(\''+item.id+'\',\'ok\')" title="Looks fine">✓</button>'+
+          '<button class="'+(state==='issue'?'on-issue':'')+'" onclick="setScanItem(\''+item.id+'\',\'issue\')" title="Concern noted">⚠</button>'+
+        '</div></div>';
+    });
+    container.innerHTML=html;
+  });
+  // Paint vibe + free-text on (re)render
+  var vibeBtns=document.querySelectorAll('#vibeRow .vibe-btn');
+  vibeBtns.forEach(function(b){ b.classList.toggle('sel', b.getAttribute('data-vibe')===inspectionData.scan.vibe); });
+  document.getElementById('scanLiked').value=inspectionData.scan.liked||'';
+  document.getElementById('scanWorried').value=inspectionData.scan.worried||'';
+  document.getElementById('scanLiked').oninput=function(){ inspectionData.scan.liked=this.value; };
+  document.getElementById('scanWorried').oninput=function(){ inspectionData.scan.worried=this.value; };
+}
+
+function setScanItem(id,state){
+  var cur=inspectionData.scan.items[id];
+  // Tapping same state again clears it (undo)
+  inspectionData.scan.items[id]=(cur===state)?'':state;
+  renderQuickScan();
+  updateScanFinishState();
+}
+
+function setVibe(v){
+  inspectionData.scan.vibe=v;
+  renderQuickScan();
+  updateScanFinishState();
+}
+
+function updateScanFinishState(){
+  var btn=document.getElementById('finishBtn');
+  var hint=document.getElementById('finishHint');
+  if(!btn||!hint)return;
+  if(inspectionData.scan.vibe){
+    btn.style.opacity='1'; btn.style.pointerEvents='auto';
+    hint.textContent='Tap to see your summary';
+  } else {
+    btn.style.opacity='.4'; btn.style.pointerEvents='none';
+    hint.textContent='Pick a vibe to continue';
+  }
+}
+
+function addScanPhoto(){
+  if((inspectionData.scan.photos||[]).length>=3){
+    showToast('Max 3 photos','Keep it quick — photos are optional at open homes','📷');
+    return;
+  }
+  var input=document.createElement('input');
+  input.type='file'; input.accept='image/*'; input.capture='environment';
+  input.onchange=function(e){
+    var file=e.target.files[0]; if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      if(!inspectionData.scan.photos)inspectionData.scan.photos=[];
+      inspectionData.scan.photos.push({url:ev.target.result, ts:new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})});
+      renderScanPhotos();
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function renderScanPhotos(){
+  var grid=document.getElementById('scanPhotos'); if(!grid)return;
+  var photos=inspectionData.scan.photos||[];
+  var html='';
+  photos.forEach(function(p,i){
+    html+='<div class="ph-thumb" onclick="window.open(\''+p.url+'\',\'_blank\')"><img src="'+p.url+'" alt=""><span class="ph-ts">'+p.ts+'</span></div>';
+  });
+  if(photos.length<3){
+    html+='<div class="ph-add" onclick="addScanPhoto()"><span style="font-size:20px">📷</span><span style="font-size:9px;font-family:\'Sora\',sans-serif;font-weight:700;color:var(--muted)">Add</span></div>';
+  }
+  grid.innerHTML=html;
+}
+
+function openQuestionsSheet(){
+  var list=document.getElementById('questionsList');
+  var lastCat='';
+  var html='';
+  QUESTIONS.forEach(function(item,i){
+    if(item.cat!==lastCat){ html+='<div class="qsheet-cat">'+item.cat+'</div>'; lastCat=item.cat; }
+    var asked=!!inspectionData.questionsAsked[i];
+    html+='<div class="qsheet-row '+(asked?'done':'')+'" id="qs-'+i+'" onclick="toggleQuestionAsked('+i+')">'+
+      '<div class="qsheet-tick">'+(asked?'✓':'')+'</div>'+
+      '<div class="qsheet-txt">'+item.q+'</div></div>';
+  });
+  list.innerHTML=html;
+  document.getElementById('questionsSheet').style.display='flex';
+}
+
+function closeQuestionsSheet(e){
+  if(e && e.target && e.target.closest && e.target.closest('.picker-sheet') && e.type==='click' && e.target.tagName!=='BUTTON')return;
+  document.getElementById('questionsSheet').style.display='none';
+}
+
+function toggleQuestionAsked(i){
+  inspectionData.questionsAsked[i]=!inspectionData.questionsAsked[i];
+  var row=document.getElementById('qs-'+i);
+  if(!row)return;
+  row.classList.toggle('done', inspectionData.questionsAsked[i]);
+  row.querySelector('.qsheet-tick').textContent=inspectionData.questionsAsked[i]?'✓':'';
+}
+
+function finishWalkthrough(){ renderSummary(); switchView('E'); }
+
+function renderSummary(){
+  var addr=inspectionData.address||'Property';
+  document.getElementById('sumAddr').textContent=addr;
+
+  var vibeMap={love:'😍 Love it',would:'🙂 Would do',backup:'😐 Backup',pass:'👎 Pass'};
+  document.getElementById('sumVibeDisplay').textContent=vibeMap[inspectionData.scan.vibe]||'—';
+
+  // Highlights: liked + worried + photos count
+  var hlHtml='';
+  if(inspectionData.scan.liked){
+    hlHtml+='<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-lt)"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--teal-dk);margin-bottom:3px">💚 Liked</div><div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.55">'+inspectionData.scan.liked+'</div></div>';
+  }
+  if(inspectionData.scan.worried){
+    hlHtml+='<div style="margin-bottom:'+(((inspectionData.scan.photos||[]).length)?'10px;padding-bottom:10px;border-bottom:1px solid var(--border-lt)':'0')+'"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--amber);margin-bottom:3px">⚠️ Worried about</div><div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.55">'+inspectionData.scan.worried+'</div></div>';
+  }
+  var pc=(inspectionData.scan.photos||[]).length;
+  if(pc){
+    hlHtml+='<div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:6px">📷 Photos</div><div style="display:flex;gap:6px;flex-wrap:wrap">';
+    inspectionData.scan.photos.forEach(function(p){
+      hlHtml+='<img src="'+p.url+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;cursor:pointer" onclick="window.open(\''+p.url+'\',\'_blank\')">';
+    });
+    hlHtml+='</div></div>';
+  }
+  var hlWrap=document.getElementById('sumHighlightsWrap');
+  if(hlHtml){ document.getElementById('sumHighlights').innerHTML=hlHtml; hlWrap.style.display='block'; }
+  else { hlWrap.style.display='none'; }
+
+  // Auto-derived flags from ⚠ toggles
+  var flags=collectScanFlags();
+  if(flags.length){
+    document.getElementById('sumFlags').innerHTML=flags.map(function(f){
+      return '<div class="sum-area-row"><div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">⚠ '+f+'</div></div></div>';
+    }).join('');
+    document.getElementById('sumFlagsWrap').style.display='block';
+  } else {
+    document.getElementById('sumFlagsWrap').style.display='none';
+  }
+
+  // Default verdict from vibe
+  var suggested={love:'yes',would:'yes',backup:'maybe',pass:'no'}[inspectionData.scan.vibe];
+  if(suggested && !inspectionData.verdict){ setVerdict(suggested); }
+}
+
+function collectScanFlags(){
+  var flags=[];
+  ['inside','practical'].forEach(function(g){
+    SCAN_ITEMS[g].forEach(function(item){
+      if(inspectionData.scan.items[item.id]==='issue')flags.push(item.flag);
+    });
+  });
+  return flags;
+}
 function setVerdict(v){
   ['yes','maybe','no'].forEach(function(x){document.getElementById('v'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('v-'+x+'-sel')});
   document.getElementById('v'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('v-'+v+'-sel');
@@ -1195,33 +1398,45 @@ function saveAndGoHome(){
 
 function exportInspectionPDF(){
   if(!window.RIQExport){showToast('Loading…','PDF library loading, try again in a moment','📄');return;}
-  var areas=window.AREAS||[];
+  var scan=inspectionData.scan||{};
   var sections=[];
-  areas.forEach(function(area){
-    var d=inspectionData.areas[area.id]||{};
-    if(!d.condition)return;
-    var content='';
-    if(d.notes)content+=d.notes;
-    if(d.redFlags&&d.redFlags.length)content+=(content?'\n':'')+'Red flags: '+d.redFlags.join(', ');
-    sections.push({
-      heading:area.icon+' '+area.name,
-      badge:{good:'Good',issues:'Issues',concern:'Concerns'}[d.condition]||'',
-      content:content||'No notes',
-      photos:(d.photos||[]).slice(0,4)
+
+  var verdictLabel={yes:'Would Apply',maybe:'Maybe',no:'Pass'}[inspectionData.verdict]||'';
+  var vibeLabel={love:'Love it',would:'Would do',backup:'Backup',pass:'Pass'}[scan.vibe]||'';
+  sections.push({
+    heading:'Verdict',
+    badge:verdictLabel==='Would Apply'?'Good':verdictLabel==='Maybe'?'Issues':verdictLabel==='Pass'?'Concerns':'',
+    content:(verdictLabel?verdictLabel:'—')+(vibeLabel?'  ·  First impression: '+vibeLabel:'')
+  });
+
+  var okItems=[], issueItems=[];
+  ['inside','practical'].forEach(function(g){
+    SCAN_ITEMS[g].forEach(function(item){
+      var st=scan.items&&scan.items[item.id];
+      if(st==='ok')okItems.push(item.icon+' '+item.label);
+      else if(st==='issue')issueItems.push(item.icon+' '+item.label);
     });
   });
-  var allFlags=[];
-  areas.forEach(function(area){var d=inspectionData.areas[area.id]||{};if(d.redFlags)d.redFlags.forEach(function(f){allFlags.push(area.name+': '+f)})});
-  var verdictLabel={yes:'Would Apply',maybe:'Maybe',no:'Pass'}[inspectionData.verdict]||'';
-  if(verdictLabel)sections.unshift({heading:'Verdict',content:verdictLabel});
-  if(inspectionData.notes)sections.push({heading:'Additional Notes',content:inspectionData.notes});
+  if(okItems.length){ sections.push({heading:'Looked fine', badge:'Good', items:okItems}); }
+  if(issueItems.length){ sections.push({heading:'Concerns noted', badge:'Issues', items:issueItems}); }
+
+  if(scan.liked)sections.push({heading:'💚 One thing I liked',content:scan.liked});
+  if(scan.worried)sections.push({heading:'⚠️ One thing I'+"'"+'m worried about',content:scan.worried});
+
+  if((scan.photos||[]).length){
+    sections.push({heading:'Photos',photos:scan.photos.map(function(p){return p.url;})});
+  }
+
+  if(inspectionData.notes)sections.push({heading:'Extra thoughts',content:inspectionData.notes});
+
+  var allFlags=collectScanFlags();
   RIQExport.generate({
-    title:'Open Home Inspection Report',
+    title:'Open Home Quick Scan',
     subtitle:inspectionData.address||'Property Inspection',
     date:new Date(),
     sections:sections,
     redFlags:allFlags.length?allFlags:null,
-    filename:'RenterIQ-Inspection-'+(inspectionData.address||'Report').replace(/[^a-zA-Z0-9]/g,'-').replace(/-+/g,'-')+'.pdf'
+    filename:'RenterIQ-QuickScan-'+(inspectionData.address||'Report').replace(/[^a-zA-Z0-9]/g,'-').replace(/-+/g,'-')+'.pdf'
   });
 }
 
@@ -1236,8 +1451,9 @@ function saveToConditionReportsVault(data){
       rent:data.rent||'',
       beds:data.beds||'2',
       verdict:data.verdict||'',
+      vibe:(data.scan&&data.scan.vibe)||'',
       notes:data.notes||'',
-      areas:data.areas||{},
+      scan:data.scan||{},
       date:Date.now()
     };
     reports.unshift(record);
@@ -1488,7 +1704,19 @@ function loadScheduledInspection(id) {
     showToast('Error', 'Could not load inspection', '❌');
   }
 }
-function loadSavedInspection(key){try{inspectionData=JSON.parse(localStorage.getItem(key)||'{}');document.getElementById('setupAddress').value=inspectionData.address||'';document.getElementById('setupRent').value=inspectionData.rent||'';document.getElementById('setupBeds').value=inspectionData.beds||'2';switchView('B')}catch(e){showToast('Error','Could not load inspection','❌')}}
+function loadSavedInspection(key){
+  try{
+    var loaded=JSON.parse(localStorage.getItem(key)||'{}');
+    // Normalise shape — older records may only carry the legacy "areas" map
+    if(!loaded.scan)loaded.scan={vibe:'',items:{},liked:'',worried:'',photos:[]};
+    if(!loaded.questionsAsked)loaded.questionsAsked={};
+    inspectionData=loaded;
+    document.getElementById('setupAddress').value=inspectionData.address||'';
+    document.getElementById('setupRent').value=inspectionData.rent||'';
+    document.getElementById('setupBeds').value=inspectionData.beds||'2';
+    switchView('B');
+  }catch(e){showToast('Error','Could not load inspection','❌')}
+}
 
 // Load user data from localStorage
 function loadUserData() {
@@ -1519,10 +1747,18 @@ document.addEventListener('DOMContentLoaded', loadUserData);
 </body>
 </html>
 <script>
-/* DYNAMIC AREAS + CUSTOM AREAS UPDATE */
-(function(){
-
-// All possible areas — toggled on/off in the setup
+/* PROPERTY TYPE SELECTOR (Quick Scan — no area matrix) */
+window.selectPropertyType = function(type) {
+  inspectionData.propertyType = type;
+  var btns = document.querySelectorAll('#propTypeSelector .priority-pill');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-type') === type);
+  }
+};
+</script>
+<script>
+/* Legacy area-matrix system removed — superseded by Quick Scan. */
+(function(){ if (true) return;
 var ALL_AREAS = {
   // Core living
   living:    {id:'living',    name:'Living Area',     icon:'🛋', tips:'Check floor condition, wall marks, power points, windows, blinds/curtains, heating/cooling, light switches', group:'core'},

@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v12 — Direct Pay + New Features
+// RenterIQ Service Worker v16 — Routine inspection hardening
 // No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
 
-var CACHE_NAME = 'renteriq-shell-v13';
+var CACHE_NAME = 'renteriq-shell-v16';
 
 var APP_SHELL = [
   '/app/index.html',

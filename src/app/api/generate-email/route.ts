@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const itemSummary = items.map((item: Record<string, string>, i: number) => 
       `${i + 1}. ${item.type || 'Document'}: ${item.name || item.title || 'Untitled'} (${item.date || 'No date'})`

@@ -38,7 +38,14 @@ Rules:
 - Mowing, general cleaning, mould from poor ventilation, oven/stove cleaning, carpet stains from tenant use = TENANT
 - If unclear, default to OWNER and note it should be confirmed
 - Always reference the Residential Tenancies Act for the relevant state
-- Be practical and fair in your assessments`;
+- Be practical and fair in your assessments
+
+Input format notes:
+- Agency reports commonly arrive as scanned PDFs or photos of a multi-column table with columns like "Item / Comment / Action Required / By Whom / Due Date". Read the table row-by-row and map each row to one item — do not skip rows that span multiple lines.
+- Some agencies include a summary / covering page with a single overall due-back date ("please return within 14 days"). Use that for \`suggested_response_deadline_days\` if found.
+- If the report includes per-item due dates (e.g. "by 30 March"), convert to days-from-today for \`deadline_days\`.
+- Bullet-list or plain-text reports should be parsed the same way: every bullet = one item.
+- Handwritten notes on scanned forms should still be read — include them as items even if legibility is uncertain.`;
 
 export async function POST(request: Request) {
   let reportText = '';
@@ -54,10 +61,30 @@ export async function POST(request: Request) {
       if (file) {
         const buffer = await file.arrayBuffer();
         const base64 = Buffer.from(buffer).toString('base64');
-        imageData = {
-          data: base64,
-          mimeType: file.type || 'image/jpeg',
-        };
+        let mimeType = file.type || '';
+
+        // iOS often leaves .heic uploads with an empty mime type — fall back
+        // to the extension so Gemini still accepts the file.
+        if (!mimeType) {
+          const name = (file.name || '').toLowerCase();
+          if (name.endsWith('.heic')) mimeType = 'image/heic';
+          else if (name.endsWith('.heif')) mimeType = 'image/heif';
+          else if (name.endsWith('.pdf')) mimeType = 'application/pdf';
+          else if (name.endsWith('.webp')) mimeType = 'image/webp';
+          else if (name.endsWith('.png')) mimeType = 'image/png';
+          else mimeType = 'image/jpeg';
+        }
+
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'];
+        if (!allowed.includes(mimeType)) {
+          return NextResponse.json(
+            { error: `Unsupported file type "${mimeType || file.type || 'unknown'}". Please upload a PDF or JPG/PNG/WebP/HEIC image of the inspection report.` },
+            { status: 400 }
+          );
+        }
+
+        imageData = { data: base64, mimeType };
+        console.log('[analyze-inspection] received', { mimeType, bytes: buffer.byteLength });
       }
     } else {
       const body = await request.json();
@@ -78,7 +105,7 @@ export async function POST(request: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const parts: Array<{ text: string } | { inlineData: { data: string; mimeType: string } }> = [];
 
@@ -121,9 +148,13 @@ export async function POST(request: Request) {
       );
     }
   } catch (error) {
-    console.error('Inspection analysis error:', error);
-    // Fall back to mock analysis on any error
-    return NextResponse.json(getMockAnalysis(reportText));
+    const err = error as Error;
+    console.error('[analyze-inspection] fatal:', err?.stack || err);
+    // Fall back to mock analysis on any error so the UI still shows something
+    // useful, but surface the real message + stack for debugging.
+    const mock = getMockAnalysis(reportText) as Record<string, unknown>;
+    mock._warning = err?.message ? `Live AI unavailable — fell back to heuristic parse: ${err.message}` : 'Live AI unavailable — fell back to heuristic parse';
+    return NextResponse.json(mock);
   }
 }
 

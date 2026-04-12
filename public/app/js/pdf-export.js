@@ -109,7 +109,184 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  // ── Agency-style Condition Report ─────────────────────────────────────
+  //
+  // Produces a residential tenancy condition report in the format used by
+  // leasing agents across AU (REIV / REIQ / REIWA style): per-room tables
+  // with Item · Clean · Undamaged · Working · Comments columns, photos
+  // rendered inline with capture timestamps, tenant signature block, and
+  // the statutory return-window disclaimer.
+  function buildConditionHTML(opts) {
+    var now = opts.date || new Date();
+    var dateStr = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+    var timeStr = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+
+    var html = '';
+    html += '<div style="font-family:Arial,Helvetica,sans-serif;color:#1A2B4A;padding:0;max-width:720px;margin:0 auto">';
+
+    // Cover / header block
+    html += '<div style="border:2px solid #0A2460;border-radius:10px;padding:22px 22px 18px;margin-bottom:18px">';
+    html += '<div style="font-size:11px;font-weight:700;color:#6B7B99;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:6px">Residential Tenancy</div>';
+    html += '<div style="font-size:22px;font-weight:800;color:#0A2460;letter-spacing:-.3px;margin-bottom:4px">Entry Condition Report</div>';
+    html += '<div style="font-size:13px;font-weight:600;color:#1A2B4A;margin-bottom:16px">Record of property condition at commencement of tenancy</div>';
+
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700;width:130px">Property</td><td style="padding:6px 0;color:#1A2B4A;font-weight:700">' + esc(opts.propertyAddress || '—') + '</td></tr>';
+    if (opts.propertyDetails) {
+      html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Details</td><td style="padding:6px 0;color:#1A2B4A">' + esc(opts.propertyDetails) + '</td></tr>';
+    }
+    html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Report date</td><td style="padding:6px 0;color:#1A2B4A">' + dateStr + ' at ' + timeStr + '</td></tr>';
+    if (opts.tenantName) {
+      html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Tenant</td><td style="padding:6px 0;color:#1A2B4A;font-weight:700">' + esc(opts.tenantName) + '</td></tr>';
+    }
+    html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Rooms recorded</td><td style="padding:6px 0;color:#1A2B4A">' + (opts.rooms ? opts.rooms.length : 0) + '</td></tr>';
+    html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Photos attached</td><td style="padding:6px 0;color:#1A2B4A">' + (opts.totalPhotos || 0) + '</td></tr>';
+    html += '</table>';
+    html += '</div>';
+
+    // Instructions / legend
+    html += '<div style="background:#F4F8FE;border:1px solid #E1ECFB;border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:11.5px;color:#1A2B4A;line-height:1.6">';
+    html += '<strong style="color:#0A2460">How to read this report.</strong> Each area is listed item-by-item with three columns: <strong>Clean</strong>, <strong>Undamaged</strong>, and <strong>Working</strong> (where applicable). A tick ✓ means the tenant agrees the item meets that standard at move-in. A cross ✗ means an issue was noted at move-in, with the comment and photo forming the supporting record.';
+    html += '</div>';
+
+    // Per-room tables
+    if (opts.rooms && opts.rooms.length) {
+      opts.rooms.forEach(function(room) {
+        html += '<div style="page-break-inside:avoid;margin-bottom:22px">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0A2460;padding-bottom:6px;margin-bottom:10px">';
+        html += '<div style="font-size:15px;font-weight:800;color:#0A2460">' + esc(room.emoji || '') + ' ' + esc(room.name || 'Room') + '</div>';
+        var bandColor = room.condition === 'issues' ? '#F59E0B' : '#10B981';
+        var bandLabel = room.condition === 'issues' ? 'Issues noted' : 'All clean & undamaged';
+        html += '<span style="background:' + bandColor + ';color:#fff;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700">' + bandLabel + '</span>';
+        html += '</div>';
+
+        // Item table
+        html += '<table style="width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed">';
+        html += '<colgroup><col style="width:26%"><col style="width:10%"><col style="width:12%"><col style="width:10%"><col style="width:42%"></colgroup>';
+        html += '<thead><tr style="background:#0A2460;color:#fff">';
+        html += '<th style="padding:7px 8px;text-align:left;font-weight:700;font-size:10.5px;letter-spacing:.3px">Item</th>';
+        html += '<th style="padding:7px 4px;font-weight:700;font-size:10.5px">Clean</th>';
+        html += '<th style="padding:7px 4px;font-weight:700;font-size:10.5px">Undamaged</th>';
+        html += '<th style="padding:7px 4px;font-weight:700;font-size:10.5px">Working</th>';
+        html += '<th style="padding:7px 8px;text-align:left;font-weight:700;font-size:10.5px">Tenant Comments</th>';
+        html += '</tr></thead><tbody>';
+
+        (room.items || []).forEach(function(it, idx) {
+          var bg = idx % 2 === 0 ? '#FAFCFF' : '#FFFFFF';
+          var c = it.clean === true ? '<span style="color:#10B981;font-weight:800">✓</span>' : it.clean === false ? '<span style="color:#EF4444;font-weight:800">✗</span>' : '—';
+          var u = it.undamaged === true ? '<span style="color:#10B981;font-weight:800">✓</span>' : it.undamaged === false ? '<span style="color:#EF4444;font-weight:800">✗</span>' : '—';
+          var w = it.working === 'na' || it.working === null ? '<span style="color:#9AA4B8">N/A</span>' : it.working === true ? '<span style="color:#10B981;font-weight:800">✓</span>' : '<span style="color:#EF4444;font-weight:800">✗</span>';
+          html += '<tr style="background:' + bg + ';border-bottom:1px solid #E8EFF8">';
+          html += '<td style="padding:7px 8px;color:#1A2B4A;font-weight:700">' + esc(it.label) + '</td>';
+          html += '<td style="padding:7px 4px;text-align:center;font-size:14px">' + c + '</td>';
+          html += '<td style="padding:7px 4px;text-align:center;font-size:14px">' + u + '</td>';
+          html += '<td style="padding:7px 4px;text-align:center;font-size:14px">' + w + '</td>';
+          html += '<td style="padding:7px 8px;color:#1A2B4A;font-size:11px;line-height:1.45">' + (it.comment ? esc(it.comment) : '<span style="color:#9AA4B8">—</span>') + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+
+        // Photos for this room — collected with per-item captions
+        var photoBlocks = [];
+        (room.items || []).forEach(function(it) {
+          (it.photos || []).forEach(function(ph) {
+            if (ph && ph.dataUrl) photoBlocks.push({ src: ph.dataUrl, caption: it.label, time: ph.time || '' });
+          });
+        });
+        if (photoBlocks.length) {
+          html += '<div style="margin-top:12px">';
+          html += '<div style="font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px">Supporting photographs</div>';
+          html += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+          photoBlocks.forEach(function(ph) {
+            html += '<div style="width:140px">';
+            html += '<img src="' + ph.src + '" style="width:140px;height:105px;object-fit:cover;border-radius:6px;border:1px solid #E8EFF8;display:block">';
+            html += '<div style="font-size:9.5px;font-weight:700;color:#6B7B99;margin-top:4px;line-height:1.3">' + esc(ph.caption) + (ph.time ? ' · ' + esc(ph.time) : '') + '</div>';
+            html += '</div>';
+          });
+          html += '</div></div>';
+        }
+
+        html += '</div>';
+      });
+    }
+
+    // Declaration + signature block
+    html += '<div style="page-break-inside:avoid;border-top:2px solid #0A2460;margin-top:22px;padding-top:16px">';
+    html += '<div style="font-size:13px;font-weight:800;color:#0A2460;margin-bottom:8px">Tenant Declaration</div>';
+    html += '<div style="font-size:11.5px;color:#1A2B4A;line-height:1.65;margin-bottom:16px">I confirm the above record accurately reflects the condition of the property as I received it at commencement of tenancy. Items marked as clean, undamaged or working are agreed as such. Items marked with a cross (✗) represent pre-existing issues I should not be held responsible for at the end of the tenancy.</div>';
+
+    html += '<table style="width:100%;border-collapse:collapse;margin-top:8px">';
+    html += '<tr>';
+    html += '<td style="width:60%;padding:0 12px 0 0;vertical-align:top">';
+    html += '<div style="font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Tenant Signature</div>';
+    if (opts.signature) {
+      html += '<div style="border-bottom:1.5px solid #1A2B4A;padding-bottom:4px;height:70px;display:flex;align-items:flex-end"><img src="' + opts.signature + '" style="max-height:66px;max-width:100%;object-fit:contain"></div>';
+    } else {
+      html += '<div style="border-bottom:1.5px solid #1A2B4A;height:70px"></div>';
+    }
+    html += '<div style="font-size:12px;font-weight:700;color:#1A2B4A;margin-top:6px">' + esc(opts.tenantName || '') + '</div>';
+    html += '<div style="font-size:10.5px;color:#6B7B99;margin-top:2px">' + dateStr + '</div>';
+    html += '</td>';
+    html += '<td style="width:40%;padding:0 0 0 12px;vertical-align:top">';
+    html += '<div style="font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Agent / Landlord</div>';
+    html += '<div style="border-bottom:1.5px solid #1A2B4A;height:70px"></div>';
+    html += '<div style="font-size:10.5px;color:#6B7B99;margin-top:8px">For agency records</div>';
+    html += '</td>';
+    html += '</tr>';
+    html += '</table>';
+    html += '</div>';
+
+    // Statutory note
+    html += '<div style="background:#FEF9E7;border:1px solid #F5D57A;border-radius:8px;padding:12px 14px;margin-top:18px;font-size:10.5px;color:#7A5A00;line-height:1.6">';
+    html += '<strong>Important.</strong> Return the signed report to your agent or landlord within the statutory period for your state (typically 3–7 days from the start of your tenancy). Keep a copy for your records — you will need it at exit to compare against the outgoing condition report.';
+    html += '</div>';
+
+    // Footer
+    html += '<div style="text-align:center;padding:18px 0 4px;font-size:9.5px;color:#9AA4B8;border-top:1px solid #E8EFF8;margin-top:18px">';
+    html += 'Generated by RenterIQ · renteriq.com.au · Report ID ' + esc(opts.reportId || ('RIQ-' + Date.now()));
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  function runPdf(container, filename, cb) {
+    var pdfOpts = {
+      margin: [10, 10, 10, 10],
+      filename: filename || 'renteriq-condition-report.pdf',
+      image: { type: 'jpeg', quality: 0.92 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+    html2pdf().set(pdfOpts).from(container).save().then(function() {
+      document.body.removeChild(container);
+      if (cb) cb();
+    }).catch(function(e) {
+      document.body.removeChild(container);
+      console.error('PDF export failed:', e);
+      if (typeof showToast === 'function') showToast('Error', 'PDF generation failed', '⚠️');
+    });
+  }
+
   window.RIQExport = {
+    generateConditionReport: function(opts) {
+      if (typeof showToast === 'function') showToast('Generating report', 'Building your condition report…', '📄');
+      loadLib(function(err) {
+        if (err) {
+          if (typeof showToast === 'function') showToast('Error', 'Could not load PDF library', '⚠️');
+          return;
+        }
+        var container = document.createElement('div');
+        container.innerHTML = buildConditionHTML(opts);
+        container.style.cssText = 'position:absolute;left:-9999px;top:0;width:720px';
+        document.body.appendChild(container);
+        var filename = opts.filename || ('RenterIQ-Entry-Condition-Report-' + new Date().toISOString().split('T')[0] + '.pdf');
+        runPdf(container, filename, function() {
+          if (typeof showToast === 'function') showToast('PDF saved', filename, '✓');
+        });
+      });
+    },
     generate: function(opts) {
       if (typeof showToast === 'function') showToast('Generating PDF', 'Preparing your report…', '📄');
 

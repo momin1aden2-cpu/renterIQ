@@ -77,6 +77,46 @@
 .modal-btn{flex:1;border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;border:none}
 .modal-btn-primary{background:var(--blue);color:#fff}
 .modal-btn-secondary{background:var(--glass-surface-1);color:var(--text);border:1px solid var(--border)}
+
+/* Itemised condition checklist */
+.item-row{background:#fff;border:1px solid var(--border-lt);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:all .2s var(--ease-smooth)}
+.item-row.has-issue{border-color:var(--amber);background:rgba(245,166,35,.04)}
+.item-head{display:flex;align-items:center;gap:12px;padding:14px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px}
+.item-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .15s}
+.item-check.checked{background:var(--teal);border-color:var(--teal);color:#fff}
+.item-check.issue{background:var(--amber);border-color:var(--amber);color:#fff}
+.item-label{flex:1;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.item-status{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.item-status.ok{color:var(--teal)}
+.item-status.issue{color:var(--amber)}
+.item-chev{font-size:18px;color:var(--muted);transition:transform .2s}
+.item-row.expanded .item-chev{transform:rotate(90deg)}
+.item-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border-lt);background:var(--blue-xl)}
+.item-row.expanded .item-body{display:block}
+.tri-row{display:flex;gap:8px;margin:14px 0 10px}
+.tri-btn{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
+.tri-btn .tri-icon{font-size:18px;line-height:1}
+.tri-btn.yes{background:rgba(0,200,150,.1);border-color:var(--teal);color:var(--teal-dk)}
+.tri-btn.no{background:rgba(232,64,64,.08);border-color:var(--red);color:var(--red)}
+.tri-btn.na{background:var(--glass-surface-1);border-color:var(--border);color:var(--muted)}
+.item-photo-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.item-photo{width:58px;height:58px;border-radius:8px;overflow:hidden;position:relative;background:var(--border-lt)}
+.item-photo img{width:100%;height:100%;object-fit:cover}
+.item-photo .tag{position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,.6);color:#fff;font-family:'Sora',sans-serif;font-size:8px;font-weight:700;padding:1px 4px;border-radius:4px}
+.item-photo-add{width:58px;height:58px;border-radius:8px;border:1.5px dashed var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:var(--muted)}
+.item-comment{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;min-height:52px;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.55;resize:none;outline:none;box-sizing:border-box}
+.item-comment:focus{border-color:var(--blue)}
+.all-good-btn{width:100%;background:linear-gradient(135deg,var(--teal),var(--teal-dk,#00a878));color:#fff;border:none;border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-weight:800;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-bottom:16px;box-shadow:0 4px 12px rgba(0,200,150,.25);letter-spacing:.3px}
+.all-good-btn:active{transform:scale(.98)}
+.all-good-btn.done{background:#fff;color:var(--teal-dk);border:1.5px solid var(--teal);box-shadow:none}
+.legal-note{font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:600;color:var(--muted);line-height:1.55;text-align:center;padding:12px 16px 0}
+
+/* Signature pad */
+.sig-pad-wrap{background:#fff;border:2px solid var(--border);border-radius:14px;padding:4px;margin-bottom:10px}
+.sig-pad{width:100%;height:160px;display:block;background:#fff;border-radius:10px;touch-action:none;cursor:crosshair}
+.sig-hint{font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:600;color:var(--muted);text-align:center;margin-bottom:12px}
+.sig-actions{display:flex;gap:10px;margin-top:-4px;margin-bottom:12px}
+.sig-clear{background:transparent;border:none;color:var(--muted);font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -118,7 +158,7 @@
   
 </div>
 
-<!-- VIEW B — ROOM DETAIL -->
+<!-- VIEW B — ROOM DETAIL (itemised checklist) -->
 <div class="view" id="viewB" style="display:none">
   <header class="room-header">
     <div class="sh-row">
@@ -127,83 +167,24 @@
     </div>
     <span class="room-emoji" id="roomEmoji">🚪</span>
     <div class="room-title-big" id="roomTitle">Entry & Hallway</div>
-    <div class="room-sub">Take photos and document condition</div>
-    <div class="tab-bar">
-      <div class="tab-item tab-active" id="tab0" onclick="setTab(0)">📸 Photos</div>
-      <div class="tab-item" id="tab1" onclick="setTab(1)">📝 Notes</div>
-      <div class="tab-item" id="tab2" onclick="setTab(2)">✓ Condition</div>
-    </div>
+    <div class="room-sub">Tap each item. Mark anything not perfect.</div>
   </header>
 
-  <!-- Tab 0 — Photos -->
-  <div id="tabContent0" style="flex:1;overflow-y:auto">
+  <div style="flex:1;overflow-y:auto;background:var(--blue-xl)">
     <div style="padding:16px">
-      <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Photos</span>
-      <div class="photo-grid" id="photoGrid">
-        <div class="add-photo" onclick="addPhoto()">
-          <span class="add-photo-icon">📷</span>
-          <span class="add-photo-label">Add Photo</span>
-        </div>
-      </div>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);text-align:center">Photos are timestamped automatically · Tap any photo to view</div>
-    </div>
-    <div style="padding:0 16px 16px">
-      <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Quick Notes</span>
-      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px">
-        <span class="qn-chip" onclick="addQuickNote('Clean',this)">✓ Clean</span>
-        <span class="qn-chip" onclick="addQuickNote('Good condition',this)">✓ Good condition</span>
-        <span class="qn-chip" onclick="addQuickNote('Minor wear',this)">Minor wear</span>
-        <span class="qn-chip" onclick="addQuickNote('Mark on wall',this)">Mark on wall</span>
-        <span class="qn-chip" onclick="addQuickNote('Scuff visible',this)">Scuff visible</span>
-        <span class="qn-chip" onclick="addQuickNote('Stain present',this)">Stain present</span>
-        <span class="qn-chip" onclick="addQuickNote('Paint chipped',this)">Paint chipped</span>
-        <span class="qn-chip" onclick="addQuickNote('Needs repair',this)">Needs repair</span>
-      </div>
-      <textarea class="notes-field" id="quickNotes" placeholder="Add any quick notes about this area..."></textarea>
-    </div>
-  </div>
+      <button class="all-good-btn" id="allGoodBtn" onclick="markRoomAllGood()">✓ Mark all items Clean, Undamaged & Working</button>
 
-  <!-- Tab 1 — Notes -->
-  <div id="tabContent1" style="flex:1;overflow-y:auto;display:none">
-    <div style="padding:16px">
-      <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Detailed Notes</span>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🧱 Walls & Ceiling</div>
-        <textarea class="notes-field" style="min-height:50px" id="wallsNotes" placeholder="Note any marks, scuffs, paint issues…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🪟 Floors & Carpet</div>
-        <textarea class="notes-field" style="min-height:50px" id="floorsNotes" placeholder="Carpet condition, scratches, stains…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">💡 Fixtures & Fittings</div>
-        <textarea class="notes-field" style="min-height:50px" id="fixturesNotes" placeholder="Lights, switches, door handles…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🚿 Plumbing & Water</div>
-        <textarea class="notes-field" style="min-height:50px" id="plumbingNotes" placeholder="Taps, drains, water pressure…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🔌 Electrical</div>
-        <textarea class="notes-field" style="min-height:50px" id="electricalNotes" placeholder="Power points, switches…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">📝 Other</div>
-        <textarea class="notes-field" id="otherNotes" style="min-height:60px" placeholder="Anything else worth noting…"></textarea>
-      </div>
-    </div>
-  </div>
+      <div id="itemsList"></div>
 
-  <!-- Tab 2 — Condition -->
-  <div id="tabContent2" style="flex:1;overflow-y:auto;display:none">
-    <div style="padding:16px">
-      <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Overall Condition</span>
-      <div style="display:flex;gap:8px;margin-bottom:20px">
-        <button class="cond-btn" id="cond-good" onclick="selectCondition('good')"><span style="font-size:24px">😊</span>Excellent</button>
-        <button class="cond-btn" id="cond-fair" onclick="selectCondition('fair')"><span style="font-size:24px">😐</span>Good</button>
-        <button class="cond-btn" id="cond-poor" onclick="selectCondition('poor')"><span style="font-size:24px">😟</span>Issues noted</button>
-      </div>
-      
-      <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:10px">💡 Why this matters</div>
-        <div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Your condition assessment helps establish the property's state at move-in. This protects you from unfair bond deductions at exit.</div>
+      <div class="legal-note">
+        Columns: <strong style="color:var(--teal-dk)">Clean</strong> · <strong style="color:var(--teal-dk)">Undamaged</strong> · <strong style="color:var(--teal-dk)">Working</strong>. Same format used by leasing agents. Tap any item to add photos or notes.
       </div>
     </div>
   </div>
 
   <div class="room-footer">
     <button class="btn-blue-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="backToOverview()">← Back</button>
-    <button class="btn-blue-c flex-1" onclick="saveRoomData()">Save & Continue ✓</button>
+    <button class="btn-blue-c flex-1" onclick="saveRoomData()">Save Room ✓</button>
   </div>
 </div>
 
@@ -326,6 +307,33 @@
   </div>
 </div>
 
+<!-- SIGNATURE MODAL -->
+<div class="modal-overlay" id="signatureModal">
+  <div class="modal-content" style="max-width:420px">
+    <div class="modal-title">Sign & Finalise</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.55">Your signature confirms this report reflects the property's condition at move-in. This is your legal record if bond is disputed at exit.</div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px">Full Name (tenant)</div>
+      <input type="text" class="modal-input" id="sigName" placeholder="e.g. Alex Taylor" style="margin-bottom:0">
+    </div>
+
+    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px">Signature</div>
+    <div class="sig-pad-wrap">
+      <canvas class="sig-pad" id="sigPad" width="380" height="160"></canvas>
+    </div>
+    <div class="sig-actions">
+      <button class="sig-clear" onclick="clearSignature()">Clear signature</button>
+    </div>
+    <div class="sig-hint">Sign with your finger or stylus above · <span id="sigDate"></span></div>
+
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-secondary" onclick="closeSignature()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="confirmSignature()">Confirm & Generate →</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADD ROOM MODAL -->
 <div class="modal-overlay" id="addRoomModal">
   <div class="modal-content">
@@ -375,8 +383,98 @@ var standardRooms=[
 var customRooms=[];
 var roomData={};
 var currentRoom=null;
+var currentItems=[];
 var selectedEmoji='🏠';
-var selectedCondition=null;
+
+// Itemised checklist — mirrors the Clean / Undamaged / Working format used
+// in residential tenancy condition reports across AU jurisdictions.
+var STANDARD_ITEMS=[
+  {id:'walls',label:'Walls',working:false},
+  {id:'ceiling',label:'Ceiling',working:false},
+  {id:'floor',label:'Floor / Carpet',working:false},
+  {id:'skirting',label:'Skirting Boards',working:false},
+  {id:'windows',label:'Windows & Glass',working:true},
+  {id:'screens',label:'Window Screens',working:false},
+  {id:'blinds',label:'Curtains / Blinds',working:true},
+  {id:'lights',label:'Light Fittings',working:true},
+  {id:'power',label:'Power Points & Switches',working:true},
+  {id:'doors',label:'Doors & Handles',working:true}
+];
+
+function getItemsForRoom(room){
+  var id=(room.id||'').toLowerCase();
+  var name=(room.name||'').toLowerCase();
+  var extras=[];
+  if(id==='kitchen'||name.indexOf('kitchen')!==-1){
+    extras=[
+      {id:'sink',label:'Sink & Taps',working:true},
+      {id:'bench',label:'Benchtops',working:false},
+      {id:'splashback',label:'Splashback & Tiles',working:false},
+      {id:'cupboards',label:'Cupboards & Drawers',working:true},
+      {id:'stove',label:'Stove & Oven',working:true},
+      {id:'rangehood',label:'Rangehood / Extractor',working:true},
+      {id:'dishwasher',label:'Dishwasher',working:true},
+      {id:'fridge_space',label:'Fridge Space',working:false}
+    ];
+  } else if(id.indexOf('bathroom')!==-1||name.indexOf('bathroom')!==-1||id==='ensuite'){
+    extras=[
+      {id:'toilet',label:'Toilet & Cistern',working:true},
+      {id:'basin',label:'Basin & Taps',working:true},
+      {id:'shower',label:'Shower & Head',working:true},
+      {id:'shower_screen',label:'Shower Screen',working:false},
+      {id:'bath',label:'Bath',working:true},
+      {id:'mirror',label:'Mirror & Cabinet',working:false},
+      {id:'towel_rails',label:'Towel Rails & Hooks',working:false},
+      {id:'exhaust',label:'Exhaust Fan',working:true},
+      {id:'tiles',label:'Tiles & Grout',working:false}
+    ];
+  } else if(id.indexOf('bedroom')!==-1||id==='master'||name.indexOf('bedroom')!==-1){
+    extras=[
+      {id:'wardrobe',label:'Wardrobe / Robe',working:true}
+    ];
+  } else if(id.indexOf('living')!==-1||name.indexOf('living')!==-1){
+    extras=[
+      {id:'heating',label:'Heating / Cooling',working:true},
+      {id:'tv_points',label:'TV / Data Points',working:true}
+    ];
+  } else if(id==='laundry'){
+    extras=[
+      {id:'laundry_tub',label:'Laundry Tub & Taps',working:true},
+      {id:'washer_space',label:'Washer Space & Plumbing',working:true},
+      {id:'dryer_space',label:'Dryer Space',working:false},
+      {id:'exhaust',label:'Exhaust Fan',working:true}
+    ];
+  } else if(id==='entry'){
+    extras=[
+      {id:'entry_door',label:'Entry Door & Locks',working:true},
+      {id:'letterbox',label:'Letterbox',working:true},
+      {id:'intercom',label:'Intercom / Doorbell',working:true}
+    ];
+  } else if(id==='garage'||id==='carport'){
+    return [
+      {id:'walls',label:'Walls',working:false},
+      {id:'ceiling',label:'Ceiling',working:false},
+      {id:'floor',label:'Floor',working:false},
+      {id:'roller_door',label:'Roller Door / Remote',working:true},
+      {id:'lights',label:'Lights',working:true},
+      {id:'power',label:'Power Points',working:true}
+    ];
+  } else if(id==='garden'||id==='balcony'||id==='outdoor'||name.indexOf('garden')!==-1||name.indexOf('balcony')!==-1){
+    return [
+      {id:'paving',label:'Paving / Decking',working:false},
+      {id:'lawn',label:'Lawn / Plants',working:false},
+      {id:'fencing',label:'Fencing / Railing',working:false},
+      {id:'outdoor_lights',label:'Outdoor Lights',working:true},
+      {id:'outdoor_taps',label:'Outdoor Tap',working:true},
+      {id:'general',label:'General Tidiness',working:false}
+    ];
+  }
+  return STANDARD_ITEMS.concat(extras);
+}
+
+function defaultItemState(item){
+  return {clean:null,undamaged:null,working:item.working?null:'na',comment:'',photos:[]};
+}
 
 // Initialize
 document.addEventListener('DOMContentLoaded',function(){
@@ -800,11 +898,14 @@ function createRoomCard(room){
   card.onclick=function(){openRoom(room)};
   
   var status='Not started';
-  if(roomData[room.id]){
-    if(roomData[room.id].completed){
-      status='✓ Completed';
-    }else if(roomData[room.id].photos && roomData[room.id].photos.length>0){
-      status=roomData[room.id].photos.length+' photos';
+  var rd=roomData[room.id];
+  if(rd){
+    if(rd.completed){
+      status=rd.condition==='issues'?'Issues noted':'✓ Completed';
+    }else if(rd.items){
+      var keys=Object.keys(rd.items);
+      var set=keys.filter(function(k){var it=rd.items[k];return it && it.clean!==null;}).length;
+      if(set)status=set+' item'+(set>1?'s':'')+' checked';
     }
   }
   
@@ -814,157 +915,241 @@ function createRoomCard(room){
 
 function openRoom(room){
   currentRoom=room;
+  currentItems=getItemsForRoom(room);
+
+  var allRooms=[].concat(standardRooms).concat(customRooms);
   document.getElementById('roomEmoji').textContent=room.emoji;
   document.getElementById('roomTitle').textContent=room.name;
-  document.getElementById('roomProgress').textContent=(standardRooms.indexOf(room)+1)+' / '+(standardRooms.length+customRooms.length);
-  
-  // Load existing data
-  var data=roomData[room.id]||{};
-  document.getElementById('quickNotes').value=data.quickNotes||'';
-  document.getElementById('wallsNotes').value=data.wallsNotes||'';
-  document.getElementById('floorsNotes').value=data.floorsNotes||'';
-  document.getElementById('fixturesNotes').value=data.fixturesNotes||'';
-  document.getElementById('plumbingNotes').value=data.plumbingNotes||'';
-  document.getElementById('electricalNotes').value=data.electricalNotes||'';
-  document.getElementById('otherNotes').value=data.otherNotes||'';
-  
-  // Load photos
-  loadPhotos(data.photos||[]);
-  
-  // Reset condition
-  selectedCondition=data.condition||null;
-  updateConditionButtons();
-  
-  // Reset tabs
-  setTab(0);
-  
-  // Switch view
+  document.getElementById('roomProgress').textContent=(allRooms.indexOf(room)+1)+' / '+allRooms.length;
+
+  if(!roomData[room.id])roomData[room.id]={};
+  if(!roomData[room.id].items)roomData[room.id].items={};
+  currentItems.forEach(function(it){
+    if(!roomData[room.id].items[it.id])roomData[room.id].items[it.id]=defaultItemState(it);
+  });
+
+  renderItems();
   switchView('B');
 }
 
-function loadPhotos(photos){
-  var grid=document.getElementById('photoGrid');
-  if(!grid)return;
-  grid.innerHTML='';
-  
-  photos.forEach(function(photo, index){
-    var cell=document.createElement('div');
-    cell.className='photo-cell';
-    cell.onclick=function(){viewPhoto(photo, index)};
-    
-    if(photo.data){
-      // Show actual photo
-      cell.innerHTML='<img src="'+photo.data+'" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;border-radius:12px"><span class="photo-ts">'+photo.time+'</span>';
-    }else{
-      // Show placeholder
-      cell.innerHTML='<div class="photo-inner" style="background:var(--blue-lt)">📸</div><span class="photo-ts">'+photo.time+'</span>';
-    }
-    grid.appendChild(cell);
+function renderItems(){
+  var list=document.getElementById('itemsList');
+  if(!list)return;
+  list.innerHTML='';
+  var data=roomData[currentRoom.id].items;
+
+  currentItems.forEach(function(item){
+    var state=data[item.id]||defaultItemState(item);
+    var row=document.createElement('div');
+    row.className='item-row';
+    row.id='itemRow-'+item.id;
+
+    var issues=[];
+    if(state.clean===false)issues.push('Not clean');
+    if(state.undamaged===false)issues.push('Damaged');
+    if(item.working && state.working===false)issues.push('Not working');
+    var hasIssue=issues.length>0;
+    var allGood=state.clean===true && state.undamaged===true && (!item.working || state.working===true);
+
+    if(hasIssue)row.className+=' has-issue';
+
+    var statusLabel=hasIssue ? issues.join(' · ') : (allGood ? 'All good' : 'Tap to check');
+    var statusCls=hasIssue ? 'issue' : (allGood ? 'ok' : '');
+    var checkCls=hasIssue ? 'item-check issue' : (allGood ? 'item-check checked' : 'item-check');
+    var checkMark=hasIssue ? '!' : (allGood ? '✓' : '');
+
+    var head=document.createElement('div');
+    head.className='item-head';
+    head.onclick=function(){ toggleItem(item.id) };
+    head.innerHTML='<div class="'+checkCls+'">'+checkMark+'</div>'+
+      '<div style="flex:1;min-width:0"><div class="item-label">'+item.label+'</div>'+
+      '<div class="item-status '+statusCls+'">'+statusLabel+'</div></div>'+
+      '<span class="item-chev">›</span>';
+    row.appendChild(head);
+
+    var body=document.createElement('div');
+    body.className='item-body';
+    body.appendChild(buildTriRow(item,state));
+    body.appendChild(buildPhotoStrip(item,state));
+    var ta=document.createElement('textarea');
+    ta.className='item-comment';
+    ta.placeholder='Note anything specific — scuff on west wall, small stain near window…';
+    ta.value=state.comment||'';
+    ta.oninput=function(){
+      roomData[currentRoom.id].items[item.id].comment=ta.value;
+      persistRoomData();
+    };
+    body.appendChild(ta);
+    row.appendChild(body);
+
+    list.appendChild(row);
   });
-  
-  // Add photo button
-  var addBtn=document.createElement('div');
-  addBtn.className='add-photo';
-  addBtn.onclick=addPhoto;
-  addBtn.innerHTML='<span class="add-photo-icon">📷</span><span class="add-photo-label">Add Photo</span>';
-  grid.appendChild(addBtn);
+  updateAllGoodBtn();
 }
 
-function viewPhoto(photo, index){
-  // Simple photo viewer - could be enhanced with modal
-  if(photo.data){
-    window.open(photo.data, '_blank');
-  }
+function buildTriRow(item,state){
+  var row=document.createElement('div');
+  row.className='tri-row';
+  var specs=[
+    {key:'clean',label:'Clean',icon:'🧼'},
+    {key:'undamaged',label:'Undamaged',icon:'🛡️'}
+  ];
+  if(item.working)specs.push({key:'working',label:'Working',icon:'⚡'});
+  specs.forEach(function(spec){
+    var val=state[spec.key];
+    var btn=document.createElement('button');
+    var cls='tri-btn';
+    var mark='—';
+    if(val===true){cls+=' yes';mark='✓ Yes';}
+    else if(val===false){cls+=' no';mark='✗ No';}
+    btn.className=cls;
+    btn.innerHTML='<span class="tri-icon">'+spec.icon+'</span><span>'+spec.label+'</span><span style="margin-top:2px">'+mark+'</span>';
+    btn.onclick=function(e){ e.stopPropagation(); cycleTri(item.id,spec.key); };
+    row.appendChild(btn);
+  });
+  return row;
 }
 
-function addPhoto(){
-  // Create file input for camera
+function cycleTri(itemId,key){
+  var state=roomData[currentRoom.id].items[itemId];
+  var cur=state[key];
+  // null/na → true → false → true (two real states, start positive)
+  if(cur===null||cur==='na')state[key]=true;
+  else if(cur===true)state[key]=false;
+  else state[key]=true;
+  persistRoomData();
+  renderItems();
+}
+
+function buildPhotoStrip(item,state){
+  var wrap=document.createElement('div');
+  wrap.className='item-photo-strip';
+  (state.photos||[]).forEach(function(photo,idx){
+    var cell=document.createElement('div');
+    cell.className='item-photo';
+    cell.onclick=function(e){ e.stopPropagation(); if(photo.data)window.open(photo.data,'_blank'); };
+    cell.innerHTML='<img src="'+photo.data+'" alt=""><span class="tag">'+photo.time+'</span>';
+    wrap.appendChild(cell);
+  });
+  var add=document.createElement('button');
+  add.className='item-photo-add';
+  add.innerHTML='📷';
+  add.onclick=function(e){ e.stopPropagation(); captureItemPhoto(item.id); };
+  wrap.appendChild(add);
+  return wrap;
+}
+
+function toggleItem(itemId){
+  var row=document.getElementById('itemRow-'+itemId);
+  if(!row)return;
+  var open=row.classList.contains('expanded');
+  document.querySelectorAll('.item-row.expanded').forEach(function(r){ r.classList.remove('expanded'); });
+  if(!open)row.classList.add('expanded');
+}
+
+function captureItemPhoto(itemId){
   var input=document.createElement('input');
   input.type='file';
   input.accept='image/*';
-  input.capture='camera';
+  input.capture='environment';
   input.onchange=function(e){
     var file=e.target.files[0];
-    if(file){
-      var reader=new FileReader();
-      reader.onload=function(event){
-        var now=new Date();
-        var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-        var timestamp=now.toISOString();
-        
-        // Add to room data
-        if(!roomData[currentRoom.id])roomData[currentRoom.id]={};
-        if(!roomData[currentRoom.id].photos)roomData[currentRoom.id].photos=[];
-        roomData[currentRoom.id].photos.push({
-          time:time,
-          timestamp:timestamp,
-          data:event.target.result,
-          fileName:file.name
-        });
-        
-        // Save immediately
-        localStorage.setItem('renteriq_entry_audit',JSON.stringify(roomData));
-        
-        // Update UI
-        loadPhotos(roomData[currentRoom.id].photos);
-        showToast('Photo captured',time+' · Timestamped and saved','📷');
-      };
-      reader.readAsDataURL(file);
-    }
+    if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var now=new Date();
+      var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+      var state=roomData[currentRoom.id].items[itemId];
+      if(!state.photos)state.photos=[];
+      state.photos.push({time:time,timestamp:now.toISOString(),data:ev.target.result,fileName:file.name});
+      persistRoomData();
+      renderItems();
+      var row=document.getElementById('itemRow-'+itemId);
+      if(row)row.classList.add('expanded');
+      showToast('Photo captured',time+' · Timestamped','📷');
+    };
+    reader.readAsDataURL(file);
   };
   input.click();
 }
 
-function addQuickNote(text,el){
-  el.classList.toggle('chip-active');
-  var field=document.getElementById('quickNotes');
-  if(el.classList.contains('chip-active')&&field){
-    field.value=field.value?field.value+'\n'+text:text;
+function markRoomAllGood(){
+  var items=roomData[currentRoom.id].items;
+  currentItems.forEach(function(it){
+    if(!items[it.id])items[it.id]=defaultItemState(it);
+    items[it.id].clean=true;
+    items[it.id].undamaged=true;
+    if(it.working)items[it.id].working=true;
+  });
+  persistRoomData();
+  renderItems();
+  showToast(currentRoom.name+' marked good','You can still flag individual items','✓');
+}
+
+function updateAllGoodBtn(){
+  var btn=document.getElementById('allGoodBtn');
+  if(!btn)return;
+  var items=roomData[currentRoom.id].items;
+  var allMarked=currentItems.every(function(it){
+    var s=items[it.id];
+    return s && s.clean===true && s.undamaged===true && (!it.working || s.working===true);
+  });
+  if(allMarked){
+    btn.classList.add('done');
+    btn.textContent='✓ All items marked good — tap any to edit';
+  } else {
+    btn.classList.remove('done');
+    btn.textContent='✓ Mark all items Clean, Undamaged & Working';
   }
 }
 
-function selectCondition(type){
-  selectedCondition=type;
-  updateConditionButtons();
+function persistRoomData(){
+  try{ localStorage.setItem('renteriq_entry_audit',JSON.stringify(roomData)); }catch(e){}
 }
 
-function updateConditionButtons(){
-  ['good','fair','poor'].forEach(function(c){
-    var btn=document.getElementById('cond-'+c);
-    if(btn){
-      btn.className='cond-btn';
-      if(c===selectedCondition){
-        btn.className+=' cond-'+c+'-active';
-      }
-    }
+function isRoomComplete(roomId){
+  var data=roomData[roomId];
+  if(!data||!data.items)return false;
+  var keys=Object.keys(data.items);
+  if(!keys.length)return false;
+  return keys.every(function(k){
+    var it=data.items[k];
+    return it && it.clean!==null && it.undamaged!==null && (it.working!==null);
   });
 }
 
 function saveRoomData(){
   if(!currentRoom)return;
-  
-  // Save all data
-  roomData[currentRoom.id]={
-    completed:true,
-    condition:selectedCondition,
-    quickNotes:document.getElementById('quickNotes').value,
-    wallsNotes:document.getElementById('wallsNotes').value,
-    floorsNotes:document.getElementById('floorsNotes').value,
-    fixturesNotes:document.getElementById('fixturesNotes').value,
-    plumbingNotes:document.getElementById('plumbingNotes').value,
-    electricalNotes:document.getElementById('electricalNotes').value,
-    otherNotes:document.getElementById('otherNotes').value,
-    photos:roomData[currentRoom.id] ? roomData[currentRoom.id].photos : []
-  };
-  
-  // Save to localStorage
-  localStorage.setItem('renteriq_entry_audit',JSON.stringify(roomData));
-  
-  // Update UI
+
+  var items=roomData[currentRoom.id].items||{};
+  var missing=currentItems.filter(function(it){
+    var s=items[it.id];
+    return !s||s.clean===null||s.undamaged===null||s.working===null;
+  });
+  if(missing.length){
+    showToast('Check '+missing.length+' item'+(missing.length>1?'s':''),'Tap "Mark all good" or set each one','⚠️');
+    return;
+  }
+
+  // Derive an overall condition band from the item ticks
+  var allGood=currentItems.every(function(it){
+    var s=items[it.id];
+    return s.clean===true && s.undamaged===true && (!it.working || s.working===true);
+  });
+  var anyIssue=currentItems.some(function(it){
+    var s=items[it.id];
+    return s.clean===false || s.undamaged===false || (it.working && s.working===false);
+  });
+
+  roomData[currentRoom.id].completed=true;
+  roomData[currentRoom.id].condition=allGood?'good':(anyIssue?'issues':'fair');
+  roomData[currentRoom.id].savedAt=new Date().toISOString();
+
+  persistRoomData();
   buildRoomGrid();
   updateGenerateButton();
-  
-  showToast(currentRoom.name+' saved','All data timestamped and saved','✓');
+
+  showToast(currentRoom.name+' saved','Condition recorded · '+currentItems.length+' items','✓');
   backToOverview();
 }
 
@@ -1008,45 +1193,136 @@ function generateEntryReport(){
   if(window.RIQPayments){
     RIQPayments.gate('entry_condition').then(function(ok){
       if(!ok)return;
-      generateEntryReportCore();
+      openSignatureModal();
     });
     return;
   }
+  openSignatureModal();
+}
+
+// ── Signature capture ──
+var sigCtx=null, sigDrawing=false, sigHasInk=false, sigData=null, sigTenantName='';
+
+function openSignatureModal(){
+  var modal=document.getElementById('signatureModal');
+  modal.style.display='flex';
+
+  // Pre-fill name from user profile if available
+  try{
+    var profile=JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}');
+    if(profile.fullName)document.getElementById('sigName').value=profile.fullName;
+  }catch(e){}
+
+  document.getElementById('sigDate').textContent=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+
+  setTimeout(initSignaturePad,50);
+}
+
+function initSignaturePad(){
+  var canvas=document.getElementById('sigPad');
+  if(!canvas)return;
+  // Make canvas crisp on retina
+  var rect=canvas.getBoundingClientRect();
+  var dpr=window.devicePixelRatio||1;
+  canvas.width=rect.width*dpr;
+  canvas.height=160*dpr;
+  canvas.style.height='160px';
+  sigCtx=canvas.getContext('2d');
+  sigCtx.scale(dpr,dpr);
+  sigCtx.lineWidth=2.2;
+  sigCtx.lineCap='round';
+  sigCtx.lineJoin='round';
+  sigCtx.strokeStyle='#1A2B4A';
+  sigHasInk=false;
+
+  var getPos=function(e){
+    var r=canvas.getBoundingClientRect();
+    var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    var y=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    return {x:x,y:y};
+  };
+  var start=function(e){ e.preventDefault(); sigDrawing=true; sigHasInk=true; var p=getPos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x,p.y); };
+  var move=function(e){ if(!sigDrawing)return; e.preventDefault(); var p=getPos(e); sigCtx.lineTo(p.x,p.y); sigCtx.stroke(); };
+  var end=function(){ sigDrawing=false; };
+
+  canvas.onmousedown=start; canvas.onmousemove=move; canvas.onmouseup=end; canvas.onmouseleave=end;
+  canvas.ontouchstart=start; canvas.ontouchmove=move; canvas.ontouchend=end;
+}
+
+function clearSignature(){
+  var canvas=document.getElementById('sigPad');
+  if(!canvas||!sigCtx)return;
+  sigCtx.clearRect(0,0,canvas.width,canvas.height);
+  sigHasInk=false;
+}
+
+function closeSignature(){
+  document.getElementById('signatureModal').style.display='none';
+}
+
+function confirmSignature(){
+  var name=document.getElementById('sigName').value.trim();
+  if(!name){ showToast('Name required','Please type your full name','⚠️'); return; }
+  if(!sigHasInk){ showToast('Signature required','Please sign in the box above','⚠️'); return; }
+  try{
+    sigData=document.getElementById('sigPad').toDataURL('image/png');
+  }catch(e){
+    sigData=null;
+  }
+  sigTenantName=name;
+  closeSignature();
   generateEntryReportCore();
 }
+
 function generateEntryReportCore(){
   showToast('Generating report','Creating your entry condition report...','📄');
 
   var auditId='entry_audit_'+Date.now();
   var reportDate=new Date().toISOString();
 
-  // Create comprehensive report data
   var reportData={
     auditId:auditId,
     propertyAddress:document.getElementById('propertyAddress').textContent,
     propertyDetails:document.getElementById('propertyDetails').textContent,
     generatedDate:reportDate,
+    tenantName:sigTenantName||'',
+    signature:sigData||null,
     rooms:[],
     totalPhotos:0,
     completedRooms:0
   };
 
-  // Collect all room data
   var allRooms=[].concat(standardRooms).concat(customRooms);
   allRooms.forEach(function(room){
-    if(roomData[room.id] && roomData[room.id].completed){
-      reportData.completedRooms++;
-      var roomInfo=Object.assign({
-        id:room.id,
-        name:room.name,
-        emoji:room.emoji
-      }, roomData[room.id]);
+    var rd=roomData[room.id];
+    if(!rd||!rd.completed)return;
+    reportData.completedRooms++;
 
-      if(roomInfo.photos){
-        reportData.totalPhotos+=roomInfo.photos.length;
-      }
-      reportData.rooms.push(roomInfo);
-    }
+    var itemDefs=getItemsForRoom(room);
+    var items=itemDefs.map(function(def){
+      var s=(rd.items&&rd.items[def.id])||{};
+      var photos=(s.photos||[]).map(function(p){
+        if(p&&p.data)reportData.totalPhotos++;
+        return {dataUrl:p.data||p.url||'',time:p.time||'',timestamp:p.timestamp||''};
+      });
+      return {
+        id:def.id,
+        label:def.label,
+        clean:s.clean===true?true:(s.clean===false?false:null),
+        undamaged:s.undamaged===true?true:(s.undamaged===false?false:null),
+        working:def.working?(s.working===true?true:(s.working===false?false:null)):'na',
+        comment:s.comment||'',
+        photos:photos
+      };
+    });
+
+    reportData.rooms.push({
+      id:room.id,
+      name:room.name,
+      emoji:room.emoji,
+      condition:rd.condition||'good',
+      items:items
+    });
   });
 
   // Local vault record (with full base64 photos for offline use)
@@ -1100,24 +1376,17 @@ function generateEntryReportCore(){
 }
 
 function exportEntryReportPDF(data){
-  if(!window.RIQExport)return;
-  var sections=[];
-  if(data.rooms&&data.rooms.length){
-    data.rooms.forEach(function(room){
-      sections.push({
-        heading:room.name||'Room',
-        badge:room.condition||'',
-        content:(room.notes||'No notes'),
-        photos:(room.photos||[]).slice(0,4).map(function(p){return p.dataUrl||p})
-      });
-    });
-  }
-  RIQExport.generate({
-    title:'Bond-Shield Move-In Report',
-    subtitle:data.address||'Entry Condition Report',
-    date:new Date(),
-    sections:sections,
-    filename:'RenterIQ-MoveIn-Report-'+new Date().toISOString().split('T')[0]+'.pdf'
+  if(!window.RIQExport||!RIQExport.generateConditionReport)return;
+  RIQExport.generateConditionReport({
+    reportId:data.auditId,
+    propertyAddress:data.propertyAddress,
+    propertyDetails:data.propertyDetails,
+    tenantName:data.tenantName,
+    signature:data.signature,
+    date:new Date(data.generatedDate||Date.now()),
+    rooms:data.rooms,
+    totalPhotos:data.totalPhotos,
+    filename:'RenterIQ-Entry-Condition-Report-'+new Date().toISOString().split('T')[0]+'.pdf'
   });
 }
 
@@ -1145,27 +1414,27 @@ function syncEntryAuditToCloud(vaultRecord){
     var rooms=(vaultRecord.data&&vaultRecord.data.rooms)||[];
     var uploadJobs=[];
 
-    // Build upload jobs for every photo across every room
+    // Upload every photo nested under each item across every room
     rooms.forEach(function(room){
-      if(!room.photos)return;
-      room.photos.forEach(function(photo,idx){
-        if(!photo||!photo.data)return; // already uploaded or empty
-        var blob=dataURLToBlob(photo.data);
-        if(!blob)return;
-        var ext=(photo.fileName&&photo.fileName.split('.').pop())||'jpg';
-        var path='entry-audits/'+auditId+'/'+room.id+'/'+idx+'.'+ext;
-        uploadJobs.push(
-          RIQStore.uploadFile(path,blob,{contentType:blob.type||'image/jpeg'})
-            .then(function(res){
-              photo.url=res.url;
-              photo.path=res.path;
-              return true;
-            })
-            .catch(function(err){
-              console.warn('Photo upload failed for '+path+':',err);
-              return false;
-            })
-        );
+      (room.items||[]).forEach(function(item){
+        (item.photos||[]).forEach(function(photo,idx){
+          if(!photo||!photo.dataUrl)return;
+          var blob=dataURLToBlob(photo.dataUrl);
+          if(!blob)return;
+          var path='entry-audits/'+auditId+'/'+room.id+'/'+item.id+'/'+idx+'.jpg';
+          uploadJobs.push(
+            RIQStore.uploadFile(path,blob,{contentType:blob.type||'image/jpeg'})
+              .then(function(res){
+                photo.url=res.url;
+                photo.path=res.path;
+                return true;
+              })
+              .catch(function(err){
+                console.warn('Photo upload failed for '+path+':',err);
+                return false;
+              })
+          );
+        });
       });
     });
 
@@ -1174,17 +1443,13 @@ function syncEntryAuditToCloud(vaultRecord){
       // under the 1MB doc limit. Local copy keeps base64 for offline use.
       var firestoreRooms=rooms.map(function(room){
         var slim=Object.assign({},room);
-        if(room.photos){
-          slim.photos=room.photos.map(function(p){
-            return {
-              time:p.time,
-              timestamp:p.timestamp,
-              fileName:p.fileName,
-              url:p.url||'',
-              path:p.path||''
-            };
+        slim.items=(room.items||[]).map(function(item){
+          var slimItem=Object.assign({},item);
+          slimItem.photos=(item.photos||[]).map(function(p){
+            return {time:p.time||'',timestamp:p.timestamp||'',url:p.url||'',path:p.path||''};
           });
-        }
+          return slimItem;
+        });
         return slim;
       });
       var firestoreRecord={
@@ -1209,66 +1474,39 @@ function syncEntryAuditToCloud(vaultRecord){
 }
 
 function generateTextReport(data){
-  var text='RENTERIQ ENTRY CONDITION REPORT\n';
-  text+='=====================================\n\n';
-  text+='Property: '+data.propertyAddress+'\n';
-  text+='Generated: '+new Date(data.generatedDate).toLocaleString()+'\n';
-  text+='Total Rooms: '+data.completedRooms+'\n';
-  text+='Total Photos: '+data.totalPhotos+'\n\n';
-  
-  text+='ROOM-BY-ROOM DOCUMENTATION\n';
-  text+='----------------------------\n\n';
-  
+  var pad=function(s,n){s=String(s);return s.length>=n?s:s+new Array(n-s.length+1).join(' ');};
+  var mark=function(v){ if(v===true)return 'YES'; if(v===false)return 'NO '; if(v==='na')return 'N/A'; return '—  '; };
+
+  var text='RESIDENTIAL TENANCY — ENTRY CONDITION REPORT\n';
+  text+='============================================\n\n';
+  text+='Property   : '+data.propertyAddress+'\n';
+  if(data.propertyDetails)text+='Details    : '+data.propertyDetails+'\n';
+  if(data.tenantName)text+='Tenant     : '+data.tenantName+'\n';
+  text+='Generated  : '+new Date(data.generatedDate).toLocaleString('en-AU')+'\n';
+  text+='Rooms      : '+data.completedRooms+'\n';
+  text+='Photos     : '+data.totalPhotos+'\n\n';
+
   data.rooms.forEach(function(room){
-    text+=room.emoji+' '+room.name.toUpperCase()+'\n';
-    text+='Condition: '+room.condition+'\n';
-    
-    if(room.photos && room.photos.length>0){
-      text+='Photos: '+room.photos.length+' taken\n';
-      room.photos.forEach(function(photo){
-        text+='  - '+photo.time+'\n';
-      });
-    }
-    
-    if(room.quickNotes){
-      text+='Quick Notes: '+room.quickNotes+'\n';
-    }
-    
-    if(room.wallsNotes){
-      text+='Walls: '+room.wallsNotes+'\n';
-    }
-    
-    if(room.floorsNotes){
-      text+='Floors: '+room.floorsNotes+'\n';
-    }
-    
-    if(room.fixturesNotes){
-      text+='Fixtures: '+room.fixturesNotes+'\n';
-    }
-    
-    if(room.plumbingNotes){
-      text+='Plumbing: '+room.plumbingNotes+'\n';
-    }
-    
-    if(room.electricalNotes){
-      text+='Electrical: '+room.electricalNotes+'\n';
-    }
-    
-    if(room.otherNotes){
-      text+='Other: '+room.otherNotes+'\n';
-    }
-    
-    text+='\n';
+    text+='\n'+(room.emoji||'')+' '+room.name.toUpperCase()+'\n';
+    text+=new Array(room.name.length+4).join('-')+'\n';
+    text+=pad('ITEM',28)+pad('CLEAN',7)+pad('UNDMG',7)+pad('WORK',7)+'COMMENT\n';
+    (room.items||[]).forEach(function(it){
+      text+=pad(it.label,28)+pad(mark(it.clean),7)+pad(mark(it.undamaged),7)+pad(mark(it.working),7)+(it.comment||'')+'\n';
+      if(it.photos&&it.photos.length){
+        it.photos.forEach(function(ph){ text+='  📷 '+(ph.time||'')+(ph.timestamp?' ('+ph.timestamp+')':'')+'\n'; });
+      }
+    });
   });
-  
-  text+='REPORT SUMMARY\n';
-  text+='==============\n';
-  text+='This entry condition report was generated by RenterIQ to document\n';
-  text+='the property condition at move-in. All photos are timestamped and\n';
-  text+='notes are digitally recorded for bond protection purposes.\n\n';
-  text+='Generated on: '+new Date().toLocaleString()+'\n';
-  text+='RenterIQ Entry Audit System\n';
-  
+
+  text+='\n\nTENANT DECLARATION\n';
+  text+='==================\n';
+  text+='I confirm the above record accurately reflects the condition of the\n';
+  text+='property at commencement of tenancy.\n\n';
+  text+='Signed: '+(data.tenantName||'_________________________')+'\n';
+  text+='Date  : '+new Date(data.generatedDate).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})+'\n\n';
+  text+='Return a signed copy to your agent or landlord within the statutory\n';
+  text+='period for your state (typically 3–7 days). Keep a copy for exit.\n';
+
   return text;
 }
 
@@ -1335,11 +1573,6 @@ function backToOverview(){
 function switchView(viewId){
   document.querySelectorAll('.view').forEach(function(v){v.style.display='none'});
   document.getElementById(viewId).style.display='flex';
-}
-
-function setTab(tabIndex){
-  document.querySelectorAll('.tab-item').forEach(function(t,i){t.classList.toggle('tab-active',i===tabIndex)});
-  document.querySelectorAll('[id^="tabContent"]').forEach(function(c,i){c.style.display=i===tabIndex?'block':'none'});
 }
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}

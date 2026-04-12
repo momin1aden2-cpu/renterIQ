@@ -109,6 +109,12 @@
      * @returns {Promise<void>}
      */
     write: function(collection, id, data) {
+      // Firestore rejects null/undefined on .set() — route callers that
+      // pass null through the delete path to keep the cache and server in sync.
+      if (data === null || data === undefined) {
+        return this.delete(collection, id);
+      }
+
       var cacheKey = 'riqcache:' + collection;
       var cache = safeJSON(cacheKey, {});
       cache[id] = data;

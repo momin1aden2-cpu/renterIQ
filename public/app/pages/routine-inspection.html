@@ -195,7 +195,7 @@
 <div class="app-shell">
 
 <!-- Hidden file inputs -->
-<input type="file" id="reportFileInput" accept=".pdf,.jpg,.jpeg,.png,.heic,.heif" style="display:none">
+<input type="file" id="reportFileInput" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/*" style="display:none">
 <input type="file" id="taskPhotoInput" accept="image/*" capture="environment" style="display:none">
 
 <!-- VIEW A — INSPECTION HISTORY -->
@@ -747,8 +747,22 @@ function runAnalysisWithAPI(textItems) {
   if (textItems) formData.append('text', textItems);
 
   fetch('/api/analyze-inspection', { method: 'POST', body: formData })
-    .then(function(r) { return r.json(); })
+    .then(function(r) { return r.json().then(function(j){ j.__status = r.status; return j; }); })
     .then(function(data) {
+      if (data && data.error) {
+        showToast('Upload rejected', data.error, '⚠️');
+        document.getElementById('aiAnalyzing').style.display = 'none';
+        switchView('B');
+        var btn2 = document.getElementById('analyzeBtn');
+        btn2.innerHTML = '✦ Analyse Report';
+        btn2.style.opacity = '1';
+        btn2.style.pointerEvents = 'auto';
+        return;
+      }
+      if (data && data._warning) {
+        console.warn('[analyze-inspection]', data._warning);
+        showToast('Using fallback parser', 'AI unavailable — review items carefully', 'ℹ️');
+      }
       // Step 2 tick
       tickStep('step2Check');
       setTimeout(function() {
