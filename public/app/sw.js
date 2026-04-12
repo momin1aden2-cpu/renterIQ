@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v33 — Journey strip gains Move-out phase (7 dots), tightened spacing
+// RenterIQ Service Worker v34 — Profile header slimmed, report-issue action bar centred via translateX on mobile
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v33';
+var CACHE_NAME = 'renteriq-shell-v34';
 
 var APP_SHELL = [
   '/app/index.html',
