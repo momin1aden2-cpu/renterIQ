@@ -180,6 +180,20 @@
 
   <div style="flex:1;overflow-y:auto;padding-bottom:100px">
 
+    <!-- One-tap "I submitted it" — shows after the resume is substantially complete
+         OR whenever there's a tracked property in the apply context. Flips the
+         tracked status to 'applied' so the home waiting card surfaces. -->
+    <div id="iSubmittedCard" style="display:none;margin:16px 16px 0">
+      <div style="background:#fff;border:1.5px solid var(--teal);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:11px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✓</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:13.5px;color:var(--text)">Already submitted to the agent?</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45">Tap once — we'll start tracking the wait and nudge you if you don't hear back.</div>
+        </div>
+        <button onclick="markSubmittedManually()" style="background:var(--teal);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-family:'Sora',sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0">I submitted ✓</button>
+      </div>
+    </div>
+
     <!-- Property Context (shown when coming from inspection) -->
     <div id="applyContextCard" style="display:none;margin:16px 16px 0">
       <div style="background:linear-gradient(135deg,#065F46,#10B981);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
@@ -1471,6 +1485,32 @@ function togglePortalCheck(idx){
   }
 }
 
+// Manual "I submitted it" — same outcome as onApplicationSubmitted, reachable
+// whether or not the in-app portal checklist was stepped through.
+function markSubmittedManually(){
+  if(typeof onApplicationSubmitted === 'function'){
+    onApplicationSubmitted();
+  }
+}
+
+function updateISubmittedCardVisibility(){
+  var card = document.getElementById('iSubmittedCard');
+  if(!card) return;
+  // Show if resume is substantially complete OR an apply-context exists
+  var r = null;
+  try { r = JSON.parse(localStorage.getItem('riq-resume')||'null'); } catch(e){}
+  var ctxRaw = localStorage.getItem('riq_apply_context');
+  var hasContext = !!ctxRaw;
+  var pct = 0;
+  if(r && typeof r === 'object'){
+    var required = ['fullName','email','mobile','currentAddress','employer','jobTitle'];
+    var filled = required.filter(function(f){ return r[f] && String(r[f]).trim(); }).length;
+    pct = Math.round((filled / required.length) * 100);
+  }
+  if(hasContext || pct >= 50){ card.style.display = 'block'; }
+  else { card.style.display = 'none'; }
+}
+
 function onApplicationSubmitted(){
   // Update tracked property status to "applied"
   try{
@@ -1675,6 +1715,15 @@ document.addEventListener('DOMContentLoaded',function(){
   });
   loadResume();
   loadApplyContext();
+  updateISubmittedCardVisibility();
+  // Re-check visibility on every autosave so the button appears as soon as
+  // the resume crosses the threshold — no need to refresh.
+  document.querySelectorAll('.form-input').forEach(function(el){
+    el.addEventListener('input', function(){
+      clearTimeout(window._iSubmittedTimer);
+      window._iSubmittedTimer = setTimeout(updateISubmittedCardVisibility, 700);
+    });
+  });
 });
 
 function loadApplyContext(){

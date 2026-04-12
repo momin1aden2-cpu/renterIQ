@@ -248,6 +248,7 @@
 <div class="sec-label">Support</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
   <div class="settings-row" onclick="navigate('/app/pages/rights.html')"><span class="settings-icon">⚖️</span><div style="flex:1"><div class="settings-title">Renter Rights Hub</div><div class="settings-sub">Free help &amp; tenancy info for your state</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="replayIntroTour()"><span class="settings-icon">🎬</span><div style="flex:1"><div class="settings-title">Replay the intro tour</div><div class="settings-sub">The 6-step walkthrough from your first open</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="contactSupport('help')"><span class="settings-icon">❓</span><div style="flex:1"><div class="settings-title">Help &amp; FAQ</div><div class="settings-sub">Get answers about features &amp; usage</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="contactSupport('contact')"><span class="settings-icon">💬</span><div style="flex:1"><div class="settings-title">Contact Support</div><div class="settings-sub">support@renteriq.com.au</div></div><span class="settings-chevron">›</span></div>
   <div class="settings-row" onclick="contactSupport('feedback')"><span class="settings-icon">📝</span><div style="flex:1"><div class="settings-title">Send Feedback</div><div class="settings-sub">Suggest a feature or report a bug</div></div><span class="settings-chevron">›</span></div>
@@ -1328,6 +1329,14 @@ function submitRating() {
     btn.disabled = false; btn.textContent = 'Submit Review';
     msg.textContent = 'Firebase not available. Please try again later.'; msg.style.display = 'block'; msg.style.color = 'var(--red)';
   }
+}
+
+// Clear the onboarding-done flag and send the user back to the home screen
+// so the upgraded 6-step tour plays again.
+function replayIntroTour(){
+  try { localStorage.removeItem('riq-onboarding-done'); } catch(e){}
+  try { showToast && showToast('Tour ready','Opening the walkthrough…','🎬'); } catch(e){}
+  setTimeout(function(){ navigate('/app/index.html'); }, 220);
 }
 
 function contactSupport(kind){

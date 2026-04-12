@@ -1691,44 +1691,64 @@ function renderActivityFeed() {
 var obStep = 0;
 var obSteps = [
   {
-    icon: '🛡️', iconBg: 'linear-gradient(135deg,var(--blue),var(--blue-md))',
+    icon: '🏡', iconBg: 'linear-gradient(135deg,var(--blue),var(--blue-md))',
     title: 'Welcome to RenterIQ',
-    sub: 'Your personal renting assistant for Australia. We help you rent smarter and stay protected — from search to move-out.',
+    sub: 'A friendly helper for Australian renters. We\'ll walk with you from first search through to key-handover — and nudge you at the right moments along the way.',
     features: [
-      { icon: '🔍', bg: 'var(--blue-lt)', text: 'Search suburbs & compare listings' },
-      { icon: '⚖️', bg: 'rgba(245,166,35,.15)', text: 'Plain-English lease review with risks flagged' },
-      { icon: '📋', bg: 'var(--teal-lt)', text: 'Inspection reports & condition audits' },
-      { icon: '🗄️', bg: 'rgba(232,64,64,.1)', text: 'Vault — your secure document storage' }
+      { icon: '🔍', bg: 'var(--blue-lt)', text: 'Track places · quick scan at open homes' },
+      { icon: '📑', bg: 'rgba(124,58,237,.15)', text: 'Lease review in plain English' },
+      { icon: '🏠', bg: 'var(--teal-lt)', text: 'Move-in + exit records to protect your bond' },
+      { icon: '🔧', bg: 'rgba(245,166,35,.15)', text: 'Log issues, email agents, track follow-ups' }
     ]
   },
   {
     icon: '🔍', iconBg: 'var(--blue-lt)',
-    title: 'Step 1: Find Your Place',
-    sub: 'Search any suburb in Australia. We\'ll link you to all major rental sites and help you track properties you\'re interested in.',
+    title: 'Find & inspect',
+    sub: 'Paste any listing URL or upload a screenshot. Book-in reminders set themselves. At the open home, a 2-minute Quick Scan captures your gut call so you can decide which to apply for.',
     features: [
-      { icon: '📍', bg: 'var(--blue-lt)', text: 'Search by suburb or postcode' },
-      { icon: '🏠', bg: 'var(--blue-lt)', text: 'Compare on realestate.com.au, Domain & more' },
-      { icon: '📌', bg: 'var(--teal-lt)', text: 'Track listings you like in one place' }
+      { icon: '📎', bg: 'var(--blue-lt)', text: 'URL paste, screenshot, or search' },
+      { icon: '🔔', bg: 'var(--teal-lt)', text: 'Auto reminders + add to calendar' },
+      { icon: '😍', bg: 'rgba(16,185,129,.14)', text: 'Quick Scan with vibe + concerns' }
     ]
   },
   {
-    icon: '⚖️', iconBg: 'rgba(245,166,35,.15)',
-    title: 'Step 2: Review Your Lease',
-    sub: 'Upload your lease and get every clause explained in plain English. Anything unusual is flagged so you know exactly what you\'re signing.',
+    icon: '✍️', iconBg: 'rgba(124,58,237,.15)',
+    title: 'Apply & review',
+    sub: 'Fill your renter profile once. If you love a place, your application comes together in minutes. When the lease lands, we break it down clause-by-clause in plain English.',
     features: [
-      { icon: '📄', bg: 'var(--blue-lt)', text: 'Upload PDF or photo of your lease' },
-      { icon: '✦', bg: 'var(--teal-lt)', text: 'Every clause broken down for you' },
-      { icon: '⚠️', bg: 'rgba(245,166,35,.15)', text: 'Flags non-standard or risky terms' }
+      { icon: '📝', bg: 'var(--blue-lt)', text: 'Auto-saving renter resume' },
+      { icon: '✉️', bg: 'rgba(124,58,237,.15)', text: 'AI cover letter drafted for you' },
+      { icon: '📑', bg: 'var(--teal-lt)', text: 'Lease read-through — just a helper, not legal advice' }
     ]
   },
   {
-    icon: '📋', iconBg: 'var(--teal-lt)',
-    title: 'Step 3: Inspect & Protect',
-    sub: 'Document everything when you move in. RenterIQ\'s inspection tools create timestamped evidence that protects your bond.',
+    icon: '🏠', iconBg: 'var(--teal-lt)',
+    title: 'Move in & settle',
+    sub: 'Walk the property room-by-room and mark what\'s clean, undamaged and working. That record is your safety net at exit time. Set up rent and bond tracking so nothing slips.',
     features: [
-      { icon: '🔑', bg: 'var(--blue-lt)', text: 'Move-in condition audit with photos' },
-      { icon: '🔍', bg: 'var(--teal-lt)', text: 'Routine inspection report analyser' },
-      { icon: '🚪', bg: 'rgba(232,64,64,.1)', text: 'Move-out checklist & exit inspection' }
+      { icon: '📸', bg: 'var(--teal-lt)', text: 'Itemised move-in record with photos' },
+      { icon: '💰', bg: 'rgba(245,166,35,.15)', text: 'Rent tracker + reminders before due' },
+      { icon: '🛡️', bg: 'var(--blue-lt)', text: 'Bond stored with reference number' }
+    ]
+  },
+  {
+    icon: '🔧', iconBg: 'rgba(245,166,35,.15)',
+    title: 'Stay on top of it',
+    sub: 'Report maintenance issues with a friendly, AI-drafted email. If the agent doesn\'t reply, we nudge you to follow up. Every message lives in a thread so nothing gets lost.',
+    features: [
+      { icon: '🔧', bg: 'rgba(245,166,35,.15)', text: 'Report issues, auto-draft the email' },
+      { icon: '💬', bg: 'var(--blue-lt)', text: 'Threaded comms — never lose the trail' },
+      { icon: '🔍', bg: 'var(--teal-lt)', text: 'Routine inspection report helper' }
+    ]
+  },
+  {
+    icon: '🚪', iconBg: 'rgba(232,64,64,.1)',
+    title: 'Move out strong',
+    sub: 'At exit time, your move-in record is the baseline. We compare every item, flag what\'s changed, and help you draft a friendly bond-return email with all the evidence attached.',
+    features: [
+      { icon: '🔁', bg: 'var(--blue-lt)', text: 'Move-in vs move-out comparison' },
+      { icon: '🛡️', bg: 'var(--teal-lt)', text: 'Bond-return guidance, your call' },
+      { icon: '🗄️', bg: 'rgba(232,64,64,.1)', text: 'Every record kept safely in your Vault' }
     ]
   }
 ];
@@ -2086,8 +2106,10 @@ async function homeTrackProperty() {
   if (urlEl) urlEl.value = '';
   if (btn) { btn.textContent = 'Save'; btn.style.opacity = '1'; btn.disabled = false; }
   homeTrackMsg('✓ ' + address + ' saved — set an inspection date on its card below.', false);
+  showToast('Saved to your list ✓', 'Next up: arrange an inspection', '🏡');
   homeRenderTracked();
   homeRenderUpcoming();
+  if (typeof homeRenderJourney === 'function') homeRenderJourney();
 }
 
 function homeTrackMsg(msg, isErr) {

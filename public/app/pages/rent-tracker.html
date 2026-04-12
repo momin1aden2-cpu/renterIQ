@@ -257,7 +257,67 @@ function saveSetup() {
   }
 
   saveData();
+  scheduleRentReminders();
   renderTracker();
+}
+
+// Schedule 3-days-before and day-of reminders for the next rent due date.
+// Writes into renteriq_reminders so the home bell badge + notifications page
+// both pick them up automatically. Dedups by id so re-saving rent setup or
+// logging a payment replaces rather than stacks.
+function scheduleRentReminders(){
+  try {
+    if(!data || !data.amount) return;
+    var nextDue = getNextDueDate();
+    if(!nextDue || isNaN(nextDue.getTime())) return;
+    var nineAm = function(d){ var x=new Date(d); x.setHours(9,0,0,0); return x; };
+    var dueDay = nineAm(nextDue);
+    var threeDaysBefore = new Date(dueDay.getTime() - 3*86400000);
+    var amount = '$' + Number(data.amount).toLocaleString('en-AU');
+    var freqLabel = data.frequency === 'weekly' ? '/week' : data.frequency === 'fortnightly' ? '/fortnight' : '/month';
+
+    var reminders = [];
+    try { reminders = JSON.parse(localStorage.getItem('renteriq_reminders')||'[]'); } catch(e){ reminders = []; }
+    if(!Array.isArray(reminders)) reminders = [];
+
+    var upsert = function(reminder){
+      var ix = reminders.findIndex(function(r){ return r && r.id === reminder.id; });
+      if(ix >= 0) reminders[ix] = reminder; else reminders.push(reminder);
+    };
+
+    if(threeDaysBefore > new Date()){
+      upsert({
+        id:'rent_3d_' + nextDue.toISOString().slice(0,10),
+        datetime:threeDaysBefore.toISOString(),
+        title:'Rent due in 3 days',
+        body:amount + freqLabel + ' · ' + nextDue.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'}),
+        icon:'💰',
+        data:{type:'rent_reminder',due:nextDue.toISOString()},
+        fired:false
+      });
+    }
+    if(dueDay > new Date()){
+      upsert({
+        id:'rent_due_' + nextDue.toISOString().slice(0,10),
+        datetime:dueDay.toISOString(),
+        title:'Rent due today',
+        body:amount + freqLabel,
+        icon:'💰',
+        data:{type:'rent_reminder',due:nextDue.toISOString()},
+        fired:false
+      });
+    }
+    localStorage.setItem('renteriq_reminders', JSON.stringify(reminders));
+
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(!RIQStore.isAuthed())return;
+        reminders.filter(function(r){ return r && r.id && /^rent_/.test(r.id); }).forEach(function(r){
+          RIQStore.write('reminders', r.id, r).catch(function(){});
+        });
+      });
+    }
+  } catch(e){ console.error('scheduleRentReminders:', e); }
 }
 
 function showSetup() {
@@ -375,6 +435,7 @@ function recordPayment(method) {
 
   data.payments.push(payment);
   saveData();
+  scheduleRentReminders();
   renderTracker();
 }
 

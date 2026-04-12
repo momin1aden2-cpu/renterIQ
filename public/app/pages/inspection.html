@@ -723,7 +723,9 @@ function showExtractedDetails(data) {
   var timeLabel = data.time_display || (data.time ? formatTimeDisplay(data.time) : '');
   if (data.date && timeLabel) {
     html += '<div style="margin-bottom:8px"><strong>📅 Inspection:</strong><br>' +
-            formatInspectionDate(data.date) + ' at ' + timeLabel + '</div>';
+            formatInspectionDate(data.date) + ' at ' + timeLabel +
+            ' <button onclick="downloadInspectionICS()" style="margin-left:6px;background:var(--blue-xl);color:var(--blue);border:none;border-radius:8px;padding:5px 10px;font-family:Sora,sans-serif;font-size:11px;font-weight:700;cursor:pointer">📆 Add to calendar</button>' +
+            '</div>';
   } else if (data.date) {
     html += '<div style="margin-bottom:8px"><strong>📅 Date:</strong><br>' + formatInspectionDate(data.date) + '</div>';
   } else if (timeLabel) {
@@ -769,6 +771,77 @@ function showExtractedDetails(data) {
   document.getElementById('extractedDetails').innerHTML = html;
   document.getElementById('uploadStep2').style.display = 'none';
   document.getElementById('uploadStep3').style.display = 'block';
+}
+
+// Build a minimal RFC 5545 .ics file for the extracted inspection and trigger a download.
+// Works on iOS Safari, Android Chrome, desktop — the OS prompts to add to calendar.
+function downloadInspectionICS(){
+  var data = extractedBookingData;
+  if(!data || !data.date){ showToast('No date saved','Extract a date first','⚠️'); return; }
+  var time = data.time || '10:00';
+  var tParts = String(time).match(/^(\d{1,2}):(\d{2})/);
+  if(!tParts){ tParts = [null,'10','00']; }
+  var startLocal = new Date(data.date + 'T' + tParts[1].padStart(2,'0') + ':' + tParts[2] + ':00');
+  if(isNaN(startLocal.getTime())){ showToast('Date unclear','Could not build calendar event','⚠️'); return; }
+  // Open-home inspections are usually 15-30 min. Default to 30 min window.
+  var endLocal = new Date(startLocal.getTime() + 30 * 60 * 1000);
+
+  var fmt = function(d){
+    // UTC-based floating datetime in YYYYMMDDTHHMMSSZ form
+    return d.getUTCFullYear() +
+      String(d.getUTCMonth()+1).padStart(2,'0') +
+      String(d.getUTCDate()).padStart(2,'0') + 'T' +
+      String(d.getUTCHours()).padStart(2,'0') +
+      String(d.getUTCMinutes()).padStart(2,'0') +
+      String(d.getUTCSeconds()).padStart(2,'0') + 'Z';
+  };
+
+  var uid = 'inspection-' + Date.now() + '@renteriq.app';
+  var summary = 'Inspection — ' + (data.address || 'Property');
+  var locationParts = [data.address].filter(Boolean);
+  var descLines = [];
+  if(data.agent_name) descLines.push('Agent: ' + data.agent_name);
+  if(data.agent_phone) descLines.push('Phone: ' + data.agent_phone);
+  if(data.agent_email) descLines.push('Email: ' + data.agent_email);
+  if(data.rent_weekly) descLines.push('Rent: ' + data.rent_weekly + '/week');
+  if(data.bedrooms) descLines.push('Bedrooms: ' + data.bedrooms);
+  descLines.push('Saved from RenterIQ');
+  var description = descLines.join('\\n');
+
+  var icsEscape = function(s){ return String(s||'').replace(/[,;\\]/g,'\\$&').replace(/\n/g,'\\n'); };
+
+  var ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//RenterIQ//Inspection Booking//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    'UID:' + uid,
+    'DTSTAMP:' + fmt(new Date()),
+    'DTSTART:' + fmt(startLocal),
+    'DTEND:' + fmt(endLocal),
+    'SUMMARY:' + icsEscape(summary),
+    'DESCRIPTION:' + description,
+    locationParts.length ? 'LOCATION:' + icsEscape(locationParts.join(', ')) : '',
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:Inspection starts in 1 hour',
+    'TRIGGER:-PT1H',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].filter(Boolean).join('\r\n');
+
+  var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'inspection-' + (data.address || 'booking').replace(/[^a-z0-9]+/gi,'-').toLowerCase() + '.ics';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  showToast('Calendar file ready','Open it to add the inspection','📆');
 }
 
 function formatTimeDisplay(t) {

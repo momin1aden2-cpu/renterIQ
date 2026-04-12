@@ -140,9 +140,22 @@
   </div>
 
   <div style="flex:1;overflow-y:auto;padding-bottom:100px">
+    <div style="padding:0 16px 8px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase;margin-bottom:10px">Agent's Copy</div>
+      <div id="agencyEntryCard" style="background:#fff;border:1.5px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:18px;cursor:pointer;display:flex;gap:12px;align-items:center" onclick="uploadAgencyEntry()">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📎</div>
+        <div style="flex:1;min-width:0">
+          <div id="agencyEntryTitle" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Agent sent you their move-in report?</div>
+          <div id="agencyEntrySub" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45">Upload a copy so we can cross-check it at exit time. Optional, but recommended.</div>
+        </div>
+        <span id="agencyEntryAction" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--blue)">›</span>
+      </div>
+      <input type="file" id="agencyEntryInput" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/*" style="display:none">
+    </div>
+
     <div style="padding:0 16px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:12px">Document Every Area</div>
-      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Take timestamped photos and notes for each room. This creates your official move-in record.</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:12px">Your Move-in Record</div>
+      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Walk through each room and mark what's clean, undamaged and working. Your own photos protect you at bond time.</div>
     </div>
 
     <div class="room-grid" id="roomGrid">
@@ -1429,6 +1442,77 @@ function filingClose(){
 
 function filingGoBondReceipt(){ filingClose(); setTimeout(function(){ navigate('/app/pages/bond-tracker.html?prompt=receipt'); },180); }
 function filingGoLease(){ filingClose(); setTimeout(function(){ navigate('/app/pages/lease.html?upload=1'); },180); }
+
+// ── Agency's move-in condition report (separate from renter's own record)
+// Stored under its own localStorage key so the exit comparison can pull it
+// as a second baseline alongside the renter's itemised walk-through.
+function loadAgencyEntryDisplay(){
+  try {
+    var raw = localStorage.getItem('riq_agency_entry_report');
+    if(!raw) return;
+    var meta = JSON.parse(raw);
+    if(!meta || !meta.fileName) return;
+    var title = document.getElementById('agencyEntryTitle');
+    var sub = document.getElementById('agencyEntrySub');
+    var action = document.getElementById('agencyEntryAction');
+    var card = document.getElementById('agencyEntryCard');
+    if(title) title.textContent = '✓ Agent\'s move-in report saved';
+    if(sub) sub.textContent = meta.fileName + ' · ' + new Date(meta.uploadedAt||Date.now()).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+    if(action) action.innerHTML = '↻';
+    if(card) card.style.borderColor = 'var(--teal)';
+  } catch(e){}
+}
+
+function uploadAgencyEntry(){
+  document.getElementById('agencyEntryInput').click();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  loadAgencyEntryDisplay();
+  var input = document.getElementById('agencyEntryInput');
+  if(input){
+    input.addEventListener('change', function(e){
+      var file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(file.size > 15 * 1024 * 1024){
+        showToast('Too large','Max 15MB','⚠️');
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(ev){
+        var meta = {
+          fileName: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          size: file.size,
+          uploadedAt: Date.now(),
+          dataUrl: ev.target.result
+        };
+        try { localStorage.setItem('riq_agency_entry_report', JSON.stringify(meta)); } catch(err){
+          showToast('Couldn\'t save','File too large for local storage — try a smaller PDF','⚠️');
+          return;
+        }
+        if(window.RIQStore){
+          RIQStore.ready.then(function(){
+            if(!RIQStore.isAuthed())return;
+            // Upload file to cloud storage for cross-device access
+            var blob = dataURLToBlob(meta.dataUrl);
+            if(blob){
+              var ext = (file.name.split('.').pop() || 'pdf').toLowerCase();
+              var path = 'agency-reports/entry/' + Date.now() + '.' + ext;
+              RIQStore.uploadFile(path, blob, { contentType: meta.mimeType }).then(function(res){
+                var slim = Object.assign({}, meta, { url: res.url, path: res.path, dataUrl: undefined });
+                RIQStore.write('agency-reports', 'entry', slim).catch(function(){});
+              }).catch(function(err){ console.warn('Agency entry upload failed:', err); });
+            }
+          });
+        }
+        loadAgencyEntryDisplay();
+        showToast('Saved ✓','Agent\'s move-in report stored','📎');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+});
 
 
 function exportEntryReportPDF(data){

@@ -142,19 +142,10 @@
       </div>
     </div>
 
-    <div class="sec-label" style="padding:0 16px">Reports Available for Comparison</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin:0 16px 14px">
-      <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
-        <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📸</div>
-        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Your Move-In Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Complete an inspection to generate this</div></div>
-        <span class="tag tag-muted">Not ready</span>
-      </div>
-      <div style="background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">
-        <div style="width:38px;height:38px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏢</div>
-        <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Agency Condition Report</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Upload your agency report to Vault</div></div>
-        <span class="tag tag-muted">Not uploaded</span>
-      </div>
-    </div>
+    <div class="sec-label" style="padding:0 16px">Evidence we'll use</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin:0 16px 14px" id="exitEvidenceList"></div>
+    <input type="file" id="agencyExitInput" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/*" style="display:none">
+    <input type="file" id="agencyEntryInputOnExit" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/*" style="display:none">
 
     <div style="margin:0 16px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:6px">⏱ Best time to do this</div>
@@ -994,6 +985,112 @@ function generateExitReport(){
   setTimeout(function(){switchView('H')},1200);
 }
 
+// ── Evidence rail (View A) — renter move-in, agency move-in, agency exit
+function renderExitEvidence(){
+  var wrap=document.getElementById('exitEvidenceList');
+  if(!wrap)return;
+
+  var entryDone = entryAuditRooms && entryAuditRooms.length > 0;
+  var agencyEntry = null, agencyExit = null;
+  try { agencyEntry = JSON.parse(localStorage.getItem('riq_agency_entry_report')||'null'); } catch(e){}
+  try { agencyExit  = JSON.parse(localStorage.getItem('riq_agency_exit_report')||'null'); } catch(e){}
+
+  var card = function(opts){
+    var bg = opts.ready ? 'rgba(0,200,150,.08)' : opts.optional ? 'var(--blue-xl)' : '#fff';
+    var iconBg = opts.iconBg || 'var(--blue-lt)';
+    var badge = opts.ready
+      ? '<span style="font-family:\'Sora\',sans-serif;font-size:10.5px;font-weight:700;color:var(--teal-dk);background:rgba(0,200,150,.14);border-radius:8px;padding:3px 8px;white-space:nowrap">Ready ✓</span>'
+      : '<span style="font-family:\'Sora\',sans-serif;font-size:10.5px;font-weight:700;color:var(--blue);background:var(--blue-xl);border-radius:8px;padding:3px 8px;white-space:nowrap">' + (opts.actionLabel || 'Upload') + ' →</span>';
+    return '<div style="background:' + bg + ';border-radius:12px;padding:12px 14px;border:1.5px solid ' + (opts.ready ? 'var(--teal)' : 'var(--border-lt)') + ';display:flex;align-items:center;gap:12px;cursor:' + (opts.onclick ? 'pointer' : 'default') + '"' + (opts.onclick ? ' onclick="' + opts.onclick + '"' : '') + '>' +
+      '<div style="width:38px;height:38px;border-radius:10px;background:' + iconBg + ';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">' + opts.icon + '</div>' +
+      '<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">' + opts.title + '</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4">' + opts.sub + '</div></div>' +
+      badge +
+    '</div>';
+  };
+
+  var html = '';
+  // 1) Renter's move-in record
+  html += card({
+    icon: '📸',
+    iconBg: 'rgba(0,200,150,.12)',
+    title: 'Your move-in record',
+    sub: entryDone ? (entryAuditRooms.length + ' rooms · itemised') : 'Complete the move-in walk-through to create this',
+    ready: entryDone,
+    actionLabel: 'Start',
+    onclick: entryDone ? '' : "navigate('/app/pages/entry-audit.html')"
+  });
+  // 2) Agency move-in report
+  html += card({
+    icon: '🏢',
+    title: 'Agent\'s move-in report',
+    sub: agencyEntry && agencyEntry.fileName
+      ? (agencyEntry.fileName + ' · uploaded ' + new Date(agencyEntry.uploadedAt||Date.now()).toLocaleDateString('en-AU',{day:'numeric',month:'short'}))
+      : 'Optional — upload a copy so we can compare the two at exit',
+    ready: !!(agencyEntry && agencyEntry.fileName),
+    actionLabel: agencyEntry && agencyEntry.fileName ? 'Replace' : 'Upload',
+    onclick: 'uploadAgencyEntryFromExit()'
+  });
+  // 3) Agency exit report (optional — usually arrives after key handover)
+  html += card({
+    icon: '📄',
+    title: 'Agent\'s exit report',
+    sub: agencyExit && agencyExit.fileName
+      ? (agencyExit.fileName + ' · uploaded ' + new Date(agencyExit.uploadedAt||Date.now()).toLocaleDateString('en-AU',{day:'numeric',month:'short'}))
+      : 'Upload when the agent sends theirs after key handover',
+    ready: !!(agencyExit && agencyExit.fileName),
+    actionLabel: agencyExit && agencyExit.fileName ? 'Replace' : 'Upload',
+    onclick: 'uploadAgencyExit()'
+  });
+
+  wrap.innerHTML = html;
+}
+
+function uploadAgencyEntryFromExit(){ document.getElementById('agencyEntryInputOnExit').click(); }
+function uploadAgencyExit(){ document.getElementById('agencyExitInput').click(); }
+
+function handleAgencyFileUpload(file, storageKey, toastLabel, cloudFolder, docId){
+  if(!file)return;
+  if(file.size > 15 * 1024 * 1024){ showToast('Too large','Max 15MB','⚠️'); return; }
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var meta={
+      fileName:file.name, mimeType:file.type||'application/octet-stream',
+      size:file.size, uploadedAt:Date.now(), dataUrl:ev.target.result
+    };
+    try { localStorage.setItem(storageKey, JSON.stringify(meta)); }
+    catch(err){ showToast('Too big for device','Try a smaller PDF','⚠️'); return; }
+
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(!RIQStore.isAuthed())return;
+        var blob=exitDataURLToBlob(meta.dataUrl);
+        if(!blob)return;
+        var ext=(file.name.split('.').pop()||'pdf').toLowerCase();
+        var path=cloudFolder+'/'+Date.now()+'.'+ext;
+        RIQStore.uploadFile(path, blob, {contentType:meta.mimeType}).then(function(res){
+          var slim=Object.assign({},meta,{url:res.url,path:res.path,dataUrl:undefined});
+          RIQStore.write('agency-reports', docId, slim).catch(function(){});
+        }).catch(function(err){ console.warn('Agency upload failed:', err); });
+      });
+    }
+    renderExitEvidence();
+    showToast('Saved ✓', toastLabel + ' stored', '📎');
+  };
+  reader.readAsDataURL(file);
+}
+
+function exitDataURLToBlob(dataUrl){
+  try{
+    var parts=dataUrl.split(',');
+    var mime=(parts[0].match(/:(.*?);/)||[null,'application/octet-stream'])[1];
+    var bstr=atob(parts[1]);
+    var n=bstr.length;
+    var u8=new Uint8Array(n);
+    while(n--)u8[n]=bstr.charCodeAt(n);
+    return new Blob([u8],{type:mime});
+  }catch(e){return null}
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   allViews.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
   var addr=loadEntryAuditData();
@@ -1001,13 +1098,21 @@ document.addEventListener('DOMContentLoaded',function(){
   buildExitAreaList();
   updateExitProgress();
   if(addr){var sub=document.getElementById('sh-sub-c');if(sub)sub.textContent=addr}
-  var reports=document.getElementById('reportsReady');
-  if(reports&&entryAuditRooms.length>0){
-    var badge=reports.querySelector('.tag-muted');
-    if(badge){badge.className='tag tag-teal';badge.textContent='Ready ✓'}
-    var detail=reports.querySelector('[style*="Complete an inspection"]');
-    if(detail)detail.textContent=entryAuditRooms.length+' rooms · '+entryAuditRooms.reduce(function(a,r){return a+(r.photos||[]).length},0)+' photos';
+  renderExitEvidence();
+
+  var aeInput=document.getElementById('agencyEntryInputOnExit');
+  if(aeInput){
+    aeInput.addEventListener('change', function(e){
+      handleAgencyFileUpload((e.target.files||[])[0], 'riq_agency_entry_report', 'Agent\'s move-in report', 'agency-reports/entry', 'entry');
+    });
   }
+  var axInput=document.getElementById('agencyExitInput');
+  if(axInput){
+    axInput.addEventListener('change', function(e){
+      handleAgencyFileUpload((e.target.files||[])[0], 'riq_agency_exit_report', 'Agent\'s exit report', 'agency-reports/exit', 'exit');
+    });
+  }
+  // Legacy static evidence block is replaced by renderExitEvidence above.
 });
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}

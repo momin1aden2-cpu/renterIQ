@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v28 — Report-issue prefills from lease + tracked records
+// RenterIQ Service Worker v30 — Journey gaps + onboarding refresh (6 steps, no legal framing)
 // No kill-switch. No dev-mode logic. Cache-first shell, network-first APIs.
 
-var CACHE_NAME = 'renteriq-shell-v28';
+var CACHE_NAME = 'renteriq-shell-v30';
 
 var APP_SHELL = [
   '/app/index.html',
