@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const SYSTEM_PROMPT = `You are an Australian rental inspection report analyst for RenterIQ.
@@ -56,6 +57,9 @@ Input format notes:
 - Handwritten notes on scanned forms should still be read — include them as items even if legibility is uncertain.`;
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  if (!auth.ok) return auth.response;
+
   let reportText = '';
   try {
     const contentType = request.headers.get('content-type') || '';
@@ -92,7 +96,6 @@ export async function POST(request: Request) {
         }
 
         imageData = { data: base64, mimeType };
-        console.log('[analyze-inspection] received', { mimeType, bytes: buffer.byteLength });
       }
     } else {
       const body = await request.json();

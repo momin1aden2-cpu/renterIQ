@@ -161,51 +161,80 @@ function renderProperties() {
   // Sort by date, newest first
   const sorted = properties.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
   
+  const esc = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const safeUrl = (u) => {
+    if (!u) return '';
+    try {
+      const parsed = new URL(u, window.location.origin);
+      return (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.href : '';
+    } catch (e) { return ''; }
+  };
+
   list.innerHTML = sorted.map(prop => {
-    // backward-compat: support both old field names and new unified schema
     const addr    = prop.address    || prop.label   || 'Property Listing';
-    const imgUrl  = prop.imageUrl   || prop.image   || '';
+    const imgUrl  = safeUrl(prop.imageUrl || prop.image || '');
     const srcSite = prop.sourceSite || prop.source  || 'unknown';
-    const link    = prop.originalLink || prop.url   || '#';
+    const link    = safeUrl(prop.originalLink || prop.url || '');
 
     const status = STATUS_OPTIONS.find(s => s.value === prop.status) || STATUS_OPTIONS[0];
     const date = new Date(prop.savedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 
     return `
-      <div class="property-card" data-id="${prop.id}">
-        <button class="delete-btn" onclick="deleteProperty('${prop.id}')">🗑️</button>
+      <div class="property-card" data-id="${esc(prop.id)}">
+        <button class="delete-btn" data-action="delete" data-id="${esc(prop.id)}">🗑️</button>
 
-        <div class="property-source">${SearchService.getSourceName(srcSite)}</div>
+        <div class="property-source">${esc(SearchService.getSourceName(srcSite))}</div>
 
         <div class="property-image">
-          ${imgUrl ? `<img src="${imgUrl}" alt="${addr}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.parentElement.textContent='🏠'">` : '🏠'}
+          ${imgUrl ? `<img src="${esc(imgUrl)}" alt="${esc(addr)}" loading="lazy" decoding="async" data-img-fallback="1">` : '🏠'}
         </div>
 
-        <span class="status-badge ${status.class}">${status.label}</span>
+        <span class="status-badge ${esc(status.class)}">${esc(status.label)}</span>
 
-        <div class="property-price">${prop.price || ''}</div>
-        <div class="property-address">${addr}</div>
-        ${prop.description ? `<div class="property-description">${prop.description}</div>` : ''}
+        <div class="property-price">${esc(prop.price || '')}</div>
+        <div class="property-address">${esc(addr)}</div>
+        ${prop.description ? `<div class="property-description">${esc(prop.description)}</div>` : ''}
 
         <div class="status-selector">
           ${STATUS_OPTIONS.map(opt => `
             <button class="status-option ${prop.status === opt.value ? 'active' : ''}"
-                    onclick="updateStatus('${prop.id}', '${opt.value}')">
-              ${opt.label}
+                    data-action="status" data-id="${esc(prop.id)}" data-value="${esc(opt.value)}">
+              ${esc(opt.label)}
             </button>
           `).join('')}
         </div>
 
         <div class="property-actions">
-          <button class="property-btn btn-primary" onclick="viewProperty('${link}')">View Listing</button>
-          <button class="property-btn btn-secondary" onclick="shareProperty('${addr}', '${link}')">Share</button>
+          <button class="property-btn btn-primary" data-action="view" data-url="${esc(link)}" ${link ? '' : 'disabled'}>View Listing</button>
+          <button class="property-btn btn-secondary" data-action="share" data-addr="${esc(addr)}" data-url="${esc(link)}">Share</button>
         </div>
 
-        <div style="margin-top:12px;font-size:11px;color:var(--muted)">Tracked on ${date}</div>
+        <div style="margin-top:12px;font-size:11px;color:var(--muted)">Tracked on ${esc(date)}</div>
       </div>
     `;
   }).join('');
+
+  list.querySelectorAll('img[data-img-fallback]').forEach(img => {
+    img.addEventListener('error', function(){ this.style.display='none'; if(this.parentElement) this.parentElement.textContent='🏠'; });
+  });
 }
+
+(function attachTrackedDelegation(){
+  const list = document.getElementById('propertiesList');
+  if (!list || list._delegated) return;
+  list._delegated = true;
+  list.addEventListener('click', function(e){
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    if (action === 'delete') { deleteProperty(btn.dataset.id); }
+    else if (action === 'status') { updateStatus(btn.dataset.id, btn.dataset.value); }
+    else if (action === 'view') { if (btn.dataset.url) viewProperty(btn.dataset.url); }
+    else if (action === 'share') { shareProperty(btn.dataset.addr || '', btn.dataset.url || ''); }
+  });
+})();
 
 function updateStatus(id, status) {
   SearchService.updatePropertyStatus(id, status);

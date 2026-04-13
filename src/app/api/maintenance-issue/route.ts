@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const SYSTEM_PROMPT = `You are a helpful Australian rental maintenance assistant for RenterIQ.
@@ -39,6 +40,9 @@ Rules:
 type GeminiPart = { text: string } | { inlineData: { data: string; mimeType: string } };
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  if (!auth.ok) return auth.response;
+
   try {
     const contentType = request.headers.get('content-type') || '';
     let description = '';
@@ -132,7 +136,7 @@ export async function POST(request: Request) {
     const err = error as Error;
     console.error('[maintenance-issue] fatal:', err?.stack || err);
     return NextResponse.json(
-      { error: err?.message ? `Draft failed: ${err.message}` : 'Could not draft the message.', details: err?.stack || String(error) },
+      { error: 'Could not draft the message.' },
       { status: 500 }
     );
   }

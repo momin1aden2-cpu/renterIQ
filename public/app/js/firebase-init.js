@@ -23,13 +23,10 @@
     if (!firebase.apps.length) {
       try {
         firebase.initializeApp(window.__FIREBASE_CONFIG__);
-        console.log('[RenterIQ] Firebase initialized successfully');
       } catch (error) {
-        console.error('[RenterIQ] Firebase initialization error:', error);
+        console.error('Firebase init:', error);
         return false;
       }
-    } else {
-      console.log('[RenterIQ] Firebase already initialized');
     }
 
     // Enable Firestore offline persistence so writes queue while offline and
@@ -71,6 +68,36 @@
     }
   });
 
-  // Export for manual initialization if needed
   window.initializeFirebase = initializeFirebase;
+
+  // Attach a Firebase ID token to outbound /api/ requests so server routes
+  // can verify the caller's uid and apply per-user rate limits.
+  if (!window.__RIQ_FETCH_PATCHED__) {
+    window.__RIQ_FETCH_PATCHED__ = true;
+    var nativeFetch = window.fetch.bind(window);
+    window.fetch = function(input, init) {
+      try {
+        var url = typeof input === 'string' ? input : (input && input.url) || '';
+        var isApi = false;
+        try { isApi = new URL(url, window.location.href).pathname.indexOf('/api/') === 0; } catch (e) {}
+        if (!isApi) return nativeFetch(input, init);
+        if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) {
+          return nativeFetch(input, init);
+        }
+        var user = firebase.auth().currentUser;
+        if (!user) return nativeFetch(input, init);
+        return user.getIdToken().then(function(token) {
+          init = init || {};
+          var headers = new Headers(init.headers || (typeof input !== 'string' && input.headers) || {});
+          if (!headers.has('Authorization')) headers.set('Authorization', 'Bearer ' + token);
+          init.headers = headers;
+          return nativeFetch(input, init);
+        }).catch(function() {
+          return nativeFetch(input, init);
+        });
+      } catch (e) {
+        return nativeFetch(input, init);
+      }
+    };
+  }
 })();

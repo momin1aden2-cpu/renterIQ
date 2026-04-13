@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface RoomSummary {
@@ -126,6 +127,9 @@ If everything matches, return empty discrepancies and bondRecovery arrays with a
 Australian context: reference Australian stores (Bunnings, Woolworths), common Australian cleaning products, and typical expectations around fair wear and tear — never frame these as law.`;
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await request.json();
     const {
@@ -248,7 +252,7 @@ Suggest practical, cost-effective fixes for chargeable items only.`;
   } catch (error) {
     console.error('Exit comparison error:', error);
     return NextResponse.json(
-      { error: 'Failed to compare exit reports', details: String(error) },
+      { error: 'Failed to compare exit reports' },
       { status: 500 }
     );
   }

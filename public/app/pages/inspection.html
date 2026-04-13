@@ -484,7 +484,7 @@
 function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
 function showToast(t,s,i){var el=document.getElementById('appToast');if(!el){el=document.createElement('div');el.id='appToast';el.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';el.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(el)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';el.style.transform='translateY(0)';el.style.opacity='1';clearTimeout(el._timer);el._timer=setTimeout(function(){el.style.transform='translateY(-90px)';el.style.opacity='0'},3200)}
 
-// ========== URL TRACKING ==========
+// URL tracking
 function inspTrackFromUrl() {
   var input = document.getElementById('inspUrlInput');
   var url = (input.value || '').trim();
@@ -572,7 +572,7 @@ function inspDeleteScheduled(id, e) {
   showToast('Removed', 'Inspection removed', '🗑️');
 }
 
-// ========== BOOKING UPLOAD FUNCTIONALITY ==========
+// Booking upload
 var selectedBookingFile = null;
 var extractedBookingData = null;
 

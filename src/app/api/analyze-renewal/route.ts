@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const SYSTEM_PROMPT = `You are an Australian tenancy lease renewal analyst for RenterIQ.
@@ -101,6 +102,9 @@ function formatPreviousLease(p: PreviousLeaseSummary): string {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  if (!auth.ok) return auth.response;
+
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -181,7 +185,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Renewal analysis error:', error);
     return NextResponse.json(
-      { error: 'Failed to analyse renewal', details: String(error) },
+      { error: 'Failed to analyse renewal' },
       { status: 500 }
     );
   }

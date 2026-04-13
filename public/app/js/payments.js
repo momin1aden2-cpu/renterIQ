@@ -12,11 +12,11 @@
  *
  * PAID (direct pay):
  *   Lease Review (2nd+)       → $4.99
- *   Bond-Shield Move-In       → $14.99
- *   Exit-Guard Bond Shield    → $19.99
+ *   Bond-Shield Move-In       → $24.99
+ *   Exit-Guard Bond Shield    → $29.99
  *
  * CLOUD SYNC:
- *   One-time $9.99 unlock. Prompted on first valuable save.
+ *   One-time $14.99 unlock. Prompted on first valuable save.
  *
  * Usage:
  *   await RIQPayments.ready;
@@ -30,12 +30,12 @@
 
   var FEATURES = {
     lease_review:      { name: 'Lease Review',            price: '$4.99',  priceCents: 499,  freeFirst: true, freeField: 'leaseReviewCount', heroIcon: '📑', heroLine: 'Get a plain-English breakdown of every clause in your lease.' },
-    entry_condition:   { name: 'Bond-Shield Move-In',     price: '$14.99', priceCents: 1499, freeFirst: false, heroIcon: '🏠', heroLine: 'Document the property at move-in with timestamped photos — protects your bond from day one.' },
-    exit_bond_shield:  { name: 'Exit-Guard Bond Shield',  price: '$19.99', priceCents: 1999, freeFirst: false, heroIcon: '🚪', heroLine: 'Compare your exit vs entry photos, flag discrepancies, and get bond recovery suggestions.' }
+    entry_condition:   { name: 'Bond-Shield Move-In',     price: '$24.99', priceCents: 2499, freeFirst: false, heroIcon: '🏠', heroLine: 'Document the property at move-in with timestamped photos — protects your bond from day one.' },
+    exit_bond_shield:  { name: 'Exit-Guard Bond Shield',  price: '$29.99', priceCents: 2999, freeFirst: false, heroIcon: '🚪', heroLine: 'Compare your exit vs entry photos, flag discrepancies, and get bond recovery suggestions.' }
   };
 
-  var CLOUD_SYNC_PRICE = '$9.99';
-  var CLOUD_SYNC_CENTS = 999;
+  var CLOUD_SYNC_PRICE = '$14.99';
+  var CLOUD_SYNC_CENTS = 1499;
   var LOCAL_KEY = 'riq_payment_state';
   var readyResolve;
   var readyPromise = new Promise(function(res) { readyResolve = res; });
@@ -190,10 +190,10 @@
           '<div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--teal),var(--teal-dk));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px">☁️</div>' +
           '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Protect this document</div>' +
           '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:8px;line-height:1.65">This is saved on your device only. If you lose or change your phone, this document is gone.</div>' +
-          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--teal-dk);margin-top:8px;line-height:1.65">Secure it in the cloud for <strong>$9.99 one-time</strong> — access your documents from any device, forever.</div>' +
+          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--teal-dk);margin-top:8px;line-height:1.65">Secure it in the cloud for <strong>$14.99 one-time</strong> — access your documents from any device, forever.</div>' +
         '</div>' +
         '<div style="display:flex;flex-direction:column;gap:10px;margin-top:20px">' +
-          '<button id="cloudPromptBuy" style="background:var(--teal);color:#fff;border:none;border-radius:14px;padding:14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,200,150,.25)">Unlock Cloud Sync — $9.99 →</button>' +
+          '<button id="cloudPromptBuy" style="background:var(--teal);color:#fff;border:none;border-radius:14px;padding:14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,200,150,.25)">Unlock Cloud Sync — $14.99 →</button>' +
           '<button id="cloudPromptSkip" style="background:none;color:var(--muted);border:none;padding:10px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;cursor:pointer">Keep it local for now</button>' +
         '</div>';
 
@@ -299,7 +299,7 @@
     },
 
     /**
-     * Enable cloud sync (one-time $9.99).
+     * Enable cloud sync (one-time $14.99).
      * In production, called via Stripe webhook Cloud Function.
      */
     enableCloudSync: function() {

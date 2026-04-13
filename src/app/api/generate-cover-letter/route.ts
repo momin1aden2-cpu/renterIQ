@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const SYSTEM_PROMPT = `You are an expert rental application coach for Australian tenants.
@@ -24,6 +25,9 @@ Respond ONLY with valid JSON:
 }`;
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await request.json();
     const {
@@ -84,7 +88,7 @@ Write a genuine, compelling cover letter using the guidelines provided.`;
   } catch (error) {
     console.error('Cover letter generation error:', error);
     return NextResponse.json(
-      { error: 'Failed to generate cover letter', details: String(error) },
+      { error: 'Failed to generate cover letter' },
       { status: 500 }
     );
   }

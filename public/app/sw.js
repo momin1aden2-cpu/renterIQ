@@ -1,7 +1,6 @@
-// RenterIQ Service Worker v44 — Profile avatar dynamic, vault delete re-renders, replay tour removed
-// No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
+// Service worker: network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v44';
+var CACHE_NAME = 'renteriq-shell-v54';
 
 var APP_SHELL = [
   '/app/index.html',

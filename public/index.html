@@ -233,7 +233,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 .so-btn-confirm:hover{background:#C93030}
 
 /* ========== HERO ========== */
-.hero{background:linear-gradient(150deg,var(--blue-navy) 0%,#0A2460 55%,#122E7A 100%);padding:72px 0 64px;overflow:hidden;text-align:center;position:relative}
+.hero{background:linear-gradient(160deg,#061B4E 0%,#0A2460 40%,#122E7A 80%,#1B50C8 150%);padding:88px 0 80px;overflow:hidden;text-align:center;position:relative}
 
 /* Geometric dot grid overlay */
 .hero::before{
@@ -248,13 +248,23 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 .hero::after{
   content:'';
   position:absolute;
-  top:-40%;left:50%;
+  top:-35%;left:50%;
   transform:translateX(-50%);
-  width:900px;height:900px;
-  background:radial-gradient(ellipse,rgba(46,99,224,.28) 0%,transparent 65%);
+  width:1100px;height:1100px;
+  background:radial-gradient(ellipse,rgba(46,99,224,.35) 0%,rgba(46,99,224,.08) 35%,transparent 65%);
   pointer-events:none;
   z-index:0;
+  animation:hero-glow 8s ease-in-out infinite;
 }
+@keyframes hero-glow{
+  0%,100%{opacity:1;transform:translateX(-50%) scale(1)}
+  50%{opacity:.85;transform:translateX(-50%) scale(1.05)}
+}
+.hero-accent{position:absolute;pointer-events:none;z-index:0;border-radius:50%;filter:blur(80px);opacity:.5}
+.hero-accent.teal{width:420px;height:420px;background:radial-gradient(circle,rgba(43,232,176,.35),transparent 70%);top:20%;left:-140px;animation:hero-accent-a 12s ease-in-out infinite}
+.hero-accent.violet{width:380px;height:380px;background:radial-gradient(circle,rgba(124,58,237,.32),transparent 70%);bottom:-100px;right:-120px;animation:hero-accent-b 14s ease-in-out infinite}
+@keyframes hero-accent-a{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+@keyframes hero-accent-b{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,15px)}}
 .hero .container{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;max-width:880px}
 
 .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius-btn);padding:7px 16px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:rgba(255,255,255,.75);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
@@ -268,8 +278,8 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 /* Search Wrapper */
 .hero-search-wrap{width:100%;max-width:660px;margin-bottom:28px}
 .location-search-wrap{position:relative;width:100%}
-.location-input-row{display:flex;align-items:center;background:#fff;border-radius:16px;padding:8px 8px 8px 18px;box-shadow:0 20px 60px rgba(0,0,0,.35),0 4px 16px rgba(0,0,0,.14);gap:8px;position:relative}
-.location-input-row:focus-within{box-shadow:0 20px 60px rgba(0,0,0,.38),0 0 0 3px rgba(27,80,200,.2)}
+.location-input-row{display:flex;align-items:center;background:#fff;border-radius:18px;padding:9px 9px 9px 20px;box-shadow:0 30px 80px rgba(6,20,55,.5),0 8px 24px rgba(6,20,55,.22);gap:10px;position:relative;transition:box-shadow .25s var(--ease),transform .25s var(--ease)}
+.location-input-row:focus-within{box-shadow:0 30px 80px rgba(6,20,55,.55),0 0 0 3px rgba(43,232,176,.35);transform:translateY(-1px)}
 .loc-search-icon{color:#9EAEC4;flex-shrink:0;display:flex;align-items:center}
 #locationInput{flex:1;font-size:15px;font-family:'Nunito',sans-serif;font-weight:600;color:var(--text);min-width:0;background:none;border:none;outline:none;height:44px}
 #locationInput::placeholder{color:#B0BDD4}
@@ -281,7 +291,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 .hero-search-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(27,80,200,.55)}
 
 /* Autocomplete Dropdown */
-.autocomplete-dropdown{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border-radius:14px;border:1.5px solid var(--border-lt);box-shadow:0 12px 48px rgba(27,80,200,.18);max-height:300px;overflow-y:auto;z-index:100}
+.autocomplete-dropdown{display:none;position:fixed;background:#fff;border-radius:14px;border:1.5px solid var(--border-lt);box-shadow:0 18px 60px rgba(9,30,82,.28),0 4px 14px rgba(9,30,82,.12);max-height:min(380px,60vh);overflow-y:auto;z-index:9999}
 .autocomplete-dropdown.open{display:block}
 .autocomplete-item{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;border-bottom:1px solid var(--border-lt);transition:background .15s}
 .autocomplete-item:last-child{border-bottom:none}
@@ -293,8 +303,10 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 .autocomplete-empty{padding:20px;text-align:center;color:var(--muted);font-size:14px}
 
 /* Hero Trust Pills */
-.hero-trust{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
-.hero-trust-item{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:rgba(255,255,255,.6);white-space:nowrap}
+.hero-trust{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.hero-trust-item{display:inline-flex;align-items:center;gap:7px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:rgba(255,255,255,.78);white-space:nowrap;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:7px 14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.hero-trust-item::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px rgba(43,232,176,.6)}
+.hero-trust-sep{display:none}
 .hero-trust-item::before{content:'✓';color:var(--teal);font-size:11px}
 .hero-trust-sep{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.2)}
 
@@ -319,21 +331,24 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 .ss-track-hint{font-size:12.5px;color:var(--muted);margin-top:10px;padding:10px 14px;background:#E0F2FE;border-radius:10px}
 
 /* ========== TRUST STATS BAR ========== */
-.trust-bar{background:var(--blue-dk);padding:22px 0}
-.trust-bar .container{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
-.trust-stat{display:flex;flex-direction:column;align-items:center;padding:0 36px;border-right:1px solid rgba(255,255,255,.12);text-align:center}
-.trust-stat:last-child{border-right:none}
-.trust-stat-num{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#fff;line-height:1}
-.trust-stat-label{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:600}
+.trust-bar{background:linear-gradient(180deg,#061B4E 0%,#0A2460 100%);padding:34px 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);position:relative;overflow:hidden}
+.trust-bar::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top,rgba(46,99,224,.18) 0%,transparent 60%);pointer-events:none}
+.trust-bar .container{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;position:relative;z-index:1}
+.trust-stat{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;text-align:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:transform .25s var(--ease),border-color .25s var(--ease),background .25s var(--ease)}
+.trust-stat:hover{transform:translateY(-2px);border-color:rgba(43,232,176,.35);background:rgba(255,255,255,.05)}
+.trust-stat-num{font-family:'Sora',sans-serif;font-weight:800;font-size:32px;line-height:1;background:linear-gradient(135deg,#FFFFFF 0%,#8FB4FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.5px}
+.trust-stat-label{font-size:11px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;font-family:'Sora',sans-serif}
 
 /* ========== HOW IT WORKS ========== */
 .how-it-works{background:linear-gradient(180deg,#fff 0%,var(--blue-xl) 100%);padding:88px 0}
 .steps-header{text-align:center;margin-bottom:56px}
 .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative}
 .steps-connector{position:absolute;top:38px;left:calc(10% + 16px);right:calc(10% + 16px);height:1.5px;background:linear-gradient(90deg,transparent,rgba(27,80,200,.25) 20%,rgba(27,80,200,.4) 50%,rgba(27,80,200,.25) 80%,transparent);pointer-events:none;z-index:0}
-.step-card{background:#fff;border-radius:var(--radius-card);padding:28px 18px 24px;border:1.5px solid var(--border-lt);text-align:center;position:relative;z-index:1;transition:transform .22s,box-shadow .22s,border-color .22s;cursor:default}
-.step-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:rgba(27,80,200,.25)}
-.step-num{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-md) 100%);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 4px 14px rgba(27,80,200,.35)}
+.step-card{background:#fff;border-radius:var(--radius-card);padding:30px 20px 24px;border:1.5px solid var(--border-lt);text-align:center;position:relative;z-index:1;transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s var(--ease);cursor:default;overflow:hidden}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(27,80,200,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s var(--ease);pointer-events:none}
+.step-card:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(9,30,82,.12),0 4px 12px rgba(9,30,82,.06);border-color:rgba(27,80,200,.35)}
+.step-card:hover::before{opacity:1}
+.step-num{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-md) 100%);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 6px 18px rgba(27,80,200,.4),inset 0 1px 0 rgba(255,255,255,.2);position:relative;z-index:1}
 .step-emoji{font-size:28px;margin-bottom:12px;line-height:1}
 .step-card h3{font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue-dk);margin-bottom:8px}
 .step-card p{font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:12px}
@@ -600,10 +615,9 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
   .rights-grid{grid-template-columns:1fr}
   .vault-grid{grid-template-columns:1fr 1fr}
   
-  .trust-bar .container{gap:0}
-  .trust-stat{padding:10px 18px;border-right:none;border-bottom:1px solid rgba(255,255,255,.1);width:50%}
-  .trust-stat:nth-child(odd){border-right:1px solid rgba(255,255,255,.1)}
-  .trust-stat:nth-last-child(-n+2){border-bottom:none}
+  .trust-bar{padding:26px 0}
+  .trust-bar .container{grid-template-columns:repeat(2,1fr);gap:10px}
+  .trust-stat{padding:16px 8px}
   
   .footer-grid{grid-template-columns:1fr}
   .footer-bottom{flex-direction:column;text-align:center;gap:10px}
@@ -679,6 +693,8 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 
 <!-- ========== HERO ========== -->
 <section class="hero" id="hero">
+  <span class="hero-accent teal" aria-hidden="true"></span>
+  <span class="hero-accent violet" aria-hidden="true"></span>
   <div class="container">
 
     <div class="hero-eyebrow">
@@ -766,7 +782,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
       <div class="trust-stat-label">App Features</div>
     </div>
     <div class="trust-stat">
-      <div class="trust-stat-num">8</div>
+      <div class="trust-stat-num">All</div>
       <div class="trust-stat-label">States & Territories</div>
     </div>
     <div class="trust-stat">
@@ -1146,6 +1162,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
           <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">1st Lease Review (always free)</span></div>
           <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Renter Rights Hub (all states)</span></div>
           <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Maintenance Log &amp; Document Vault</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Routine Inspection Assist</span></div>
           <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--teal);font-size:13px;flex-shrink:0">✓</span><span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text)">Push Notifications &amp; Reminders</span></div>
         </div>
       </div>
@@ -1161,19 +1178,15 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px">
             <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Bond-Shield Move-In</span>
-            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$15.99</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px">
-            <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Routine Assist</span>
-            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$4.99</span>
+            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$24.99</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px">
             <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Exit-Guard Bond Shield</span>
-            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$19.99</span>
+            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$29.99</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,200,150,.2);border-radius:10px;padding:10px 12px">
             <span style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px">Cloud Sync (one-time)</span>
-            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$9.99</span>
+            <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px">$14.99</span>
           </div>
         </div>
         <div style="margin-top:16px;font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.65);line-height:1.55;text-align:center">No subscription. No recurring charges. Credits never expire.</div>
@@ -1181,7 +1194,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
     </div>
 
     <div style="text-align:center;margin-top:28px">
-      <p style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted);max-width:460px;margin:0 auto;line-height:1.65">Your bond is typically $1,500–$3,000. Our most comprehensive report (Exit-Guard) costs $19.99. That's less than 1% of what you're protecting.</p>
+      <p style="font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted);max-width:460px;margin:0 auto;line-height:1.65">Your bond is typically $1,500–$3,000. Our most comprehensive report (Exit-Guard) costs $29.99. That's about 1% of what you're protecting.</p>
     </div>
   </div>
 </section>
@@ -1529,7 +1542,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 // SDK scripts have already executed and window.__FIREBASE_CONFIG__ is populated.
 let auth, db;
 
-// ========== MOBILE NAV TOGGLE ==========
+// Mobile nav toggle
 function toggleMobileNav() {
   const links = document.getElementById('navLinks');
   links.classList.toggle('mobile-open');
@@ -1544,7 +1557,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ========== SMART SEARCH HUB - PROVIDER SELECTION ==========
+// Search hub provider selection
 let suburbsData = [];
 let selectedLocation = null;
 
@@ -1573,24 +1586,38 @@ function handleLocationInput() {
   else hideAutocomplete();
 }
 
+function positionAutocomplete() {
+  const row = document.querySelector('.location-input-row');
+  if (!row) return;
+  const rect = row.getBoundingClientRect();
+  autocompleteDropdown.style.top = (rect.bottom + 8) + 'px';
+  autocompleteDropdown.style.left = rect.left + 'px';
+  autocompleteDropdown.style.width = rect.width + 'px';
+}
+
 function showAutocomplete(query) {
   const matches = findSuburbs(query);
+  const escAttr = (s) => String(s).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+  const escText = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if (matches.length === 0) {
     autocompleteDropdown.innerHTML = '<div class="autocomplete-empty">No locations found. Try a different search.</div>';
-    autocompleteDropdown.classList.add('open');
-    return;
-  }
-  autocompleteDropdown.innerHTML = matches.map((suburb, index) => `
-    <div class="autocomplete-item ${index === 0 ? 'selected' : ''}" data-index="${index}" onclick="selectSuburb('${suburb.name}', '${suburb.postcode}', '${suburb.state}')">
-      <div class="autocomplete-main">
-        <span class="autocomplete-name">${suburb.name}</span>
-        <span class="autocomplete-meta">${suburb.state} · ${suburb.postcode}</span>
+  } else {
+    autocompleteDropdown.innerHTML = matches.map((suburb, index) => `
+      <div class="autocomplete-item ${index === 0 ? 'selected' : ''}" data-index="${index}" onclick="selectSuburb('${escAttr(suburb.name)}', '${escAttr(suburb.postcode)}', '${escAttr(suburb.state)}')">
+        <div class="autocomplete-main">
+          <span class="autocomplete-name">${escText(suburb.name)}</span>
+          <span class="autocomplete-meta">${escText(suburb.state)} · ${escText(suburb.postcode)}</span>
+        </div>
+        <span class="autocomplete-postcode">${escText(suburb.postcode)}</span>
       </div>
-      <span class="autocomplete-postcode">${suburb.postcode}</span>
-    </div>
-  `).join('');
+    `).join('');
+  }
+  positionAutocomplete();
   autocompleteDropdown.classList.add('open');
 }
+
+window.addEventListener('resize', () => { if (autocompleteDropdown && autocompleteDropdown.classList.contains('open')) positionAutocomplete(); });
+window.addEventListener('scroll', () => { if (autocompleteDropdown && autocompleteDropdown.classList.contains('open')) positionAutocomplete(); }, { passive: true });
 
 function findSuburbs(query) {
   if (!suburbsData.length) return [];
@@ -1831,7 +1858,7 @@ function lsCloseModal() {
   if (modal) modal.style.transform = 'translateY(100%)';
 }
 
-// ========== FIREBASE AUTHENTICATION ==========
+// Firebase auth
 function showAuth() {
   document.getElementById('authOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -2040,7 +2067,7 @@ document.addEventListener('click', (e) => {
 
 // auth.onAuthStateChanged registered inside DOMContentLoaded after Firebase init
 
-// ========== MOBILE APP BANNER ==========
+// Mobile app banner
 function showMobileAppBanner() {
   const banner = document.getElementById('mobileAppBanner');
   if (banner && !localStorage.getItem('appBannerClosed') && window.innerWidth <= 768) {
@@ -2055,7 +2082,7 @@ function closeAppBanner() {
   localStorage.setItem('appBannerClosed', 'true');
 }
 
-// ========== PWA INSTALL ==========
+// PWA install
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -2122,7 +2149,7 @@ document.getElementById('iosModalClose')?.addEventListener('click', () => {
   document.getElementById('iosModal').style.display = 'none';
 });
 
-// ========== INIT ==========
+// Init
 window.addEventListener('DOMContentLoaded', () => {
   // Deferred Firebase SDK scripts have fully executed by this point.
   // Safe to initialize and register the auth state observer.

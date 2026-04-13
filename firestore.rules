@@ -3,40 +3,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ─────────────────────────────────────────────────────────────
-    // User-scoped data
-    // Path: users/{uid}/{collection}/{docId}
-    // Only the owning user can read or write anything under their UID.
+    // User-scoped data. Paths under users/{uid} are readable/writable
+    // only by the owning user.
     //
-    // CREDIT SCHEMA (pay-per-event, NOT subscription):
-    //   users/{uid}/state/credits
-    //     credits:           int  (current balance, never expires)
-    //     cloudSyncEnabled:  bool (true = cloud sync purchased, $9.99 one-time)
-    //     leaseReviewCount:  int  (tracks the 1st-free-ever freebie)
-    //     lifetimeCredits:   int  (total ever purchased)
-    //     betaCredited:      bool (true = 5 beta credits already granted)
+    // Credit schema (pay-per-event):
+    //   users/{uid}/state/credits       — balance, sync flag, lifetime counters
+    //   users/{uid}/transactions/{id}   — credit / cloud sync purchases
+    //   users/{uid}/usage/{id}          — consumption records per feature
     //
-    //   users/{uid}/transactions/{txnId}
-    //     type:        'credit_purchase' | 'cloud_sync_purchase'
-    //     credits:     int (how many credits in this purchase)
-    //     amount:      number (AUD cents)
-    //     stripeId:    string (Stripe payment intent ID — null until live)
-    //     status:      'pending' | 'completed' | 'refunded'
-    //     createdAt:   timestamp
-    //
-    //   users/{uid}/usage/{usageId}
-    //     feature:     'lease_review' | 'entry_condition' | 'routine_assist' | 'exit_bond_shield'
-    //     credits:     int (how many credits consumed)
-    //     createdAt:   timestamp
-    //
-    // ⚠️ SECURITY NOTE: During beta, the client can write credits
-    // directly (needed for beta credit grants + offline-first decrments).
-    // When Stripe goes live, lock credits writes to Cloud Functions:
-    //   match /users/{userId}/state/credits {
-    //     allow read: if request.auth.uid == userId;
-    //     allow write: if false; // Only via admin SDK in Cloud Functions
-    //   }
-    // ─────────────────────────────────────────────────────────────
+    // During beta the client can write credits directly (needed for beta
+    // grants and offline-first decrements). Before Stripe goes live, move
+    // credit writes behind Cloud Functions by narrowing this block.
     match /users/{userId}/{document=**} {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow create: if request.auth != null && request.auth.uid == userId;
@@ -44,10 +21,7 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Legacy top-level routine_inspections collection
-    // Existing data created before user-scoping. Read/write only your own.
-    // ─────────────────────────────────────────────────────────────
+    // Legacy top-level routine_inspections. Read/write own documents only.
     match /routine_inspections/{docId} {
       allow read, update, delete: if request.auth != null
         && resource.data.userId == request.auth.uid;
@@ -55,15 +29,8 @@ service cloud.firestore {
         && request.resource.data.userId == request.auth.uid;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Public reviews collection
-    // - Anyone can READ all reviews (social proof / SEO)
-    // - One review per UID — doc id must equal the writer's UID
-    //   (anonymous auth gives every visitor a unique UID with no friction)
-    // - Strict field validation prevents spam and abuse
-    // - Updates allowed (users can edit their own review)
-    // - Deletes blocked (prevents vote rigging)
-    // ─────────────────────────────────────────────────────────────
+    // Public reviews. Anyone can read; one review per uid (docId == uid).
+    // Field validation guards spam; deletes blocked so scores can't be gamed.
     match /reviews/{reviewId} {
       allow read: if true;
 
@@ -92,7 +59,6 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // Default deny — anything not matched above is forbidden.
     match /{document=**} {
       allow read, write: if false;
     }

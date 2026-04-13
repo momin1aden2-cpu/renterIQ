@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function GET(request: Request) {
+  const auth = await requireAuth(request, { limit: 60, allowAnonymous: true });
+  if (!auth.ok) return auth.response;
+
   const { searchParams } = new URL(request.url);
   const url = searchParams.get('url');
 
@@ -12,19 +16,21 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Validate URL
     const urlObj = new URL(url);
+    if (urlObj.protocol !== 'https:') {
+      return NextResponse.json({ error: 'Only https URLs are supported' }, { status: 400 });
+    }
+
     const allowedDomains = [
       'realestate.com.au',
       'domain.com.au',
       'reiwa.com.au',
       'rent.com.au'
     ];
-    
-    const isAllowed = allowedDomains.some(domain => 
-      urlObj.hostname.includes(domain)
-    );
-    
+
+    const host = urlObj.hostname.toLowerCase();
+    const isAllowed = allowedDomains.some(d => host === d || host.endsWith('.' + d));
+
     if (!isAllowed) {
       return NextResponse.json(
         { error: 'Domain not supported' },

@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { PDFDocument } from 'pdf-lib';
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await request.json();
     const { image, resume } = body;
@@ -91,7 +95,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Prefill form error:', error);
     return NextResponse.json(
-      { error: 'Failed to process form', details: String(error) },
+      { error: 'Failed to process form' },
       { status: 500 }
     );
   }

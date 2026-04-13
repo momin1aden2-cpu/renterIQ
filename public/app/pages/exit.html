@@ -234,7 +234,7 @@
   </div>
 
   <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border-lt);padding:12px 16px;padding-bottom:env(safe-area-inset-bottom,16px);z-index:10">
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px">Exit-Guard Bond Shield — $19.99 one-time · Compares entry vs exit photos</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px">Exit-Guard Bond Shield — $29.99 one-time · Compares entry vs exit photos</div>
     <div style="display:flex;gap:10px">
       <button class="btn-outline-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="switchView('A')">← Back</button>
       <button class="btn-blue-c flex-1" id="startExitBtn" style="border-radius:12px;opacity:.5;pointer-events:none" onclick="switchView('C')">Generate Bond Shield Report →</button>
@@ -1157,7 +1157,12 @@ function draftBondReturnEmail(){
   try { var prof = JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}'); tenantName = prof.fullName || ''; } catch(e){}
   if(!tenantName){ try { tenantName = localStorage.getItem('riq-user-name') || ''; } catch(e){} }
 
-  showToast('Drafting your message…','Hang on, writing the bond return email','🤖');
+  showAiDraftOverlay('Drafting your bond return email', [
+    'Reading your exit report',
+    'Cross-referencing maintenance log',
+    'Checking your communications trail',
+    'Writing a polite, clear email'
+  ]);
 
   fetch('/api/bond-return-email', {
     method:'POST',
@@ -1175,6 +1180,7 @@ function draftBondReturnEmail(){
   })
   .then(function(r){ return r.json(); })
   .then(function(data){
+    hideAiDraftOverlay();
     if(!data || data.error){ showToast('Draft failed', (data && data.error) || 'Could not draft the email','⚠️'); return; }
     var subject = encodeURIComponent(data.subject || ('Bond return — ' + (address || 'tenancy')));
     var body = encodeURIComponent(data.body || '');
@@ -1207,8 +1213,83 @@ function draftBondReturnEmail(){
   })
   .catch(function(err){
     console.error(err);
+    hideAiDraftOverlay();
     showToast('Draft failed','Check your connection and try again','⚠️');
   });
+}
+
+// ── Reusable AI drafting overlay ──
+// Full-screen frosted modal with ticking steps so the user sees progress
+// during the 5–15s Gemini round-trip rather than a frozen toast.
+function showAiDraftOverlay(title, steps){
+  var existing = document.getElementById('aiDraftOverlay');
+  if(existing) existing.remove();
+
+  var stepsHtml = steps.map(function(s, i){
+    return '<div class="aiDo-step" id="aiDoStep-' + i + '">' +
+      '<div class="aiDo-check" id="aiDoCheck-' + i + '">○</div>' +
+      '<div class="aiDo-label">' + s + '</div>' +
+    '</div>';
+  }).join('');
+
+  var overlay = document.createElement('div');
+  overlay.id = 'aiDraftOverlay';
+  overlay.innerHTML =
+    '<style>' +
+      '#aiDraftOverlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;animation:aiDoFade .25s ease}' +
+      '@keyframes aiDoFade{from{opacity:0}to{opacity:1}}' +
+      '#aiDraftOverlay .aiDo-card{background:#fff;border-radius:22px;padding:26px 22px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.35)}' +
+      '#aiDraftOverlay .aiDo-spinner{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#1B50C8,#2E63E0);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 14px;animation:aiDoPulse 1.4s ease-in-out infinite}' +
+      '@keyframes aiDoPulse{0%,100%{transform:scale(1);box-shadow:0 6px 20px rgba(27,80,200,.3)}50%{transform:scale(1.05);box-shadow:0 10px 28px rgba(27,80,200,.45)}}' +
+      '#aiDraftOverlay .aiDo-title{font-family:Sora,sans-serif;font-weight:800;font-size:17px;color:#0F172A;text-align:center;letter-spacing:-.2px;margin-bottom:4px}' +
+      '#aiDraftOverlay .aiDo-sub{font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:#64748B;text-align:center;margin-bottom:18px}' +
+      '#aiDraftOverlay .aiDo-step{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;transition:background .25s ease}' +
+      '#aiDraftOverlay .aiDo-step.active{background:rgba(27,80,200,.06)}' +
+      '#aiDraftOverlay .aiDo-check{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:#CBD5E1;flex-shrink:0;transition:all .25s ease}' +
+      '#aiDraftOverlay .aiDo-step.active .aiDo-check{color:#1B50C8;animation:aiDoSpin 1s linear infinite}' +
+      '#aiDraftOverlay .aiDo-step.done .aiDo-check{background:#00C896;color:#fff}' +
+      '@keyframes aiDoSpin{to{transform:rotate(360deg)}}' +
+      '#aiDraftOverlay .aiDo-label{font-family:Nunito,sans-serif;font-weight:700;font-size:13px;color:#334155;line-height:1.4}' +
+      '#aiDraftOverlay .aiDo-step.done .aiDo-label{color:#0F172A}' +
+    '</style>' +
+    '<div class="aiDo-card">' +
+      '<div class="aiDo-spinner">✦</div>' +
+      '<div class="aiDo-title">' + title + '</div>' +
+      '<div class="aiDo-sub">This usually takes 10–15 seconds</div>' +
+      '<div>' + stepsHtml + '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  var i = 0;
+  var total = steps.length;
+  var advance = function(){
+    if(i > 0){
+      var prev = document.getElementById('aiDoStep-' + (i - 1));
+      if(prev){ prev.classList.remove('active'); prev.classList.add('done'); }
+      var prevCheck = document.getElementById('aiDoCheck-' + (i - 1));
+      if(prevCheck) prevCheck.textContent = '✓';
+    }
+    if(i < total){
+      var cur = document.getElementById('aiDoStep-' + i);
+      if(cur) cur.classList.add('active');
+      i++;
+    }
+  };
+  advance();
+  overlay._timer = setInterval(function(){
+    if(i < total) advance();
+  }, 2800);
+}
+
+function hideAiDraftOverlay(){
+  var overlay = document.getElementById('aiDraftOverlay');
+  if(!overlay) return;
+  if(overlay._timer) clearInterval(overlay._timer);
+  // Mark all steps done for a clean close
+  var steps = overlay.querySelectorAll('.aiDo-step');
+  steps.forEach(function(s){ s.classList.remove('active'); s.classList.add('done'); });
+  overlay.querySelectorAll('.aiDo-check').forEach(function(c){ c.textContent = '✓'; });
+  setTimeout(function(){ overlay.style.opacity = '0'; overlay.style.transition = 'opacity .2s'; setTimeout(function(){ overlay.remove(); }, 220); }, 180);
 }
 
 function renderComparisonResults(data){

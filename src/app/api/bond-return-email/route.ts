@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const SYSTEM_PROMPT = `You are a friendly bond-return email drafter for RenterIQ. You help an Australian renter ask for their bond back politely and confidently after they've moved out.
@@ -46,6 +47,9 @@ type Payload = {
 };
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  if (!auth.ok) return auth.response;
+
   try {
     const body = (await request.json()) as Payload;
 

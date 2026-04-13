@@ -56,7 +56,18 @@
       "Bash(grep -cE \"subscri|pro plan|premium plan|pro tier|free beta|billing.*payment|current plan|renter plan|basic plan|family plan\" public/app/pages/profile.html public/about.html)",
       "Bash(grep -c \"credits.js\" public/app/pages/lease.html public/app/pages/entry-audit.html public/app/pages/routine-inspection.html public/app/pages/exit.html)",
       "Bash(ls public/app/js/lib/)",
-      "Bash(ls node_modules/html2pdf.js)"
+      "Bash(ls node_modules/html2pdf.js)",
+      "Bash(grep -rL \"viewport\" public/app/pages/*.html public/app/index.html)",
+      "Bash(grep -rL \"bottom-nav\" public/app/pages/*.html)",
+      "Bash(grep -rL \"sidebar.js\" public/app/pages/*.html)",
+      "Bash(node -e \"const fs=require\\('fs'\\);const paths=['src/app/api/extract-inspection-details/route.ts','src/app/api/analyze-inspection/route.ts','src/app/api/analyze-lease/route.ts','src/app/api/compare-exit/route.ts','src/app/api/generate-email/route.ts','src/app/api/analyze-renewal/route.ts','src/app/api/prefill-form/route.ts','src/app/api/generate-cover-letter/route.ts'];paths.forEach\\(p=>{const s=fs.readFileSync\\(p,'utf8'\\).replace\\(/gemini-2\\\\.0-flash/g,'gemini-2.5-flash'\\);fs.writeFileSync\\(p,s\\);console.log\\('updated',p\\);}\\);\")",
+      "Bash(sed -i 's|// URL TRACKING|// URL tracking|' app/pages/inspection.html)",
+      "Bash(sed -i 's|// BOOKING UPLOAD FUNCTIONALITY|// Booking upload|' app/pages/inspection.html)",
+      "Bash(sed -i 's|// MOBILE NAV TOGGLE|// Mobile nav toggle|' index.html)",
+      "Bash(sed -i 's|// SMART SEARCH HUB - PROVIDER SELECTION|// Search hub provider selection|' index.html)",
+      "Bash(sed -i 's|// FIREBASE AUTHENTICATION|// Firebase auth|' index.html)",
+      "Bash(node _admin_check.js)",
+      "Bash(rm _admin_check.js)"
     ]
   }
 }

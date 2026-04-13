@@ -1833,6 +1833,10 @@ function loadLeaseAgreements(){
     var raw=localStorage.getItem('riq-vault-leases');
     var leases=raw?JSON.parse(raw):[];
     if(!Array.isArray(leases))leases=[];
+    // Quick-start tenancies (no lease document) live alongside real lease
+    // agreements for the tenancy dashboard, but shouldn't show up in the Vault
+    // "Lease Agreements" folder — that folder is specifically for uploaded docs.
+    leases=leases.filter(function(l){ return l && l.source!=='already-renting' && (l.fileName||l.fileUrl||l.totalClauses); });
     leases.sort(function(a,b){return new Date(b.savedAt||0).getTime()-new Date(a.savedAt||0).getTime()});
 
     var listEl=document.getElementById('leaseList');
@@ -2903,10 +2907,18 @@ function loadVaultCounts(){
     if (receiptsRaw) { try { receiptsCount = JSON.parse(receiptsRaw).length || 0; } catch(e) {} }
     var fb = document.querySelector('.vault-count-f');
     if (fb) fb.textContent = receiptsCount + ' receipt' + (receiptsCount !== 1 ? 's' : '');
-    // Lease Agreements
+    // Lease Agreements — match loadLeaseAgreements filter: only real uploaded
+    // documents, not the quick-start tenancy records.
     var leaseRaw = localStorage.getItem('riq-vault-leases');
     var leaseCount = 0;
-    if (leaseRaw) { try { leaseCount = JSON.parse(leaseRaw).length || 0; } catch(e) {} }
+    if (leaseRaw) {
+      try {
+        var arr = JSON.parse(leaseRaw);
+        if (Array.isArray(arr)) {
+          leaseCount = arr.filter(function(l){ return l && l.source!=='already-renting' && (l.fileName||l.fileUrl||l.totalClauses); }).length;
+        }
+      } catch(e) {}
+    }
     var lb = document.querySelector('.vault-count-b');
     if (lb) lb.textContent = leaseCount + ' file' + (leaseCount !== 1 ? 's' : '');
   }catch(e){}

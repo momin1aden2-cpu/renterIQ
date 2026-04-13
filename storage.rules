@@ -3,21 +3,12 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // ─────────────────────────────────────────────────────────────
-    // User-scoped file storage
-    // Path: users/{uid}/{folder}/{file}
-    //   - users/{uid}/leases/{leaseId}.pdf
-    //   - users/{uid}/entry-audits/{auditId}/{photoId}.jpg
-    //   - users/{uid}/exit-audits/{auditId}/{photoId}.jpg
-    //   - users/{uid}/personal-docs/{docId}.{ext}
-    //   - users/{uid}/receipts/{receiptId}.{ext}
-    //   - users/{uid}/maintenance/{itemId}/{photoId}.jpg
-    // ─────────────────────────────────────────────────────────────
+    // User-scoped storage under users/{uid}/... (leases, entry/exit audits,
+    // personal docs, receipts, maintenance photos). Only the owner can read
+    // or write. Uploads capped at 15MB with a content-type allowlist.
     match /users/{userId}/{allPaths=**} {
-      // Read: only the owner
       allow read: if request.auth != null && request.auth.uid == userId;
 
-      // Write: only the owner, max 15MB per file, common renter file types
       allow write: if request.auth != null
         && request.auth.uid == userId
         && (
@@ -34,7 +25,6 @@ service firebase.storage {
         );
     }
 
-    // Default deny
     match /{allPaths=**} {
       allow read, write: if false;
     }

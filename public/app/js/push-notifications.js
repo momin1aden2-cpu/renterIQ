@@ -165,10 +165,8 @@
       return loadMessagingSDK().then(function() {
         var messaging = firebase.messaging();
         return messaging.deleteToken();
-      }).then(function() {
-        console.log('[RIQPush] Token deleted');
       }).catch(function(err) {
-        console.warn('[RIQPush] Token deletion failed:', err);
+        console.error('Token deletion failed:', err);
       });
     },
 

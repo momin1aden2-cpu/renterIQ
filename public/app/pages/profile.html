@@ -287,7 +287,7 @@
   <div class="pr-sub">Your account information</div>
 </header>
 
-<div style="flex:1;padding:16px;padding-bottom:120px">
+<div style="flex:1;padding:16px;padding-bottom:180px">
 
 <!-- AVATAR SECTION -->
 <div style="text-align:center;padding:20px 0 24px">
@@ -328,7 +328,7 @@
 </div>
 
 <!-- STICKY FOOTER -->
-<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
+<div style="position:fixed;bottom:calc(68px + env(safe-area-inset-bottom, 0px));left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:100;box-shadow:0 -6px 18px rgba(10,36,96,.06)">
   <button style="background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
   <button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Saved ✓','Personal details updated','✓');setTimeout(function(){switchView('A')},800)">Save Changes</button>
 </div>
@@ -345,7 +345,7 @@
   <div class="pr-sub">Your active tenancy details</div>
 </header>
 
-<div style="flex:1;padding:16px;padding-bottom:120px">
+<div style="flex:1;padding:16px;padding-bottom:180px">
 
 <!-- ACTIVE PROPERTY CARD — populated from riq-vault-leases by loadTenancyView() -->
 <div id="tenancyCard" style="background:#fff;border-radius:18px;padding:18px;border:1.5px solid var(--blue-lt);box-shadow:0 4px 16px rgba(27,80,200,.1);margin-bottom:14px">
@@ -354,7 +354,10 @@
       <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🏠</div>
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)" id="tenancyHeading">Active Tenancy</div>
     </div>
-    <span id="tenancyBadge" style="background:rgba(0,200,150,.1);color:var(--teal-dk);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Active</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="tenancyBadge" style="background:rgba(0,200,150,.1);color:var(--teal-dk);border-radius:100px;padding:4px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px">Active</span>
+      <button id="tenancyEditBtn" onclick="openTenancyEditor()" aria-label="Edit tenancy details" style="background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:7px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;letter-spacing:.3px;display:flex;align-items:center;gap:4px"><span style="font-size:12px">✎</span>Edit</button>
+    </div>
   </div>
   <div style="height:1px;background:var(--border-lt);margin:14px 0"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -386,9 +389,9 @@
 </div>
 
 <!-- STICKY FOOTER -->
-<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
+<div style="position:fixed;bottom:calc(68px + env(safe-area-inset-bottom, 0px));left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:100;box-shadow:0 -6px 18px rgba(10,36,96,.06)">
   <button style="background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
-  <button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Saved ✓','Property details updated','✓');setTimeout(function(){switchView('A')},800)">Save</button>
+  <button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="openTenancyEditor()">✎ Edit details</button>
 </div>
 </div>
 
@@ -403,7 +406,7 @@
   <div class="pr-sub">Manage your alert preferences</div>
 </header>
 
-<div style="flex:1;padding:16px;padding-bottom:120px">
+<div style="flex:1;padding:16px;padding-bottom:180px">
 
 <!-- PUSH STATUS -->
 <div id="pushStatusCard" style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px;margin-bottom:16px">
@@ -492,7 +495,7 @@
 </div>
 
 <!-- STICKY FOOTER -->
-<div style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:10">
+<div style="position:fixed;bottom:calc(68px + env(safe-area-inset-bottom, 0px));left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--border-lt);padding:14px 16px;display:flex;gap:10px;z-index:100;box-shadow:0 -6px 18px rgba(10,36,96,.06)">
   <button style="background:#fff;color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer" onclick="switchView('A')">← Back</button>
   <button style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Preferences saved ✓','','✓');setTimeout(function(){switchView('A')},800)">Save Preferences</button>
 </div>
@@ -541,8 +544,8 @@
   <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px">One-time payment per report. No subscription. No recurring charges.</div>
   <div style="display:flex;flex-direction:column;gap:10px">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Review</div><div style="font-weight:600;font-size:11px;color:var(--muted)">2nd review onwards</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">$4.99</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond-Shield Move-In</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Entry Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">$14.99</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit-Guard Bond Shield</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Exit Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">$19.99</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Bond-Shield Move-In</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Entry Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">$24.99</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--blue-xl);border-radius:10px"><div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Exit-Guard Bond Shield</div><div style="font-weight:600;font-size:11px;color:var(--muted)">Exit Condition Report</div></div><span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--blue)">$29.99</span></div>
   </div>
 </div>
 
@@ -555,7 +558,7 @@
       <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55">Sync your Vault, reports and photos across every device. One-time purchase — no recurring fees.</div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
         <span id="cloudSyncStatus" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Local only</span>
-        <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--teal-dk)">$9.99 one-time</span>
+        <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--teal-dk)">$14.99 one-time</span>
       </div>
       <button style="margin-top:10px;width:100%;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Coming soon','Cloud sync purchase is being set up','☁️')">Unlock Cloud Sync →</button>
     </div>
@@ -648,7 +651,7 @@
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px">Purchase Terms</div>
   <div style="display:flex;flex-direction:column;gap:10px">
     <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Reports</strong> — Paid per report via secure Stripe checkout. Each tool shows the price before you confirm.</div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Cloud Sync</strong> — A one-time $9.99 purchase that syncs your Vault across devices. Non-refundable once activated.</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Cloud Sync</strong> — A one-time $14.99 purchase that syncs your Vault across devices. Non-refundable once activated.</div>
     <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">No subscriptions</strong> — RenterIQ does not charge recurring fees. You will never be auto-billed.</div>
   </div>
 </div>
@@ -1164,6 +1167,148 @@ function loadTenancyView(){
   }
 }
 
+// ── Tenancy editor — edit any saved lease record (works for both
+// "already renting" quick-start entries and full lease reviews) ──
+function openTenancyEditor(){
+  var lease=null;
+  try{
+    var raw=localStorage.getItem('riq-vault-leases');
+    if(raw){
+      var list=JSON.parse(raw);
+      if(Array.isArray(list)&&list.length){
+        list.sort(function(a,b){return new Date(b.savedAt||0).getTime()-new Date(a.savedAt||0).getTime()});
+        lease=list[0];
+      }
+    }
+  }catch(e){}
+
+  // If no tenancy saved yet, route to lease.html so they can upload one
+  if(!lease){
+    if(typeof navigate==='function') navigate('/app/pages/lease.html');
+    return;
+  }
+
+  var prev=document.getElementById('tenancyEditSheet');
+  if(prev) prev.remove();
+
+  var esc=function(s){ return (s==null?'':String(s)).replace(/"/g,'&quot;'); };
+  var dateVal=function(d){ if(!d) return ''; var t=new Date(d); if(isNaN(t.getTime())) return ''; var y=t.getFullYear(),m=String(t.getMonth()+1).padStart(2,'0'),dd=String(t.getDate()).padStart(2,'0'); return y+'-'+m+'-'+dd; };
+
+  var sheet=document.createElement('div');
+  sheet.id='tenancyEditSheet';
+  sheet.innerHTML=
+    '<style>'+
+      '#tenancyEditSheet{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;animation:tesFade .2s ease}'+
+      '@keyframes tesFade{from{opacity:0}to{opacity:1}}'+
+      '#tenancyEditSheet .tes-sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:520px;max-height:92vh;display:flex;flex-direction:column;animation:tesSlide .3s cubic-bezier(.2,.8,.3,1)}'+
+      '@keyframes tesSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}'+
+      '#tenancyEditSheet .tes-grab{width:40px;height:4px;background:#CBD5E1;border-radius:100px;margin:10px auto 0}'+
+      '#tenancyEditSheet .tes-head{padding:12px 22px 14px;border-bottom:1px solid var(--border-lt)}'+
+      '#tenancyEditSheet .tes-title{font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.2px}'+
+      '#tenancyEditSheet .tes-sub{font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}'+
+      '#tenancyEditSheet .tes-body{flex:1;overflow-y:auto;padding:18px 22px 16px;display:flex;flex-direction:column;gap:14px}'+
+      '#tenancyEditSheet label{display:block}'+
+      '#tenancyEditSheet .tes-label{font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}'+
+      '#tenancyEditSheet input,#tenancyEditSheet select{width:100%;padding:13px 14px;border:1.5px solid var(--border-lt);border-radius:12px;font-family:Nunito,sans-serif;font-weight:600;font-size:14px;color:var(--text);background:#fff;box-sizing:border-box;-webkit-appearance:none;appearance:none}'+
+      '#tenancyEditSheet input:focus,#tenancyEditSheet select:focus{outline:none;border-color:var(--blue)}'+
+      '#tenancyEditSheet .tes-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}'+
+      '#tenancyEditSheet .tes-foot{padding:14px 22px 22px;border-top:1px solid var(--border-lt);display:flex;gap:10px;background:#fff}'+
+      '#tenancyEditSheet .tes-btn{flex:1;padding:14px;border-radius:13px;font-family:Sora,sans-serif;font-weight:800;font-size:14px;cursor:pointer;border:none;letter-spacing:.2px}'+
+      '#tenancyEditSheet .tes-btn-primary{background:linear-gradient(135deg,var(--blue),#2E63E0);color:#fff}'+
+      '#tenancyEditSheet .tes-btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border-lt)}'+
+    '</style>'+
+    '<div class="tes-sheet" onclick="event.stopPropagation()">'+
+      '<div class="tes-grab"></div>'+
+      '<div class="tes-head">'+
+        '<div class="tes-title">Edit tenancy details</div>'+
+        '<div class="tes-sub">Update anything — address, dates, rent, or property manager contact.</div>'+
+      '</div>'+
+      '<div class="tes-body">'+
+        '<label><div class="tes-label">Rental Address</div><input id="tesAddr" type="text" value="'+esc(lease.address)+'" autocomplete="street-address"></label>'+
+        '<div class="tes-row">'+
+          '<label><div class="tes-label">Weekly Rent</div><input id="tesRent" type="text" inputmode="decimal" value="'+esc(lease.weeklyRent)+'" placeholder="$650"></label>'+
+          '<label><div class="tes-label">Bond</div><input id="tesBond" type="text" inputmode="decimal" value="'+esc(lease.bond)+'" placeholder="$2,600"></label>'+
+        '</div>'+
+        '<div class="tes-row">'+
+          '<label><div class="tes-label">Lease Start</div><input id="tesStart" type="date" value="'+esc(dateVal(lease.startDate))+'"></label>'+
+          '<label><div class="tes-label">Lease End</div><input id="tesEnd" type="date" value="'+esc(dateVal(lease.endDate))+'"></label>'+
+        '</div>'+
+        '<label><div class="tes-label">Lease Type</div>'+
+          '<select id="tesType">'+
+            '<option value="">Select…</option>'+
+            '<option value="fixed"'+(lease.leaseType==='fixed'?' selected':'')+'>Fixed term</option>'+
+            '<option value="periodic"'+(lease.leaseType==='periodic'?' selected':'')+'>Rolling / month-to-month</option>'+
+            '<option value="unknown"'+(lease.leaseType==='unknown'?' selected':'')+'>Not sure</option>'+
+          '</select>'+
+        '</label>'+
+        '<label><div class="tes-label">Agency / Landlord</div><input id="tesAgency" type="text" value="'+esc(lease.agencyName)+'"></label>'+
+        '<div class="tes-row">'+
+          '<label><div class="tes-label">Property Manager</div><input id="tesPm" type="text" value="'+esc(lease.pmName)+'"></label>'+
+          '<label><div class="tes-label">PM Phone</div><input id="tesPmPhone" type="tel" value="'+esc(lease.pmPhone)+'"></label>'+
+        '</div>'+
+        '<label><div class="tes-label">Agent Email</div><input id="tesAgentEmail" type="email" value="'+esc(lease.agentEmail||'')+'" placeholder="agent@agency.com.au"></label>'+
+      '</div>'+
+      '<div class="tes-foot">'+
+        '<button class="tes-btn tes-btn-ghost" onclick="closeTenancyEditor()">Cancel</button>'+
+        '<button class="tes-btn tes-btn-primary" onclick="saveTenancyEdit(\''+lease.id+'\')">Save changes</button>'+
+      '</div>'+
+    '</div>';
+  sheet.addEventListener('click', closeTenancyEditor);
+  document.body.appendChild(sheet);
+}
+
+function closeTenancyEditor(){
+  var s=document.getElementById('tenancyEditSheet');
+  if(!s) return;
+  s.style.opacity='0';
+  s.style.transition='opacity .2s';
+  setTimeout(function(){ s.remove(); }, 220);
+}
+
+function saveTenancyEdit(id){
+  var v=function(x){ var el=document.getElementById(x); return el?el.value.trim():''; };
+  var addr=v('tesAddr');
+  if(!addr){
+    var el=document.getElementById('tesAddr');
+    if(el){ el.style.borderColor='#E84040'; el.focus(); }
+    return;
+  }
+  var normMoney=function(s){ if(!s) return ''; s=String(s).replace(/[^0-9.]/g,''); return s?'$'+s:''; };
+
+  try{
+    var list=JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+    if(!Array.isArray(list)) list=[];
+    var idx=list.findIndex(function(l){ return l && l.id===id; });
+    if(idx===-1) return;
+    var rec=list[idx];
+    rec.address=addr;
+    rec.weeklyRent=normMoney(v('tesRent'));
+    rec.bond=normMoney(v('tesBond'));
+    rec.startDate=v('tesStart');
+    rec.endDate=v('tesEnd');
+    rec.leaseType=v('tesType');
+    rec.agencyName=v('tesAgency');
+    rec.pmName=v('tesPm');
+    rec.pmPhone=v('tesPmPhone');
+    rec.agentEmail=v('tesAgentEmail');
+    rec.updatedAt=new Date().toISOString();
+    list[idx]=rec;
+    localStorage.setItem('riq-vault-leases', JSON.stringify(list));
+    try{ localStorage.setItem('riq-lease-record', JSON.stringify(rec)); }catch(e){}
+
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(!RIQStore.isAuthed()) return;
+        RIQStore.write('leases', rec.id, rec).catch(function(){});
+      });
+    }
+  }catch(e){ console.error('saveTenancyEdit:',e); }
+
+  closeTenancyEditor();
+  loadTenancyView();
+  if(typeof showToast==='function') showToast('Updated ✓','Tenancy details saved','✓');
+}
+
 function updateProfileStateRowSubtitle(){
   var saved=localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'';
   var sub=document.getElementById('profileStateRowSub');
@@ -1428,6 +1573,11 @@ document.addEventListener('DOMContentLoaded',function(){
   if(hash==='#notifications')switchView('D');
   if(hash==='#credits'||hash==='#subscription')switchView('E');
   if(hash==='#privacy')switchView('F');
+
+  try {
+    var qView = new URLSearchParams(window.location.search).get('view');
+    if(qView && ['A','B','C','D','E','F'].indexOf(qView) !== -1) switchView(qView);
+  } catch(e){}
 
   if('Notification' in window&&Notification.permission==='granted'){
     pushEnabled=true;updatePushToggle(true);updatePushStatusCard(true);

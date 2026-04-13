@@ -1209,6 +1209,9 @@
     <!-- ── Resume-in-progress card (surfaces saved renter profile drafts) ── -->
     <div id="resumeDraftCard" style="display:none;padding:14px 16px 0"></div>
 
+    <!-- ── Already-renting quick start — empty-state only ── -->
+    <div id="alreadyRentingCard" style="display:none;padding:14px 16px 0"></div>
+
     <!-- ── Your Journey — progress strip ────────────────────── -->
     <div id="journeyStrip" style="display:none;padding:18px 16px 0">
       <div style="background:#fff;border:1px solid var(--border-lt);border-radius:18px;padding:14px 14px 12px;box-shadow:var(--shadow-card)">
@@ -1219,6 +1222,9 @@
         <div id="journeyTrack" style="display:flex;align-items:center;gap:4px"></div>
       </div>
     </div>
+
+    <!-- ── Tenancy summary — condensed glanceable card from Property & Tenancy ── -->
+    <div id="tenancySummaryCard" style="display:none;padding:14px 16px 0"></div>
 
     <!-- ── What's On ─────────────────────────────────────────── -->
     <div style="padding:20px 16px 0">
@@ -1528,7 +1534,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ========== ACTIVITY FEED ==========
+// Activity feed
 function renderActivityFeed() {
   var feed = document.getElementById('activityFeed');
   if (!feed) return;
@@ -1612,7 +1618,7 @@ function renderActivityFeed() {
   }).join('');
 }
 
-// ========== ONBOARDING FLOW ==========
+// Onboarding flow
 var obStep = 0;
 var obSteps = [
   {
@@ -1758,7 +1764,7 @@ function applyUpdate() {
   location.reload();
 }
 
-// ========== INLINE SEARCH WIDGET ==========
+// Inline search widget
 var homeSuburbsData = [];
 var homeSelectedSuburb = null;
 
@@ -1893,7 +1899,7 @@ document.addEventListener('click', function(e) {
 
 homeLoadSuburbs();
 
-// ========== PROPERTY TRACKING ==========
+// Property tracking
 var TRACKED_KEY = 'renteriq_tracked_properties';
 var TRACKED_COLLECTION = 'tracked-properties';
 
@@ -2725,8 +2731,23 @@ function homeRenderLeaseRenewal(){
   var addr = lease.address || 'your rental';
   var endStr = new Date(lease.endDate).toLocaleDateString('en-AU', { day:'numeric', month:'long', year:'numeric' });
 
+  // 90-day band is a quiet, informational strip — no hero card, no urgency.
+  // Hero treatment only kicks in from 60 days in, when a real decision is due.
+  if(band === '90'){
+    container.innerHTML =
+      '<div style="background:#fff;border:1px solid var(--border-lt);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);cursor:pointer" onclick="navigate(\'/app/pages/renewal.html\')">'+
+        '<div style="width:34px;height:34px;border-radius:10px;background:var(--blue-xl);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔑</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:var(--text);letter-spacing:-.1px">Lease renewal on the horizon</div>'+
+          '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4">Your lease ends ' + endStr + '. No rush — we\'ll nudge you closer to the date.</div>'+
+        '</div>'+
+        '<button onclick="event.stopPropagation();homeDismissRenewal(\'90\')" aria-label="Dismiss" style="background:transparent;border:none;color:var(--muted);width:24px;height:24px;font-size:16px;line-height:1;cursor:pointer;flex-shrink:0">×</button>'+
+      '</div>';
+    container.style.display = 'block';
+    return;
+  }
+
   var bandCopy = {
-    '90': { headline:'Lease ends in about 3 months', sub:'Time to start thinking about renewing or moving on. No pressure yet.' },
     '60': { headline:'Lease ends in about 2 months', sub:'Worth deciding soon — agents usually want notice 30+ days out.' },
     '30': { headline:'Lease ends in 30 days', sub:'Decision time. Renew, negotiate, or give notice and start exit prep.' },
     '7':  { headline:'Lease ends in ' + daysLeft + ' day' + (daysLeft===1?'':'s'), sub:'Last week of your lease. Make sure your move-out plan is locked in.' }
@@ -2802,6 +2823,235 @@ function homeRenderResumeDraft(){
       '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-top:8px">' + pct + '% complete</div>' +
     '</div>';
   container.style.display='block';
+}
+
+// ── Already-renting quick start ─────────────────────────────
+// Shows on an empty home for users who are already in a tenancy and just want
+// to start using RenterIQ from where they are — no lease upload required.
+function homeRenderAlreadyRenting(){
+  var container = document.getElementById('alreadyRentingCard');
+  if(!container) return;
+
+  // Hide once they've added a tenancy (any source) or skipped it
+  var hasLease = false;
+  try {
+    var list = JSON.parse(localStorage.getItem('riq-vault-leases') || '[]');
+    if(Array.isArray(list) && list.length) hasLease = true;
+  } catch(e){}
+  var skipped = false;
+  try { skipped = localStorage.getItem('riq-already-renting-skipped') === '1'; } catch(e){}
+  if(hasLease || skipped){ container.style.display = 'none'; return; }
+
+  container.innerHTML =
+    '<div style="background:linear-gradient(135deg,#0F2A6B,#1B50C8);border-radius:20px;padding:18px 18px 16px;color:#fff;box-shadow:0 10px 26px rgba(27,80,200,.28);position:relative">' +
+      '<button onclick="homeSkipAlreadyRenting()" aria-label="Dismiss" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>' +
+      '<div style="display:flex;align-items:center;gap:6px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;opacity:.85;margin-bottom:6px"><span>🏠</span>Already renting?</div>' +
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;line-height:1.25;margin-bottom:6px;letter-spacing:-.2px">Pick up from where you are</div>' +
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;line-height:1.55;color:rgba(255,255,255,.88);margin-bottom:14px">No lease document needed. Just tell us a few basics so we can help with rent, inspections and maintenance from today.</div>' +
+      '<button onclick="openAlreadyRentingSheet()" style="background:#fff;color:var(--blue);border:none;border-radius:12px;padding:12px 18px;font-family:Sora,sans-serif;font-weight:800;font-size:13px;cursor:pointer;letter-spacing:.2px;display:flex;align-items:center;gap:8px">Start from here →</button>' +
+    '</div>';
+  container.style.display = 'block';
+}
+
+function homeSkipAlreadyRenting(){
+  try { localStorage.setItem('riq-already-renting-skipped', '1'); } catch(e){}
+  var c = document.getElementById('alreadyRentingCard');
+  if(c) c.style.display = 'none';
+}
+
+// Bottom-sheet form — minimal fields, everything except address is optional
+function openAlreadyRentingSheet(){
+  var existing = document.getElementById('alreadyRentingSheet');
+  if(existing) existing.remove();
+
+  var sheet = document.createElement('div');
+  sheet.id = 'alreadyRentingSheet';
+  sheet.innerHTML =
+    '<style>' +
+      '#alreadyRentingSheet{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;animation:arsFade .2s ease}' +
+      '@keyframes arsFade{from{opacity:0}to{opacity:1}}' +
+      '#alreadyRentingSheet .ars-sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:520px;max-height:92vh;display:flex;flex-direction:column;animation:arsSlide .3s cubic-bezier(.2,.8,.3,1)}' +
+      '@keyframes arsSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}' +
+      '#alreadyRentingSheet .ars-grab{width:40px;height:4px;background:#CBD5E1;border-radius:100px;margin:10px auto 0}' +
+      '#alreadyRentingSheet .ars-head{padding:12px 22px 14px;border-bottom:1px solid var(--border-lt)}' +
+      '#alreadyRentingSheet .ars-title{font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.2px}' +
+      '#alreadyRentingSheet .ars-sub{font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}' +
+      '#alreadyRentingSheet .ars-body{flex:1;overflow-y:auto;padding:18px 22px 16px;display:flex;flex-direction:column;gap:14px}' +
+      '#alreadyRentingSheet label{display:block}' +
+      '#alreadyRentingSheet .ars-label{font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}' +
+      '#alreadyRentingSheet .ars-optional{font-family:Sora,sans-serif;font-weight:600;font-size:10px;color:var(--muted);opacity:.7;margin-left:6px;text-transform:none;letter-spacing:0}' +
+      '#alreadyRentingSheet input,#alreadyRentingSheet select{width:100%;padding:13px 14px;border:1.5px solid var(--border-lt);border-radius:12px;font-family:Nunito,sans-serif;font-weight:600;font-size:14px;color:var(--text);background:#fff;box-sizing:border-box;-webkit-appearance:none;appearance:none}' +
+      '#alreadyRentingSheet input:focus,#alreadyRentingSheet select:focus{outline:none;border-color:var(--blue)}' +
+      '#alreadyRentingSheet .ars-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}' +
+      '#alreadyRentingSheet .ars-foot{padding:14px 22px 22px;border-top:1px solid var(--border-lt);display:flex;gap:10px;background:#fff}' +
+      '#alreadyRentingSheet .ars-btn{flex:1;padding:14px;border-radius:13px;font-family:Sora,sans-serif;font-weight:800;font-size:14px;cursor:pointer;border:none;letter-spacing:.2px}' +
+      '#alreadyRentingSheet .ars-btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-md,#2E63E0));color:#fff}' +
+      '#alreadyRentingSheet .ars-btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border-lt)}' +
+      '#alreadyRentingSheet .ars-note{font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);line-height:1.55;background:var(--blue-xl,#EEF3FF);border-radius:10px;padding:10px 12px}' +
+    '</style>' +
+    '<div class="ars-sheet" onclick="event.stopPropagation()">' +
+      '<div class="ars-grab"></div>' +
+      '<div class="ars-head">' +
+        '<div class="ars-title">Start from where you are</div>' +
+        '<div class="ars-sub">Only the address is required. Fill in what you know — you can add the rest later.</div>' +
+      '</div>' +
+      '<div class="ars-body">' +
+        '<div class="ars-note">💡 No lease document? No problem. You can still use RenterIQ for rent tracking, maintenance reports, inspections and exit records.</div>' +
+        '<label><div class="ars-label">Rental Address</div><input id="arsAddr" type="text" placeholder="e.g. 12 Smith St, Surry Hills NSW 2010" autocomplete="street-address"></label>' +
+        '<div class="ars-row">' +
+          '<label><div class="ars-label">Weekly Rent<span class="ars-optional">optional</span></div><input id="arsRent" type="text" inputmode="decimal" placeholder="$650"></label>' +
+          '<label><div class="ars-label">Bond<span class="ars-optional">optional</span></div><input id="arsBond" type="text" inputmode="decimal" placeholder="$2,600"></label>' +
+        '</div>' +
+        '<div class="ars-row">' +
+          '<label><div class="ars-label">Lease Start<span class="ars-optional">optional</span></div><input id="arsStart" type="date"></label>' +
+          '<label><div class="ars-label">Lease End<span class="ars-optional">optional</span></div><input id="arsEnd" type="date"></label>' +
+        '</div>' +
+        '<label><div class="ars-label">Lease Type<span class="ars-optional">optional</span></div>' +
+          '<select id="arsType"><option value="">Select…</option><option value="fixed">Fixed term</option><option value="periodic">Rolling / month-to-month</option><option value="unknown">Not sure</option></select>' +
+        '</label>' +
+        '<label><div class="ars-label">Agency / Landlord<span class="ars-optional">optional</span></div><input id="arsAgency" type="text" placeholder="e.g. Ray White Bondi"></label>' +
+        '<div class="ars-row">' +
+          '<label><div class="ars-label">Property Manager<span class="ars-optional">optional</span></div><input id="arsPm" type="text" placeholder="Full name"></label>' +
+          '<label><div class="ars-label">PM Phone<span class="ars-optional">optional</span></div><input id="arsPmPhone" type="tel" placeholder="04xx xxx xxx"></label>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ars-foot">' +
+        '<button class="ars-btn ars-btn-ghost" onclick="closeAlreadyRentingSheet()">Cancel</button>' +
+        '<button class="ars-btn ars-btn-primary" onclick="saveAlreadyRenting()">Save & continue</button>' +
+      '</div>' +
+    '</div>';
+  sheet.addEventListener('click', closeAlreadyRentingSheet);
+  document.body.appendChild(sheet);
+  setTimeout(function(){ var a = document.getElementById('arsAddr'); if(a) a.focus(); }, 350);
+}
+
+function closeAlreadyRentingSheet(){
+  var s = document.getElementById('alreadyRentingSheet');
+  if(!s) return;
+  s.style.opacity = '0';
+  s.style.transition = 'opacity .2s';
+  setTimeout(function(){ s.remove(); }, 220);
+}
+
+function saveAlreadyRenting(){
+  var v = function(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  var addr = v('arsAddr');
+  if(!addr){
+    var el = document.getElementById('arsAddr');
+    if(el){ el.style.borderColor = '#E84040'; el.focus(); }
+    return;
+  }
+
+  var normMoney = function(s){ if(!s) return ''; s = String(s).replace(/[^0-9.]/g,''); return s ? '$' + s : ''; };
+  var now = new Date();
+  var record = {
+    id: 'lease_' + Date.now(),
+    savedAt: now.toISOString(),
+    fileName: '',
+    address: addr,
+    startDate: v('arsStart'),
+    endDate: v('arsEnd'),
+    weeklyRent: normMoney(v('arsRent')),
+    bond: normMoney(v('arsBond')),
+    leaseType: v('arsType'),
+    agencyName: v('arsAgency'),
+    pmName: v('arsPm'),
+    pmPhone: v('arsPmPhone'),
+    source: 'already-renting',
+    totalClauses: 0,
+    flaggedCount: 0,
+    state: (function(){ try { return localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || ''; } catch(e){ return ''; } })(),
+    fileUrl: '',
+    filePath: '',
+    fileSize: 0,
+    fileMimeType: ''
+  };
+
+  try {
+    localStorage.setItem('riq-lease-record', JSON.stringify(record));
+    var list = JSON.parse(localStorage.getItem('riq-vault-leases') || '[]');
+    list.unshift(record);
+    localStorage.setItem('riq-vault-leases', JSON.stringify(list));
+  } catch(e){}
+
+  if(window.RIQStore){
+    RIQStore.ready.then(function(){
+      if(!RIQStore.isAuthed()) return;
+      RIQStore.write('leases', record.id, record).catch(function(){});
+    });
+  }
+
+  closeAlreadyRentingSheet();
+  homeRenderAlreadyRenting();
+  homeRenderTenancy();
+  if(typeof homeRenderJourney === 'function') homeRenderJourney();
+  if(typeof homeRenderRentCard === 'function') homeRenderRentCard();
+  if(typeof homeRenderBondCard === 'function') homeRenderBondCard();
+  if(typeof homeRenderLeaseRenewal === 'function') homeRenderLeaseRenewal();
+
+  if(typeof showToast === 'function') showToast('You\'re set up ✓','We\'ll take it from here. Explore rent, maintenance and inspections.','🏠');
+}
+
+// ── Tenancy summary card — condensed glance of the active lease
+function homeRenderTenancy(){
+  var container = document.getElementById('tenancySummaryCard');
+  if(!container) return;
+
+  var lease = null;
+  try {
+    var raw = localStorage.getItem('riq-vault-leases');
+    if(raw){
+      var list = JSON.parse(raw);
+      if(Array.isArray(list) && list.length){
+        list.sort(function(a,b){ return new Date(b.savedAt||0).getTime() - new Date(a.savedAt||0).getTime(); });
+        lease = list[0];
+      }
+    }
+  } catch(e){}
+
+  if(!lease || !lease.address){ container.style.display = 'none'; return; }
+
+  var endTime = lease.endDate ? new Date(lease.endDate).getTime() : NaN;
+  var startTime = lease.startDate ? new Date(lease.startDate).getTime() : NaN;
+  var daysLeft = !isNaN(endTime) ? Math.ceil((endTime - Date.now()) / 86400000) : null;
+
+  // Suppress when the dedicated renewal card is already showing (7/30/60/90 window)
+  // to avoid two near-identical cards stacked.
+  if(daysLeft !== null && daysLeft >= 0 && daysLeft <= 90){
+    var renewalCard = document.getElementById('leaseRenewalCard');
+    if(renewalCard && renewalCard.style.display !== 'none'){ container.style.display = 'none'; return; }
+  }
+
+  var rent = lease.weeklyRent ? String(lease.weeklyRent).replace(/^\$?/, '$') : '';
+  var pct = 0;
+  if(!isNaN(startTime) && !isNaN(endTime) && endTime > startTime){
+    pct = Math.max(0, Math.min(100, Math.round((Date.now() - startTime) / (endTime - startTime) * 100)));
+  }
+
+  var statusLine = '';
+  if(daysLeft === null) statusLine = 'Lease dates not set';
+  else if(daysLeft < 0) statusLine = 'Lease ended ' + Math.abs(daysLeft) + ' day' + (Math.abs(daysLeft)===1?'':'s') + ' ago';
+  else if(daysLeft === 0) statusLine = 'Lease ends today';
+  else statusLine = daysLeft + ' day' + (daysLeft===1?'':'s') + ' left on lease';
+
+  var shortAddr = lease.address.length > 42 ? lease.address.slice(0, 40) + '…' : lease.address;
+
+  container.innerHTML =
+    '<div style="background:#fff;border:1px solid var(--border-lt);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-card);cursor:pointer" onclick="navigate(\'/app/pages/profile.html?view=C\')">' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:' + (pct>0?'10px':'0') + '">' +
+        '<div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#1B50C8,#2E63E0);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏠</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + shortAddr + '</div>' +
+          '<div style="font-family:Nunito,sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-top:2px">' + statusLine + (rent ? ' · ' + rent + '/wk' : '') + '</div>' +
+        '</div>' +
+        '<span style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--blue)">›</span>' +
+      '</div>' +
+      (pct > 0 ?
+        '<div style="height:6px;background:var(--border-lt);border-radius:100px;overflow:hidden">' +
+          '<div style="width:' + pct + '%;height:100%;background:linear-gradient(90deg,#1B50C8,#2E63E0);border-radius:100px"></div>' +
+        '</div>' : '') +
+    '</div>';
+  container.style.display = 'block';
 }
 
 // ── Journey progress strip ─────────────────────────────────────
@@ -3041,6 +3291,8 @@ document.addEventListener('DOMContentLoaded', function() {
   homeRenderJourney();
   homeRenderResumeDraft();
   homeRenderLeaseRenewal();
+  homeRenderTenancy();
+  homeRenderAlreadyRenting();
   // Defer everything else until the browser is idle
   if ('requestIdleCallback' in window) {
     requestIdleCallback(homeIdleInit, { timeout: 1500 });
