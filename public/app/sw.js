@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v42 — Original-file storage backfill + receipt PDF/DOC cloud upload
+// RenterIQ Service Worker v43 — Unified delete with confirm across every vault folder
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v42';
+var CACHE_NAME = 'renteriq-shell-v43';
 
 var APP_SHELL = [
   '/app/index.html',
