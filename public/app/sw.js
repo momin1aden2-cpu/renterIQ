@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v39 — Photo timestamps unified across report-issue + routine + maintenance
+// RenterIQ Service Worker v40 — Application form: 4 swipeable steps with stepper dots
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v39';
+var CACHE_NAME = 'renteriq-shell-v40';
 
 var APP_SHELL = [
   '/app/index.html',

@@ -37,6 +37,14 @@
 .mini-progress{height:3px;background:rgba(255,255,255,.15);border-radius:100px;margin-top:12px;overflow:hidden}
 .mini-progress-fill{height:100%;border-radius:100px;transition:width .4s ease}
 
+/* Sub-step swiper inside View B (4 panels: Personal · Employment · Rental · Household) */
+.b-step{display:none;animation:bStepIn .25s var(--ease-smooth)}
+.b-step.active{display:block}
+@keyframes bStepIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+.b-dot{flex:1;height:4px;border-radius:100px;background:rgba(255,255,255,.18);transition:background .25s,transform .25s}
+.b-dot.active{background:#fff;transform:scaleY(1.5)}
+.b-dot.done{background:rgba(255,255,255,.6)}
+
 .sec-label{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 10px;display:flex;justify-content:space-between;align-items:center}
 .sec-label-action{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer;text-transform:none;letter-spacing:0}
 
@@ -260,154 +268,159 @@
 <div class="view" id="viewB" style="display:none;flex-direction:column;min-height:100vh">
   <header class="sh">
     <div class="sh-row">
-      <button class="sh-back" onclick="switchView('A')"><span class="sh-back-arrow">‹</span><span class="sh-label">Resume</span></button>
-      <span class="sh-right-text">1 of 4</span>
+      <button class="sh-back" id="bStepBackBtn" onclick="bStepBack()"><span class="sh-back-arrow">‹</span><span class="sh-label" id="bStepBackLabel">Resume</span></button>
+      <span class="sh-right-text" id="bStepCounter">Step 1 of 4</span>
     </div>
-    <div class="sh-title" style="font-size:22px">Your Details</div>
-    <div class="sh-sub">Saved here — copy into any application</div>
-    <div class="mini-progress"><div class="mini-progress-fill" style="width:25%;background:#fff"></div></div>
+    <div class="sh-title" id="bStepTitle" style="font-size:22px">About you</div>
+    <div class="sh-sub" id="bStepSub">Just the basics — name, contact, where you live now</div>
+    <!-- Stepper dots — 4 segments, current one filled -->
+    <div style="display:flex;gap:6px;margin-top:14px;padding:0">
+      <div class="b-dot active" data-dot="1"></div>
+      <div class="b-dot" data-dot="2"></div>
+      <div class="b-dot" data-dot="3"></div>
+      <div class="b-dot" data-dot="4"></div>
+    </div>
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
-    <div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:13px 15px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
+    <div id="bStepRecycledHint" style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:13px 15px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
       <span style="font-size:18px;flex-shrink:0">♻️</span>
-      <div style="font-weight:600;font-size:12.5px;color:#005040;line-height:1.6">These details are saved to your device. Your next application will have everything pre-filled.</div>
+      <div style="font-weight:600;font-size:12.5px;color:#005040;line-height:1.6">Saved on your device. Next time it's all pre-filled — you only update what's changed.</div>
     </div>
 
-    <!-- Personal -->
-    <div class="sec-label">Personal Details</div>
-    <div class="form-card">
-      <div class="form-field"><label class="form-label">Full Legal Name</label><input id="r-fullName" class="form-input" placeholder="Your full legal name" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Date of Birth</label><input id="r-dob" class="form-input" placeholder="DD/MM/YYYY" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Email Address</label><input id="r-email" class="form-input" type="email" placeholder="your@email.com" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Mobile Number</label><input id="r-mobile" class="form-input" type="tel" placeholder="04xx xxx xxx" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Current Address</label><input id="r-currentAddress" class="form-input" placeholder="Your current address" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Time at Address</label><input id="r-timeAtAddress" class="form-input" placeholder="e.g. 2 years" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Reason for Moving</label><input id="r-reasonMoving" class="form-input" placeholder="Briefly explain your reason" oninput="autosave()"></div>
-    </div>
-    <button class="btn-muted-c btn-full" style="border-radius:10px;margin-top:10px;font-size:13px" onclick="copySection('personal')">📋 Copy Personal Details</button>
-
-    <!-- Employment -->
-    <div class="sec-label" style="margin-top:20px">Employment</div>
-    <div class="form-card">
-      <div class="form-field"><label class="form-label">Employment Status</label>
-        <select id="r-employmentStatus" class="form-input" style="cursor:pointer" onchange="autosave()">
-          <option value="">Select status…</option>
-          <option>Employed Full-Time</option>
-          <option>Employed Part-Time</option>
-          <option>Self-Employed</option>
-          <option>Casual</option>
-          <option>Student</option>
-          <option>Between Jobs</option>
-        </select>
+    <!-- ── STEP 1 — PERSONAL ───────────────────────────────────────────── -->
+    <section class="b-step active" data-bstep="1">
+      <div class="form-card">
+        <div class="form-field"><label class="form-label">Full Name</label><input id="r-fullName" class="form-input" placeholder="As it appears on ID" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Date of Birth</label><input id="r-dob" class="form-input" placeholder="DD/MM/YYYY" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Email Address</label><input id="r-email" class="form-input" type="email" placeholder="your@email.com" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Mobile Number</label><input id="r-mobile" class="form-input" type="tel" placeholder="04xx xxx xxx" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Current Address</label><input id="r-currentAddress" class="form-input" placeholder="Where you live right now" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">How long there?</label><input id="r-timeAtAddress" class="form-input" placeholder="e.g. 2 years" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Reason for moving</label><input id="r-reasonMoving" class="form-input" placeholder="Quick reason — needs more space, closer to work, etc." oninput="autosave()"></div>
       </div>
-      <div class="form-field"><label class="form-label">Employer</label><input id="r-employer" class="form-input" placeholder="Your employer" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Job Title</label><input id="r-jobTitle" class="form-input" placeholder="Your job title" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Duration in Role</label><input id="r-empDuration" class="form-input" placeholder="e.g. 2 years" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Annual Income</label>
-        <input id="r-income" class="form-input" placeholder="$0 (before tax)" oninput="autosave()">
-        <div class="form-note">Agencies may ask for payslips to verify</div>
-      </div>
-    </div>
-    <button class="btn-muted-c btn-full" style="border-radius:10px;margin-top:10px;font-size:13px" onclick="copySection('employment')">📋 Copy Employment Details</button>
+      <button class="btn-muted-c btn-full" style="border-radius:10px;margin-top:10px;font-size:13px" onclick="copySection('personal')">📋 Copy this step</button>
+    </section>
 
-    <!-- Rental History -->
-    <!-- Rental History 1 -->
-    <div class="sec-label" style="margin-top:20px">Rental History — Most Recent<span class="sec-label-action" onclick="copySection('rental1')">📋 Copy</span></div>
-    <div class="form-card">
-      <div class="form-field"><label class="form-label">Previous Address</label><input id="r-prevAddress" class="form-input" placeholder="Your previous rental address" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Weekly Rent</label><input id="r-prevRent" class="form-input" placeholder="$0 per week" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Agency / Landlord Name</label><input id="r-prevAgency" class="form-input" placeholder="Agency or landlord name" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Landlord / PM Phone</label><input id="r-prevContact" class="form-input" type="tel" placeholder="Phone number" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Duration</label><input id="r-prevDuration" class="form-input" placeholder="e.g. Jan 2022 – Mar 2024" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Reason for Leaving</label><input id="r-prevReason" class="form-input" placeholder="e.g. Lease ended, relocating" oninput="autosave()"></div>
-    </div>
-
-    <!-- Rental History 2 -->
-    <div class="sec-label" style="margin-top:20px">Rental History — Previous<span class="sec-label-action" onclick="copySection('rental2')">📋 Copy</span></div>
-    <div class="form-card" style="border-style:dashed">
-      <div class="form-field"><label class="form-label">Previous Address</label><input id="r-prev2Address" class="form-input" placeholder="Earlier rental address (optional)" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Weekly Rent</label><input id="r-prev2Rent" class="form-input" placeholder="$0 per week" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Agency / Landlord Name</label><input id="r-prev2Agency" class="form-input" placeholder="Agency or landlord name" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Landlord / PM Phone</label><input id="r-prev2Contact" class="form-input" type="tel" placeholder="Phone number" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Duration</label><input id="r-prev2Duration" class="form-input" placeholder="e.g. Mar 2020 – Jan 2022" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Reason for Leaving</label><input id="r-prev2Reason" class="form-input" placeholder="e.g. Lease ended" oninput="autosave()"></div>
-    </div>
-
-    <!-- Pet Declaration -->
-    <div class="sec-label" style="margin-top:20px">Pet Declaration</div>
-    <div class="form-card">
-      <div class="toggle-row">
-        <div>
-          <div class="toggle-label">I have pets</div>
-          <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Always declare — undisclosed pets can void your lease</div>
+    <!-- ── STEP 2 — EMPLOYMENT ─────────────────────────────────────────── -->
+    <section class="b-step" data-bstep="2">
+      <div class="form-card">
+        <div class="form-field"><label class="form-label">Employment Status</label>
+          <select id="r-employmentStatus" class="form-input" style="cursor:pointer" onchange="autosave()">
+            <option value="">Select status…</option>
+            <option>Employed Full-Time</option>
+            <option>Employed Part-Time</option>
+            <option>Self-Employed</option>
+            <option>Casual</option>
+            <option>Student</option>
+            <option>Between Jobs</option>
+          </select>
         </div>
-        <div onclick="togglePets()" style="cursor:pointer;display:flex">
-          <input type="checkbox" id="r-hasPets" style="display:none">
-          <div id="petTrack" style="width:44px;height:26px;background:var(--border);border-radius:100px;position:relative;transition:background .2s;cursor:pointer">
-            <div id="petKnob" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+        <div class="form-field"><label class="form-label">Employer</label><input id="r-employer" class="form-input" placeholder="Company or business name" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Job Title</label><input id="r-jobTitle" class="form-input" placeholder="Your role" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Duration in Role</label><input id="r-empDuration" class="form-input" placeholder="e.g. 2 years" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Annual Income</label>
+          <input id="r-income" class="form-input" placeholder="$0 (before tax)" oninput="autosave()">
+          <div class="form-note">Agencies usually ask for a few payslips to verify</div>
+        </div>
+      </div>
+      <button class="btn-muted-c btn-full" style="border-radius:10px;margin-top:10px;font-size:13px" onclick="copySection('employment')">📋 Copy this step</button>
+    </section>
+
+    <!-- ── STEP 3 — RENTAL HISTORY ─────────────────────────────────────── -->
+    <section class="b-step" data-bstep="3">
+      <div class="sec-label" style="margin-top:0">Most recent rental<span class="sec-label-action" onclick="copySection('rental1')">📋 Copy</span></div>
+      <div class="form-card">
+        <div class="form-field"><label class="form-label">Address</label><input id="r-prevAddress" class="form-input" placeholder="Where you rented" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Weekly Rent</label><input id="r-prevRent" class="form-input" placeholder="$0 per week" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Agency or Landlord</label><input id="r-prevAgency" class="form-input" placeholder="Who managed it" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Their Phone</label><input id="r-prevContact" class="form-input" type="tel" placeholder="So they can be contacted for a reference" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Duration</label><input id="r-prevDuration" class="form-input" placeholder="e.g. Jan 2022 – Mar 2024" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Reason for Leaving</label><input id="r-prevReason" class="form-input" placeholder="Lease ended, relocating, etc." oninput="autosave()"></div>
+      </div>
+
+      <div class="sec-label" style="margin-top:20px">Earlier rental — optional<span class="sec-label-action" onclick="copySection('rental2')">📋 Copy</span></div>
+      <div class="form-card" style="border-style:dashed">
+        <div class="form-field"><label class="form-label">Address</label><input id="r-prev2Address" class="form-input" placeholder="Skip if not applicable" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Weekly Rent</label><input id="r-prev2Rent" class="form-input" placeholder="$0 per week" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Agency or Landlord</label><input id="r-prev2Agency" class="form-input" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Their Phone</label><input id="r-prev2Contact" class="form-input" type="tel" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Duration</label><input id="r-prev2Duration" class="form-input" placeholder="e.g. Mar 2020 – Jan 2022" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Reason for Leaving</label><input id="r-prev2Reason" class="form-input" oninput="autosave()"></div>
+      </div>
+    </section>
+
+    <!-- ── STEP 4 — HOUSEHOLD (pets, vehicles, occupants) ──────────────── -->
+    <section class="b-step" data-bstep="4">
+      <div class="sec-label" style="margin-top:0">Pets</div>
+      <div class="form-card">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">I have pets</div>
+            <div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Always declare — undisclosed pets can void a lease</div>
+          </div>
+          <div onclick="togglePets()" style="cursor:pointer;display:flex">
+            <input type="checkbox" id="r-hasPets" style="display:none">
+            <div id="petTrack" style="width:44px;height:26px;background:var(--border);border-radius:100px;position:relative;transition:background .2s;cursor:pointer">
+              <div id="petKnob" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div id="petSection" style="display:none">
-      <div class="form-card" style="margin-top:10px">
-        <div class="form-field"><label class="form-label">Type of Pet</label>
-          <select id="r-petType" class="form-input" style="cursor:pointer" onchange="autosave()">
-            <option value="">Select type…</option><option>Dog</option><option>Cat</option><option>Bird</option><option>Rabbit</option><option>Fish</option><option>Other</option>
+      <div id="petSection" style="display:none">
+        <div class="form-card" style="margin-top:10px">
+          <div class="form-field"><label class="form-label">Type of Pet</label>
+            <select id="r-petType" class="form-input" style="cursor:pointer" onchange="autosave()">
+              <option value="">Select type…</option><option>Dog</option><option>Cat</option><option>Bird</option><option>Rabbit</option><option>Fish</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-field"><label class="form-label">Breed</label><input id="r-petBreed" class="form-input" placeholder="e.g. Golden Retriever" oninput="autosave()"></div>
+          <div class="form-field"><label class="form-label">Age</label><input id="r-petAge" class="form-input" placeholder="e.g. 3 years" oninput="autosave()"></div>
+          <div class="form-field"><label class="form-label">Council Registration</label><input id="r-petRego" class="form-input" placeholder="If applicable" oninput="autosave()"></div>
+          <div class="form-field"><label class="form-label">Anything else worth saying</label><input id="r-petNotes" class="form-input" placeholder="e.g. Desexed, indoor only, very well behaved" oninput="autosave()"></div>
+        </div>
+      </div>
+
+      <div class="sec-label" style="margin-top:20px">Vehicles</div>
+      <div class="form-card">
+        <div class="form-field"><label class="form-label">How many?</label>
+          <select id="r-vehicleCount" class="form-input" style="cursor:pointer" onchange="autosave()">
+            <option value="">Select…</option><option>None</option><option>1</option><option>2</option><option>3+</option>
           </select>
         </div>
-        <div class="form-field"><label class="form-label">Breed</label><input id="r-petBreed" class="form-input" placeholder="e.g. Golden Retriever" oninput="autosave()"></div>
-        <div class="form-field"><label class="form-label">Age</label><input id="r-petAge" class="form-input" placeholder="e.g. 3 years" oninput="autosave()"></div>
-        <div class="form-field"><label class="form-label">Council Registration Number</label><input id="r-petRego" class="form-input" placeholder="Registration number (if applicable)" oninput="autosave()"></div>
-        <div class="form-field"><label class="form-label">Additional Notes</label><input id="r-petNotes" class="form-input" placeholder="e.g. Desexed, indoor only, very well behaved" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Vehicle 1 — Make &amp; Model</label><input id="r-vehicle1" class="form-input" placeholder="e.g. Toyota Camry" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Registration</label><input id="r-vehicle1Rego" class="form-input" placeholder="e.g. ABC123" style="text-transform:uppercase" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Vehicle 2 — if applicable</label><input id="r-vehicle2" class="form-input" placeholder="e.g. Honda Jazz" oninput="autosave()"></div>
       </div>
-    </div>
 
-    <!-- Vehicle Details -->
-    <div class="sec-label" style="margin-top:20px">Vehicle Details</div>
-    <div class="form-card">
-      <div class="form-field"><label class="form-label">Number of Vehicles</label>
-        <select id="r-vehicleCount" class="form-input" style="cursor:pointer" onchange="autosave()">
-          <option value="">Select…</option><option>None</option><option>1</option><option>2</option><option>3+</option>
-        </select>
-      </div>
-      <div class="form-field"><label class="form-label">Vehicle 1 — Make &amp; Model</label><input id="r-vehicle1" class="form-input" placeholder="e.g. Toyota Camry" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Registration</label><input id="r-vehicle1Rego" class="form-input" placeholder="e.g. ABC123" style="text-transform:uppercase" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Vehicle 2 — Make &amp; Model (if applicable)</label><input id="r-vehicle2" class="form-input" placeholder="e.g. Honda Jazz" oninput="autosave()"></div>
-    </div>
-
-    <!-- Occupant Details -->
-    <div class="sec-label" style="margin-top:20px">Other Occupants</div>
-    <div class="form-card">
-      <div class="form-field"><label class="form-label">Total Number Moving In (including you)</label>
-        <select id="r-occupantCount" class="form-input" style="cursor:pointer" onchange="autosave()">
-          <option value="">Select…</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option>
-        </select>
-      </div>
-      <div class="form-field"><label class="form-label">Occupant 2 — Full Name</label><input id="r-occ2Name" class="form-input" placeholder="Name (if applicable)" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Relationship</label><input id="r-occ2Rel" class="form-input" placeholder="e.g. Partner, Housemate" oninput="autosave()"></div>
-      <div class="form-field"><label class="form-label">Occupant 3 — Full Name</label><input id="r-occ3Name" class="form-input" placeholder="Name (if applicable)" oninput="autosave()"></div>
-    </div>
-
-  </div>
-
-    <!-- Confirmation -->
-    <div style="margin:16px 0;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:14px 16px">
-      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent">
-        <input type="checkbox" id="detailsConfirmCheck" style="width:20px;height:20px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;margin-top:2px">
-        <div>
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">I've reviewed all details above</div>
-          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5">Everything is accurate and ready to be used in my application.</div>
+      <div class="sec-label" style="margin-top:20px">Other people moving in</div>
+      <div class="form-card">
+        <div class="form-field"><label class="form-label">Total people moving in (including you)</label>
+          <select id="r-occupantCount" class="form-input" style="cursor:pointer" onchange="autosave()">
+            <option value="">Select…</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option>
+          </select>
         </div>
-      </label>
-    </div>
+        <div class="form-field"><label class="form-label">Occupant 2 — Name</label><input id="r-occ2Name" class="form-input" placeholder="If applicable" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Relationship</label><input id="r-occ2Rel" class="form-input" placeholder="e.g. Partner, Housemate" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Occupant 3 — Name</label><input id="r-occ3Name" class="form-input" placeholder="If applicable" oninput="autosave()"></div>
+      </div>
 
+      <!-- Confirmation only on the final step -->
+      <div style="margin:18px 0 0;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:14px 16px">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <input type="checkbox" id="detailsConfirmCheck" style="width:20px;height:20px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;margin-top:2px">
+          <div>
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">I've reviewed everything across all 4 steps</div>
+            <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5">Ready to use in any application.</div>
+          </div>
+        </label>
+      </div>
+    </section>
   </div>
 
   <div class="sticky-footer">
-    <button class="btn-outline-c" onclick="switchView('A')">← Back</button>
-    <button class="btn-blue-c flex-1" style="border-radius:12px" onclick="confirmAndSaveDetails()">Save & Next →</button>
+    <button class="btn-outline-c" id="bStepFooterBack" onclick="bStepBack()">← Back</button>
+    <button class="btn-blue-c flex-1" id="bStepFooterNext" style="border-radius:12px" onclick="bStepNext()">Next →</button>
   </div>
 </div>
 
@@ -917,6 +930,8 @@ function switchView(id){
       requestAnimationFrame(function(){nxt.style.transition='opacity .2s ease';nxt.style.opacity='1';nxt.style.pointerEvents=''});
     });
     window.scrollTo(0,0);
+    // Always start View B at step 1 so the renter doesn't land mid-form
+    if(id === 'B' && typeof setBStep === 'function') setBStep(1);
   },150);
   currentView=id;
 }
@@ -1575,6 +1590,91 @@ function confirmAndSaveDetails(){
   }
   saveAndNext('check-details','status-details','Details saved ✓','C');
 }
+
+// ── Sub-step navigation inside View B ─────────────────────────────────────
+// Splits the long Your Details form into 4 swipeable panels: Personal,
+// Employment, Rental history, Household. Keeps the renter focused on one
+// chunk at a time and makes the form feel premium on mobile.
+var bStepCurrent = 1;
+var B_STEP_META = {
+  1: { title: 'About you',         sub: 'Just the basics — name, contact, where you live now' },
+  2: { title: 'Work & income',     sub: 'Helps the agent see you can cover the rent' },
+  3: { title: 'Where you\'ve rented', sub: 'Last one or two places — references go here' },
+  4: { title: 'Household',         sub: 'Pets, vehicles, who else is moving in' }
+};
+
+function setBStep(n){
+  if(n < 1) n = 1;
+  if(n > 4) n = 4;
+  bStepCurrent = n;
+
+  // Show the matching panel
+  document.querySelectorAll('.b-step').forEach(function(el){
+    el.classList.toggle('active', String(el.getAttribute('data-bstep')) === String(n));
+  });
+
+  // Update dots
+  document.querySelectorAll('.b-dot').forEach(function(dot){
+    var d = parseInt(dot.getAttribute('data-dot'), 10);
+    dot.classList.toggle('active', d === n);
+    dot.classList.toggle('done', d < n);
+  });
+
+  // Update header text + counter
+  var meta = B_STEP_META[n] || B_STEP_META[1];
+  var t = document.getElementById('bStepTitle');
+  var s = document.getElementById('bStepSub');
+  var c = document.getElementById('bStepCounter');
+  if(t) t.textContent = meta.title;
+  if(s) s.textContent = meta.sub;
+  if(c) c.textContent = 'Step ' + n + ' of 4';
+
+  // Header back button: step 1 → "Resume" (View A), other steps → previous step
+  var backLabel = document.getElementById('bStepBackLabel');
+  if(backLabel) backLabel.textContent = n === 1 ? 'Resume' : ('Step ' + (n - 1));
+
+  // Footer Next button text changes on the last step
+  var nextBtn = document.getElementById('bStepFooterNext');
+  if(nextBtn){
+    if(n < 4) nextBtn.innerHTML = 'Next →';
+    else nextBtn.innerHTML = 'Save & continue to ID →';
+  }
+  // Footer back: greyed out on step 1
+  var fb = document.getElementById('bStepFooterBack');
+  if(fb){
+    if(n === 1) fb.textContent = '← Resume';
+    else fb.textContent = '← Back';
+  }
+
+  // Scroll to the top of the panel so the renter starts at field #1
+  var scroller = document.querySelector('#viewB > div[style*="overflow-y:auto"]');
+  if(scroller) scroller.scrollTop = 0;
+}
+
+function bStepNext(){
+  if(bStepCurrent < 4){
+    setBStep(bStepCurrent + 1);
+    return;
+  }
+  // Last step — run the existing confirm + save flow
+  confirmAndSaveDetails();
+}
+
+function bStepBack(){
+  if(bStepCurrent > 1){
+    setBStep(bStepCurrent - 1);
+    return;
+  }
+  // On step 1, back goes back to the resume hub
+  switchView('A');
+}
+
+// Reset to step 1 whenever View B opens, so the renter doesn't land mid-form
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){
+    if(typeof setBStep === 'function') setBStep(1);
+  }, 50);
+});
 
 function openPortal(url){
   showToast('Opening portal','Have your details ready — it takes 2 minutes','🔗');
