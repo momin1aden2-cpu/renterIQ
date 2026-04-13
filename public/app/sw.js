@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v40 — Application form: 4 swipeable steps with stepper dots
+// RenterIQ Service Worker v41 — Polish round: 2-col grids, vault empty states, lease renewal card, connections sheet, scan compare
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v40';
+var CACHE_NAME = 'renteriq-shell-v41';
 
 var APP_SHELL = [
   '/app/index.html',

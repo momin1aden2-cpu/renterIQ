@@ -68,6 +68,7 @@
 .tip-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px}
 .tip-txt{font-weight:600;font-size:12.5px;color:#1a3a8f;line-height:1.55}
 .photos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
+@media (max-width:480px){.photos-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
 .ph-thumb{aspect-ratio:1;border-radius:9px;overflow:hidden;position:relative;cursor:pointer}
 .ph-thumb img{width:100%;height:100%;object-fit:cover}
 .ph-ts{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.55);border-radius:4px;padding:1px 5px;font-family:'Sora',sans-serif;font-size:8px;font-weight:700;color:#fff}
@@ -1575,6 +1576,108 @@ function saveAndGoHome(){
   setTimeout(function(){navigate('/app/index.html')},1500)
 }
 
+// ── Weekend Quick Scan comparison ──
+// Side-by-side mini-cards of every saved scan so the renter can decide
+// which 1-3 to actually apply for. Sorted by vibe (Love → Would → Backup → Pass).
+function openScanCompareSheet(){
+  var saved = [];
+  for(var i = 0; i < localStorage.length; i++){
+    var k = localStorage.key(i);
+    if(k && k.indexOf('renteriq_openhome_insp_') === 0){
+      try { saved.push({ key:k, data:JSON.parse(localStorage.getItem(k) || '{}') }); } catch(e){}
+    }
+  }
+  if(!saved.length){ showToast('Nothing to compare', 'Complete a few Quick Scans first', 'ℹ️'); return; }
+
+  // Sort by vibe ranking, then by save time desc
+  var rank = { love:0, would:1, backup:2, pass:3, '':4 };
+  saved.sort(function(a, b){
+    var av = (a.data.scan && a.data.scan.vibe) || '';
+    var bv = (b.data.scan && b.data.scan.vibe) || '';
+    var rd = rank[av] - rank[bv];
+    if(rd !== 0) return rd;
+    var at = parseInt((a.key.split('_')[3] || '0'), 10);
+    var bt = parseInt((b.key.split('_')[3] || '0'), 10);
+    return bt - at;
+  });
+
+  var vibeMap = {
+    love:   { label:'😍 Loved it',  color:'#065F46', bg:'rgba(16,185,129,.14)', border:'#10B981' },
+    would:  { label:'🙂 Would do',  color:'#1B50C8', bg:'var(--blue-xl)',       border:'var(--blue)' },
+    backup: { label:'😐 Backup',    color:'#78350F', bg:'rgba(245,158,11,.14)', border:'var(--amber)' },
+    pass:   { label:'👎 Pass',      color:'#7F1D1D', bg:'rgba(239,68,68,.12)',  border:'var(--red)' }
+  };
+
+  var rowsHtml = saved.map(function(s){
+    var d = s.data || {};
+    var scan = d.scan || {};
+    var vibe = scan.vibe || '';
+    var v = vibeMap[vibe] || { label:'No verdict', color:'var(--muted)', bg:'var(--blue-xl)', border:'var(--border)' };
+    var ts = parseInt((s.key.split('_')[3] || '0'), 10);
+    var dateStr = ts ? new Date(ts).toLocaleDateString('en-AU', { day:'numeric', month:'short' }) : '';
+
+    // Pull a couple of one-line takeaways
+    var takeaways = [];
+    if(scan.liked) takeaways.push('💚 ' + scan.liked.slice(0, 90));
+    if(scan.worried) takeaways.push('⚠️ ' + scan.worried.slice(0, 90));
+
+    // Issue items count
+    var issueCount = 0;
+    if(scan.items){
+      Object.keys(scan.items).forEach(function(k){ if(scan.items[k] === 'issue') issueCount++; });
+    }
+
+    var meta = [];
+    if(d.rent) meta.push(d.rent);
+    if(d.beds) meta.push(d.beds + ' bed');
+    if(dateStr) meta.push(dateStr);
+
+    return '<div style="background:#fff;border:2px solid ' + v.border + ';border-radius:14px;padding:14px 14px;margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\'' + s.key + '\')">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px">'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);line-height:1.3">' + (d.address || 'Property') + '</div>'+
+          '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">' + meta.join(' · ') + '</div>'+
+        '</div>'+
+        '<span style="display:inline-block;font-family:Sora,sans-serif;font-weight:800;font-size:11px;color:' + v.color + ';background:' + v.bg + ';border-radius:100px;padding:5px 11px;white-space:nowrap;flex-shrink:0">' + v.label + '</span>'+
+      '</div>'+
+      (takeaways.length ? '<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">' + takeaways.map(function(t){ return '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--text);line-height:1.45">' + t + (t.length >= 92 ? '…' : '') + '</div>'; }).join('') + '</div>' : '') +
+      (issueCount > 0 ? '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--amber);background:rgba(245,158,11,.1);border-radius:6px;padding:3px 8px;display:inline-block;margin-top:8px">⚠ ' + issueCount + ' concern' + (issueCount>1?'s':'') + ' flagged</div>' : '') +
+    '</div>';
+  }).join('');
+
+  var loveCount = saved.filter(function(s){ return (s.data.scan && s.data.scan.vibe) === 'love'; }).length;
+  var wouldCount = saved.filter(function(s){ return (s.data.scan && s.data.scan.vibe) === 'would'; }).length;
+  var topPicks = loveCount + wouldCount;
+
+  var headerLine = topPicks > 0
+    ? topPicks + ' ' + (topPicks === 1 ? 'place worth' : 'places worth') + ' applying for · sorted by your vibe'
+    : 'Nothing stood out yet — keep looking?';
+
+  var overlay = document.createElement('div');
+  overlay.id = 'scanCompareSheet';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease';
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:88vh;display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">'+
+      '<div style="padding:14px 20px 12px;border-bottom:1px solid var(--border-lt);flex-shrink:0">'+
+        '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px"></div>'+
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.3px">📊 Compare your inspections</div>'+
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5">' + headerLine + '</div>'+
+      '</div>'+
+      '<div style="flex:1;overflow-y:auto;padding:14px 16px">' + rowsHtml + '</div>'+
+      '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0">'+
+        '<button id="scanCompareCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer">Close</button>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    overlay.style.opacity = '1';
+    var sheet = overlay.firstElementChild; if(sheet) sheet.style.transform = 'translateY(0)';
+  });
+  var close = function(){ overlay.style.opacity = '0'; setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 200); };
+  document.getElementById('scanCompareCloseBtn').onclick = close;
+  overlay.onclick = function(e){ if(e.target === overlay) close(); };
+}
+
 function exportInspectionPDF(){
   if(!window.RIQExport){showToast('Loading…','PDF library loading, try again in a moment','📄');return;}
   if(!inspectionData || (!inspectionData.address && !inspectionData.scan && !inspectionData.areas)){
@@ -1848,7 +1951,11 @@ function renderInspectionList(){
     return true;
   });
   if(orphanSaved.length>0){
-    html+='<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin:16px 0 10px">Past Inspections</div>';
+    var totalSaved = orphanSaved.length + alreadyInspected.length;
+    var compareBtn = totalSaved >= 2
+      ? '<button onclick="openScanCompareSheet()" style="background:var(--blue-xl);color:var(--blue);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer">Compare side-by-side →</button>'
+      : '';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px"><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase">Past Inspections</span>'+compareBtn+'</div>';
     var vibeMap2={love:{t:'😍 Loved it',c:'#065F46',bg:'rgba(16,185,129,.14)'},would:{t:'🙂 Would do',c:'var(--blue)',bg:'var(--blue-xl)'},backup:{t:'😐 Backup',c:'#78350F',bg:'rgba(245,158,11,.14)'},pass:{t:'👎 Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
     orphanSaved.forEach(function(item){
       var ts=parseInt((item.key.split('_')[3]||'0'),10);

@@ -132,10 +132,10 @@
       <div class="qa-card" onclick="switchView('D')"><div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔧</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Log Maintenance</div></div>
     </div>
     <div style="padding:20px 16px 10px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Recent Activity</div></div>
-    <div id="recentActivityList" style="margin:0 16px 16px;background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:20px;text-align:center;color:var(--muted)">
-      <div style="font-size:28px;margin-bottom:8px">📂</div>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue-dk);margin-bottom:4px">No activity yet</div>
-      <div style="font-size:12px">Your saved documents and actions will appear here.</div>
+    <div id="recentActivityList" style="margin:0 16px 16px;background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:24px 20px;text-align:center;color:var(--muted)">
+      <div style="font-size:32px;margin-bottom:10px">📂</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--text);margin-bottom:4px">Nothing here yet</div>
+      <div style="font-size:12.5px;line-height:1.55;max-width:240px;margin:0 auto">Every report, message and receipt you save in RenterIQ shows up here in date order.</div>
     </div>
   </div>
   <button class="share-fab" onclick="openSharePicker()" title="Share/Compile">📤</button>
@@ -198,10 +198,10 @@
     <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:5px">💡 About Lease Agreements</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">RenterIQ saves a plain-English summary of every lease you upload — including key dates, rent, bond and any clauses to watch.</div></div>
     <div id="leaseList">
       <div style="text-align:center;padding:40px 20px" id="noLeases">
-        <div style="font-size:40px;margin-bottom:10px">📑</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk);margin-bottom:6px">No lease saved yet</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px">Upload your lease to get a plain-English review and track your key dates.</div>
-        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/lease.html')">📑 Review My Lease</button>
+        <div style="font-size:44px;margin-bottom:12px">📑</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Your lease will live here</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">Upload it once — we break it down in plain English and remind you of key dates as the year goes on.</div>
+        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/lease.html')">📑 Upload &amp; review</button>
       </div>
     </div>
   </div>
@@ -216,10 +216,10 @@
     <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:5px">💡 About Move-in Records</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Your record of the property on move-in day. Compare it to the exit record when you leave — it helps protect your bond.</div></div>
     <div id="conditionReportsList">
       <div style="text-align:center;padding:40px 20px" id="noConditionReports">
-        <div style="font-size:40px;margin-bottom:10px">🏠</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk);margin-bottom:6px">No records yet</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px">After you move in, document each room to create your record.</div>
-        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/inspection.html')">📸 Start Inspection</button>
+        <div style="font-size:44px;margin-bottom:12px">🏠</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Your move-in record will appear here</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">On move-in day, walk the property room-by-room — your record becomes the safety net for your bond at exit time.</div>
+        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/entry-audit.html')">🏠 Start move-in record</button>
       </div>
     </div>
   </div>
@@ -237,9 +237,10 @@
     <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:5px">💡 About the maintenance log</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">A dated record of every repair you've asked for — handy if questions come up later about when you reported something.</div></div>
     <div id="maintenanceItemsList">
       <div style="text-align:center;padding:40px 20px" id="noMaintenanceItems">
-        <div style="font-size:40px;margin-bottom:10px">🔧</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk);margin-bottom:6px">No maintenance items yet</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted)">Use the button above to log a maintenance request and track its progress.</div>
+        <div style="font-size:44px;margin-bottom:12px">🔧</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Nothing broken? Nice.</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">When something needs fixing, report it here — we'll draft the email and chase it up if the agent goes quiet.</div>
+        <button style="background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:800;cursor:pointer;min-height:44px;box-shadow:0 4px 14px rgba(245,158,11,.3)" onclick="navigate('/app/pages/report-issue.html')">✦ Report an issue</button>
       </div>
     </div>
   </div>
@@ -253,10 +254,11 @@
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:100px">
     <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:5px">💡 Why save communications?</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">A dated record of every message between you and the agent or landlord. Save emails and letters here so you can look things up when you need to.</div></div>
     <div id="commsList">
-      <div style="text-align:center;padding:32px 20px" id="noCommsItems">
-        <div style="font-size:40px;margin-bottom:10px">💬</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk);margin-bottom:6px">No messages saved yet</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted)">Save emails, texts, and letters with your agent or landlord.</div>
+      <div style="text-align:center;padding:40px 20px" id="noCommsItems">
+        <div style="font-size:44px;margin-bottom:12px">💬</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Your message trail will live here</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">Every email RenterIQ drafts for you (maintenance, follow-ups, bond return) is saved automatically — easy to look up later.</div>
+        <button style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="openNewCommsSheet()">+ Save a message manually</button>
       </div>
     </div>
   </div>
@@ -271,9 +273,10 @@
     <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:5px">💡 Why save receipts?</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Proof of payment for rent, bond, and repairs — all in one place and easy to find later.</div></div>
     <div id="receiptsList">
       <div style="text-align:center;padding:40px 20px" id="noReceiptsItems">
-        <div style="font-size:40px;margin-bottom:10px">🧾</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk);margin-bottom:6px">No receipts yet</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted)">Add your rent receipts, bond confirmation and any repair costs here.</div>
+        <div style="font-size:44px;margin-bottom:12px">🧾</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Keep every receipt — easy to find later</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">Snap the bond receipt, rent payments, repair invoices. Comes in handy if anything ever needs to be proven.</div>
+        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="openNewReceiptSheet()">+ Add your first receipt</button>
       </div>
     </div>
   </div>
@@ -288,10 +291,10 @@
     <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:5px">💡 About Exit Reports</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Your exit inspection records prove the property's condition when you handed back the keys — your strongest evidence in any bond dispute. Keep them here forever.</div></div>
     <div id="exitReportsList">
       <div style="text-align:center;padding:40px 20px" id="noExitReports">
-        <div style="font-size:40px;margin-bottom:10px">🚪</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk);margin-bottom:6px">No exit reports yet</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px">Complete an exit inspection to see your bond protection record here.</div>
-        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/exit.html')">🚪 Start Exit Inspection</button>
+        <div style="font-size:44px;margin-bottom:12px">🚪</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Your move-out record will live here</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">When the time comes, walk the property the same way as move-in — we'll compare both sides to help you defend your bond.</div>
+        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/exit.html')">🚪 Start exit walkthrough</button>
       </div>
     </div>
   </div>
@@ -305,11 +308,11 @@
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:100px">
     <div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:5px">💡 About Routine Inspections</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.65">Your landlord or agent can inspect the property every 3–6 months. Use RenterIQ to photograph issues, upload the report, get a clear action plan, and automatically draft your response — all saved here.</div></div>
     <div id="routineReportsList">
-      <div style="text-align:center;padding:32px 20px" id="noRoutineReports">
-        <div style="font-size:40px;margin-bottom:10px">🔍</div>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--blue-dk);margin-bottom:6px">No routine inspections yet</div>
-        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px">Complete a routine inspection to see your reports here.</div>
-        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/routine-inspection.html')">🔍 Start Now</button>
+      <div style="text-align:center;padding:40px 20px" id="noRoutineReports">
+        <div style="font-size:44px;margin-bottom:12px">🔍</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Got a routine inspection report?</div>
+        <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">Upload it and we'll split the actions into "yours" vs "the agent's", set deadlines, and draft a friendly reply.</div>
+        <button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate('/app/pages/routine-inspection.html')">🔍 Upload report</button>
       </div>
     </div>
   </div>
