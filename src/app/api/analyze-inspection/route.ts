@@ -37,8 +37,16 @@ Rules:
 - Plumbing, electrical, structural, roofing, hot water, heating/cooling, locks, security = OWNER
 - Mowing, general cleaning, mould from poor ventilation, oven/stove cleaning, carpet stains from tenant use = TENANT
 - If unclear, default to OWNER and note it should be confirmed
-- Always reference the Residential Tenancies Act for the relevant state
+- Reference common Australian tenancy expectations (don't quote specific Act sections)
 - Be practical and fair in your assessments
+
+Limits & quality:
+- Aim for clarity, not maximum count. Return ONLY items that genuinely need action (skip "Satisfactory", "OK", "Good condition" rows entirely — those are not action items).
+- Soft cap: typically 15–25 items is right for most inspections. A large home with many real defects can legitimately produce 30–45 items — that's fine, return them all if they are real and actionable.
+- Hard cap: 60 items absolute maximum. If the report has more than that, prioritise by severity and merge low-priority cleaning items by room ("Bedroom 2: dust skirtings, cobwebs in corner, wipe window sill" as one item).
+- Merge duplicates aggressively. Multiple "clean grease from rangehood" entries → one item. "Wipe skirting boards in living, dining, hallway" → "Wipe skirting boards throughout main living areas."
+- Skip headers, room labels, page numbers, and "general comment" rows that aren't actionable.
+- If you have to merge or summarise, mention the room/area in the description so the renter still knows where to act.
 
 Input format notes:
 - Agency reports commonly arrive as scanned PDFs or photos of a multi-column table with columns like "Item / Comment / Action Required / By Whom / Due Date". Read the table row-by-row and map each row to one item — do not skip rows that span multiple lines.

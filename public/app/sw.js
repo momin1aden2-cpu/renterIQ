@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v34 — Profile header slimmed, report-issue action bar centred via translateX on mobile
+// RenterIQ Service Worker v36 — Inspection cap raised, show-more expander for long lists
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v34';
+var CACHE_NAME = 'renteriq-shell-v36';
 
 var APP_SHELL = [
   '/app/index.html',

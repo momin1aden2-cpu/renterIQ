@@ -1577,45 +1577,82 @@ function saveAndGoHome(){
 
 function exportInspectionPDF(){
   if(!window.RIQExport){showToast('Loading…','PDF library loading, try again in a moment','📄');return;}
-  var scan=inspectionData.scan||{};
-  var sections=[];
-
-  var verdictLabel={yes:'Would Apply',maybe:'Maybe',no:'Pass'}[inspectionData.verdict]||'';
-  var vibeLabel={love:'Love it',would:'Would do',backup:'Backup',pass:'Pass'}[scan.vibe]||'';
-  sections.push({
-    heading:'Verdict',
-    badge:verdictLabel==='Would Apply'?'Good':verdictLabel==='Maybe'?'Issues':verdictLabel==='Pass'?'Concerns':'',
-    content:(verdictLabel?verdictLabel:'—')+(vibeLabel?'  ·  First impression: '+vibeLabel:'')
-  });
-
-  var okItems=[], issueItems=[];
-  ['inside','practical'].forEach(function(g){
-    SCAN_ITEMS[g].forEach(function(item){
-      var st=scan.items&&scan.items[item.id];
-      if(st==='ok')okItems.push(item.icon+' '+item.label);
-      else if(st==='issue')issueItems.push(item.icon+' '+item.label);
-    });
-  });
-  if(okItems.length){ sections.push({heading:'Looked fine', badge:'Good', items:okItems}); }
-  if(issueItems.length){ sections.push({heading:'Concerns noted', badge:'Issues', items:issueItems}); }
-
-  if(scan.liked)sections.push({heading:'💚 One thing I liked',content:scan.liked});
-  if(scan.worried)sections.push({heading:'⚠️ One thing I'+"'"+'m worried about',content:scan.worried});
-
-  if((scan.photos||[]).length){
-    sections.push({heading:'Photos',photos:scan.photos.map(function(p){return p.url;})});
+  if(!inspectionData || (!inspectionData.address && !inspectionData.scan && !inspectionData.areas)){
+    showToast('Nothing to export','Complete an inspection first','⚠️');
+    return;
   }
 
-  if(inspectionData.notes)sections.push({heading:'Extra thoughts',content:inspectionData.notes});
+  var scan = inspectionData.scan || {};
+  var sections = [];
 
-  var allFlags=collectScanFlags();
+  // Property summary — ALWAYS present so the PDF is never empty
+  var propertyLines = [];
+  if(inspectionData.address) propertyLines.push('Address: ' + inspectionData.address);
+  if(inspectionData.rent) propertyLines.push('Rent: ' + inspectionData.rent);
+  if(inspectionData.beds) propertyLines.push('Bedrooms: ' + inspectionData.beds);
+  if(inspectionData.propertyType) propertyLines.push('Type: ' + inspectionData.propertyType);
+  sections.push({
+    heading: 'Property',
+    items: propertyLines.length ? propertyLines : ['Inspection details']
+  });
+
+  // Verdict + vibe
+  var verdictLabel = {yes:'Would Apply', maybe:'Maybe', no:'Pass'}[inspectionData.verdict] || '';
+  var vibeLabel = {love:'😍 Loved it', would:'🙂 Would do', backup:'😐 Backup', pass:'👎 Pass'}[scan.vibe] || '';
+  if(verdictLabel || vibeLabel){
+    sections.push({
+      heading: 'My verdict',
+      badge: verdictLabel === 'Would Apply' ? 'Good' : verdictLabel === 'Maybe' ? 'Issues' : verdictLabel === 'Pass' ? 'Concerns' : '',
+      content: [verdictLabel, vibeLabel].filter(Boolean).join('  ·  ')
+    });
+  }
+
+  // Quick Scan items (new shape) — only if SCAN_ITEMS exists in this context
+  var okItems = [], issueItems = [];
+  if(typeof SCAN_ITEMS !== 'undefined' && scan.items){
+    ['inside','practical'].forEach(function(g){
+      (SCAN_ITEMS[g] || []).forEach(function(item){
+        var st = scan.items[item.id];
+        if(st === 'ok') okItems.push(item.icon + ' ' + item.label);
+        else if(st === 'issue') issueItems.push(item.icon + ' ' + item.label);
+      });
+    });
+  }
+  if(okItems.length) sections.push({heading: 'Looked fine', badge: 'Good', items: okItems});
+  if(issueItems.length) sections.push({heading: 'Concerns noted', badge: 'Issues', items: issueItems});
+
+  if(scan.liked) sections.push({heading: '💚 One thing I liked', content: scan.liked});
+  if(scan.worried) sections.push({heading: '⚠️ One thing I\'m worried about', content: scan.worried});
+
+  if((scan.photos || []).length){
+    sections.push({heading: 'Photos', photos: scan.photos.map(function(p){ return p.url || p; })});
+  }
+
+  // Legacy support — older inspections used `areas` instead of `scan`
+  if(inspectionData.areas && typeof inspectionData.areas === 'object'){
+    Object.keys(inspectionData.areas).forEach(function(areaId){
+      var d = inspectionData.areas[areaId];
+      if(!d || !d.condition) return;
+      sections.push({
+        heading: areaId.charAt(0).toUpperCase() + areaId.slice(1).replace(/_/g,' '),
+        badge: d.condition === 'good' ? 'Good' : d.condition === 'issues' ? 'Issues' : 'Concerns',
+        content: d.notes || '(no notes)',
+        photos: (d.photos || []).slice(0, 3).map(function(p){ return p.url || p.data || p; })
+      });
+    });
+  }
+
+  if(inspectionData.notes) sections.push({heading: 'Extra thoughts', content: inspectionData.notes});
+
+  var allFlags = (typeof collectScanFlags === 'function') ? collectScanFlags() : [];
+
   RIQExport.generate({
-    title:'Open Home Quick Scan',
-    subtitle:inspectionData.address||'Property Inspection',
-    date:new Date(),
-    sections:sections,
-    redFlags:allFlags.length?allFlags:null,
-    filename:'RenterIQ-QuickScan-'+(inspectionData.address||'Report').replace(/[^a-zA-Z0-9]/g,'-').replace(/-+/g,'-')+'.pdf'
+    title: 'Open Home Quick Scan',
+    subtitle: inspectionData.address || 'Property Inspection',
+    date: new Date(),
+    sections: sections,
+    redFlags: allFlags.length ? allFlags : null,
+    filename: 'RenterIQ-QuickScan-' + ((inspectionData.address || 'Report').replace(/[^a-zA-Z0-9]/g,'-').replace(/-+/g,'-')) + '.pdf'
   });
 }
 

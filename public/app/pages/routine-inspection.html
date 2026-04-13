@@ -799,6 +799,36 @@ function tickStep(id) {
 }
 
 function onAnalysisComplete(data) {
+  // Defensive client-side cleanup: dedup by description, strip unactionable
+  // entries, hard-cap at 60 (a large home with many real defects might
+  // legitimately produce 40-50 items — we don't want to silently drop them).
+  if (data && Array.isArray(data.items)) {
+    var seen = {};
+    var skipPhrases = ['satisfactory', 'good condition', 'no action', 'n/a', 'not applicable', 'page', 'comment'];
+    var originalCount = data.items.length;
+    data.items = data.items.filter(function(it){
+      if (!it || !it.description) return false;
+      var desc = String(it.description).trim();
+      if (desc.length < 4) return false;
+      var lower = desc.toLowerCase();
+      if (skipPhrases.some(function(p){ return lower === p || lower.startsWith(p + ' '); })) return false;
+      var key = lower.replace(/[^a-z0-9]+/g,' ').trim();
+      if (seen[key]) return false;
+      seen[key] = true;
+      return true;
+    }).slice(0, 60);
+
+    // If we trimmed a lot, surface a friendly note to the renter
+    data._dedupTrimmed = originalCount - data.items.length;
+
+    // Recompute summary from the cleaned list so the badges always match
+    data.summary = data.summary || {};
+    data.summary.total = data.items.length;
+    data.summary.tenant_count = data.items.filter(function(it){ return it.responsibility === 'tenant'; }).length;
+    data.summary.owner_count  = data.items.filter(function(it){ return it.responsibility === 'owner'; }).length;
+    data.summary.urgent_count = data.items.filter(function(it){ return it.priority === 'high'; }).length;
+  }
+
   analysisData = data;
   taskCompleted = {};
   taskPhotos = {};
@@ -806,11 +836,10 @@ function onAnalysisComplete(data) {
   var items = data.items || [];
   var summary = data.summary || { total: items.length, tenant_count: 0, owner_count: 0 };
 
-  // Update analysis complete header
   document.getElementById('aiIconEl').classList.remove('analyzing');
   document.getElementById('aiIconEl').textContent = '✅';
   document.getElementById('aiTitleEl').textContent = 'Analysis Complete';
-  document.getElementById('aiSubEl').textContent = summary.total + ' items categorised · ' + summary.owner_count + ' owner · ' + summary.tenant_count + ' tenant';
+  document.getElementById('aiSubEl').textContent = summary.total + ' items · ' + summary.tenant_count + ' for you · ' + summary.owner_count + ' for the agent';
 
   setTimeout(function() {
     document.getElementById('aiAnalyzing').style.display = 'none';
@@ -819,32 +848,76 @@ function onAnalysisComplete(data) {
   }, 800);
 }
 
+// Reveal the rest of a long item list (Your tasks / For the agent)
+function riExpandList(btn, sel){
+  document.querySelectorAll(sel).forEach(function(el){ el.style.display = ''; });
+  btn.style.display = 'none';
+}
+
 // ── Render Analysis Results (View C) ──
 function renderAnalysisResults(data) {
   var items = data.items || [];
-  var ownerItems = items.filter(function(it) { return it.responsibility === 'owner'; });
+  var ownerItems  = items.filter(function(it) { return it.responsibility === 'owner';  });
   var tenantItems = items.filter(function(it) { return it.responsibility === 'tenant'; });
+
   var html = '';
 
-  if (ownerItems.length) {
-    html += '<div class="cat-section"><div class="cat-header"><div class="cat-icon" style="background:rgba(232,64,64,.1)">🔧</div><div class="cat-title">Owner Responsibility</div><div class="cat-count">' + ownerItems.length + ' items</div></div>';
-    ownerItems.forEach(function(it) {
-      html += '<div class="cat-item"><div class="ci-top"><div class="ci-text">' + esc(it.description) + '</div><span class="tag tag-red">Owner</span></div><div class="ci-detail">' + esc(it.explanation) + '</div><div class="ci-action"><span style="font-size:16px">💡</span><div class="ci-action-text">' + esc(it.action) + '</div></div></div>';
-    });
-    html += '</div>';
-  }
+  // Hero summary card so the renter sees the split at a glance
+  html += '<div style="padding:14px 16px 6px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+    '<div style="background:rgba(245,166,35,.10);border:1.5px solid rgba(245,166,35,.35);border-radius:14px;padding:14px 14px 12px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:18px">🧹</span><span style="font-family:Sora,sans-serif;font-weight:800;font-size:11px;color:#7A5500;letter-spacing:.6px;text-transform:uppercase">Your tasks</span></div><div style="font-family:Sora,sans-serif;font-weight:800;font-size:28px;color:#7A5500;line-height:1">' + tenantItems.length + '</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:#8A6500;margin-top:4px">to do before deadline</div></div>'+
+    '<div style="background:rgba(232,64,64,.08);border:1.5px solid rgba(232,64,64,.30);border-radius:14px;padding:14px 14px 12px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:18px">🔧</span><span style="font-family:Sora,sans-serif;font-weight:800;font-size:11px;color:#7A1F1F;letter-spacing:.6px;text-transform:uppercase">For agent</span></div><div style="font-family:Sora,sans-serif;font-weight:800;font-size:28px;color:#7A1F1F;line-height:1">' + ownerItems.length + '</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:#8A2F2F;margin-top:4px">to report &amp; follow up</div></div>'+
+  '</div></div>';
 
+  // Show first N items inline, fold the rest behind a "Show all" toggle so a
+  // genuinely long list doesn't overwhelm the screen on mobile.
+  var INLINE_LIMIT = 12;
+
+  // YOUR TASKS section (tenant items)
   if (tenantItems.length) {
-    html += '<div class="cat-section"><div class="cat-header"><div class="cat-icon" style="background:rgba(245,166,35,.1)">🧹</div><div class="cat-title">Tenant Responsibility</div><div class="cat-count">' + tenantItems.length + ' items</div></div>';
-    tenantItems.forEach(function(it) {
-      var dueText = it.deadline_days ? 'Due in ' + it.deadline_days + ' days' : '';
-      html += '<div class="cat-item"><div class="ci-top"><div class="ci-text">' + esc(it.description) + '</div><span class="tag tag-amber">Tenant</span></div><div class="ci-detail">' + esc(it.explanation) + '</div><div class="ci-action"><span style="font-size:16px">⏱️</span><div class="ci-action-text">' + (dueText || esc(it.action)) + '</div></div></div>';
+    var tenantHidden = Math.max(0, tenantItems.length - INLINE_LIMIT);
+    html += '<div style="padding:18px 16px 6px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🧹</div><div style="flex:1"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:15px;color:var(--text);letter-spacing:-.2px">Your tasks</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted)">' + tenantItems.length + ' item' + (tenantItems.length !== 1 ? 's' : '') + ' you need to handle</div></div></div></div>';
+    html += '<div style="padding:0 16px" id="tenantItemsList">';
+    tenantItems.forEach(function(it, i){
+      var dueText = it.deadline_days ? 'Due in ' + it.deadline_days + ' day' + (it.deadline_days !== 1 ? 's' : '') : '';
+      var prio = it.priority === 'high' ? '#EF4444' : it.priority === 'medium' ? '#F59E0B' : '#10B981';
+      var hiddenStyle = i >= INLINE_LIMIT ? ';display:none' : '';
+      html += '<div class="ten-item" style="background:#fff;border:1.5px solid var(--border-lt);border-left:4px solid ' + prio + ';border-radius:12px;padding:13px 14px;margin-bottom:8px' + hiddenStyle + '">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:14px;color:var(--text);line-height:1.4;flex:1">' + esc(it.description) + '</div>' + (dueText ? '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:#7A5500;background:rgba(245,166,35,.15);border-radius:8px;padding:3px 8px;white-space:nowrap;flex-shrink:0">⏰ ' + dueText + '</span>' : '') + '</div>'+
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.5">' + esc(it.action || it.explanation || '') + '</div>'+
+      '</div>';
     });
+    if (tenantHidden > 0) {
+      html += '<button onclick="riExpandList(this,\'.ten-item\')" style="width:100%;background:var(--blue-xl);border:1px dashed var(--border);color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;margin-top:4px">Show ' + tenantHidden + ' more</button>';
+    }
     html += '</div>';
   }
 
-  html += '<div style="padding:0 16px;margin-top:8px"><button class="btn-blue-c btn-full" onclick="switchView(\'D\');renderActionPlan()">📋 View Action Plan</button><div style="height:10px"></div><button class="btn-muted-c btn-full" onclick="buildResponse()">✉️ Build Response to Agent</button></div>';
-  html += '<div style="padding:16px"><div class="disclaimer-note"><span class="dn-icon">⚠️</span><p>Smart classification · Reviewed by tenant · This is guidance only, not legal advice.</p></div></div>';
+  // FOR THE AGENT section (owner items)
+  if (ownerItems.length) {
+    var ownerHidden = Math.max(0, ownerItems.length - INLINE_LIMIT);
+    html += '<div style="padding:22px 16px 6px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7A1F1F,#E84040);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔧</div><div style="flex:1"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:15px;color:var(--text);letter-spacing:-.2px">For the agent / landlord</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted)">' + ownerItems.length + ' item' + (ownerItems.length !== 1 ? 's' : '') + ' to mention in your reply</div></div></div></div>';
+    html += '<div style="padding:0 16px" id="ownerItemsList">';
+    ownerItems.forEach(function(it, i){
+      var prio = it.priority === 'high' ? '#EF4444' : it.priority === 'medium' ? '#F59E0B' : '#9AA4B8';
+      var hiddenStyle = i >= INLINE_LIMIT ? ';display:none' : '';
+      html += '<div class="own-item" style="background:#fff;border:1.5px solid var(--border-lt);border-left:4px solid ' + prio + ';border-radius:12px;padding:13px 14px;margin-bottom:8px;opacity:.92' + hiddenStyle + '">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:14px;color:var(--text);line-height:1.4;flex:1">' + esc(it.description) + '</div><span style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:#7A1F1F;background:rgba(232,64,64,.10);border-radius:8px;padding:3px 8px;white-space:nowrap;flex-shrink:0">Agent</span></div>'+
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.5">' + esc(it.action || it.explanation || '') + '</div>'+
+      '</div>';
+    });
+    if (ownerHidden > 0) {
+      html += '<button onclick="riExpandList(this,\'.own-item\')" style="width:100%;background:var(--blue-xl);border:1px dashed var(--border);color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;margin-top:4px">Show ' + ownerHidden + ' more</button>';
+    }
+    html += '</div>';
+  }
+
+  // Primary actions
+  html += '<div style="padding:22px 16px 8px;display:flex;flex-direction:column;gap:10px">'+
+    '<button onclick="switchView(\'D\');renderActionPlan()" style="width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:14px;padding:16px;font-family:Sora,sans-serif;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 6px 20px rgba(27,80,200,.3);min-height:52px">📋 Open my action plan</button>'+
+    '<button onclick="buildResponse()" style="width:100%;background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:14px;padding:14px;font-family:Sora,sans-serif;font-weight:800;font-size:14px;cursor:pointer;min-height:48px">✉️ Skip — just draft the agent reply</button>'+
+  '</div>';
+
+  html += '<div style="padding:16px"><div class="disclaimer-note"><span class="dn-icon">⚠️</span><p>Smart classification · Always check before acting. Helper, not legal advice.</p></div></div>';
 
   document.getElementById('analysisResults').innerHTML = html;
 }
@@ -941,45 +1014,57 @@ function buildResponse() {
   var tenantItems = items.filter(function(it) { return it.responsibility === 'tenant'; });
   var ownerItems = items.filter(function(it) { return it.responsibility === 'owner'; });
   var deadline = analysisData.suggested_response_deadline_days || 14;
-  var agencyName = document.getElementById('agencyName').value || 'the Agency';
+  var agencyName = document.getElementById('agencyName').value || '';
   var today = new Date();
   var dueDate = new Date(today.getTime() + deadline * 86400000);
 
   document.getElementById('dlTitle').textContent = 'Response due in ' + deadline + ' days';
   document.getElementById('dlSub').textContent = 'Respond by ' + dueDate.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  // Generate email
-  var email = 'Dear ' + agencyName + ',\n\n';
-  email += 'Thank you for the routine inspection report dated ' + today.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) + '.\n\n';
+  // Friendly, factual draft — same tone as the maintenance issue route
+  var greeting = agencyName ? 'Hi ' + agencyName + ',' : 'Hi there,';
+  var email = greeting + '\n\n';
+  email += 'Thanks for the routine inspection report. Here\'s where things are at from my end.\n\n';
 
   if (tenantItems.length) {
-    email += 'TENANT ACTION ITEMS:\n';
+    var doneList = [], pendingList = [];
     tenantItems.forEach(function(it) {
       var done = taskCompleted[items.indexOf(it)];
       var photos = taskPhotos[items.indexOf(it)] || [];
-      email += (done ? '✓' : '•') + ' ' + it.description;
-      if (it.deadline_days) email += ' — Will complete within ' + it.deadline_days + ' days';
-      if (photos.length) email += ' (' + photos.length + ' photo' + (photos.length > 1 ? 's' : '') + ' attached)';
-      email += '\n';
+      var line = '• ' + it.description;
+      if (photos.length) line += ' (' + photos.length + ' photo' + (photos.length > 1 ? 's' : '') + ' attached)';
+      if (done) doneList.push(line);
+      else {
+        if (it.deadline_days) line += ' — I\'ll have this sorted within ' + it.deadline_days + ' day' + (it.deadline_days !== 1 ? 's' : '');
+        pendingList.push(line);
+      }
     });
-    email += '\n';
+    if (doneList.length) {
+      email += 'Already done on my end:\n' + doneList.join('\n') + '\n\n';
+    }
+    if (pendingList.length) {
+      email += 'I\'ll get to these shortly:\n' + pendingList.join('\n') + '\n\n';
+    }
   }
 
   if (ownerItems.length) {
-    email += 'OWNER/AGENT ITEMS:\n';
-    ownerItems.forEach(function(it) {
-      email += '• ' + it.description + ' — ' + it.action + '\n';
-    });
-    email += '\n';
+    email += 'A few items I think need to be looked at by the owner / property manager:\n';
+    ownerItems.forEach(function(it) { email += '• ' + it.description + '\n'; });
+    email += '\nWould appreciate a heads-up on when these can be arranged. Happy to coordinate access if needed.\n\n';
   }
 
-  email += 'Please confirm receipt and arrange the above owner repairs at your earliest convenience.\n\n';
-  email += 'Kind regards,\n';
+  email += 'Let me know if anything\'s unclear or you need more from me.\n\nKind regards,\n';
 
-  // Try to get user name
+  // Pre-fill tenant name from profile / resume
   var userName = '';
   try { userName = localStorage.getItem('riq-user-name') || ''; } catch(e) {}
-  email += userName || '[Your Name]';
+  if (!userName) {
+    try { var prof = JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}'); userName = prof.fullName || ''; } catch(e){}
+  }
+  if (!userName) {
+    try { var resume = JSON.parse(localStorage.getItem('riq-resume')||'{}'); userName = resume.fullName || ''; } catch(e){}
+  }
+  email += userName || '[Your name]';
 
   document.getElementById('responseField').value = email;
 
@@ -1014,11 +1099,29 @@ function copyResponse() {
 function sendResponse() {
   var email = document.getElementById('responseField').value;
   var agencyName = document.getElementById('agencyName').value || '';
-  var subject = encodeURIComponent('Routine Inspection Response — ' + new Date().toLocaleDateString('en-AU'));
+
+  // Try to pre-fill the agent's email address from the saved lease record or
+  // the active tracked property so the user doesn't have to type it.
+  var to = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}');
+    if (lease.agentEmail) to = lease.agentEmail;
+  } catch(e){}
+  if (!to) {
+    try {
+      var tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+      if (Array.isArray(tracked)) {
+        var living = tracked.find(function(p){ return p && p.status === 'lease_signed'; }) || tracked[0];
+        if (living) to = living.agent_email || (living.booking_data && living.booking_data.agent_email) || '';
+      }
+    } catch(e){}
+  }
+
+  var subject = encodeURIComponent('Routine inspection — my response (' + new Date().toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' }) + ')');
   var body = encodeURIComponent(email);
-  window.open('mailto:?subject=' + subject + '&body=' + body);
+  window.open('mailto:' + encodeURIComponent(to) + '?subject=' + subject + '&body=' + body, '_self');
   saveToCommsVault(email, agencyName);
-  showToast('Opening email', 'Saved to Communications · Paste into email app', '✉️');
+  showToast('Opening email', 'Saved to Communications · Send when ready', '✉️');
   setTimeout(function() { switchView('F'); renderReminders(); }, 1200);
 }
 
@@ -1348,7 +1451,19 @@ function saveToFirestore(cb) {
       });
     });
 
-    Promise.all(uploadJobs).then(function() {
+    // Also upload the ORIGINAL report file (PDF/image) so the renter can
+    // open it later from the vault and see what the agent actually sent.
+    var originalUpload = Promise.resolve(null);
+    if (uploadedFile) {
+      var origExt = (uploadedFile.name || 'report').split('.').pop().toLowerCase();
+      var origPath = 'routine-inspections/' + inspId + '/original.' + origExt;
+      originalUpload = RIQStore.uploadFile(origPath, uploadedFile, { contentType: uploadedFile.type || 'application/octet-stream' })
+        .then(function(res){ return { url: res.url, path: res.path, fileName: uploadedFile.name, mimeType: uploadedFile.type }; })
+        .catch(function(err){ console.warn('Original report upload failed:', err); return null; });
+    }
+
+    Promise.all([Promise.all(uploadJobs), originalUpload]).then(function(results) {
+      var originalReport = results[1];
       var record = {
         id: inspId,
         agency: document.getElementById('agencyName').value || '',
@@ -1356,9 +1471,21 @@ function saveToFirestore(cb) {
         taskCompleted: taskCompleted,
         photos: uploadedPhotos,
         photoCount: Object.keys(uploadedPhotos).reduce(function(sum, k) { return sum + uploadedPhotos[k].length; }, 0),
+        originalReport: originalReport, // {url, path, fileName, mimeType} or null
         status: 'completed',
         date: new Date().toISOString()
       };
+      // Mirror the original-report URL onto the local past-inspections list so
+      // the vault card can render "View original" without another lookup.
+      try {
+        var pastRaw = localStorage.getItem(STORAGE_KEY + '_past') || '[]';
+        var pastList = JSON.parse(pastRaw);
+        var pi = pastList.findIndex(function(x){ return x && x.id === inspId; });
+        if (pi !== -1 && originalReport) {
+          pastList[pi].originalReport = originalReport;
+          localStorage.setItem(STORAGE_KEY + '_past', JSON.stringify(pastList));
+        }
+      } catch(e){}
       RIQStore.write('routine-inspections', inspId, record).then(function() {
         showToast('Saved to cloud ✓', 'Inspection synced across your devices', '☁️');
       }).catch(function(err) {
