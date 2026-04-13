@@ -660,7 +660,8 @@ function openNewReceiptSheet(){
 }
 function closeReceiptsSheet(){var o=document.getElementById('receiptsOverlay'),s=document.getElementById('receiptsSheet');if(!o||!s)return;o.style.opacity='0';s.style.transform='translateY(100%)';setTimeout(function(){o.style.display='none'},320)}
 
-var receiptPhoto = null;
+var receiptPhoto = null;        // image: data URL · file: {type:'file', name, icon}
+var receiptPhotoBlob = null;    // raw File for non-image cloud upload
 function handleReceiptPhoto(input){
   if(!input.files || !input.files[0]) return;
   var file = input.files[0];
@@ -668,6 +669,7 @@ function handleReceiptPhoto(input){
   if(VAULT_ACCEPTED_EXTS.indexOf(ext)===-1){showToast('File not supported','Use JPG, PNG, HEIC, PDF or DOCX','⚠️');return;}
   var isImage = file.type.startsWith('image/');
   var preview = document.getElementById('receiptPhotoPreview');
+  receiptPhotoBlob = file; // keep the raw file around for cloud upload
   if(isImage){
     var reader = new FileReader();
     reader.onload = function(e){
@@ -678,7 +680,7 @@ function handleReceiptPhoto(input){
   }else{
     var icon = fileTypeIcon(ext);
     var shortName = file.name.length>12?file.name.slice(0,10)+'…':file.name;
-    receiptPhoto = {type:'file',name:file.name,icon:icon};
+    receiptPhoto = {type:'file',name:file.name,icon:icon,mimeType:file.type};
     preview.innerHTML = '<div style="width:70px;height:70px;border-radius:10px;position:relative;flex-shrink:0;background:var(--blue-xl);border:1px solid var(--border-lt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px;box-sizing:border-box"><span style="font-size:24px">'+icon+'</span><span style="font-size:8px;color:var(--muted);text-align:center;line-height:1.2;word-break:break-all">'+shortName+'</span><span onclick="clearReceiptPhoto()" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">×</span></div>';
   }
 }
@@ -726,6 +728,11 @@ function syncReceiptToCloud(rec){
   RIQStore.ready.then(function(){
     if(!RIQStore.isAuthed())return;
     var photo=rec.photo;
+    // Capture the raw file at sync time — closure will hold it even after
+    // we clear receiptPhotoBlob from the form
+    var rawFile = receiptPhotoBlob;
+    receiptPhotoBlob = null;
+
     var afterUpload=function(cloudPhoto){
       var cloudRec=Object.assign({},rec,{photo:cloudPhoto||null});
       RIQStore.write('receipts',rec.id,cloudRec).then(function(){
@@ -734,21 +741,33 @@ function syncReceiptToCloud(rec){
           var i=list.findIndex(function(x){return x.id===rec.id});
           if(i!==-1){list[i]=cloudRec;localStorage.setItem('riq_receipts',JSON.stringify(list));}
         }catch(e){}
+        loadReceipts();
       }).catch(function(err){console.warn('Receipt cloud sync failed:',err)});
     };
+
+    // Image data URL → blob → cloud upload
     if(typeof photo==='string'&&photo.indexOf('data:')===0){
       var blob=maint_dataURLToBlob(photo);
       if(!blob){afterUpload(null);return}
       var ext=blob.type.split('/')[1]||'jpg';
       var path='receipts/'+rec.id+'.'+ext;
       RIQStore.uploadFile(path,blob,{contentType:blob.type})
-        .then(function(res){afterUpload({url:res.url,path:res.path})})
+        .then(function(res){afterUpload({url:res.url,path:res.path,fileName:rec.id+'.'+ext,mimeType:blob.type})})
         .catch(function(err){console.warn('Receipt photo upload failed:',err);afterUpload(null);});
-    } else if(photo&&typeof photo==='object'){
-      afterUpload(photo); // file placeholder
-    } else {
-      afterUpload(null);
+      return;
     }
+
+    // Non-image file (PDF, DOCX) — upload the raw File if we still have it
+    if(photo && typeof photo==='object' && photo.type==='file' && rawFile){
+      var fext=(photo.name||'').split('.').pop().toLowerCase()||'pdf';
+      var fpath='receipts/'+rec.id+'.'+fext;
+      RIQStore.uploadFile(fpath,rawFile,{contentType:rawFile.type||photo.mimeType||'application/octet-stream'})
+        .then(function(res){afterUpload({url:res.url,path:res.path,fileName:photo.name,mimeType:rawFile.type||'',icon:photo.icon})})
+        .catch(function(err){console.warn('Receipt file upload failed:',err);afterUpload(photo);});
+      return;
+    }
+
+    afterUpload(photo || null);
   });
 }
 
@@ -1201,8 +1220,24 @@ function loadReceipts(){
         '<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">' + (r.description || 'Receipt') + '</div>' +
         '<div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">' + date + (r.amount ? ' · $' + r.amount : '') + '</div></div>' +
         '<span style="font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;color:' + typeColor + ';background:' + typeColor.replace(')', '').replace('var(--', 'rgba(') + ',.1);border-radius:8px;padding:4px 10px;text-transform:capitalize">' + (r.type || 'Other') + '</span></div>';
+      // Receipt attachment can be: data URL (image), {url, fileName, ...} cloud-uploaded, or {type:'file', name, icon} legacy placeholder
       if (r.photo) {
-        html += '<div style="padding-left:56px"><img src="' + r.photo + '" loading="lazy" decoding="async" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="window.open(this.src)"></div>';
+        if (typeof r.photo === 'string') {
+          // Plain data URL (image, pre-cloud)
+          html += '<div style="padding-left:56px"><img src="' + r.photo + '" loading="lazy" decoding="async" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="window.open(this.src)"></div>';
+        } else if (r.photo.url) {
+          // Cloud-uploaded — image OR doc/PDF
+          var isImg = (r.photo.mimeType || '').indexOf('image/') === 0;
+          if (isImg) {
+            html += '<div style="padding-left:56px;display:flex;align-items:center;gap:10px"><img src="' + r.photo.url + '" loading="lazy" decoding="async" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="window.open(\'' + r.photo.url + '\',\'_blank\')"><a href="' + r.photo.url + '" target="_blank" rel="noopener" style="font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-decoration:none">Open ↗</a></div>';
+          } else {
+            var icn = r.photo.icon || '📎';
+            html += '<div style="padding-left:56px"><a href="' + r.photo.url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-decoration:none;background:var(--blue-xl);border-radius:10px;padding:8px 12px"><span style="font-size:18px">' + icn + '</span><span>' + (r.photo.fileName || 'Open file') + '</span><span style="font-size:13px">↗</span></a></div>';
+          }
+        } else if (r.photo.type === 'file') {
+          // Legacy placeholder — never uploaded. Show as missing.
+          html += '<div style="padding-left:56px;font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:var(--muted);font-style:italic">📎 ' + (r.photo.name || 'File') + ' (saved before cloud upload — file not stored)</div>';
+        }
       }
       html += '</div>';
     });
@@ -1324,7 +1359,7 @@ function loadRoutineReports(){
         '</div>'+
         (origUrl
           ? '<div style="padding-left:56px;width:100%;box-sizing:border-box"><a href="'+origUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-decoration:none;background:var(--blue-xl);border-radius:8px;padding:7px 12px"><span>📄</span><span>View original report</span><span style="font-size:14px">↗</span></a></div>'
-          : '<div style="padding-left:56px;font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:var(--muted);font-style:italic">Original file not stored — sign in before analysing to save a copy</div>')+
+          : '<div style="padding-left:56px;width:100%;box-sizing:border-box"><button onclick="attachOriginalRoutine(\''+(insp.id||'')+'\')" style="display:inline-flex;align-items:center;gap:6px;font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border:1.5px dashed var(--border);border-radius:8px;padding:7px 12px;cursor:pointer">📎 Attach the original file</button><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4">Saved before file storage was wired — upload the PDF/photo if you still have it</div></div>')+
         '</div>';
     });
     list.innerHTML=html;
@@ -1333,6 +1368,77 @@ function loadRoutineReports(){
     var badge=document.querySelector('.vault-count-h');
     if(badge)badge.textContent=inspections.length+' report'+(inspections.length!==1?'s':'');
   }catch(e){console.error('Load routine reports error:',e);}
+}
+
+/* ── Backfill: attach the original report file to a past routine inspection
+ * Lets the renter recover by uploading the PDF/image they still have, even
+ * if the inspection was analysed before file-storage was wired up. */
+function attachOriginalRoutine(inspId){
+  if(!inspId){ showToast('No inspection ID','Cannot attach to this record','⚠️'); return; }
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/*';
+  input.onchange = function(e){
+    var file = e.target.files && e.target.files[0];
+    if(!file) return;
+    if(file.size > 15 * 1024 * 1024){ showToast('Too large','Max 15MB','⚠️'); return; }
+    showToast('Uploading…', file.name, '☁️');
+
+    if(!window.RIQStore){ showToast('Sign in first','Cloud storage is needed to keep the file safe','⚠️'); return; }
+    RIQStore.ready.then(function(){
+      if(!RIQStore.isAuthed()){ showToast('Sign in first','We need cloud access to save the file','⚠️'); return; }
+      var reader = new FileReader();
+      reader.onload = function(ev){
+        var blob = vaultDataURLToBlob(ev.target.result);
+        if(!blob){ showToast('Couldn\'t read file','Try a different file','⚠️'); return; }
+        var ext = (file.name.split('.').pop() || 'pdf').toLowerCase();
+        var path = 'routine-inspections/' + inspId + '/original.' + ext;
+        RIQStore.uploadFile(path, blob, { contentType: blob.type || file.type || 'application/octet-stream' })
+          .then(function(res){
+            var meta = { url: res.url, path: res.path, fileName: file.name, mimeType: file.type || '' };
+
+            // Update local past-inspections list
+            try {
+              var list = JSON.parse(localStorage.getItem('riq_routine_inspection_past') || '[]');
+              var i = list.findIndex(function(r){ return r && r.id === inspId; });
+              if(i !== -1){
+                list[i].originalReport = meta;
+                localStorage.setItem('riq_routine_inspection_past', JSON.stringify(list));
+              }
+            } catch(err){}
+
+            // Mirror to the Firestore inspection record
+            RIQStore.read('routine-inspections', inspId).then(function(rec){
+              if(rec){
+                rec.originalReport = meta;
+                RIQStore.write('routine-inspections', inspId, rec).catch(function(){});
+              }
+            });
+
+            showToast('Attached ✓','You can now open the original from this card','📎');
+            loadRoutineReports();
+          })
+          .catch(function(err){
+            console.warn('Backfill upload failed:', err);
+            showToast('Upload failed','Check your connection and try again','⚠️');
+          });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+  input.click();
+}
+
+function vaultDataURLToBlob(dataUrl){
+  try {
+    var parts = dataUrl.split(',');
+    var mime = (parts[0].match(/:(.*?);/) || [null, 'application/octet-stream'])[1];
+    var bstr = atob(parts[1]);
+    var n = bstr.length;
+    var u8 = new Uint8Array(n);
+    while(n--) u8[n] = bstr.charCodeAt(n);
+    return new Blob([u8], { type: mime });
+  } catch(e){ return null; }
 }
 
 /* ── Auto-create 90/60/30 day lease renewal reminders ── */

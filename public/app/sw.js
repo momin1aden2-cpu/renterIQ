@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v41 — Polish round: 2-col grids, vault empty states, lease renewal card, connections sheet, scan compare
+// RenterIQ Service Worker v42 — Original-file storage backfill + receipt PDF/DOC cloud upload
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v41';
+var CACHE_NAME = 'renteriq-shell-v42';
 
 var APP_SHELL = [
   '/app/index.html',
