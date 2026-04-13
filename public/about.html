@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <meta name="geo.region" content="AU">
 <meta name="geo.placename" content="Australia">
-<meta name="description" content="About RenterIQ — why we built it, the experience that started it all, and every feature inside the app.">
+<meta name="description" content="About RenterIQ — made in Perth for every Australian renter. The story behind the app, and every feature it gives you.">
 <meta name="theme-color" content="#1B50C8">
 <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,9 +50,15 @@ button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(27,80,200,.35)}
 
 /* ========== HERO ========== */
-.page-hero{background:linear-gradient(150deg,var(--blue-navy) 0%,#0A2460 55%,#122E7A 100%);padding:80px 0 88px;text-align:center;position:relative;overflow:hidden}
-.page-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
-.page-hero::after{content:'';position:absolute;top:-30%;left:50%;transform:translateX(-50%);width:800px;height:700px;background:radial-gradient(ellipse,rgba(46,99,224,.25) 0%,transparent 65%);pointer-events:none}
+.page-hero{background:linear-gradient(160deg,#061B4E 0%,#0A2460 40%,#122E7A 80%,#1B50C8 150%);padding:88px 0 96px;text-align:center;position:relative;overflow:hidden}
+.page-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
+.page-hero::after{content:'';position:absolute;top:-30%;left:50%;transform:translateX(-50%);width:1000px;height:900px;background:radial-gradient(ellipse,rgba(46,99,224,.32) 0%,rgba(46,99,224,.08) 40%,transparent 65%);pointer-events:none;z-index:0;animation:about-glow 8s ease-in-out infinite}
+@keyframes about-glow{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.85;transform:translateX(-50%) scale(1.05)}}
+.hero-accent{position:absolute;pointer-events:none;z-index:0;border-radius:50%;filter:blur(80px);opacity:.5}
+.hero-accent.teal{width:420px;height:420px;background:radial-gradient(circle,rgba(43,232,176,.35),transparent 70%);top:20%;left:-140px;animation:about-accent-a 12s ease-in-out infinite}
+.hero-accent.violet{width:380px;height:380px;background:radial-gradient(circle,rgba(124,58,237,.32),transparent 70%);bottom:-80px;right:-120px;animation:about-accent-b 14s ease-in-out infinite}
+@keyframes about-accent-a{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+@keyframes about-accent-b{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,15px)}}
 .page-hero .container{max-width:720px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
 .page-eyebrow{display:inline-block;font-family:'Sora',sans-serif;font-weight:800;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:18px}
 .page-hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(28px,5vw,46px);color:#fff;line-height:1.12;margin-bottom:18px}
@@ -180,10 +186,12 @@ button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
 
 <!-- HERO -->
 <section class="page-hero">
+  <span class="hero-accent teal" aria-hidden="true"></span>
+  <span class="hero-accent violet" aria-hidden="true"></span>
   <div class="container">
     <div class="page-eyebrow">Our Story</div>
-    <h1>We built this because<br>we've been there.</h1>
-    <p>A bond dispute. No evidence. A lesson that every Australian renter deserves better tools than a paper form on a Saturday morning.</p>
+    <h1>Built by renters,<br>for every renter.</h1>
+    <p>From Yokine in Perth to Paddington in Sydney — every Australian tenant walks the same path. Inspection in a rush. A paper form on a Saturday morning. And months later, a bond claim you never saw coming.</p>
   </div>
 </section>
 
@@ -191,24 +199,22 @@ button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
 <div class="content-wrap">
 
   <div class="story-card">
-    <p>I found the apartment on a Thursday. By Saturday I had signed the lease. Two-bedroom in Melbourne's inner north — nothing fancy, but it felt like home. I did the entry inspection with the property manager, ticked the boxes on the paper form they handed me, handed it back, and thought nothing more of it.</p>
-    <p>I lived there for fourteen months. I was a good tenant. Paid rent on time. Reported a leaking tap within a week of it starting. Swept the floors before I left. I thought I'd done everything right.</p>
-    <p>Then the bond claim arrived.</p>
-    <p><strong>$1,840 for carpet replacement in the main bedroom. $320 for repainting a wall in the hallway.</strong> They said it was damage I'd caused. I knew it wasn't — the carpet had been worn when I moved in, and that mark on the wall was there on day one. I remembered it clearly.</p>
-    <p>But <em>remembering</em> something and <em>proving</em> something are completely different things.</p>
-    <p>I had no photos from move-in. The entry report I'd signed was the agency's version, checked off in a rush on a Saturday morning. I had nothing timestamped, nothing room-by-room, nothing that could stand up against the agency's claim.</p>
-    <p><strong>I lost $2,160 of my bond.</strong> Not because I'd caused any damage. But because I didn't have the tools to prove I hadn't.</p>
+    <p>Most renters have a version of the same story. You find a place that feels right. You sign the lease, do the walk-through with the property manager, tick the boxes on the paper form they hand you, and get on with life. You live there. You pay your rent on time. You look after it.</p>
+    <p>Then the tenancy ends, and the bond claim arrives.</p>
+    <p><strong>Carpet replacement. Wall repainting. Cleaning charges.</strong> You know a lot of it isn't fair — marks that were there on day one, wear that was already worn in. You remember. But <em>remembering</em> something and <em>proving</em> something are completely different things.</p>
+    <p>It happened to us right here in Yokine, Perth. The entry report we signed was the agency's version, checked off in fifteen minutes. No photos that mattered, no timestamps, nothing room-by-room. When the bond claim landed, we had nothing that could stand up against it.</p>
+    <p>We'd seen the same thing happen to friends in Melbourne, flatmates in Brisbane, family in Sydney. Different cities. Same gap. <strong>The outcome follows whoever has the better paperwork</strong> — and for most renters, that isn't us.</p>
   </div>
 
   <div class="callout">
-    <h3>That experience didn't just cost money. It changed how I thought about renting.</h3>
-    <p>Every Australian renter has the right to get their bond back if they've looked after a property. But the system is built around whoever has the better paperwork. Agencies have professional condition reports. Renters have whatever they had time to write down on a Saturday morning. That imbalance is what RenterIQ is built to fix.</p>
+    <h3>Every Australian renter deserves the tools to protect their bond.</h3>
+    <p>The system is built around whoever has the better evidence. Agencies have professional condition reports, templates, photos, software. Renters have whatever they had time to scribble on a Saturday morning. RenterIQ exists to close that gap — a proper record, in your pocket, for every renter, everywhere in the country.</p>
   </div>
 
   <div class="story-card">
-    <p>I spent the months after that dispute learning everything I could about how bond claims work, what evidence tribunals accept, and what renters are actually entitled to under Australian tenancy law. What I found was consistent across every state: <strong>the outcome almost always follows the evidence trail.</strong></p>
-    <p>So I started building the tool I wished I'd had. Something that would walk you through a property room by room, photograph what matters, timestamp it all, and generate a professional report — before you ever hand the entry form back. Something that would read your lease in plain English before you signed it. Something that would store everything in one place, so fourteen months later you'd have everything you needed.</p>
-    <p>That tool is RenterIQ. Built for the renter who works hard, pays their rent, and deserves to get their full bond back.</p>
+    <p>After losing our own bond dispute, we started digging into how bond claims actually get decided. We talked to renters across every state. We read the tenancy legislation. We sat through tribunal hearings. One thing kept repeating: <strong>the outcome follows the evidence trail.</strong> A timestamped, itemised record almost always wins. A signed agency form with three ticks almost always loses.</p>
+    <p>So we built the tool we wished we'd had. Something that walks you through a property room by room, photographs what matters, timestamps it all, and generates a proper record — <em>before</em> you ever hand the entry form back. Something that reads your lease in plain English before you sign it. Something that keeps every receipt, message and maintenance log in one place, so when the bond claim arrives fourteen months later, you have everything.</p>
+    <p>That tool is RenterIQ. Made in Perth, built for every renter in Australia — whether you're starting a tenancy in Yokine, Kensington, Redcliffe or anywhere in between.</p>
   </div>
 
   <!-- ALL FEATURES SECTION -->
@@ -248,7 +254,7 @@ button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
           <div class="feat-item-icon">📸</div>
           <div>
             <h4>Entry Condition Report</h4>
-            <span class="feat-item-badge" style="background:#E8F5E9;color:#2E7D32">3 credits</span>
+            <span class="feat-item-badge pro">$24.99</span>
           </div>
         </div>
         <p>On move-in day — walk through room by room, photograph every wall, floor and fitting. A professional, timestamped entry condition report in minutes. The thing I didn't have.</p>
@@ -336,7 +342,7 @@ button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
           <div class="feat-item-icon">🚪</div>
           <div>
             <h4>Exit Condition Report</h4>
-            <span class="feat-item-badge" style="background:#E8F5E9;color:#2E7D32">4 credits</span>
+            <span class="feat-item-badge pro">$29.99</span>
           </div>
         </div>
         <p>At move-out — RenterIQ compares your entry and exit photos side by side, flagging differences for your review. Nothing enters the report without your approval. A professional dispute-ready PDF, ready to go.</p>
@@ -379,7 +385,8 @@ button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
   </div>
 
   <div class="story-card" style="margin-top:0">
-    <p>RenterIQ is currently in open beta. Every feature is free. We're asking early users to share their experience — what works, what doesn't, what you wish it did. This product is being built by someone who rents, for people who rent. Your feedback shapes it directly.</p>
+    <p>RenterIQ is free to search, apply, track inspections, manage your lease, log maintenance and run your first lease review — the day-to-day of renting, on us. You only pay when you need a report that protects your bond: the Entry Condition Report when you move in, or the Exit Comparison when you move out. No subscriptions. No recurring charges. Pay once, keep the record forever.</p>
+    <p>We're still in open beta. If you spot something that could work better, tell us — this product is shaped by the renters who use it.</p>
     <p><strong>If you've ever lost a bond you didn't deserve to lose — this one's for you.</strong></p>
   </div>
 
@@ -425,7 +432,7 @@ button{font-family:'Sora',sans-serif;cursor:pointer;border:none;outline:none}
     </div>
     <div class="footer-divider"></div>
     <div class="footer-bottom">
-      <span class="fb-copy">© 2025 RenterIQ Pty Ltd · Built in Australia 🇦🇺 · Personal organisation tool only — not a legal service.</span>
+      <span class="fb-copy">© 2026 RenterIQ Pty Ltd · Made in Perth, Western Australia 🇦🇺 · Personal organisation tool only — not a legal service.</span>
       <div class="fb-links">
         <a href="/privacy.html">Privacy</a>
         <a href="/terms.html">Terms</a>
