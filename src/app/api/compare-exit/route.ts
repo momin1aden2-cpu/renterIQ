@@ -8,6 +8,42 @@ interface RoomSummary {
   entryNotes: string;
   exitCondition: string;
   exitNotes: string;
+  // New: per-item changes detected client-side (Phase 2 evidence model)
+  changedItems?: ChangedItem[];
+}
+
+interface ChangedItem {
+  label: string;
+  entry: { clean: boolean | null; undamaged: boolean | null; working: boolean | string | null; comment?: string };
+  exit:  { clean: boolean | null; undamaged: boolean | null; working: boolean | string | null; comment?: string };
+}
+
+interface MaintenanceRef {
+  date: string;       // ISO
+  description: string;
+  status: 'pending' | 'resolved';
+  threadId?: string;
+}
+
+interface CommunicationRef {
+  date: string;       // ISO
+  type: string;
+  subject: string;
+  bodyPreview: string;
+  threadId?: string;
+}
+
+interface RoutineRef {
+  date: string;       // ISO
+  agency?: string;
+  itemsCount?: number;
+  topConcerns?: string[];
+}
+
+interface AgencyDoc {
+  fileName?: string;
+  url?: string;
+  uploadedAt?: number;
 }
 
 interface Discrepancy {
@@ -53,19 +89,24 @@ Return ONLY valid JSON in exactly this format:
   "summary": {
     "areasChecked": number,
     "matches": number,
-    "discrepancies": number
+    "reviewItems": number,
+    "chargeableItems": number,
+    "bondAtRiskEstimate": "e.g. $0–$120" or null
   },
   "areas": [
-    { "room": "Room Name", "emoji": "emoji", "status": "match" | "review" }
+    { "room": "Room Name", "emoji": "emoji", "status": "match" | "review" | "chargeable" }
   ],
   "discrepancies": [
     {
       "room": "Room Name",
       "emoji": "emoji",
-      "description": "Friendly 2-3 sentence summary of what's changed — no jargon, no legal tone",
+      "itemLabel": "Specific item name (e.g. 'Carpet' or 'Bathroom tiles')",
+      "description": "Friendly 2-3 sentence summary of what's changed",
       "entryContext": "Brief note of move-in state",
       "exitContext": "Brief note of exit state",
-      "severity": "minor" | "moderate" | "significant"
+      "severity": "match" | "review" | "chargeable",
+      "evidenceRefs": ["M3", "C7"],
+      "evidenceNote": "Optional one-line note about what the evidence shows (e.g. 'You reported this on 8 March 2026 and the agent confirmed receipt the next day')"
     }
   ],
   "bondRecovery": [
@@ -87,10 +128,24 @@ Australian context: reference Australian stores (Bunnings, Woolworths), common A
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { rooms, propertyAddress, state = 'VIC' } = body as {
+    const {
+      rooms,
+      propertyAddress,
+      state = 'VIC',
+      maintenanceLog = [],
+      communications = [],
+      routineHistory = [],
+      agencyEntryReport,
+      agencyExitReport,
+    } = body as {
       rooms: RoomSummary[];
       propertyAddress?: string;
       state?: string;
+      maintenanceLog?: MaintenanceRef[];
+      communications?: CommunicationRef[];
+      routineHistory?: RoutineRef[];
+      agencyEntryReport?: AgencyDoc | null;
+      agencyExitReport?: AgencyDoc | null;
     };
 
     if (!rooms || !Array.isArray(rooms) || rooms.length === 0) {
@@ -105,13 +160,58 @@ export async function POST(request: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-    const roomsText = rooms.map(r =>
-      `ROOM: ${r.emoji} ${r.name}\n` +
-      `  Move-in condition: ${r.entryCondition || 'Good'}\n` +
-      `  Move-in notes: ${r.entryNotes || 'No issues noted'}\n` +
-      `  Exit condition: ${r.exitCondition || 'Good'}\n` +
-      `  Exit notes: ${r.exitNotes || 'No issues noted'}`
-    ).join('\n\n');
+    // Per-room comparison block, including item-level changes when present
+    const roomsText = rooms.map(r => {
+      let block = `ROOM: ${r.emoji || ''} ${r.name}\n` +
+        `  Move-in overall: ${r.entryCondition || 'Good'}\n` +
+        `  Move-in notes: ${r.entryNotes || '(none)'}\n` +
+        `  Exit overall: ${r.exitCondition || 'Good'}\n` +
+        `  Exit notes: ${r.exitNotes || '(none)'}`;
+      if (r.changedItems && r.changedItems.length){
+        block += '\n  CHANGED ITEMS (entry → exit):';
+        r.changedItems.forEach(ci => {
+          const fmt = (v: boolean | string | null | undefined) => v === true ? '✓' : v === false ? '✗' : (v === 'na' ? 'N/A' : '?');
+          const entryStr = `clean ${fmt(ci.entry.clean)} · undamaged ${fmt(ci.entry.undamaged)} · working ${fmt(ci.entry.working)}`;
+          const exitStr  = `clean ${fmt(ci.exit.clean)} · undamaged ${fmt(ci.exit.undamaged)} · working ${fmt(ci.exit.working)}`;
+          block += `\n    • ${ci.label}: ${entryStr}  →  ${exitStr}` + (ci.exit.comment ? ` — "${ci.exit.comment}"` : '');
+        });
+      }
+      return block;
+    }).join('\n\n');
+
+    // Evidence the tenant has accumulated during the tenancy — this is what
+    // lets us cross-reference "you reported this on X" against changed items
+    let evidenceText = '';
+    if (maintenanceLog.length){
+      evidenceText += '\n\nMAINTENANCE LOG (issues the tenant reported during tenancy):\n';
+      maintenanceLog.slice(0, 30).forEach((m, i) => {
+        const d = m.date ? new Date(m.date).toISOString().slice(0,10) : '?';
+        evidenceText += `  [M${i+1}] ${d} · ${m.status || 'pending'} · ${m.description}\n`;
+      });
+    }
+    if (communications.length){
+      evidenceText += '\nCOMMUNICATIONS WITH AGENT/LANDLORD:\n';
+      communications.slice(0, 30).forEach((c, i) => {
+        const d = c.date ? new Date(c.date).toISOString().slice(0,10) : '?';
+        evidenceText += `  [C${i+1}] ${d} · ${c.type || 'message'} · ${c.subject || ''}` +
+          (c.bodyPreview ? ` — "${c.bodyPreview.slice(0,140)}${c.bodyPreview.length>140?'…':''}"` : '') + '\n';
+      });
+    }
+    if (routineHistory.length){
+      evidenceText += '\nROUTINE INSPECTIONS (agency-led):\n';
+      routineHistory.slice(0, 10).forEach((r, i) => {
+        const d = r.date ? new Date(r.date).toISOString().slice(0,10) : '?';
+        evidenceText += `  [R${i+1}] ${d}` + (r.agency?` · ${r.agency}`:'') + (r.itemsCount?` · ${r.itemsCount} items`:'');
+        if (r.topConcerns && r.topConcerns.length) evidenceText += ` · key concerns: ${r.topConcerns.join('; ')}`;
+        evidenceText += '\n';
+      });
+    }
+    if (agencyEntryReport && agencyEntryReport.fileName){
+      evidenceText += `\nAGENT'S MOVE-IN REPORT on file: ${agencyEntryReport.fileName}\n`;
+    }
+    if (agencyExitReport && agencyExitReport.fileName){
+      evidenceText += `AGENT'S MOVE-OUT REPORT on file: ${agencyExitReport.fileName}\n`;
+    }
 
     const userPrompt = `Compare the move-in and exit condition for a rental property in ${state}, Australia.
 Property: ${propertyAddress || 'Rental property'}
@@ -119,8 +219,16 @@ Property: ${propertyAddress || 'Rental property'}
 ROOM-BY-ROOM COMPARISON:
 
 ${roomsText}
+${evidenceText}
 
-Identify any genuine discrepancies (beyond normal fair wear and tear) and suggest practical fixes to help the tenant recover their bond.`;
+For each genuine change between move-in and exit, decide one of:
+- "match" — fair wear and tear or no real change, no concern
+- "review" — worth checking, the agent might query it but it's defensible
+- "chargeable" — the agent is likely to claim against the bond unless explained or evidenced
+
+When something appears chargeable, scan the maintenance log + communications above to see if the tenant ALREADY reported the issue during the tenancy. If they did, mention that as an "evidence" reference like [M3] or [C7] in the description — the renter is going to use this to defend against a claim, so the cross-reference is gold.
+
+Suggest practical, cost-effective fixes for chargeable items only.`;
 
     const result = await model.generateContent([
       { text: SYSTEM_PROMPT },

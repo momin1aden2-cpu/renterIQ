@@ -92,6 +92,42 @@
 .timeline-line{width:2px;flex:1;min-height:20px;background:var(--border-lt);margin:4px auto}
 .timeline-event{display:flex;gap:12px;align-items:flex-start}
 
+/* Itemised checklist (mirrors entry-audit) */
+.item-row{background:#fff;border:1px solid var(--border-lt);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:all .2s var(--ease-smooth)}
+.item-row.has-issue{border-color:var(--amber);background:rgba(245,166,35,.04)}
+.item-row.has-changed{border-color:var(--red);background:rgba(232,64,64,.05)}
+.item-head{display:flex;align-items:center;gap:12px;padding:14px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px}
+.item-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .15s}
+.item-check.checked{background:var(--teal);border-color:var(--teal);color:#fff}
+.item-check.issue{background:var(--amber);border-color:var(--amber);color:#fff}
+.item-check.changed{background:var(--red);border-color:var(--red);color:#fff}
+.item-label{flex:1;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.item-status{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.item-status.ok{color:var(--teal)}
+.item-status.issue{color:var(--amber)}
+.item-status.changed{color:var(--red)}
+.item-baseline{font-family:'Nunito',sans-serif;font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-xl);border-radius:6px;padding:2px 7px;margin-top:3px;display:inline-block;letter-spacing:.2px}
+.item-chev{font-size:18px;color:var(--muted);transition:transform .2s}
+.item-row.expanded .item-chev{transform:rotate(90deg)}
+.item-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border-lt);background:var(--blue-xl)}
+.item-row.expanded .item-body{display:block}
+.tri-row{display:flex;gap:8px;margin:14px 0 10px}
+.tri-btn{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
+.tri-btn .tri-icon{font-size:18px;line-height:1}
+.tri-btn.yes{background:rgba(0,200,150,.1);border-color:var(--teal);color:var(--teal-dk)}
+.tri-btn.no{background:rgba(232,64,64,.08);border-color:var(--red);color:var(--red)}
+.tri-btn.na{background:var(--glass-surface-1);border-color:var(--border);color:var(--muted)}
+.item-photo-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.item-photo{width:58px;height:58px;border-radius:8px;overflow:hidden;position:relative;background:var(--border-lt)}
+.item-photo img{width:100%;height:100%;object-fit:cover}
+.item-photo .tag{position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,.6);color:#fff;font-family:'Sora',sans-serif;font-size:8px;font-weight:700;padding:1px 4px;border-radius:4px}
+.item-photo-add{width:58px;height:58px;border-radius:8px;border:1.5px dashed var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:var(--muted)}
+.item-comment{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;min-height:52px;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.55;resize:none;outline:none;box-sizing:border-box}
+.item-comment:focus{border-color:var(--blue)}
+.same-as-entry-btn{width:100%;background:linear-gradient(135deg,var(--teal),#009E78);color:#fff;border:none;border-radius:14px;padding:14px;font-family:'Sora',sans-serif;font-weight:800;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-bottom:16px;box-shadow:0 4px 12px rgba(0,200,150,.25);letter-spacing:.3px}
+.same-as-entry-btn:active{transform:scale(.98)}
+.same-as-entry-btn.done{background:#fff;color:var(--teal-dk);border:1.5px solid var(--teal);box-shadow:none}
+.exit-legal-note{font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:600;color:var(--muted);line-height:1.55;text-align:center;padding:12px 16px 0}
 </style>
 </head>
 <body>
@@ -250,93 +286,22 @@
     </div>
     <span class="room-emoji" id="exitRoomEmoji">🚪</span>
     <div class="room-title-big" id="exitRoomTitle">Entry &amp; Hallway</div>
-    <div class="room-sub">Photograph the current state of this area</div>
-    <div class="tab-bar">
-      <div class="tab-item tab-active" id="exitTab0" onclick="setExitTab(0)">📸 Photos</div>
-      <div class="tab-item" id="exitTab1" onclick="setExitTab(1)">📝 Notes</div>
-      <div class="tab-item" id="exitTab2" onclick="setExitTab(2)">✓ Condition</div>
-    </div>
+    <div class="room-sub">Compared item-by-item with your move-in record</div>
   </header>
 
-  <!-- Tab 0 — Photos -->
-  <div id="exitTabContent0" style="flex:1;overflow-y:auto">
+  <div style="flex:1;overflow-y:auto;background:var(--blue-xl)">
     <div style="padding:16px">
-      <div id="exitMiPhotoCtx" style="background:var(--blue-xl);border-radius:10px;padding:10px 12px;margin-bottom:12px;display:flex;gap:10px;align-items:center">
-        <span style="font-size:14px">📸</span>
-        <span id="exitMiPhotoContext" style="font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Move-in: Good condition · 3 photos</span>
-        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);margin-left:auto;cursor:pointer;white-space:nowrap" onclick="showToast('Move-in photos','Side by side comparison coming after walkthrough','📸')">Compare →</span>
-      </div>
-      <span class="fsl">Photos</span>
-      <div class="photo-grid" id="exitPhotoGrid">
-        <div class="photo-cell"><div class="photo-inner ph-teal">📸</div><span class="photo-ts">09:14</span></div>
-        <div class="photo-cell"><div class="photo-inner ph-blue">🏠</div><span class="photo-ts">09:15</span></div>
-        <div class="add-photo" onclick="addExitPhoto()"><span class="add-photo-icon">📷</span><span class="add-photo-label">Add Photo</span></div>
-      </div>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);text-align:center">Photos are timestamped automatically · Tap any photo to view</div>
-    </div>
-    <div style="padding:0 16px 16px">
-      <span class="fsl">Quick Notes</span>
-      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px">
-        <span class="qn-chip" onclick="addExitQuickNote('✓ Clean',this)">✓ Clean</span>
-        <span class="qn-chip" onclick="addExitQuickNote('✓ Repaired',this)">✓ Repaired</span>
-        <span class="qn-chip" onclick="addExitQuickNote('✓ Good condition',this)">✓ Good condition</span>
-        <span class="qn-chip" onclick="addExitQuickNote('Mark visible',this)">Mark visible</span>
-        <span class="qn-chip" onclick="addExitQuickNote('Scuff noted',this)">Scuff noted</span>
-        <span class="qn-chip" onclick="addExitQuickNote('Stain present',this)">Stain present</span>
-        <span class="qn-chip" onclick="addExitQuickNote('Paint touched up',this)">Paint touched up</span>
-        <span class="qn-chip" onclick="addExitQuickNote('Professionally cleaned',this)">Professionally cleaned</span>
-      </div>
-      <textarea class="notes-field" id="exitNotesField" placeholder="Describe current condition… e.g. 'walls clean, minor mark touched up with paint'"></textarea>
-    </div>
-  </div>
-
-  <!-- Tab 1 — Notes -->
-  <div id="exitTabContent1" style="flex:1;overflow-y:auto;display:none">
-    <div style="padding:16px">
-      <span class="fsl">Detailed Notes</span>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🧱 Walls & Ceiling</div>
-        <textarea class="notes-field" style="min-height:50px" placeholder="Note any marks, scuffs, paint issues…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🪟 Floors & Carpet</div>
-        <textarea class="notes-field" style="min-height:50px" placeholder="Carpet condition, scratches, stains…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">💡 Fixtures & Fittings</div>
-        <textarea class="notes-field" style="min-height:50px" placeholder="Lights, switches, door handles…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🚿 Plumbing & Water</div>
-        <textarea class="notes-field" style="min-height:50px" placeholder="Taps, drains, water pressure…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">🔌 Electrical</div>
-        <textarea class="notes-field" style="min-height:50px" placeholder="Power points, switches…"></textarea>
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">📝 Other</div>
-        <textarea class="notes-field" id="exitDetailNotes" style="min-height:60px" placeholder="Document the current exit condition in detail…"></textarea>
-      </div>
-      <div style="font-weight:600;font-size:12px;color:var(--muted)">Your notes are private and only used to generate your comparison report.</div>
-    </div>
-  </div>
-
-  <!-- Tab 2 — Condition -->
-  <div id="exitTabContent2" style="flex:1;overflow-y:auto;display:none">
-    <div style="padding:16px">
-      <span class="fsl">Overall Area Condition at Exit</span>
-      <div style="display:flex;gap:8px;margin-bottom:20px">
-        <button class="cond-btn" id="exit-cond-good" onclick="selectExitCondition('good')"><span style="font-size:24px">😊</span>Clean &amp; good</button>
-        <button class="cond-btn" id="exit-cond-fair" onclick="selectExitCondition('fair')"><span style="font-size:24px">😐</span>Minor issues</button>
-        <button class="cond-btn" id="exit-cond-poor" onclick="selectExitCondition('poor')"><span style="font-size:24px">😟</span>Needs attention</button>
-      </div>
-      <div class="checklist-card">
-        <span class="fsl" style="margin-bottom:12px">Exit Checklist</span>
-        <div class="check-row"><input type="checkbox" id="exck0"><label for="exck0">Area thoroughly cleaned</label></div>
-        <div class="check-row"><input type="checkbox" id="exck1"><label for="exck1">No new damage since move-in</label></div>
-        <div class="check-row"><input type="checkbox" id="exck2"><label for="exck2">All fixtures present and working</label></div>
-        <div class="check-row"><input type="checkbox" id="exck3"><label for="exck3">Floors/carpet clean</label></div>
-        <div class="check-row"><input type="checkbox" id="exck4"><label for="exck4">Walls in acceptable condition</label></div>
-        <div class="check-row"><input type="checkbox" id="exck5"><label for="exck5">Windows clean</label></div>
-        <div class="check-row"><input type="checkbox" id="exck6"><label for="exck6">Any repairs completed</label></div>
+      <button class="same-as-entry-btn" id="sameAsEntryBtn" onclick="markRoomSameAsEntry()">↩ Same as move-in (no changes)</button>
+      <div id="exitItemsList"></div>
+      <div class="exit-legal-note">
+        Each item starts mirroring your <strong style="color:var(--blue)">move-in record</strong>. Tap anything that has changed since you moved in — add a photo + comment if you can.
       </div>
     </div>
   </div>
 
   <div class="room-footer">
-    <button class="btn-outline-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="goBackToExitRooms()">← Back to Rooms</button>
-    <button class="btn-teal-c flex-1" onclick="markExitAreaComplete()">Mark Area Complete ✓</button>
+    <button class="btn-outline-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="goBackToExitRooms()">← Back</button>
+    <button class="btn-teal-c flex-1" onclick="markExitAreaComplete()">Save room ✓</button>
   </div>
 </div>
 
@@ -446,13 +411,14 @@
     </div>
 
     <div style="display:flex;flex-direction:column;gap:10px">
-      <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="navigate('/app/pages/vault.html#exit')">View Full Report in Vault</button>
-      <button class="btn-outline-c btn-full" style="border-radius:14px" onclick="navigate('/app/pages/rights.html')">Know Your Rights — Bond Disputes</button>
+      <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="draftBondReturnEmail()">✉️ Draft my bond return email</button>
+      <button class="btn-outline-c btn-full" style="border-radius:14px" onclick="navigate('/app/pages/vault.html#exit')">View full report in Vault</button>
+      <button class="btn-outline-c btn-full" style="border-radius:14px" onclick="navigate('/app/pages/rights.html')">Know your bond rights</button>
       <button style="background:transparent;color:var(--muted);width:100%;padding:12px;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;text-align:center" onclick="navigate('/app/index.html')">Back to Home</button>
     </div>
   </div>
 
-  
+
 </div>
 
 </div><!-- /app-shell -->
@@ -592,55 +558,353 @@ function buildExitAreaList(){
   var lbl=document.getElementById('exitProgressLabel');if(lbl)lbl.textContent='0 of '+exitRoomData.length+' areas completed';
 }
 
-function openExitRoom(idx){
-  exitCurrentRoom=idx;
-  var r=exitRoomData[idx];
-  document.getElementById('exitRoomEmoji').textContent=r.emoji;
-  document.getElementById('exitRoomTitle').textContent=r.name;
-  document.getElementById('exitRoomCounter').textContent=(idx+1)+' / '+exitRoomData.length;
-  exitSelectedCondition=null;
-  var ctx=document.getElementById('exitMiPhotoContext');
-  if(ctx)ctx.textContent='Move-in: '+buildEntryContext(r.name);
-  ['good','fair','poor'].forEach(function(c){var el=document.getElementById('exit-cond-'+c);if(el)el.className='cond-btn'});
-  var saved=exitRoomNotes[idx]||{};
-  var nf=document.getElementById('exitNotesField');if(nf)nf.value=saved.notes||'';
-  if(saved.condition){selectExitCondition(saved.condition)}
-  document.querySelectorAll('#viewD .qn-chip').forEach(function(c){c.classList.remove('chip-active')});
-  for(var i=0;i<7;i++){var cb=document.getElementById('exck'+i);if(cb)cb.checked=false}
-  var pg=document.getElementById('exitPhotoGrid');
-  if(pg){
-    var colors=['ph-teal','ph-blue','ph-slate'],emojis=['📸','🏠','🪟','🔍','🧱'];
-    pg.innerHTML='<div class="photo-cell"><div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">09:14</span></div>'
-      +'<div class="photo-cell"><div class="photo-inner '+colors[Math.floor(Math.random()*colors.length)]+'">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div><span class="photo-ts">09:15</span></div>'
-      +'<div class="add-photo" onclick="addExitPhoto()"><span class="add-photo-icon">📷</span><span class="add-photo-label">Add Photo</span></div>';
+// ── Itemised checklist (mirrors entry-audit so comparison is apples-to-apples) ──
+var EXIT_STANDARD_ITEMS = [
+  {id:'walls',label:'Walls',working:false},
+  {id:'ceiling',label:'Ceiling',working:false},
+  {id:'floor',label:'Floor / Carpet',working:false},
+  {id:'skirting',label:'Skirting Boards',working:false},
+  {id:'windows',label:'Windows & Glass',working:true},
+  {id:'screens',label:'Window Screens',working:false},
+  {id:'blinds',label:'Curtains / Blinds',working:true},
+  {id:'lights',label:'Light Fittings',working:true},
+  {id:'power',label:'Power Points & Switches',working:true},
+  {id:'doors',label:'Doors & Handles',working:true}
+];
+
+function getExitItemsForRoom(room){
+  var name = (room.name || '').toLowerCase();
+  var extras = [];
+  if(name.indexOf('kitchen') !== -1){
+    extras = [
+      {id:'sink',label:'Sink & Taps',working:true},
+      {id:'bench',label:'Benchtops',working:false},
+      {id:'splashback',label:'Splashback & Tiles',working:false},
+      {id:'cupboards',label:'Cupboards & Drawers',working:true},
+      {id:'stove',label:'Stove & Oven',working:true},
+      {id:'rangehood',label:'Rangehood / Extractor',working:true},
+      {id:'dishwasher',label:'Dishwasher',working:true},
+      {id:'fridge_space',label:'Fridge Space',working:false}
+    ];
+  } else if(name.indexOf('bathroom') !== -1 || name.indexOf('ensuite') !== -1 || name.indexOf('toilet') !== -1){
+    extras = [
+      {id:'toilet',label:'Toilet & Cistern',working:true},
+      {id:'basin',label:'Basin & Taps',working:true},
+      {id:'shower',label:'Shower & Head',working:true},
+      {id:'shower_screen',label:'Shower Screen',working:false},
+      {id:'bath',label:'Bath',working:true},
+      {id:'mirror',label:'Mirror & Cabinet',working:false},
+      {id:'towel_rails',label:'Towel Rails & Hooks',working:false},
+      {id:'exhaust',label:'Exhaust Fan',working:true},
+      {id:'tiles',label:'Tiles & Grout',working:false}
+    ];
+  } else if(name.indexOf('bedroom') !== -1 || name.indexOf('master') !== -1){
+    extras = [{id:'wardrobe',label:'Wardrobe / Robe',working:true}];
+  } else if(name.indexOf('living') !== -1){
+    extras = [
+      {id:'heating',label:'Heating / Cooling',working:true},
+      {id:'tv_points',label:'TV / Data Points',working:true}
+    ];
+  } else if(name.indexOf('laundry') !== -1){
+    extras = [
+      {id:'laundry_tub',label:'Laundry Tub & Taps',working:true},
+      {id:'washer_space',label:'Washer Space & Plumbing',working:true},
+      {id:'dryer_space',label:'Dryer Space',working:false}
+    ];
+  } else if(name.indexOf('entry') !== -1 || name.indexOf('hallway') !== -1){
+    extras = [
+      {id:'entry_door',label:'Entry Door & Locks',working:true},
+      {id:'letterbox',label:'Letterbox',working:true}
+    ];
+  } else if(name.indexOf('garage') !== -1 || name.indexOf('carport') !== -1){
+    return [
+      {id:'walls',label:'Walls',working:false},
+      {id:'ceiling',label:'Ceiling',working:false},
+      {id:'floor',label:'Floor',working:false},
+      {id:'roller_door',label:'Roller Door / Remote',working:true},
+      {id:'lights',label:'Lights',working:true},
+      {id:'power',label:'Power Points',working:true}
+    ];
+  } else if(name.indexOf('garden') !== -1 || name.indexOf('balcony') !== -1 || name.indexOf('outdoor') !== -1){
+    return [
+      {id:'paving',label:'Paving / Decking',working:false},
+      {id:'lawn',label:'Lawn / Plants',working:false},
+      {id:'fencing',label:'Fencing / Railing',working:false},
+      {id:'outdoor_lights',label:'Outdoor Lights',working:true},
+      {id:'outdoor_taps',label:'Outdoor Tap',working:true},
+      {id:'general',label:'General Tidiness',working:false}
+    ];
   }
-  setExitTab(0);switchView('D');
+  return EXIT_STANDARD_ITEMS.concat(extras);
 }
 
-function goBackToExitRooms(){switchView('C')}
+// Pull the matching entry-baseline items by room name (case-insensitive).
+function getEntryItemsForRoom(roomName){
+  var match = entryAuditRooms.find(function(r){ return r.name && r.name.toLowerCase() === String(roomName||'').toLowerCase(); });
+  return (match && Array.isArray(match.items)) ? match.items : [];
+}
+
+function defaultExitItemState(item, baselineItem){
+  // Default = same as entry. If no baseline (legacy entry without items),
+  // start at a clean slate (true/true/true).
+  if(baselineItem){
+    return {
+      clean: baselineItem.clean,
+      undamaged: baselineItem.undamaged,
+      working: item.working ? baselineItem.working : 'na',
+      comment: '',
+      photos: []
+    };
+  }
+  return {clean:true, undamaged:true, working:item.working?true:'na', comment:'', photos:[]};
+}
+
+var exitCurrentItems = [];
+
+function openExitRoom(idx){
+  exitCurrentRoom = idx;
+  var r = exitRoomData[idx];
+  document.getElementById('exitRoomEmoji').textContent = r.emoji;
+  document.getElementById('exitRoomTitle').textContent = r.name;
+  document.getElementById('exitRoomCounter').textContent = (idx+1) + ' / ' + exitRoomData.length;
+
+  // Build the item list for this room
+  exitCurrentItems = getExitItemsForRoom(r);
+  var entryItems = getEntryItemsForRoom(r.name);
+  var entryByLabel = {};
+  entryItems.forEach(function(ei){ entryByLabel[(ei.label||'').toLowerCase()] = ei; });
+
+  // Initialise per-room item state if first visit
+  if(!exitRoomNotes[idx]) exitRoomNotes[idx] = {items:{}};
+  if(!exitRoomNotes[idx].items) exitRoomNotes[idx].items = {};
+  exitCurrentItems.forEach(function(it){
+    if(!exitRoomNotes[idx].items[it.id]){
+      var baseline = entryByLabel[(it.label||'').toLowerCase()] || null;
+      exitRoomNotes[idx].items[it.id] = defaultExitItemState(it, baseline);
+      // Stash baseline reference for comparison later
+      exitRoomNotes[idx].items[it.id]._baseline = baseline ? {
+        clean: baseline.clean, undamaged: baseline.undamaged, working: baseline.working,
+        comment: baseline.comment || '', photos: baseline.photos || []
+      } : null;
+    }
+  });
+
+  renderExitItems();
+  switchView('D');
+}
+
+function renderExitItems(){
+  var list = document.getElementById('exitItemsList');
+  if(!list) return;
+  var roomState = exitRoomNotes[exitCurrentRoom].items;
+  var html = '';
+  exitCurrentItems.forEach(function(item){
+    var s = roomState[item.id] || defaultExitItemState(item, null);
+    var baseline = s._baseline;
+
+    // Detect changed-since-entry
+    var changed = false;
+    if(baseline){
+      if(baseline.clean !== s.clean) changed = true;
+      if(baseline.undamaged !== s.undamaged) changed = true;
+      if(item.working && baseline.working !== s.working) changed = true;
+    }
+    var hasIssue = (s.clean === false || s.undamaged === false || (item.working && s.working === false));
+    var allGood = (s.clean === true && s.undamaged === true && (!item.working || s.working === true));
+
+    var rowClass = 'item-row';
+    if(changed) rowClass += ' has-changed';
+    else if(hasIssue) rowClass += ' has-issue';
+
+    var checkCls = changed ? 'item-check changed' : (hasIssue ? 'item-check issue' : (allGood ? 'item-check checked' : 'item-check'));
+    var checkMark = changed ? '↻' : (hasIssue ? '!' : (allGood ? '✓' : ''));
+    var statusCls = changed ? 'changed' : (hasIssue ? 'issue' : (allGood ? 'ok' : ''));
+    var statusText = changed ? 'Changed since move-in' : (hasIssue ? 'Issue' : (allGood ? 'Same as move-in' : 'Tap to check'));
+
+    // Baseline chip — quick reference for what entry recorded
+    var baselineChip = '';
+    if(baseline){
+      var bC = baseline.clean===true?'✓':baseline.clean===false?'✗':'—';
+      var bU = baseline.undamaged===true?'✓':baseline.undamaged===false?'✗':'—';
+      var bW = (baseline.working==='na'||baseline.working===null)?'—':(baseline.working===true?'✓':'✗');
+      baselineChip = '<span class="item-baseline">Move-in: '+bC+' clean · '+bU+' undamaged · '+bW+' working</span>';
+    } else {
+      baselineChip = '<span class="item-baseline" style="color:var(--muted);background:var(--blue-xl)">No move-in baseline saved</span>';
+    }
+
+    html += '<div class="' + rowClass + '" id="exitItemRow-' + item.id + '">' +
+      '<div class="item-head" onclick="toggleExitItem(\'' + item.id + '\')">' +
+        '<div class="' + checkCls + '">' + checkMark + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="item-label">' + item.label + '</div>' +
+          baselineChip +
+          '<div class="item-status ' + statusCls + '" style="margin-top:3px">' + statusText + '</div>' +
+        '</div>' +
+        '<span class="item-chev">›</span>' +
+      '</div>' +
+      '<div class="item-body">' +
+        buildExitTriRow(item, s) +
+        buildExitPhotoStrip(item, s) +
+        '<textarea class="item-comment" placeholder="What changed? e.g. carpet stain in corner near window, scuff on west wall…" oninput="updateExitItemComment(\'' + item.id + '\', this.value)">' + (s.comment || '') + '</textarea>' +
+      '</div>' +
+    '</div>';
+  });
+  list.innerHTML = html;
+  updateSameAsEntryBtn();
+}
+
+function buildExitTriRow(item, state){
+  var specs = [{key:'clean',label:'Clean',icon:'🧼'}, {key:'undamaged',label:'Undamaged',icon:'🛡️'}];
+  if(item.working) specs.push({key:'working',label:'Working',icon:'⚡'});
+  var html = '<div class="tri-row">';
+  specs.forEach(function(spec){
+    var val = state[spec.key];
+    var cls = 'tri-btn';
+    var mark = '—';
+    if(val === true){ cls += ' yes'; mark = '✓ Yes'; }
+    else if(val === false){ cls += ' no'; mark = '✗ No'; }
+    html += '<button class="' + cls + '" onclick="event.stopPropagation();cycleExitTri(\'' + item.id + '\',\'' + spec.key + '\')">' +
+      '<span class="tri-icon">' + spec.icon + '</span>' +
+      '<span>' + spec.label + '</span>' +
+      '<span style="margin-top:2px">' + mark + '</span>' +
+    '</button>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function buildExitPhotoStrip(item, state){
+  var photos = state.photos || [];
+  var html = '<div class="item-photo-strip">';
+  photos.forEach(function(p){
+    html += '<div class="item-photo" onclick="event.stopPropagation();window.open(\'' + (p.data || p.url || '') + '\',\'_blank\')">' +
+      '<img src="' + (p.data || p.url || '') + '" alt="">' +
+      '<span class="tag">' + (p.time || '') + '</span>' +
+    '</div>';
+  });
+  html += '<button class="item-photo-add" onclick="event.stopPropagation();captureExitItemPhoto(\'' + item.id + '\')">📷</button>';
+  html += '</div>';
+  return html;
+}
+
+function toggleExitItem(itemId){
+  var row = document.getElementById('exitItemRow-' + itemId);
+  if(!row) return;
+  var open = row.classList.contains('expanded');
+  document.querySelectorAll('.item-row.expanded').forEach(function(r){ r.classList.remove('expanded'); });
+  if(!open) row.classList.add('expanded');
+}
+
+function cycleExitTri(itemId, key){
+  var s = exitRoomNotes[exitCurrentRoom].items[itemId];
+  var cur = s[key];
+  if(cur === null || cur === 'na') s[key] = true;
+  else if(cur === true) s[key] = false;
+  else s[key] = true;
+  renderExitItems();
+  // Re-open the same item that was tapped so the user stays in context
+  var row = document.getElementById('exitItemRow-' + itemId);
+  if(row) row.classList.add('expanded');
+}
+
+function updateExitItemComment(itemId, val){
+  var s = exitRoomNotes[exitCurrentRoom].items[itemId];
+  if(s) s.comment = val;
+}
+
+function captureExitItemPhoto(itemId){
+  var input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
+  input.onchange = function(e){
+    var file = e.target.files[0]; if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var s = exitRoomNotes[exitCurrentRoom].items[itemId];
+      if(!s.photos) s.photos = [];
+      var now = new Date();
+      var time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+      s.photos.push({data: ev.target.result, time: time, timestamp: now.toISOString(), fileName: file.name});
+      renderExitItems();
+      var row = document.getElementById('exitItemRow-' + itemId);
+      if(row) row.classList.add('expanded');
+      showToast('Photo captured', time + ' · saved to exit record', '📷');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function markRoomSameAsEntry(){
+  var roomState = exitRoomNotes[exitCurrentRoom].items;
+  exitCurrentItems.forEach(function(item){
+    var s = roomState[item.id];
+    if(!s || !s._baseline) return;
+    s.clean = s._baseline.clean;
+    s.undamaged = s._baseline.undamaged;
+    s.working = item.working ? s._baseline.working : 'na';
+  });
+  renderExitItems();
+  showToast('Reset to move-in', 'Tap any item to flag a change', '↩');
+}
+
+function updateSameAsEntryBtn(){
+  var btn = document.getElementById('sameAsEntryBtn');
+  if(!btn) return;
+  var roomState = exitRoomNotes[exitCurrentRoom].items;
+  var anyChanged = false;
+  exitCurrentItems.forEach(function(item){
+    var s = roomState[item.id]; if(!s || !s._baseline) return;
+    if(s.clean !== s._baseline.clean) anyChanged = true;
+    if(s.undamaged !== s._baseline.undamaged) anyChanged = true;
+    if(item.working && s.working !== s._baseline.working) anyChanged = true;
+  });
+  if(anyChanged){
+    btn.classList.remove('done');
+    btn.textContent = '↩ Reset all to move-in (no changes)';
+  } else {
+    btn.classList.add('done');
+    btn.textContent = '✓ All items match your move-in record';
+  }
+}
+
+function goBackToExitRooms(){ switchView('C'); }
 
 function markExitAreaComplete(){
-  var cond=exitSelectedCondition||'good';
-  var notes=document.getElementById('exitNotesField')?document.getElementById('exitNotesField').value:'';
-  exitRoomNotes[exitCurrentRoom]={condition:cond,notes:notes};
-  exitRoomsDone[exitCurrentRoom]=true;
-  var condLabel=cond==='good'?'Clean & good':cond==='fair'?'Minor issues':'Needs attention';
-  var row=document.getElementById('exitRoom-'+exitCurrentRoom);
+  // Derive an overall room condition from the items
+  var roomState = exitRoomNotes[exitCurrentRoom].items;
+  var anyChanged = false, anyIssue = false;
+  exitCurrentItems.forEach(function(item){
+    var s = roomState[item.id]; if(!s) return;
+    if(s._baseline){
+      if(s.clean !== s._baseline.clean) anyChanged = true;
+      if(s.undamaged !== s._baseline.undamaged) anyChanged = true;
+      if(item.working && s.working !== s._baseline.working) anyChanged = true;
+    }
+    if(s.clean === false || s.undamaged === false || (item.working && s.working === false)) anyIssue = true;
+  });
+  var cond = anyChanged ? 'changed' : (anyIssue ? 'issues' : 'good');
+  exitRoomNotes[exitCurrentRoom].condition = cond;
+  exitRoomNotes[exitCurrentRoom].savedAt = Date.now();
+  exitRoomsDone[exitCurrentRoom] = true;
+
+  var condLabel = cond === 'changed' ? 'Changes from move-in' : cond === 'issues' ? 'Issues noted' : 'Same as move-in';
+  var row = document.getElementById('exitRoom-' + exitCurrentRoom);
   if(row){
-    row.style.borderColor='rgba(0,200,150,.3)';row.style.borderWidth='1.5px';row.style.background='rgba(0,200,150,.02)';row.style.boxShadow='none';
-    var icon=row.querySelector('.room-icon-wrap'),status=row.querySelector('.room-status'),check=row.querySelector('.room-check');
-    if(icon)icon.style.background='rgba(0,200,150,.1)';
-    if(status){status.textContent='Done · '+condLabel;status.style.color='var(--teal-dk)'}
-    if(check){check.style.background='var(--teal)';check.style.borderColor='var(--teal)';check.style.color='white';check.textContent='✓'}
+    var col = cond === 'changed' ? 'var(--red)' : cond === 'issues' ? 'var(--amber)' : 'var(--teal)';
+    row.style.borderColor = col; row.style.borderWidth = '1.5px'; row.style.boxShadow = 'none';
+    var status = row.querySelector('.room-status'), check = row.querySelector('.room-check');
+    if(status){ status.textContent = 'Done · ' + condLabel; status.style.color = col; }
+    if(check){ check.style.background = col; check.style.borderColor = col; check.style.color = '#fff'; check.textContent = '✓'; }
   }
-  var next=exitRoomsDone.findIndex(function(d,i){return i>exitCurrentRoom&&!d});
-  if(next===-1)next=exitRoomsDone.findIndex(function(d){return!d});
-  if(next!==-1){
-    var nr=document.getElementById('exitRoom-'+next);
-    if(nr){nr.style.border='2px solid var(--blue)';nr.style.boxShadow='0 4px 16px rgba(27,80,200,.1)';var ni=nr.querySelector('.room-icon-wrap');if(ni)ni.style.background='var(--blue-lt)';var ns=nr.querySelector('.room-status');if(ns)ns.textContent='Ready — tap to start'}
+  // Auto-advance to next undone room
+  var next = exitRoomsDone.findIndex(function(d, i){ return i > exitCurrentRoom && !d; });
+  if(next === -1) next = exitRoomsDone.findIndex(function(d){ return !d; });
+  if(next !== -1){
+    var nr = document.getElementById('exitRoom-' + next);
+    if(nr){ nr.style.border = '2px solid var(--blue)'; nr.style.boxShadow = '0 4px 16px rgba(27,80,200,.1)'; }
   }
   updateExitProgress();
-  showToast(exitRoomData[exitCurrentRoom].name+' done ✓',condLabel+' · Saved','✓');
+  showToast(exitRoomData[exitCurrentRoom].name + ' saved ✓', condLabel, '✓');
   switchView('C');
 }
 
@@ -707,34 +971,121 @@ async function runExitGenerationCore(){
     },delay);
   });
 
-  var rooms=exitRoomData.map(function(r,i){
-    var exit=exitRoomNotes[i]||{};
-    return{
-      name:r.name,emoji:r.emoji,
-      entryCondition:r.entryCondition||'good',
-      entryNotes:r.entryNotes||'',
-      exitCondition:exit.condition||'good',
-      exitNotes:exit.notes||''
+  // Build per-room comparison payload INCLUDING per-item changes so the AI
+  // can reason at the item level, not just at the room level.
+  var rooms = exitRoomData.map(function(r, i){
+    var exit = exitRoomNotes[i] || {};
+    var changedItems = [];
+    if (exit.items && typeof exit.items === 'object') {
+      Object.keys(exit.items).forEach(function(itId){
+        var s = exit.items[itId];
+        if (!s || !s._baseline) return;
+        var b = s._baseline;
+        var diff = (b.clean !== s.clean) || (b.undamaged !== s.undamaged) || (b.working !== s.working);
+        if (diff) {
+          // Find the item label from the registry
+          var rItems = getExitItemsForRoom(r);
+          var def = rItems.find(function(x){ return x.id === itId; });
+          changedItems.push({
+            label: def ? def.label : itId,
+            entry: { clean: b.clean, undamaged: b.undamaged, working: b.working, comment: b.comment || '' },
+            exit:  { clean: s.clean, undamaged: s.undamaged, working: s.working, comment: s.comment || '' }
+          });
+        }
+      });
+    }
+    return {
+      name: r.name,
+      emoji: r.emoji,
+      entryCondition: r.entryCondition || 'good',
+      entryNotes: r.entryNotes || '',
+      exitCondition: exit.condition || 'good',
+      exitNotes: exit.notes || '',
+      changedItems: changedItems
     };
   });
 
-  var propertyAddress='';
-  try{
-    var tracked=JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
-    if(tracked.length>0)propertyAddress=tracked[tracked.length-1].address||tracked[tracked.length-1].label||'';
-  }catch(e){}
+  // Property address — prefer the saved lease, fall back to the latest tracked property
+  var propertyAddress = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record') || '{}');
+    if (lease.address) propertyAddress = lease.address;
+  } catch(e){}
+  if (!propertyAddress) {
+    try {
+      var tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties') || '[]');
+      if (tracked.length > 0) propertyAddress = tracked[tracked.length-1].address || tracked[tracked.length-1].label || '';
+    } catch(e){}
+  }
 
-  try{
-    var resp=await fetch('/api/compare-exit',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({rooms:rooms,propertyAddress:propertyAddress})
+  // Pull in everything that proves you've been a good tenant: maintenance log,
+  // communications thread, routine inspection history, agency-supplied reports
+  var maintenanceLog = [];
+  try {
+    var ml = JSON.parse(localStorage.getItem('riq_maintenance_items') || '[]');
+    if (Array.isArray(ml)) maintenanceLog = ml.map(function(m){
+      return {
+        date: m.date ? new Date(m.date).toISOString() : '',
+        description: m.description || m.issueType || '',
+        status: m.status === 'resolved' ? 'resolved' : 'pending',
+        threadId: m.threadId || ''
+      };
     });
-    if(resp.ok){
-      var data=await resp.json();
-      if(!data.error){aiComparisonData=data}
+  } catch(e){}
+
+  var communications = [];
+  try {
+    var cm = JSON.parse(localStorage.getItem('riq_communications') || '[]');
+    if (Array.isArray(cm)) communications = cm.map(function(c){
+      return {
+        date: c.date ? new Date(c.date).toISOString() : '',
+        type: c.type || 'message',
+        subject: c.subject || '',
+        bodyPreview: (c.body || '').slice(0, 220),
+        threadId: c.threadId || ''
+      };
+    });
+  } catch(e){}
+
+  var routineHistory = [];
+  try {
+    var rh = JSON.parse(localStorage.getItem('riq_routine_inspection_past') || '[]');
+    if (Array.isArray(rh)) routineHistory = rh.map(function(r){
+      return {
+        date: r.date ? new Date(r.date).toISOString() : '',
+        agency: r.agency || '',
+        itemsCount: r.itemCount || (r.summary && r.summary.total) || 0,
+        topConcerns: []
+      };
+    });
+  } catch(e){}
+
+  var agencyEntryReport = null, agencyExitReport = null;
+  try { agencyEntryReport = JSON.parse(localStorage.getItem('riq_agency_entry_report') || 'null'); } catch(e){}
+  try { agencyExitReport  = JSON.parse(localStorage.getItem('riq_agency_exit_report')  || 'null'); } catch(e){}
+  // Strip the dataUrl payload from agency reports to keep request body tiny
+  if (agencyEntryReport && agencyEntryReport.dataUrl) agencyEntryReport = {fileName: agencyEntryReport.fileName, uploadedAt: agencyEntryReport.uploadedAt};
+  if (agencyExitReport  && agencyExitReport.dataUrl)  agencyExitReport  = {fileName: agencyExitReport.fileName,  uploadedAt: agencyExitReport.uploadedAt};
+
+  try {
+    var resp = await fetch('/api/compare-exit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        rooms: rooms,
+        propertyAddress: propertyAddress,
+        maintenanceLog: maintenanceLog,
+        communications: communications,
+        routineHistory: routineHistory,
+        agencyEntryReport: agencyEntryReport,
+        agencyExitReport: agencyExitReport
+      })
+    });
+    if (resp.ok) {
+      var data = await resp.json();
+      if (!data.error) aiComparisonData = data;
     }
-  }catch(e){}
+  } catch(e){}
 
   if(!aiComparisonData){
     aiComparisonData={
@@ -781,26 +1132,136 @@ function exportExitReportPDF(data){
   });
 }
 
-function renderComparisonResults(data){
-  var disc=data.discrepancies||[];
-  var banner=document.getElementById('compBannerText');
-  var subtitle=document.getElementById('compSubtitle');
-  if(banner){banner.textContent=disc.length===0?'✓ No significant differences found — your property matches move-in condition.':'RenterIQ found '+disc.length+' potential difference'+(disc.length!==1?'s':'')+'. Review each one — you decide what gets recorded.'}
-  if(subtitle){subtitle.textContent=disc.length===0?'All areas match move-in':''+disc.length+' item'+(disc.length!==1?'s':'')+' for your review'}
+// ── Draft bond return email — opens an editable mailto with the AI draft ──
+function draftBondReturnEmail(){
+  if(!aiComparisonData){ showToast('Run comparison first','Generate the exit comparison before drafting','⚠️'); return; }
+  var disc = aiComparisonData.discrepancies || [];
+  var summary = aiComparisonData.summary || {};
+  var chargeable = disc.filter(function(d){ return d.severity === 'chargeable'; })
+    .map(function(d){ return { room:d.room, itemLabel:d.itemLabel, description:d.description, evidenceRefs:d.evidenceRefs||[], evidenceNote:d.evidenceNote||'' }; });
+  var review = disc.filter(function(d){ return d.severity === 'review'; })
+    .map(function(d){ return { room:d.room, itemLabel:d.itemLabel, description:d.description }; });
 
-  var areasList=document.getElementById('compAreasList');
-  if(areasList&&data.areas&&data.areas.length>0){
-    var rows=data.areas.map(function(a,idx){
-      var isLast=idx===data.areas.length-1;
-      var isReview=a.status==='review';
-      return '<div style="padding:10px 14px;'+(isLast?'':'border-bottom:1px solid var(--border-lt);')+'display:flex;align-items:center;gap:10px;'+(isReview?'background:rgba(245,166,35,.03)':'')+'">'
-        +'<span style="font-size:16px">'+a.emoji+'</span>'
-        +'<span style="font-family:\'Sora\',sans-serif;font-weight:'+(isReview?'800':'700')+';font-size:13px;color:var(--text);flex:1">'+a.room+'</span>'
-        +(isReview?'<span class="tag tag-amber">Review ⚠</span>':'<span class="tag tag-teal">Match ✓</span>')
-        +'</div>';
+  var address = '';
+  try { var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}'); if(lease.address) address = lease.address; } catch(e){}
+
+  var agentName = '', agentEmail = '';
+  try {
+    var lease2 = JSON.parse(localStorage.getItem('riq-lease-record')||'{}');
+    agentName = lease2.agencyName || '';
+    agentEmail = lease2.agentEmail || '';
+  } catch(e){}
+
+  var tenantName = '';
+  try { var prof = JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}'); tenantName = prof.fullName || ''; } catch(e){}
+  if(!tenantName){ try { tenantName = localStorage.getItem('riq-user-name') || ''; } catch(e){} }
+
+  showToast('Drafting your message…','Hang on, writing the bond return email','🤖');
+
+  fetch('/api/bond-return-email', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      propertyAddress: address,
+      moveOutDate: new Date().toISOString(),
+      agentName: agentName,
+      tenantName: tenantName,
+      bondAtRisk: summary.bondAtRiskEstimate || '',
+      chargeableItems: chargeable,
+      reviewItems: review,
+      hasFullBondReturnExpectation: chargeable.length === 0
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(!data || data.error){ showToast('Draft failed', (data && data.error) || 'Could not draft the email','⚠️'); return; }
+    var subject = encodeURIComponent(data.subject || ('Bond return — ' + (address || 'tenancy')));
+    var body = encodeURIComponent(data.body || '');
+    window.open('mailto:' + encodeURIComponent(agentEmail) + '?subject=' + subject + '&body=' + body, '_self');
+
+    // Save into Communications so the trail stays in the vault
+    try {
+      var commId = 'comm_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+      var cm = {
+        id: commId,
+        type: 'bond_return_request',
+        to: agentEmail || agentName || 'Agent',
+        subject: data.subject || 'Bond return',
+        body: data.body || '',
+        date: Date.now(),
+        source: 'exit-report',
+        propertyAddress: address
+      };
+      var list = JSON.parse(localStorage.getItem('riq_communications')||'[]');
+      list.unshift(cm);
+      localStorage.setItem('riq_communications', JSON.stringify(list));
+      if(window.RIQStore){
+        RIQStore.ready.then(function(){
+          if(!RIQStore.isAuthed())return;
+          RIQStore.write('communications', cm.id, cm).catch(function(){});
+        });
+      }
+    } catch(e){}
+    showToast('Email opened ✓','Saved a copy in Communications','✉️');
+  })
+  .catch(function(err){
+    console.error(err);
+    showToast('Draft failed','Check your connection and try again','⚠️');
+  });
+}
+
+function renderComparisonResults(data){
+  var disc = data.discrepancies || [];
+  var summary = data.summary || {};
+  var chargeable = disc.filter(function(d){ return d.severity === 'chargeable'; });
+  var review = disc.filter(function(d){ return d.severity === 'review'; });
+
+  var banner = document.getElementById('compBannerText');
+  var subtitle = document.getElementById('compSubtitle');
+  if (banner) {
+    if (disc.length === 0) banner.textContent = '✓ Nothing flagged. Your property looks the same as move-in.';
+    else if (chargeable.length === 0) banner.textContent = 'A few items the agent might raise — all defensible.';
+    else banner.textContent = chargeable.length + ' item' + (chargeable.length!==1?'s':'') + ' the agent could try to claim against your bond.';
+  }
+  if (subtitle) {
+    subtitle.textContent = disc.length === 0 ? 'All clear — strong position for full bond return' : (chargeable.length + ' chargeable · ' + review.length + ' worth checking');
+  }
+
+  // Bond-at-risk hero card — first thing the renter sees
+  var bondCardHTML = '';
+  if (summary.bondAtRiskEstimate || chargeable.length > 0) {
+    bondCardHTML = '<div style="background:linear-gradient(135deg,#7A1F1F,#E84040);border-radius:18px;padding:18px;margin-bottom:16px;color:#fff;box-shadow:0 6px 20px rgba(232,64,64,.25)">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.7);letter-spacing:1.3px;text-transform:uppercase;margin-bottom:6px">Bond at risk</div>'+
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:26px;letter-spacing:-.5px">'+ (summary.bondAtRiskEstimate || 'Up to ~$' + (chargeable.length * 100) + '–' + (chargeable.length * 250)) +'</div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:rgba(255,255,255,.85);margin-top:8px;line-height:1.55">Estimated based on '+chargeable.length+' chargeable item'+(chargeable.length!==1?'s':'')+'. Most can be reduced or removed if you fix things before handover or evidence them with your records.</div>'+
+    '</div>';
+  } else {
+    bondCardHTML = '<div style="background:linear-gradient(135deg,#065F46,#10B981);border-radius:18px;padding:18px;margin-bottom:16px;color:#fff;box-shadow:0 6px 20px rgba(16,185,129,.25)">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px">🎉 You\'re in great shape</div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.9);margin-top:6px;line-height:1.55">Nothing chargeable was flagged. You should expect your full bond back.</div>'+
+    '</div>';
+  }
+
+  var areasList = document.getElementById('compAreasList');
+  if (areasList && data.areas && data.areas.length > 0) {
+    var rows = data.areas.map(function(a, idx){
+      var isLast = idx === data.areas.length - 1;
+      var status = a.status || 'match';
+      var bg = status === 'chargeable' ? 'rgba(232,64,64,.05)' : status === 'review' ? 'rgba(245,166,35,.03)' : '';
+      var tag = status === 'chargeable' ? '<span class="tag" style="background:rgba(232,64,64,.12);color:var(--red)">Chargeable</span>'
+              : status === 'review' ? '<span class="tag tag-amber">Review</span>'
+              : '<span class="tag tag-teal">Match ✓</span>';
+      return '<div style="padding:10px 14px;'+(isLast?'':'border-bottom:1px solid var(--border-lt);')+'display:flex;align-items:center;gap:10px;background:'+bg+'">'+
+        '<span style="font-size:16px">'+a.emoji+'</span>'+
+        '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">'+a.room+'</span>'+
+        tag +
+        '</div>';
     }).join('');
-    areasList.innerHTML='<div class="sec-label" style="padding:0 0 10px">All '+data.areas.length+' Areas</div>'
-      +'<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:20px">'+rows+'</div>';
+    areasList.innerHTML = bondCardHTML +
+      '<div class="sec-label" style="padding:0 0 10px">Room overview</div>'+
+      '<div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:20px">'+rows+'</div>';
+  } else if (areasList) {
+    areasList.innerHTML = bondCardHTML;
   }
 
   var container=document.getElementById('compDiscrepanciesContainer');
@@ -823,19 +1284,46 @@ function renderComparisonResults(data){
 
   var cards=document.getElementById('discCards');
   disc.forEach(function(d,n){
+    var sev = d.severity || 'review';
+    var border = sev === 'chargeable' ? 'var(--red)' : 'var(--amber)';
+    var headBg = sev === 'chargeable' ? 'rgba(232,64,64,.08)' : 'rgba(245,166,35,.08)';
+    var iconBg = sev === 'chargeable' ? 'rgba(232,64,64,.15)' : 'rgba(245,166,35,.15)';
+    var subText = sev === 'chargeable' ? 'Likely chargeable — see below' : 'Worth checking';
+    var subColor = sev === 'chargeable' ? '#7A1F1F' : '#8A6500';
+    var sevTag = sev === 'chargeable'
+      ? '<span class="tag" style="background:rgba(232,64,64,.15);color:var(--red)">🔴 Chargeable</span>'
+      : '<span class="tag tag-amber">⚠️ Review</span>';
+    var itemTitle = d.itemLabel ? d.itemLabel : 'Difference noted';
+
+    // Cross-reference badges from maintenance log + comms (e.g. [M3], [C7])
+    var evidenceHtml = '';
+    if (d.evidenceRefs && d.evidenceRefs.length) {
+      var refs = d.evidenceRefs.map(function(ref){
+        var isM = String(ref).indexOf('M') === 0;
+        var bg = isM ? 'rgba(245,166,35,.12)' : 'rgba(124,58,237,.12)';
+        var col = isM ? '#7A5500' : '#5B21B6';
+        var label = isM ? '🔧 Maintenance #' + ref.slice(1) : '💬 Message #' + ref.slice(1);
+        return '<span style="display:inline-flex;align-items:center;gap:4px;font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:'+col+';background:'+bg+';border-radius:8px;padding:3px 8px">'+label+'</span>';
+      }).join('');
+      evidenceHtml = '<div style="padding:0 16px 12px"><div style="background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.25);border-radius:10px;padding:10px 12px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:14px">🛡</span><span style="font-family:Sora,sans-serif;font-weight:800;font-size:10.5px;color:var(--teal-dk);text-transform:uppercase;letter-spacing:.8px">You have evidence</span></div>' +
+        (d.evidenceNote ? '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--text);line-height:1.5;margin-bottom:6px">'+d.evidenceNote+'</div>' : '') +
+        '<div style="display:flex;flex-wrap:wrap;gap:6px">'+refs+'</div></div></div>';
+    }
+
     var card=document.createElement('div');
     card.id='reviewCard-'+n;
-    card.style.cssText='background:#fff;border-radius:18px;border:2px solid var(--amber);box-shadow:0 4px 16px rgba(245,166,35,.1);overflow:hidden';
+    card.style.cssText='background:#fff;border-radius:18px;border:2px solid '+border+';box-shadow:0 4px 16px rgba(0,0,0,.05);overflow:hidden';
     card.innerHTML=
-      '<div style="padding:14px 16px;background:rgba(245,166,35,.08);display:flex;align-items:center;gap:10px">'
-        +'<div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+d.emoji+'</div>'
-        +'<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+d.room+'</div><div style="font-weight:600;font-size:12px;color:#8A6500">Difference detected</div></div>'
-        +'<span class="tag tag-amber">⚠️ Review</span>'
+      '<div style="padding:14px 16px;background:'+headBg+';display:flex;align-items:center;gap:10px">'
+        +'<div style="width:36px;height:36px;border-radius:10px;background:'+iconBg+';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+d.emoji+'</div>'
+        +'<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text)">'+d.room+' · '+itemTitle+'</div><div style="font-weight:600;font-size:12px;color:'+subColor+'">'+subText+'</div></div>'
+        +sevTag
       +'</div>'
       +'<div style="padding:14px 16px">'
         +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px"><span style="font-size:12px">🤖</span><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">RenterIQ noticed:</span></div>'
         +'<div style="font-weight:600;font-size:13.5px;color:var(--text);line-height:1.75">'+d.description+'</div>'
       +'</div>'
+      +evidenceHtml
       +'<div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
         +'<div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Move-in</div><div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-blue">'+d.emoji+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">'+d.entryContext+'</div></div>'
         +'<div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Exit</div><div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-teal">'+d.emoji+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">'+d.exitContext+'</div></div>'
