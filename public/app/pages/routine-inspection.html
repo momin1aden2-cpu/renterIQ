@@ -142,6 +142,9 @@
 .plan-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .2s;font-size:14px}
 .plan-check.done{background:var(--teal);border-color:var(--teal);color:#fff}
 .plan-photo-row{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.plan-photo{width:52px;height:52px;border-radius:10px;overflow:hidden;position:relative;border:1px solid var(--border-lt);background:var(--blue-xl);flex-shrink:0}
+.plan-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.plan-photo .ts{position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,.6);color:#fff;font-family:'Sora',sans-serif;font-size:8.5px;font-weight:700;padding:1.5px 5px;border-radius:4px;letter-spacing:.3px;pointer-events:none}
 .plan-photo-thumb{width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--border-lt)}
 .plan-photo-add{width:52px;height:52px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .2s}
 .plan-photo-add:active{border-color:var(--blue)}
@@ -938,9 +941,17 @@ function renderActionPlan() {
     tHtml += '<div class="plan-card" id="planCard' + globalIdx + '"><div class="plan-top"><div class="plan-priority ' + it.priority + '"></div><div class="plan-body"><div class="plan-title">' + esc(it.description) + '</div><div class="plan-desc">' + esc(it.action) + '</div>';
     if (it.deadline_days) tHtml += '<div class="plan-due"><span>⏰</span><span class="plan-due-text">Due in ' + it.deadline_days + ' days</span></div>';
     tHtml += '</div><div class="plan-check' + (done ? ' done' : '') + '" onclick="toggleTask(' + globalIdx + ')">' + (done ? '✓' : '') + '</div></div>';
-    // Photo row
+    // Photo row — supports both legacy string photos and new {url, time} objects
     tHtml += '<div class="plan-photo-row" id="photoRow' + globalIdx + '">';
-    photos.forEach(function(p) { tHtml += '<img class="plan-photo-thumb" src="' + p + '" loading="lazy" decoding="async" alt="">'; });
+    photos.forEach(function(p) {
+      var src = typeof p === 'string' ? p : (p && (p.url || p.data)) || '';
+      var ts = (p && p.time) || '';
+      if(!src) return;
+      tHtml += '<div class="plan-photo">'+
+        '<img src="' + src + '" loading="lazy" decoding="async" alt="">'+
+        (ts ? '<span class="ts">' + ts + '</span>' : '')+
+      '</div>';
+    });
     tHtml += '<div class="plan-photo-add" onclick="addTaskPhoto(' + globalIdx + ')">+</div></div></div>';
   });
   document.getElementById('tenantTasksSection').innerHTML = tHtml;
@@ -997,9 +1008,15 @@ document.getElementById('taskPhotoInput').addEventListener('change', function(e)
   var reader = new FileReader();
   reader.onload = function(ev) {
     if (!taskPhotos[currentPhotoTaskIdx]) taskPhotos[currentPhotoTaskIdx] = [];
-    taskPhotos[currentPhotoTaskIdx].push(ev.target.result);
+    var now = new Date();
+    var time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    taskPhotos[currentPhotoTaskIdx].push({
+      url: ev.target.result,
+      time: time,
+      timestamp: now.toISOString()
+    });
     renderActionPlan();
-    showToast('Photo added', 'Evidence photo attached to task', '📸');
+    showToast('Photo added · ' + time, 'Timestamped to your action plan', '📸');
     saveState();
   };
   reader.readAsDataURL(file);
@@ -1074,8 +1091,16 @@ function buildResponse() {
   Object.keys(taskPhotos).forEach(function(k) { allPhotos = allPhotos.concat(taskPhotos[k]); });
   if (allPhotos.length) {
     var pH = '';
-    allPhotos.forEach(function(p) { pH += '<img class="photo-attach-thumb" src="' + p + '" loading="lazy" decoding="async" alt="">'; });
-    pH += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:var(--muted);align-self:center">' + allPhotos.length + ' photo' + (allPhotos.length > 1 ? 's' : '') + '</div>';
+    allPhotos.forEach(function(p) {
+      var src = typeof p === 'string' ? p : (p && (p.url || p.data)) || '';
+      var ts = (p && p.time) || '';
+      if(!src) return;
+      pH += '<div style="position:relative;width:60px;height:60px;flex-shrink:0">'+
+        '<img class="photo-attach-thumb" src="' + src + '" loading="lazy" decoding="async" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--border-lt)">'+
+        (ts ? '<span style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,.6);color:#fff;font-family:Sora,sans-serif;font-size:8.5px;font-weight:700;padding:1.5px 5px;border-radius:4px;letter-spacing:.3px">'+ts+'</span>' : '')+
+      '</div>';
+    });
+    pH += '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:var(--muted);align-self:center;margin-left:6px">' + allPhotos.length + ' photo' + (allPhotos.length > 1 ? 's' : '') + ' attached</div>';
     photoGrid.innerHTML = pH;
     photoGrid.style.display = 'flex';
   } else {
@@ -1430,19 +1455,23 @@ function saveToFirestore(cb) {
       var photos = taskPhotos[taskKey] || [];
       uploadedPhotos[taskKey] = [];
       photos.forEach(function(photoData, idx) {
-        if (typeof photoData !== 'string' || !photoData.indexOf) return;
-        if (photoData.indexOf('data:') !== 0) {
-          // already a URL
-          uploadedPhotos[taskKey].push({ url: photoData });
+        // Photos can now be plain dataURL strings (legacy) or {url, time, timestamp} objects
+        var dataUrl = typeof photoData === 'string' ? photoData : (photoData && photoData.url) || '';
+        var time = (photoData && photoData.time) || '';
+        var ts = (photoData && photoData.timestamp) || '';
+        if (!dataUrl) return;
+        if (dataUrl.indexOf('data:') !== 0) {
+          // Already a remote URL — keep timestamp metadata if present
+          uploadedPhotos[taskKey].push({ url: dataUrl, time: time, timestamp: ts });
           return;
         }
-        var blob = ri_dataURLToBlob(photoData);
+        var blob = ri_dataURLToBlob(dataUrl);
         if (!blob) return;
         var path = 'routine-inspections/' + inspId + '/task' + taskKey + '_' + idx + '.jpg';
         uploadJobs.push(
           RIQStore.uploadFile(path, blob, { contentType: blob.type || 'image/jpeg' })
             .then(function(res) {
-              uploadedPhotos[taskKey].push({ url: res.url, path: res.path });
+              uploadedPhotos[taskKey].push({ url: res.url, path: res.path, time: time, timestamp: ts });
             })
             .catch(function(err) {
               console.warn('Routine inspection photo upload failed:', err);

@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v38 — Exit Report complete: itemised + evidence-aware AI + bond return email
+// RenterIQ Service Worker v39 — Photo timestamps unified across report-issue + routine + maintenance
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v38';
+var CACHE_NAME = 'renteriq-shell-v39';
 
 var APP_SHELL = [
   '/app/index.html',

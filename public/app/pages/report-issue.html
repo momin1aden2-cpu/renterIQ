@@ -56,6 +56,7 @@
 .ri-photo{aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;background:var(--border-lt)}
 .ri-photo img{width:100%;height:100%;object-fit:cover}
 .ri-photo .rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+.ri-photo .ts{position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-family:'Sora',sans-serif;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;letter-spacing:.3px;pointer-events:none}
 .ri-add{aspect-ratio:1;border:2px dashed var(--border);background:var(--blue-xl);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .ri-add-icon{font-size:22px}
 .ri-add-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted)}
@@ -370,8 +371,16 @@ function addRiPhoto(){
     var file=e.target.files[0]; if(!file)return;
     var reader=new FileReader();
     reader.onload=function(ev){
-      issue.photos.push({ url:ev.target.result, file:file });
+      var now=new Date();
+      var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+      issue.photos.push({
+        url:ev.target.result,
+        file:file,
+        time:time,                      // HH:MM for the visible badge
+        timestamp:now.toISOString()     // full precision for the saved record
+      });
       renderPhotos();
+      showToast('Photo added · '+time, 'Timestamped to your maintenance report', '📷');
     };
     reader.readAsDataURL(file);
   };
@@ -384,7 +393,11 @@ function renderPhotos(){
   var grid=document.getElementById('riPhotoGrid');
   var html='';
   issue.photos.forEach(function(p,i){
-    html+='<div class="ri-photo"><img src="'+p.url+'" alt=""><span class="rm" onclick="removeRiPhoto('+i+')">×</span></div>';
+    html+='<div class="ri-photo">'+
+      '<img src="'+p.url+'" alt="">'+
+      (p.time ? '<span class="ts">'+p.time+'</span>' : '')+
+      '<span class="rm" onclick="removeRiPhoto('+i+')">×</span>'+
+    '</div>';
   });
   if(issue.photos.length<4){
     html+='<div class="ri-add" onclick="addRiPhoto()"><span class="ri-add-icon">📷</span><span class="ri-add-label">Add</span></div>';
@@ -523,8 +536,10 @@ function saveRecords(opts){
   var followUpDays=(draft && draft.follow_up_days) || (issue.urgency==='emergency'?2:issue.urgency==='urgent'?5:10);
   var expectDays=(draft && draft.expected_response_days) || (issue.urgency==='emergency'?1:issue.urgency==='urgent'?3:7);
 
-  // Photos — base64 for local, could be uploaded by sync
-  var photoData=issue.photos.map(function(p){return p.url;});
+  // Photos — keep timestamps + base64 for local. Cloud sync can upload later.
+  var photoData=issue.photos.map(function(p){
+    return { url:p.url, time:p.time||'', timestamp:p.timestamp||'' };
+  });
 
   // Maintenance item
   var maintId='maint_'+now+'_'+Math.random().toString(36).slice(2,6);
