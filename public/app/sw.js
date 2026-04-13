@@ -1,7 +1,7 @@
-// RenterIQ Service Worker v43 — Unified delete with confirm across every vault folder
+// RenterIQ Service Worker v44 — Profile avatar dynamic, vault delete re-renders, replay tour removed
 // No kill-switch. No dev-mode logic. Network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v43';
+var CACHE_NAME = 'renteriq-shell-v44';
 
 var APP_SHELL = [
   '/app/index.html',

@@ -842,12 +842,14 @@ function resolveItem(id){
 function loadMaintenanceItems(){
   try {
     var raw = localStorage.getItem('riq_maintenance_items');
-    if (!raw) return;
-    var items = JSON.parse(raw);
-    if (!items.length) return;
+    var items = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(items)) items = [];
     var list = document.getElementById('maintenanceItemsList');
-    var empty = document.getElementById('noMaintenanceItems');
-    if (empty) empty.style.display = 'none';
+    if (!items.length) {
+      if (list) list.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:44px;margin-bottom:12px">🔧</div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Nothing broken? Nice.</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">When something needs fixing, report it here — we\'ll draft the email and chase it up if the agent goes quiet.</div><button style="background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:\'Sora\',sans-serif;font-size:13px;font-weight:800;cursor:pointer;min-height:44px;box-shadow:0 4px 14px rgba(245,158,11,.3)" onclick="navigate(\'/app/pages/report-issue.html\')">✦ Report an issue</button></div>';
+      var subN = document.getElementById('maintenanceSubtitle'); if (subN) subN.textContent = '0 items logged';
+      return;
+    }
     var pending = items.filter(function(i) { return i.status !== 'resolved'; });
     var resolved = items.filter(function(i) { return i.status === 'resolved'; });
     var html = '';
@@ -1112,12 +1114,14 @@ function openFollowUpReviewSheet(item, draft){
 function loadComms(){
   try {
     var raw = localStorage.getItem('riq_communications');
-    if (!raw) return;
-    var comms = JSON.parse(raw);
-    if (!comms.length) return;
+    var comms = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(comms)) comms = [];
     var list = document.getElementById('commsList');
-    var empty = document.getElementById('noCommsItems');
-    if (empty) empty.style.display = 'none';
+    if (!comms.length) {
+      if (list) list.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:44px;margin-bottom:12px">💬</div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Your message trail will live here</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">Every email RenterIQ drafts for you (maintenance, follow-ups, bond return) is saved automatically — easy to look up later.</div><button style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:12px 24px;font-family:\'Sora\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="openNewCommsSheet()">+ Save a message manually</button></div>';
+      var subN = document.getElementById('commsSubtitle'); if (subN) subN.textContent = '0 saved messages';
+      return;
+    }
     var html = '';
     comms.forEach(function(c, i) {
       var date = new Date(c.date).toLocaleDateString('en-AU', {day: 'numeric', month: 'short', year: 'numeric'});
@@ -1216,12 +1220,15 @@ function closeReceiptsSheet(){var o=document.getElementById('receiptsOverlay'),s
 function loadReceipts(){
   try {
     var raw = localStorage.getItem('riq_receipts');
-    if (!raw) return;
-    var receipts = JSON.parse(raw);
-    if (!receipts.length) return;
+    var receipts = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(receipts)) receipts = [];
     var list = document.getElementById('receiptsList');
-    var empty = document.getElementById('noReceiptsItems');
-    if (empty) empty.style.display = 'none';
+    if (!receipts.length) {
+      if (list) list.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:44px;margin-bottom:12px">🧾</div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Keep every receipt — easy to find later</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">Snap the bond receipt, rent payments, repair invoices. Comes in handy if anything ever needs to be proven.</div><button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:\'Sora\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="openNewReceiptSheet()">+ Add your first receipt</button></div>';
+      var subN = document.getElementById('receiptsSubtitle'); if (subN) subN.textContent = '0 receipts';
+      var badgeN = document.querySelector('.vault-count-f'); if (badgeN) badgeN.textContent = '0 receipts';
+      return;
+    }
     var html = '';
     receipts.forEach(function(r) {
       var date = new Date(r.date).toLocaleDateString('en-AU', {day: 'numeric', month: 'short', year: 'numeric'});
@@ -1351,12 +1358,15 @@ document.addEventListener('DOMContentLoaded',function(){
 function loadRoutineReports(){
   try{
     var raw=localStorage.getItem('riq_routine_inspection_past');
-    if(!raw)return;
-    var inspections=JSON.parse(raw);
-    if(!inspections||!inspections.length)return;
+    var inspections=raw?JSON.parse(raw):[];
+    if(!Array.isArray(inspections))inspections=[];
     var list=document.getElementById('routineReportsList');
-    var empty=document.getElementById('noRoutineReports');
-    if(empty)empty.style.display='none';
+    if(!inspections.length){
+      if(list)list.innerHTML='<div style="text-align:center;padding:40px 20px"><div style="font-size:44px;margin-bottom:12px">🔍</div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Got a routine inspection report?</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">Upload it and we\'ll split the actions into "yours" vs "the agent\'s", set deadlines, and draft a friendly reply.</div><button style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:\'Sora\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="navigate(\'/app/pages/routine-inspection.html\')">🔍 Upload report</button></div>';
+      var subN=document.getElementById('routineSubtitle');if(subN)subN.textContent='0 reports saved';
+      var badgeN=document.querySelector('.vault-count-h');if(badgeN)badgeN.textContent='0 reports';
+      return;
+    }
     var html='';
     inspections.forEach(function(insp,i){
       var summary=insp.summary||{};
