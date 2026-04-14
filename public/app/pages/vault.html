@@ -2110,10 +2110,11 @@ function renderLeaseDetail(l){
   }
   html += termRow('Start date', startStr);
   html += termRow('End date', endStr);
-  html += termRow('Weekly rent', l.weeklyRent || kt.rentWeekly);
-  if (kt.rentFrequency) html += termRow('Rent frequency', kt.rentFrequency);
+  html += termRow('Rent', (l.weeklyRent || kt.rentWeekly || '—') + (kt.rentFrequency ? ' ' + kt.rentFrequency : ''));
+  if (kt.rentPaymentMethod) html += termRow('Payment method', kt.rentPaymentMethod);
   html += termRow('Bond', l.bond || kt.bondAmount);
-  if (kt.bondAuthority) html += termRow('Bond held with', kt.bondAuthority);
+  if (kt.bondAuthorityState || kt.bondAuthority) html += termRow('Bond held with', kt.bondAuthorityState ? (kt.bondAuthority ? kt.bondAuthority + ' (' + kt.bondAuthorityState + ')' : kt.bondAuthorityState) : kt.bondAuthority);
+  if (kt.bondReference) html += termRow('Bond reference', kt.bondReference);
   if (kt.leaseType) html += termRow('Lease type', kt.leaseType);
   if (kt.breakClause) html += termRow('Break clause', kt.breakClause);
   if (kt.noticePeriod) html += termRow('Notice period', kt.noticePeriod);

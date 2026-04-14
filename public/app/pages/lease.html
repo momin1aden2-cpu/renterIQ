@@ -995,7 +995,9 @@ function saveToVault(){
 
 function propagateLeaseToTrackers(record){
   var kt = record.keyTerms || {};
-  // Rent tracker — weekly amount + frequency
+  var STATE_CODES = ['NSW','VIC','QLD','WA','SA','TAS','ACT','NT'];
+
+  // Rent tracker — amount + frequency + due day + method
   try {
     var rentRaw = String(record.weeklyRent || kt.rentWeekly || '').replace(/[^0-9.]/g,'');
     if (rentRaw) {
@@ -1004,20 +1006,37 @@ function propagateLeaseToTrackers(record){
         rentData.amount = parseFloat(rentRaw);
         var freq = String(kt.rentFrequency||'').toLowerCase();
         rentData.frequency = freq.indexOf('fortnight')!==-1 ? 'fortnightly' : freq.indexOf('month')!==-1 ? 'monthly' : 'weekly';
-        if (!rentData.payments) rentData.payments = [];
+        // Rent due day — accept number 0-6 for weekly/fortnightly, 1-28 for monthly
+        if (kt.rentDueDay !== undefined && kt.rentDueDay !== null && kt.rentDueDay !== '') {
+          var n = parseInt(kt.rentDueDay, 10);
+          if (!isNaN(n)) {
+            if (rentData.frequency === 'monthly' && n >= 1 && n <= 28) rentData.rentDay = n;
+            else if (rentData.frequency !== 'monthly' && n >= 0 && n <= 6) rentData.rentDay = n;
+          }
+        }
+        if (kt.rentPaymentMethod) rentData.paymentMethod = kt.rentPaymentMethod;
+        if (kt.rentFirstPaymentDate) rentData.firstPaymentDate = kt.rentFirstPaymentDate;
         if (record.address) rentData.address = record.address;
+        if (!rentData.payments) rentData.payments = [];
         localStorage.setItem('riq_rent_tracker', JSON.stringify(rentData));
       }
     }
   } catch(e){}
-  // Bond tracker — amount + authority (if AI extracted one)
+
+  // Bond tracker — amount + state authority + reference + lodge date
   try {
     var bondRaw = String(record.bond || kt.bondAmount || '').replace(/[^0-9.]/g,'');
     if (bondRaw) {
       var bondData = {}; try { bondData = JSON.parse(localStorage.getItem('riq_bond_tracker')||'{}'); } catch(e){}
       if (!bondData.amount) {
         bondData.amount = parseFloat(bondRaw);
-        if (kt.bondAuthority) bondData.authority = kt.bondAuthority;
+        // Prefer the state code the AI returned, else fall back to saved user state
+        var authCode = (kt.bondAuthorityState || '').toUpperCase();
+        if (!authCode) authCode = (localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || '').toUpperCase();
+        if (authCode && STATE_CODES.indexOf(authCode) !== -1) bondData.authority = authCode;
+        if (kt.bondAuthority && !bondData.authorityName) bondData.authorityName = kt.bondAuthority;
+        if (kt.bondReference) bondData.referenceNumber = kt.bondReference;
+        if (kt.bondLodgeDate) bondData.lodgeDate = kt.bondLodgeDate;
         if (record.address) bondData.address = record.address;
         localStorage.setItem('riq_bond_tracker', JSON.stringify(bondData));
       }
@@ -1243,26 +1262,44 @@ function showPostSigningModal(terms) {
   requestAnimationFrame(function() { overlay.style.opacity = '1'; requestAnimationFrame(function() { card.style.transform = 'translateY(0)'; }); });
 }
 
-// Extract key terms from lease for post-signing setup + the vault detail view
+// Extract key terms from lease — maps AI summary → flat keyTerms object used
+// by the vault detail view and the rent/bond tracker propagation.
 function extractLeaseKeyTerms(data) {
   try {
     var terms = {};
-    if (data.summary) {
-      var s = data.summary;
-      if (s.weekly_rent || s.rent) terms.rentWeekly = s.weekly_rent || s.rent;
-      if (s.bond || s.bond_amount) terms.bondAmount = s.bond || s.bond_amount;
-      if (s.bond_authority || s.bond_held_with) terms.bondAuthority = s.bond_authority || s.bond_held_with;
-      if (s.lease_start || s.start_date) terms.leaseStart = s.lease_start || s.start_date;
-      if (s.lease_end || s.end_date) terms.leaseEnd = s.lease_end || s.end_date;
-      if (s.property_address || s.address) terms.address = s.property_address || s.address;
-      if (s.landlord || s.landlord_name) terms.landlord = s.landlord || s.landlord_name;
-      if (s.agent || s.agency) terms.agent = s.agent || s.agency;
-      if (s.rent_frequency) terms.rentFrequency = s.rent_frequency;
-      if (s.break_clause) terms.breakClause = s.break_clause;
-      if (s.notice_period) terms.noticePeriod = s.notice_period;
-      if (s.lease_type) terms.leaseType = s.lease_type;
-    }
-    if (data.clauses) {
+    var s = (data && data.summary) || {};
+
+    // Rent
+    if (s.rent_amount || s.weekly_rent || s.rent) terms.rentWeekly = s.rent_amount || s.weekly_rent || s.rent;
+    if (s.rent_frequency) terms.rentFrequency = s.rent_frequency;
+    if (s.rent_due_day !== undefined && s.rent_due_day !== null && s.rent_due_day !== '') terms.rentDueDay = s.rent_due_day;
+    if (s.rent_payment_method) terms.rentPaymentMethod = s.rent_payment_method;
+    if (s.rent_first_payment_date) terms.rentFirstPaymentDate = s.rent_first_payment_date;
+
+    // Bond
+    if (s.bond_amount || s.bond) terms.bondAmount = s.bond_amount || s.bond;
+    if (s.bond_authority_state) terms.bondAuthorityState = String(s.bond_authority_state).toUpperCase();
+    if (s.bond_authority_name || s.bond_authority) terms.bondAuthority = s.bond_authority_name || s.bond_authority;
+    if (s.bond_reference) terms.bondReference = s.bond_reference;
+    if (s.bond_lodge_date) terms.bondLodgeDate = s.bond_lodge_date;
+
+    // Lease term
+    if (s.lease_start || s.start_date) terms.leaseStart = s.lease_start || s.start_date;
+    if (s.lease_end || s.end_date) terms.leaseEnd = s.lease_end || s.end_date;
+    if (s.lease_type) terms.leaseType = s.lease_type;
+    if (s.notice_period) terms.noticePeriod = s.notice_period;
+    if (s.break_clause) terms.breakClause = s.break_clause;
+
+    // Parties + property
+    if (s.property_address || s.address) terms.address = s.property_address || s.address;
+    if (s.landlord_name || s.landlord) terms.landlord = s.landlord_name || s.landlord;
+    if (s.agency_name || s.agent || s.agency) terms.agent = s.agency_name || s.agent || s.agency;
+    if (s.agent_name) terms.pmName = s.agent_name;
+    if (s.agent_email) terms.pmEmail = s.agent_email;
+    if (s.agent_phone) terms.pmPhone = s.agent_phone;
+
+    // Fallback scan of clauses in case summary is sparse
+    if (Array.isArray(data.clauses)) {
       data.clauses.forEach(function(c) {
         var t = (c.title || '').toLowerCase();
         var ex = c.explanation || '';
@@ -1280,6 +1317,14 @@ function extractLeaseKeyTerms(data) {
         }
       });
     }
+
+    // If address hints at a state and we have no explicit authority code, infer it
+    if (!terms.bondAuthorityState && terms.address) {
+      var addr = terms.address.toUpperCase();
+      var stateMatch = addr.match(/\b(NSW|VIC|QLD|WA|SA|TAS|ACT|NT)\b/);
+      if (stateMatch) terms.bondAuthorityState = stateMatch[1];
+    }
+
     localStorage.setItem('riq_lease_terms', JSON.stringify(terms));
   } catch(e) {}
 }

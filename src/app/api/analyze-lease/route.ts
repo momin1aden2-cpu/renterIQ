@@ -31,11 +31,27 @@ Respond ONLY with valid JSON in this exact format:
     "warning_count": number,
     "overall_risk": "low" | "medium" | "high",
     "key_concerns": ["Short bullet point of each major concern"],
-    "rent_amount": "Extracted rent amount if found, or null",
-    "bond_amount": "Extracted bond amount if found, or null",
-    "lease_start": "Extracted start date if found, or null",
-    "lease_end": "Extracted end date if found, or null",
-    "property_address": "Extracted address if found, or null"
+    "rent_amount": "Extracted rent amount as a dollar string (e.g. '$650') or null",
+    "rent_frequency": "'weekly' | 'fortnightly' | 'monthly' — how often rent is paid, or null",
+    "rent_due_day": "Day rent is due. Integer 0-6 for weekly/fortnightly (0=Sunday, 1=Monday … 6=Saturday), OR integer 1-28 for monthly. Null if unclear",
+    "rent_payment_method": "'direct debit' | 'BPAY' | 'bank transfer' | 'agency portal' | 'other', or null",
+    "rent_first_payment_date": "ISO date (YYYY-MM-DD) of first rent payment if stated, else null",
+    "bond_amount": "Extracted bond amount as a dollar string (e.g. '$2,600') or null",
+    "bond_authority_state": "One of 'NSW','VIC','QLD','WA','SA','TAS','ACT','NT'. Infer from the property address or jurisdiction if not explicitly stated. Null only if truly indeterminable",
+    "bond_authority_name": "Plain-English name of the bond authority mentioned in the lease if any (e.g. 'RTBA', 'Rental Bond Board', 'RTA Queensland'), else null",
+    "bond_reference": "Bond lodgement reference number if stated in the lease, else null",
+    "bond_lodge_date": "ISO date (YYYY-MM-DD) of bond lodgement if stated, else null",
+    "lease_start": "ISO date (YYYY-MM-DD) or null",
+    "lease_end": "ISO date (YYYY-MM-DD) or null",
+    "lease_type": "'fixed term' | 'periodic' | 'rolling', or null",
+    "notice_period": "Notice period in days if stated, or null",
+    "break_clause": "Brief plain-English summary of the break-lease terms, or null",
+    "property_address": "Extracted address if found, or null",
+    "landlord_name": "Landlord's name if found, or null",
+    "agency_name": "Managing agency if found, or null",
+    "agent_name": "Property manager / agent full name if found, or null",
+    "agent_email": "Property manager email if found, or null",
+    "agent_phone": "Property manager phone if found, or null"
   }
 }
 
@@ -47,7 +63,10 @@ Rules:
 - Be practical and fair — most standard lease terms are fine
 - Always provide the plain-English explanation even for standard clauses
 - This is a plain-English understanding helper, NEVER legal advice. Do not cite specific Act section numbers inline in explanations. law_reference may name the Act in passing ("Residential Tenancies Act 1997 (Vic)") but never quote specific section numbers that sound prescriptive
-- Limit to the 12 most important clauses if the lease is very long`;
+- Limit to the 12 most important clauses if the lease is very long
+- For bond_authority_state, map the property's state to the code: NSW, VIC, QLD, WA, SA, TAS, ACT, NT. If the lease names an authority (e.g. "RTBA"), still set the state code
+- Dates must be ISO format (YYYY-MM-DD) so the app can use them directly
+- Be conservative — if a field is not clearly stated, return null rather than guess. The app will fall back to asking the user`;
 
 type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } };
 
