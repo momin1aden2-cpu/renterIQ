@@ -301,10 +301,16 @@ function init(){
   if(data && data.amount && data.authority && data.referenceNumber && data.lodgeDate){
     renderSummary(data);
   } else if(data) {
-    // Pre-fill form with partial data (e.g. from lease extraction)
+    // Pre-fill form with partial data (e.g. from the lease review)
     var amtEl = document.getElementById('bondAmount');
+    var authEl = document.getElementById('bondAuthority');
+    var refEl = document.getElementById('bondRef');
+    var dateEl = document.getElementById('bondDate');
     var addrEl = document.getElementById('bondAddress');
     if(amtEl && data.amount) amtEl.value = data.amount;
+    if(authEl && data.authority) authEl.value = data.authority;
+    if(refEl && data.referenceNumber) refEl.value = data.referenceNumber;
+    if(dateEl && data.lodgeDate) dateEl.value = data.lodgeDate;
     if(addrEl && data.address) addrEl.value = data.address;
   }
 

@@ -781,6 +781,16 @@ function startAnalysisCore(){
       if(window.RIQPayments)RIQPayments.recordPurchase('lease_review');
       finishAnimation();
       extractLeaseKeyTerms(data);
+      // Seed rent + bond trackers immediately from the AI extraction so the
+      // user finds them pre-filled even if they exit before saving to vault.
+      var ldForSeed = {}; try { ldForSeed = JSON.parse(localStorage.getItem('riq-lease-data')||'{}'); } catch(e){}
+      var ktForSeed = {}; try { ktForSeed = JSON.parse(localStorage.getItem('riq_lease_terms')||'{}'); } catch(e){}
+      propagateLeaseToTrackers({
+        address: ldForSeed.address || ktForSeed.address || '',
+        weeklyRent: ldForSeed.weeklyRent || ktForSeed.rentWeekly || '',
+        bond: ldForSeed.bond || ktForSeed.bondAmount || '',
+        keyTerms: ktForSeed
+      });
       if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function') RIQPayments.promptCloudSync();
     })
     .catch(function(err){
@@ -1045,19 +1055,24 @@ function propagateLeaseToTrackers(record){
 }
 
 function syncLeaseToCloud(record){
-  function persistLocal(rec){
-    try {
-      var list = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
-      var idx = list.findIndex(function(l){ return l && l.id === rec.id; });
-      if (idx !== -1) list[idx] = rec; else list.unshift(rec);
-      localStorage.setItem('riq-vault-leases', JSON.stringify(list));
-      localStorage.setItem('riq-lease-record', JSON.stringify(rec));
-    } catch(e){}
-  }
+  // Cloud sync is a paid upgrade. If the user hasn't purchased it, everything
+  // stays on-device — no file uploads, no Firestore writes, no "synced" toast.
+  var cloudEnabled = !!(window.RIQPayments && typeof RIQPayments.isCloudSyncEnabled === 'function' && RIQPayments.isCloudSyncEnabled());
+  if (!cloudEnabled) return;
 
   if(!window.RIQStore) return;
   RIQStore.ready.then(function(){
     if(!RIQStore.isAuthed()) return;
+
+    function persistLocal(rec){
+      try {
+        var list = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+        var idx = list.findIndex(function(l){ return l && l.id === rec.id; });
+        if (idx !== -1) list[idx] = rec; else list.unshift(rec);
+        localStorage.setItem('riq-vault-leases', JSON.stringify(list));
+        localStorage.setItem('riq-lease-record', JSON.stringify(rec));
+      } catch(e){}
+    }
 
     function writeMetadata(rec){
       persistLocal(rec);

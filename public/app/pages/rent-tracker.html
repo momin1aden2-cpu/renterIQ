@@ -496,18 +496,21 @@ function init() {
   } else {
     document.getElementById('setupView').style.display = '';
     document.getElementById('trackerView').style.display = 'none';
-    // Pre-fill setup if partial data from lease
+    // Pre-fill setup form from anything the lease review extracted
     if (data && data.amount) {
-      var amtInput = document.getElementById('amountInput');
+      var amtInput = document.getElementById('rentAmount');
       if (amtInput) amtInput.value = data.amount;
     }
     if (data && data.frequency) {
-      var freqBtns = document.querySelectorAll('.freq-btn');
-      freqBtns.forEach(function(b) {
+      document.querySelectorAll('.freq-btn').forEach(function(b) {
         b.classList.toggle('active', b.dataset.freq === data.frequency);
         if (b.dataset.freq === data.frequency) selectedFreq = data.frequency;
       });
       renderDayOptions();
+    }
+    if (data && (data.rentDay !== undefined && data.rentDay !== null)) {
+      var dayEl = document.getElementById('rentDay');
+      if (dayEl) dayEl.value = data.rentDay;
     }
   }
 }
