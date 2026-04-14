@@ -780,7 +780,6 @@ function startAnalysisCore(){
       }
       if(window.RIQPayments)RIQPayments.recordPurchase('lease_review');
       finishAnimation();
-      saveLeaseToVault(data);
       extractLeaseKeyTerms(data);
       if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function') RIQPayments.promptCloudSync();
     })
@@ -927,64 +926,123 @@ function toggleOriginal(n){
   if(toggle)toggle.textContent=isHidden?'Hide ‹':'Show ›';
 }
 
-// Save to Vault
+// Save to Vault — single source of truth. Carries property metadata,
+// the AI clauses/summary, extracted key terms, and the original file ref.
 function saveToVault(){
-  var now=new Date();
-  var el=document.getElementById('savedTime');
-  if(el)el.textContent='Saved '+now.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit',hour12:true})+' · '+now.toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+  // Updating an existing record (re-save after edits)? Preserve its id.
+  var existingId = (window.__riqEditingLeaseId || '');
+  var now = new Date();
+  var el = document.getElementById('savedTime');
+  if(el) el.textContent = 'Saved '+now.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit',hour12:true})+' · '+now.toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
 
-  // Persist lease review record to localStorage
-  var ld={};try{ld=JSON.parse(localStorage.getItem('riq-lease-data')||'{}')}catch(e){}
-  var record={
-    id:'lease_'+Date.now(),
-    savedAt:now.toISOString(),
-    fileName:document.getElementById('fileName')?document.getElementById('fileName').textContent:'',
-    address:ld.address||'',
-    startDate:ld.startDate||'',
-    endDate:ld.endDate||'',
-    weeklyRent:ld.weeklyRent||'',
-    bond:ld.bond||'',
-    agencyName:ld.agencyName||'',
-    pmName:ld.pmName||'',
-    pmPhone:ld.pmPhone||'',
-    totalClauses:totalClauses,
-    flaggedCount:leaseData&&leaseData.clauses?leaseData.clauses.filter(function(c){return c.rating!=='standard'}).length:3,
-    state:localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'',
-    fileUrl:'',     // populated after Cloud Storage upload
-    filePath:'',    // populated after Cloud Storage upload
-    fileSize:uploadedFile?uploadedFile.size:0,
-    fileMimeType:uploadedFile?uploadedFile.type:''
+  var ld = {}; try { ld = JSON.parse(localStorage.getItem('riq-lease-data')||'{}'); } catch(e){}
+  var keyTerms = {}; try { keyTerms = JSON.parse(localStorage.getItem('riq_lease_terms')||'{}'); } catch(e){}
+
+  var clauses = (leaseData && leaseData.clauses) ? leaseData.clauses : [];
+  var flaggedCount = clauses.filter(function(c){ return c && c.rating !== 'standard'; }).length;
+
+  var record = {
+    id: existingId || ('lease_'+Date.now()),
+    type: 'lease_review',
+    savedAt: now.toISOString(),
+    fileName: (document.getElementById('fileName') && document.getElementById('fileName').textContent) || '',
+    // Property / tenancy basics — prefer user-edited form values, fall back to AI extraction
+    address: ld.address || keyTerms.address || '',
+    startDate: ld.startDate || keyTerms.leaseStart || '',
+    endDate: ld.endDate || keyTerms.leaseEnd || '',
+    weeklyRent: ld.weeklyRent || keyTerms.rentWeekly || '',
+    bond: ld.bond || keyTerms.bondAmount || '',
+    agencyName: ld.agencyName || keyTerms.agent || '',
+    pmName: ld.pmName || '',
+    pmPhone: ld.pmPhone || '',
+    agentEmail: ld.agentEmail || '',
+    // AI-extracted tenancy key terms
+    keyTerms: keyTerms,
+    // Full AI analysis
+    clauses: clauses,
+    summary: (leaseData && leaseData.summary) || {},
+    overallRisk: (leaseData && leaseData.overall_risk) || '',
+    totalClauses: clauses.length || totalClauses,
+    flaggedCount: flaggedCount || 0,
+    state: localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || '',
+    // File refs (filled in after cloud upload resolves)
+    fileUrl: '',
+    filePath: '',
+    fileSize: uploadedFile ? uploadedFile.size : 0,
+    fileMimeType: uploadedFile ? uploadedFile.type : ''
   };
-  localStorage.setItem('riq-lease-record',JSON.stringify(record));
 
-  // Local vault folder
-  try{
-    var vaultLeases=JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
-    vaultLeases.unshift(record);
-    localStorage.setItem('riq-vault-leases',JSON.stringify(vaultLeases));
-  }catch(e){}
+  // Mirror to the "active tenancy" record
+  localStorage.setItem('riq-lease-record', JSON.stringify(record));
 
-  // ── Cloud sync (background) ──
-  // Upload the PDF to Storage, then write the lease metadata (including the
-  // download URL) to Firestore. Updates the same record in localStorage so
-  // the UI shows the cloud reference next time it loads.
+  // Upsert into the vault leases folder (replace if id matches)
+  try {
+    var vaultLeases = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+    var existingIdx = vaultLeases.findIndex(function(l){ return l && l.id === record.id; });
+    if (existingIdx !== -1) vaultLeases[existingIdx] = record;
+    else vaultLeases.unshift(record);
+    localStorage.setItem('riq-vault-leases', JSON.stringify(vaultLeases));
+  } catch(e){}
+
+  // Seed the rent + bond trackers from the lease (only if the user hasn't
+  // already set them up — we never overwrite their own entries).
+  propagateLeaseToTrackers(record);
+
+  // Cloud sync (best-effort). On success we re-save with fileUrl so the
+  // vault detail view can link to the original document.
   syncLeaseToCloud(record);
 }
 
+function propagateLeaseToTrackers(record){
+  var kt = record.keyTerms || {};
+  // Rent tracker — weekly amount + frequency
+  try {
+    var rentRaw = String(record.weeklyRent || kt.rentWeekly || '').replace(/[^0-9.]/g,'');
+    if (rentRaw) {
+      var rentData = {}; try { rentData = JSON.parse(localStorage.getItem('riq_rent_tracker')||'{}'); } catch(e){}
+      if (!rentData.amount) {
+        rentData.amount = parseFloat(rentRaw);
+        var freq = String(kt.rentFrequency||'').toLowerCase();
+        rentData.frequency = freq.indexOf('fortnight')!==-1 ? 'fortnightly' : freq.indexOf('month')!==-1 ? 'monthly' : 'weekly';
+        if (!rentData.payments) rentData.payments = [];
+        if (record.address) rentData.address = record.address;
+        localStorage.setItem('riq_rent_tracker', JSON.stringify(rentData));
+      }
+    }
+  } catch(e){}
+  // Bond tracker — amount + authority (if AI extracted one)
+  try {
+    var bondRaw = String(record.bond || kt.bondAmount || '').replace(/[^0-9.]/g,'');
+    if (bondRaw) {
+      var bondData = {}; try { bondData = JSON.parse(localStorage.getItem('riq_bond_tracker')||'{}'); } catch(e){}
+      if (!bondData.amount) {
+        bondData.amount = parseFloat(bondRaw);
+        if (kt.bondAuthority) bondData.authority = kt.bondAuthority;
+        if (record.address) bondData.address = record.address;
+        localStorage.setItem('riq_bond_tracker', JSON.stringify(bondData));
+      }
+    }
+  } catch(e){}
+}
+
 function syncLeaseToCloud(record){
-  if(!window.RIQStore)return;
+  function persistLocal(rec){
+    try {
+      var list = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+      var idx = list.findIndex(function(l){ return l && l.id === rec.id; });
+      if (idx !== -1) list[idx] = rec; else list.unshift(rec);
+      localStorage.setItem('riq-vault-leases', JSON.stringify(list));
+      localStorage.setItem('riq-lease-record', JSON.stringify(rec));
+    } catch(e){}
+  }
+
+  if(!window.RIQStore) return;
   RIQStore.ready.then(function(){
-    if(!RIQStore.isAuthed())return;
+    if(!RIQStore.isAuthed()) return;
 
     function writeMetadata(rec){
-      RIQStore.write('leases',rec.id,rec).then(function(){
-        // Mirror back into localStorage so the next render picks up the cloud URL
-        try{
-          var list=JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
-          var idx=list.findIndex(function(l){return l.id===rec.id});
-          if(idx!==-1){list[idx]=rec;}else{list.unshift(rec);}
-          localStorage.setItem('riq-vault-leases',JSON.stringify(list));
-        }catch(e){}
+      persistLocal(rec);
+      RIQStore.write('leases', rec.id, rec).then(function(){
         showToast('Saved to cloud ✓','Lease synced across your devices','☁️');
       }).catch(function(err){
         console.warn('Lease metadata sync failed:',err);
@@ -992,13 +1050,12 @@ function syncLeaseToCloud(record){
     }
 
     if(uploadedFile){
-      // Upload the PDF blob first
-      var ext=(uploadedFile.name.split('.').pop()||'pdf').toLowerCase();
-      var path='leases/'+record.id+'.'+ext;
-      RIQStore.uploadFile(path,uploadedFile,{contentType:uploadedFile.type||'application/pdf'})
+      var ext = (uploadedFile.name.split('.').pop()||'pdf').toLowerCase();
+      var path = 'leases/'+record.id+'.'+ext;
+      RIQStore.uploadFile(path, uploadedFile, { contentType: uploadedFile.type || 'application/pdf' })
         .then(function(res){
-          record.fileUrl=res.url;
-          record.filePath=res.path;
+          record.fileUrl = res.url;
+          record.filePath = res.path;
           writeMetadata(record);
         })
         .catch(function(err){
@@ -1006,7 +1063,6 @@ function syncLeaseToCloud(record){
           writeMetadata(record);
         });
     } else {
-      // Demo mode or no file selected — just sync metadata
       writeMetadata(record);
     }
   });
@@ -1049,6 +1105,26 @@ document.addEventListener('DOMContentLoaded',function(){
     if(ld.pmName&&document.getElementById('ld-pmName'))document.getElementById('ld-pmName').value=ld.pmName;
     if(ld.pmPhone&&document.getElementById('ld-pmPhone'))document.getElementById('ld-pmPhone').value=ld.pmPhone;
   }catch(e){}
+
+  // Re-open a saved lease review when launched with ?id=lease_xxx
+  try {
+    var qId = new URLSearchParams(window.location.search).get('id');
+    if (qId) {
+      var list = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+      var saved = Array.isArray(list) ? list.find(function(l){ return l && l.id === qId; }) : null;
+      if (saved && saved.clauses && saved.clauses.length) {
+        window.__riqEditingLeaseId = saved.id;
+        leaseData = { clauses: saved.clauses, summary: saved.summary || {}, overall_risk: saved.overallRisk };
+        totalClauses = saved.clauses.length;
+        if (saved.keyTerms) localStorage.setItem('riq_lease_terms', JSON.stringify(saved.keyTerms));
+        var fn = document.getElementById('fileName');
+        if (fn && saved.fileName) fn.textContent = saved.fileName;
+        renderClauses(leaseData);
+        renderSummary(leaseData);
+        switchView('C');
+      }
+    }
+  } catch(e){ console.error('lease re-open hydration:',e); }
 });
 
 // Post-signing setup — pre-fill bond and rent from lease terms
@@ -1167,30 +1243,7 @@ function showPostSigningModal(terms) {
   requestAnimationFrame(function() { overlay.style.opacity = '1'; requestAnimationFrame(function() { card.style.transform = 'translateY(0)'; }); });
 }
 
-// Save lease analysis to vault
-function saveLeaseToVault(data) {
-  try {
-    var leases = JSON.parse(localStorage.getItem('riq-vault-leases') || '[]');
-    var record = {
-      id: 'lease_' + Date.now(),
-      type: 'lease_review',
-      address: (data.summary && data.summary.property_address) || document.getElementById('setupAddress') && document.getElementById('setupAddress').value || '',
-      summary: data.summary || {},
-      clauseCount: data.clauses ? data.clauses.length : 0,
-      flaggedCount: data.clauses ? data.clauses.filter(function(c) { return c.rating !== 'standard'; }).length : 0,
-      date: Date.now()
-    };
-    leases.unshift(record);
-    localStorage.setItem('riq-vault-leases', JSON.stringify(leases));
-    if (window.RIQStore) {
-      RIQStore.ready.then(function() {
-        if (RIQStore.isAuthed()) RIQStore.write('leases', record.id, record);
-      });
-    }
-  } catch(e) {}
-}
-
-// Extract key terms from lease for post-signing setup
+// Extract key terms from lease for post-signing setup + the vault detail view
 function extractLeaseKeyTerms(data) {
   try {
     var terms = {};
@@ -1198,6 +1251,7 @@ function extractLeaseKeyTerms(data) {
       var s = data.summary;
       if (s.weekly_rent || s.rent) terms.rentWeekly = s.weekly_rent || s.rent;
       if (s.bond || s.bond_amount) terms.bondAmount = s.bond || s.bond_amount;
+      if (s.bond_authority || s.bond_held_with) terms.bondAuthority = s.bond_authority || s.bond_held_with;
       if (s.lease_start || s.start_date) terms.leaseStart = s.lease_start || s.start_date;
       if (s.lease_end || s.end_date) terms.leaseEnd = s.lease_end || s.end_date;
       if (s.property_address || s.address) terms.address = s.property_address || s.address;
@@ -1205,18 +1259,24 @@ function extractLeaseKeyTerms(data) {
       if (s.agent || s.agency) terms.agent = s.agent || s.agency;
       if (s.rent_frequency) terms.rentFrequency = s.rent_frequency;
       if (s.break_clause) terms.breakClause = s.break_clause;
+      if (s.notice_period) terms.noticePeriod = s.notice_period;
+      if (s.lease_type) terms.leaseType = s.lease_type;
     }
-    // Also scan clauses for key data
     if (data.clauses) {
       data.clauses.forEach(function(c) {
         var t = (c.title || '').toLowerCase();
-        if (t.indexOf('rent') !== -1 && !terms.rentWeekly && c.explanation) {
-          var rentMatch = c.explanation.match(/\$[\d,]+(?:\.\d{2})?\s*(?:per|\/)\s*week/i);
+        var ex = c.explanation || '';
+        if (t.indexOf('rent') !== -1 && !terms.rentWeekly && ex) {
+          var rentMatch = ex.match(/\$[\d,]+(?:\.\d{2})?\s*(?:per|\/)\s*week/i);
           if (rentMatch) terms.rentWeekly = rentMatch[0];
         }
-        if (t.indexOf('bond') !== -1 && !terms.bondAmount && c.explanation) {
-          var bondMatch = c.explanation.match(/\$[\d,]+(?:\.\d{2})?/);
+        if (t.indexOf('bond') !== -1 && !terms.bondAmount && ex) {
+          var bondMatch = ex.match(/\$[\d,]+(?:\.\d{2})?/);
           if (bondMatch) terms.bondAmount = bondMatch[0];
+        }
+        if (t.indexOf('bond') !== -1 && !terms.bondAuthority && ex) {
+          var authMatch = ex.match(/(RTBA|Bond Authority|Tenancy Services Division|Rental Deposit Authority|Residential Tenancies Authority|NSW Fair Trading|Rental Bonds Online|Consumer Affairs|Bond Administrator)[^.]*/i);
+          if (authMatch) terms.bondAuthority = authMatch[0];
         }
       });
     }

@@ -2057,27 +2057,31 @@ function openReportDetail(kind,id){
 }
 
 function renderLeaseDetail(l){
-  var title=document.getElementById('reportDetailTitle');
-  var sub=document.getElementById('reportDetailSub');
-  var body=document.getElementById('reportDetailBody');
-  var savedDate=l.savedAt?new Date(l.savedAt).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}):'';
-  if(title)title.textContent=l.address||l.fileName||'Lease Agreement';
-  if(sub)sub.textContent='Reviewed '+savedDate;
+  var title = document.getElementById('reportDetailTitle');
+  var sub = document.getElementById('reportDetailSub');
+  var body = document.getElementById('reportDetailBody');
+  var savedDate = l.savedAt ? new Date(l.savedAt).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}) : '';
+  if(title) title.textContent = l.address || l.fileName || 'Lease Agreement';
+  if(sub) sub.textContent = 'Reviewed '+savedDate;
 
-  var startStr=l.startDate?new Date(l.startDate).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'—';
-  var endStr=l.endDate?new Date(l.endDate).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'—';
-  var daysLeft='';
-  if(l.endDate){
-    var end=new Date(l.endDate);
+  var kt = l.keyTerms || {};
+  var fmt = function(d){ if(!d) return '—'; var t = new Date(d); return isNaN(t.getTime()) ? d : t.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}); };
+  var startStr = fmt(l.startDate || kt.leaseStart);
+  var endStr = fmt(l.endDate || kt.leaseEnd);
+  var daysLeft = '';
+  if(l.endDate || kt.leaseEnd){
+    var end = new Date(l.endDate || kt.leaseEnd);
     if(!isNaN(end.getTime())){
-      var d=Math.ceil((end.getTime()-Date.now())/86400000);
-      daysLeft=d>0?d+' days remaining':'Lease ended';
+      var d = Math.ceil((end.getTime() - Date.now()) / 86400000);
+      daysLeft = d > 0 ? d+' days left' : 'Ended';
     }
   }
-  var flagged=l.flaggedCount||0;
-  var totalClauses=l.totalClauses||0;
+  var clauses = Array.isArray(l.clauses) ? l.clauses : [];
+  var flaggedClauses = clauses.filter(function(c){ return c && c.rating !== 'standard'; });
+  var flagged = l.flaggedCount || flaggedClauses.length;
+  var totalClauses = l.totalClauses || clauses.length;
 
-  var html=
+  var html =
     '<div style="background:linear-gradient(135deg,var(--blue),var(--blue-md));border-radius:18px;padding:18px 20px;margin-bottom:14px;color:#fff">'
       +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:6px">Lease Agreement</div>'
       +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;margin-bottom:14px">'+vaultEsc(l.address||'Property')+'</div>'
@@ -2088,7 +2092,15 @@ function renderLeaseDetail(l){
       +'</div>'
     +'</div>';
 
-  html+='<div class="sec-label" style="padding:0 0 10px">Key Terms</div>'
+  // Original file — surface this near the top so the user can always grab the contract
+  if(l.fileUrl){
+    html += '<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="window.open(\''+vaultEsc(l.fileUrl)+'\',\'_blank\')"><span>📄</span> Open original lease</button>';
+  } else if (!clauses.length) {
+    html += '<div style="background:rgba(27,80,200,.05);border:1px solid var(--blue-lt);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">💡 Re-upload your lease in the Lease Reviewer to restore the original file and the full clause-by-clause breakdown.</div>';
+  }
+
+  // Tenancy key terms — pulled from the AI extraction + any user-entered metadata
+  html += '<div class="sec-label" style="padding:0 0 10px">Tenancy Key Terms</div>'
     +'<div style="background:#fff;border:1px solid var(--border-lt);border-radius:16px;overflow:hidden;margin-bottom:14px">';
   function termRow(label,value,isLast){
     return '<div style="padding:13px 16px;'+(isLast?'':'border-bottom:1px solid var(--border-lt);')+'display:flex;align-items:center;gap:12px">'
@@ -2096,25 +2108,68 @@ function renderLeaseDetail(l){
       +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text);text-align:right">'+vaultEsc(value||'—')+'</div>'
     +'</div>';
   }
-  html+=termRow('Start date',startStr);
-  html+=termRow('End date',endStr);
-  html+=termRow('Weekly rent',l.weeklyRent);
-  html+=termRow('Bond',l.bond);
-  html+=termRow('Agency',l.agencyName);
-  html+=termRow('Property manager',l.pmName);
-  html+=termRow('PM phone',l.pmPhone,true);
-  html+='</div>';
+  html += termRow('Start date', startStr);
+  html += termRow('End date', endStr);
+  html += termRow('Weekly rent', l.weeklyRent || kt.rentWeekly);
+  if (kt.rentFrequency) html += termRow('Rent frequency', kt.rentFrequency);
+  html += termRow('Bond', l.bond || kt.bondAmount);
+  if (kt.bondAuthority) html += termRow('Bond held with', kt.bondAuthority);
+  if (kt.leaseType) html += termRow('Lease type', kt.leaseType);
+  if (kt.breakClause) html += termRow('Break clause', kt.breakClause);
+  if (kt.noticePeriod) html += termRow('Notice period', kt.noticePeriod);
+  html += termRow('Agency', l.agencyName || kt.agent);
+  html += termRow('Property manager', l.pmName);
+  html += termRow('PM phone', l.pmPhone, true);
+  html += '</div>';
 
-  if(flagged>0){
-    html+='<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px;margin-bottom:14px"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:5px">⚠️ '+flagged+' clause'+(flagged!==1?'s':'')+' need review</div><div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.6">Open the Lease Reviewer to see the full plain-English breakdown of every flagged clause.</div></div>';
+  // Flagged clauses — plain English + original wording expander
+  if (flaggedClauses.length) {
+    html += '<div class="sec-label" style="padding:0 0 10px">⚠️ Clauses to review ('+flaggedClauses.length+')</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">';
+    flaggedClauses.forEach(function(c, i){
+      var isWarn = c.rating === 'warning';
+      var accent = isWarn ? '#E84040' : '#F5A623';
+      var bg = isWarn ? 'rgba(232,64,64,.05)' : 'rgba(245,166,35,.05)';
+      var border = isWarn ? 'rgba(232,64,64,.2)' : 'rgba(245,166,35,.25)';
+      var badge = isWarn ? 'Warning' : 'Unusual';
+      html += '<div style="background:'+bg+';border:1px solid '+border+';border-radius:14px;padding:14px 16px">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-family:Sora,sans-serif;font-weight:800;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:'+accent+';background:#fff;border:1px solid '+border+';border-radius:100px;padding:3px 10px">'+badge+'</span>'
+        +'<span style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:var(--text)">'+vaultEsc(c.title||('Clause '+(c.number||(i+1))))+'</span></div>'
+        +'<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.6;margin-bottom:8px">'+vaultEsc(c.explanation||'')+'</div>'
+        +(c.flag ? '<div style="font-family:Nunito,sans-serif;font-weight:700;font-size:12px;color:'+accent+';line-height:1.55;margin-bottom:8px">Why it stands out: '+vaultEsc(c.flag)+'</div>' : '')
+        +(c.law_reference ? '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-bottom:8px">Reference: '+vaultEsc(c.law_reference)+'</div>' : '')
+        +(c.original ? '<details style="margin-top:4px"><summary style="cursor:pointer;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;color:var(--blue);padding:4px 0">Show original wording</summary><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;padding:10px 12px;background:#fff;border:1px solid var(--border-lt);border-radius:10px;white-space:pre-wrap">'+vaultEsc(c.original)+'</div></details>' : '')
+        +'</div>';
+    });
+    html += '</div>';
+  } else if (clauses.length) {
+    html += '<div style="background:rgba(0,200,150,.05);border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:14px 16px;margin-bottom:14px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);margin-bottom:4px">✓ All '+totalClauses+' clauses look standard</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">Nothing was flagged as unusual or concerning. Open in the Lease Reviewer to read the full plain-English breakdown.</div></div>';
   }
 
-  if(l.fileUrl){
-    html+='<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;margin-bottom:10px" onclick="window.open(\''+vaultEsc(l.fileUrl)+'\',\'_blank\')">📄 Open original PDF →</button>';
-  }
-  html+='<button class="btn-outline-c btn-full" style="border-radius:14px;padding:14px" onclick="navigate(\'/app/pages/lease.html\')">Open in Lease Reviewer →</button>';
+  // Actionable next steps — tied to the data the AI extracted
+  var actions = [];
+  if (kt.rentWeekly || l.weeklyRent) actions.push({ icon:'💰', title:'Set up rent tracking', sub:'Track payments and due dates', href:'/app/pages/rent-tracker.html' });
+  if (kt.bondAmount || l.bond) actions.push({ icon:'🛡️', title:'Set up bond tracking', sub:'Record bond amount and where it\'s held', href:'/app/pages/bond-tracker.html' });
+  actions.push({ icon:'📸', title:'Start move-in condition report', sub:'Document the property room by room', href:'/app/pages/entry-audit.html' });
+  if (flaggedClauses.length) actions.push({ icon:'📖', title:'Re-read flagged clauses', sub:'Walk through every flagged item', href:'/app/pages/lease.html?id='+encodeURIComponent(l.id) });
 
-  body.innerHTML=html;
+  if (actions.length) {
+    html += '<div class="sec-label" style="padding:0 0 10px">Things you can do with this lease</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">';
+    actions.forEach(function(a){
+      html += '<button onclick="navigate(\''+a.href+'\')" style="display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid var(--border-lt);border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left">'
+        +'<div style="width:38px;height:38px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+a.icon+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:13.5px;color:var(--text);letter-spacing:-.1px">'+vaultEsc(a.title)+'</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px">'+vaultEsc(a.sub)+'</div></div>'
+        +'<span style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--blue)">›</span>'
+      +'</button>';
+    });
+    html += '</div>';
+  }
+
+  // Re-open in reviewer — carries the id so the lease page rehydrates
+  html += '<button class="btn-outline-c btn-full" style="border-radius:14px;padding:14px" onclick="navigate(\'/app/pages/lease.html?id='+encodeURIComponent(l.id)+'\')">Re-open in Lease Reviewer →</button>';
+
+  body.innerHTML = html;
 }
 
 function renderEntryAuditDetail(record){
