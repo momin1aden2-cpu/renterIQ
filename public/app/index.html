@@ -1226,6 +1226,9 @@
     <!-- ── Tenancy summary — condensed glanceable card from Property & Tenancy ── -->
     <div id="tenancySummaryCard" style="display:none;padding:14px 16px 0"></div>
 
+    <!-- Critical reminder: lease saved but move-in audit not done -->
+    <div id="moveInReminderCard" style="display:none;padding:14px 16px 0"></div>
+
     <!-- ── What's On ─────────────────────────────────────────── -->
     <div style="padding:20px 16px 0">
       <div class="sec-row" style="margin-bottom:12px">
@@ -2992,6 +2995,74 @@ function saveAlreadyRenting(){
   if(typeof showToast === 'function') showToast('You\'re set up ✓','We\'ll take it from here. Explore rent, maintenance and inspections.','🏠');
 }
 
+// ── Move-in reminder — persistent card when lease exists but no entry audit
+// This is the single most important thing a renter can do after signing.
+// Stays visible until they complete (or start) the audit.
+function homeRenderMoveInReminder(){
+  var container = document.getElementById('moveInReminderCard');
+  if(!container) return;
+
+  // Need a saved lease with an address
+  var lease = null;
+  try {
+    var list = JSON.parse(localStorage.getItem('riq-vault-leases') || '[]');
+    if (Array.isArray(list) && list.length) {
+      list.sort(function(a,b){ return new Date(b.savedAt||0).getTime() - new Date(a.savedAt||0).getTime(); });
+      lease = list[0];
+    }
+  } catch(e){}
+  if (!lease || !lease.address) { container.style.display = 'none'; return; }
+
+  // Hide once an entry audit exists
+  var hasEntry = false;
+  try {
+    var reports = JSON.parse(localStorage.getItem('renteriq_vault_reports') || '[]');
+    hasEntry = Array.isArray(reports) && reports.some(function(r){ return r && r.type === 'entry-audit'; });
+  } catch(e){}
+  if (hasEntry) { container.style.display = 'none'; return; }
+
+  // Day-aware urgency based on lease start date
+  var startTime = lease.startDate ? new Date(lease.startDate).getTime() : NaN;
+  var daysUntilStart = !isNaN(startTime) ? Math.ceil((startTime - Date.now()) / 86400000) : null;
+
+  var tone, headline, sub, ctaLabel;
+  if (daysUntilStart === null) {
+    tone = 'amber';
+    headline = 'Do your move-in inspection before keys handover';
+    sub = 'Walk the property while it\'s empty. Photograph every room. This is the record that protects your bond at exit.';
+    ctaLabel = 'Start Move-In Audit →';
+  } else if (daysUntilStart > 7) {
+    tone = 'blue';
+    headline = 'Move-in in ' + daysUntilStart + ' days — plan your inspection';
+    sub = 'The day you get the keys is the day to do your move-in audit. Document everything before a single box comes in.';
+    ctaLabel = 'Plan my move-in audit →';
+  } else if (daysUntilStart >= 0) {
+    tone = 'red';
+    headline = daysUntilStart === 0 ? 'Move-in is TODAY — audit before you unpack' : 'Move-in in ' + daysUntilStart + ' day' + (daysUntilStart===1?'':'s') + ' — prep now';
+    sub = 'The moment you have keys, walk through and photograph everything while the place is empty. Once your things are in, you can\'t prove what was there on day one.';
+    ctaLabel = 'Start Move-In Audit →';
+  } else {
+    tone = 'red';
+    headline = 'You\'re in — but the audit isn\'t done';
+    sub = 'Every day you leave this undone is a day without evidence. Walk through now and photograph every room before anything else changes.';
+    ctaLabel = 'Do it now →';
+  }
+
+  var bg = tone === 'red' ? 'linear-gradient(135deg,#7A1F1F,#E84040)' : tone === 'amber' ? 'linear-gradient(135deg,#7A4500,#F5A623)' : 'linear-gradient(135deg,#0A2460,#1B50C8)';
+
+  container.innerHTML =
+    '<div style="background:'+bg+';border-radius:20px;padding:18px 18px 16px;color:#fff;box-shadow:0 10px 26px rgba(10,36,96,.22);position:relative;overflow:hidden">'+
+      '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,255,255,.16),transparent 60%);pointer-events:none"></div>'+
+      '<div style="position:relative;z-index:1">'+
+        '<div style="display:inline-flex;align-items:center;gap:6px;font-family:Sora,sans-serif;font-weight:800;font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:100px;padding:5px 11px;margin-bottom:10px"><span>📸</span>Move-In Condition Report</div>'+
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:17px;line-height:1.3;margin-bottom:6px;letter-spacing:-.2px">'+headline+'</div>'+
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;line-height:1.55;color:rgba(255,255,255,.88);margin-bottom:14px">'+sub+'</div>'+
+        '<button onclick="navigate(\'/app/pages/entry-audit.html\')" style="background:#fff;color:'+(tone==='red'?'#7A1F1F':tone==='amber'?'#7A4500':'var(--blue-dk)')+';border:none;border-radius:12px;padding:11px 18px;font-family:Sora,sans-serif;font-weight:800;font-size:13px;cursor:pointer;letter-spacing:.2px">'+ctaLabel+'</button>'+
+      '</div>'+
+    '</div>';
+  container.style.display = 'block';
+}
+
 // ── Tenancy summary card — condensed glance of the active lease
 function homeRenderTenancy(){
   var container = document.getElementById('tenancySummaryCard');
@@ -3292,6 +3363,7 @@ document.addEventListener('DOMContentLoaded', function() {
   homeRenderResumeDraft();
   homeRenderLeaseRenewal();
   homeRenderTenancy();
+  homeRenderMoveInReminder();
   homeRenderAlreadyRenting();
   // Defer everything else until the browser is idle
   if ('requestIdleCallback' in window) {

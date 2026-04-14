@@ -597,12 +597,15 @@
       </div>
     </div>
 
-    <!-- Move In Prompt -->
-    <div style="background:linear-gradient(135deg,var(--blue-dk),var(--blue));border-radius:16px;padding:18px;margin-bottom:14px;cursor:pointer" onclick="navigate('/app/pages/inspection.html')">
-      <span style="font-size:28px;display:block;margin-bottom:10px">🔑</span>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:6px">Ready to do your Move-In Audit?</div>
-      <div style="font-weight:600;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.6">Before you bring anything in, document the entire property with timestamped photos. This is your most important protection against bond disputes.</div>
-      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--teal);margin-top:10px;display:block">Start Move-In Audit →</span>
+    <!-- Move-In Audit — the single most important step after signing -->
+    <div style="background:linear-gradient(135deg,#7A1F1F,#E84040);border-radius:18px;padding:20px;margin-bottom:14px;cursor:pointer;position:relative;overflow:hidden" onclick="navigate('/app/pages/entry-audit.html')">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,255,255,.18) 0%,transparent 60%);pointer-events:none"></div>
+      <div style="position:relative;z-index:1">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:100px;padding:5px 12px;margin-bottom:12px;font-family:Sora,sans-serif;font-weight:800;font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;color:#fff"><span>⚠️</span>Do this before you get the keys</div>
+        <div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:#fff;margin-bottom:8px;letter-spacing:-.2px;line-height:1.3">Walk the property while it's empty.<br>Photograph everything.</div>
+        <div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.88);line-height:1.6;margin-bottom:14px">Once you move your things in, you can\'t prove what was there on day one. Your timestamped record is the single thing agents can\'t argue with at exit time.</div>
+        <button style="background:#fff;color:#7A1F1F;border:none;border-radius:12px;padding:12px 18px;font-family:Sora,sans-serif;font-weight:800;font-size:13px;cursor:pointer;letter-spacing:.2px">Start Move-In Audit →</button>
+      </div>
     </div>
 
     <!-- Signed Lease → Post-Signing Setup -->
