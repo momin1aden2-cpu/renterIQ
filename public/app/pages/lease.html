@@ -17,6 +17,7 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
+<script src="/app/js/local-files.js" defer></script>
 <script src="/app/js/payments.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -455,6 +456,19 @@
       </div>
     </div>
 
+    <!-- Review extracted details — confirm before anything flows to trackers -->
+    <div id="extractedTerms" style="display:none;background:#fff;border-radius:18px;padding:16px 18px;border:1px solid var(--border-lt);margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px">
+        <div style="width:30px;height:30px;border-radius:9px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📋</div>
+        <div>
+          <div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);letter-spacing:-.1px">Tenancy details we extracted</div>
+          <div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.55">Double-check these. Tap any field to edit — your changes flow to the rent tracker, bond tracker and your active tenancy when you save.</div>
+        </div>
+      </div>
+      <div id="extractedTermsBody" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div id="extractedTermsMissing" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.22);border-radius:10px;font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:#7A5500;line-height:1.55"></div>
+    </div>
+
     <!-- Flagged Items -->
     <div class="sec-label">Items Requiring Your Attention</div>
     <div id="summaryFlagged" style="display:flex;flex-direction:column;gap:10px">
@@ -557,17 +571,20 @@
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">Saved to Your Vault</div>
       <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-lt)">
         <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div>
-        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Lease Agreement PDF</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Your uploaded lease document</div></div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Original lease file</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Stored on this device — open any time from the Vault</div></div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-lt)">
         <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📋</div>
-        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Plain-English Review</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">12 clauses reviewed · 3 items flagged</div></div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Plain-English review</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Every clause, every flag, every reference</div></div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;padding:11px 0">
-        <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚠️</div>
-        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Flagged Items Summary</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Pets · Alterations · Break Lease</div></div>
+        <div style="width:36px;height:36px;border-radius:9px;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏠</div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Tenancy details</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Rent, bond, dates, agency contacts — ready for setup</div></div>
       </div>
     </div>
+
+    <!-- Storage status — always local first, cloud only if purchased -->
+    <div id="storageStatusCard" style="background:#fff;border-radius:18px;padding:18px 20px;border:1px solid var(--border-lt);margin-bottom:14px"></div>
 
     <!-- What Happens Next -->
     <div style="background:#fff;border-radius:16px;padding:18px;border:1px solid var(--border-lt);margin-bottom:14px">
@@ -724,20 +741,136 @@ var totalClauses=12;
 var understood={};
 
 function startAnalysis(){
-  if(window.RIQPayments){
-    RIQPayments.gate('lease_review').then(function(ok){
-      if(!ok)return;
+  ensureStateBeforeAnalysis().then(function(ok){
+    if (!ok) return;
+    if (window.RIQPayments) {
+      RIQPayments.gate('lease_review').then(function(paid){ if (paid) startAnalysisCore(); });
+    } else {
       startAnalysisCore();
+    }
+  });
+}
+
+// If no state is saved in the user's profile, pull it from the lease-details
+// form (preferred, matches the specific property) or pop a quick picker before
+// we touch the API. No silent defaults — the AI must analyse against the
+// correct state's Act.
+function ensureStateBeforeAnalysis(){
+  return new Promise(function(resolve){
+    var existing = (localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || '').toUpperCase();
+
+    // Try inferring from the saved lease-details address — most accurate per-lease
+    var inferred = '';
+    try {
+      var ld = JSON.parse(localStorage.getItem('riq-lease-data')||'{}');
+      var addr = (ld.address || '').toUpperCase();
+      var m = addr.match(/\b(NSW|VIC|QLD|WA|SA|TAS|ACT|NT)\b/);
+      if (m) inferred = m[1];
+      if (!inferred) {
+        var pc = addr.match(/\b(\d{4})\b/);
+        if (pc) {
+          var p = parseInt(pc[1], 10);
+          if (p >= 2000 && p <= 2999) inferred = 'NSW';
+          else if (p >= 3000 && p <= 3999) inferred = 'VIC';
+          else if (p >= 4000 && p <= 4999) inferred = 'QLD';
+          else if (p >= 5000 && p <= 5999) inferred = 'SA';
+          else if (p >= 6000 && p <= 6999) inferred = 'WA';
+          else if (p >= 7000 && p <= 7999) inferred = 'TAS';
+          else if (p >= 800 && p <= 899) inferred = 'NT';
+          else if (p >= 2600 && p <= 2920) inferred = 'ACT';
+        }
+      }
+    } catch(e){}
+
+    // If we have an inferred state and it differs from the saved one (or saved is empty),
+    // prefer the inferred one — this specific lease is what we're analysing.
+    if (inferred) {
+      localStorage.setItem('riq-lease-analysis-state', inferred);
+      resolve(true);
+      return;
+    }
+    if (existing) {
+      localStorage.setItem('riq-lease-analysis-state', existing);
+      resolve(true);
+      return;
+    }
+
+    // Nothing to infer and nothing saved — ask the user now
+    openStatePicker(function(pick){
+      if (!pick) { resolve(false); return; }
+      localStorage.setItem('riq-lease-analysis-state', pick);
+      // Also save to the user profile so other flows benefit
+      if (!localStorage.getItem('renteriq_user_state') && !localStorage.getItem('riq-user-state')) {
+        localStorage.setItem('riq-user-state', pick);
+      }
+      resolve(true);
     });
-    return;
+  });
+}
+
+function openStatePicker(onDone){
+  var existing = document.getElementById('riqStatePicker');
+  if (existing) existing.remove();
+
+  var states = [
+    { code:'NSW', name:'New South Wales' },
+    { code:'VIC', name:'Victoria' },
+    { code:'QLD', name:'Queensland' },
+    { code:'WA',  name:'Western Australia' },
+    { code:'SA',  name:'South Australia' },
+    { code:'TAS', name:'Tasmania' },
+    { code:'ACT', name:'Australian Capital Territory' },
+    { code:'NT',  name:'Northern Territory' }
+  ];
+
+  var overlay = document.createElement('div');
+  overlay.id = 'riqStatePicker';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:100010;background:rgba(10,36,96,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease';
+
+  var card = document.createElement('div');
+  card.style.cssText = 'width:100%;max-width:430px;background:#fff;border-radius:22px 22px 0 0;padding:22px 20px calc(env(safe-area-inset-bottom,0px)+22px);transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-height:85vh;overflow-y:auto';
+  card.onclick = function(e){ e.stopPropagation(); };
+
+  card.innerHTML =
+    '<div style="width:40px;height:4px;background:var(--border);border-radius:100px;margin:0 auto 16px"></div>'+
+    '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:4px;letter-spacing:-.2px">Which state is this property in?</div>'+
+    '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.55">Tenancy law differs between Australian states. We need this so the lease is analysed against the right rules.</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px">'+
+      states.map(function(s){
+        return '<button data-state="'+s.code+'" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:var(--blue-xl);border:1.5px solid var(--border-lt);border-radius:12px;padding:13px 16px;font-family:Sora,sans-serif;font-weight:800;font-size:13.5px;color:var(--text);cursor:pointer;text-align:left">'+
+          '<span>'+s.name+'</span>'+
+          '<span style="font-family:Sora,sans-serif;font-weight:800;font-size:11px;color:var(--blue);letter-spacing:1px">'+s.code+'</span>'+
+        '</button>';
+      }).join('')+
+    '</div>';
+
+  overlay.appendChild(card);
+  overlay.onclick = function(){ close(null); };
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){ overlay.style.opacity='1'; requestAnimationFrame(function(){ card.style.transform='translateY(0)'; }); });
+
+  function close(pick){
+    overlay.style.opacity = '0';
+    card.style.transform = 'translateY(100%)';
+    setTimeout(function(){ overlay.remove(); onDone(pick); }, 220);
   }
-  startAnalysisCore();
+
+  card.querySelectorAll('[data-state]').forEach(function(btn){
+    btn.addEventListener('click', function(){ close(btn.getAttribute('data-state')); });
+  });
 }
 function startAnalysisCore(){
   collectLeaseDetails();
-  var userState=localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'your state';
-  var stepStateEl=document.getElementById('lStep2State');
-  if(stepStateEl)stepStateEl.textContent='Comparing to standard '+userState+' agreement';
+  var userState = localStorage.getItem('riq-lease-analysis-state') || localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || 'your state';
+  var stepStateEl = document.getElementById('lStep2State');
+  if(stepStateEl) stepStateEl.textContent = 'Comparing to standard '+userState+' agreement';
+
+  // CRITICAL: wipe the placeholder clause cards before analysis. The HTML
+  // ships with example VIC content so designers can preview the layout; that
+  // content must never be seen by a real user. If the AI response fails to
+  // parse, the container stays empty and the error state shows instead.
+  var container = document.getElementById('clauseContainer');
+  if (container) container.innerHTML = '';
   switchView('B');
   understood={};
 
@@ -754,50 +887,140 @@ function startAnalysisCore(){
     },delay);
   });
 
-  // Call lease analysis API
-  var isDemoMode=document.getElementById('fileName').textContent==='sample_lease.pdf';
-  var fetchPromise;
-  if(!isDemoMode&&uploadedFile){
-    var formData=new FormData();
-    formData.append('file',uploadedFile);
-    fetchPromise=fetch('/api/analyze-lease',{method:'POST',body:formData});
-  } else {
-    fetchPromise=fetch('/api/analyze-lease',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({text:''})
-    });
+  // Call lease analysis API — but first check the deterministic cache.
+  // Same file (by SHA-256) always returns the same analysis, so the vault
+  // record stays consistent across re-uploads.
+  var isDemoMode = document.getElementById('fileName').textContent === 'sample_lease.pdf';
+  var analysisStart = Date.now();
+
+  function getUserState(){
+    // Per-analysis state wins — set by ensureStateBeforeAnalysis from the lease
+    // address, falling back to the user profile, then a picker if neither exists.
+    var s = (localStorage.getItem('riq-lease-analysis-state') || localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || '').toUpperCase();
+    if (!s) {
+      try {
+        var ld = JSON.parse(localStorage.getItem('riq-lease-data')||'{}');
+        var addr = (ld.address || '').toUpperCase();
+        var m = addr.match(/\b(NSW|VIC|QLD|WA|SA|TAS|ACT|NT)\b/);
+        if (m) s = m[1];
+      } catch(e){}
+    }
+    return s || '';
   }
 
-  fetchPromise
-    .then(function(r){return r.json()})
-    .then(function(data){
-      leaseData=data;
-      if(data.clauses){
-        totalClauses=data.clauses.length;
-        renderClauses(data);
-        renderSummary(data);
+  function runAnalysis(){
+    var state = getUserState();
+    var fetchPromise;
+    if (!isDemoMode && uploadedFile){
+      var formData = new FormData();
+      formData.append('file', uploadedFile);
+      if (state) formData.append('state', state);
+      fetchPromise = fetch('/api/analyze-lease', { method:'POST', body: formData });
+    } else {
+      fetchPromise = fetch('/api/analyze-lease', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ text:'', state: state })
+      });
+    }
+    return fetchPromise.then(function(r){ return r.json(); });
+  }
+
+  function computeFileHash(file){
+    if (!file || !window.crypto || !window.crypto.subtle) return Promise.resolve(null);
+    return file.arrayBuffer()
+      .then(function(buf){ return window.crypto.subtle.digest('SHA-256', buf); })
+      .then(function(hash){
+        var arr = Array.from(new Uint8Array(hash));
+        return arr.map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+      })
+      .catch(function(){ return null; });
+  }
+
+  function cacheKey(hash){
+    if (!hash) return '';
+    // Cache is scoped to the jurisdiction — if the user changes state, they get
+    // a fresh analysis against the correct tenancy framework. The "v2" prefix
+    // forces a re-analysis whenever we materially change the prompt.
+    var state = getUserState() || 'AU';
+    return 'riq-lease-cache-v2-' + state + '-' + hash;
+  }
+
+  function getCached(hash){
+    var key = cacheKey(hash);
+    if (!key) return null;
+    try {
+      var raw = localStorage.getItem(key);
+      if (!raw) return null;
+      var cached = JSON.parse(raw);
+      if (!cached || !cached.data || !cached.savedAt) return null;
+      if (Date.now() - cached.savedAt > 90 * 24 * 60 * 60 * 1000) return null;
+      return cached.data;
+    } catch(e){ return null; }
+  }
+
+  function setCached(hash, data){
+    var key = cacheKey(hash);
+    if (!key || !data) return;
+    try { localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), data: data })); }
+    catch(e){ /* storage full — not fatal */ }
+  }
+
+  var cachePromise = (isDemoMode || !uploadedFile) ? Promise.resolve(null) : computeFileHash(uploadedFile);
+
+  cachePromise
+    .then(function(hash){
+      window.__riqLeaseHash = hash;
+      var cached = getCached(hash);
+      if (cached) {
+        // Respect the progress animation — give it a beat so it doesn't jank
+        var elapsed = Date.now() - analysisStart;
+        var wait = Math.max(0, 3500 - elapsed);
+        return new Promise(function(resolve){ setTimeout(function(){ resolve({ data: cached, fromCache: true }); }, wait); });
       }
-      if(window.RIQPayments)RIQPayments.recordPurchase('lease_review');
+      return runAnalysis().then(function(data){ setCached(hash, data); return { data: data, fromCache: false }; });
+    })
+    .then(function(result){
+      var data = result.data;
+      window.__riqAnalysisFromCache = result.fromCache;
+      leaseData = data;
+
+      if (!data || !Array.isArray(data.clauses) || !data.clauses.length) {
+        // API returned an error or truncated response. Don't pretend we analysed.
+        showAnalysisError(data && data.error ? data.error : 'The AI response came back incomplete.');
+        return;
+      }
+
+      totalClauses = data.clauses.length;
+      renderClauses(data);
+      renderSummary(data);
+
+      if (window.RIQPayments) RIQPayments.recordPurchase('lease_review');
       finishAnimation();
       extractLeaseKeyTerms(data);
-      // Seed rent + bond trackers immediately from the AI extraction so the
-      // user finds them pre-filled even if they exit before saving to vault.
-      var ldForSeed = {}; try { ldForSeed = JSON.parse(localStorage.getItem('riq-lease-data')||'{}'); } catch(e){}
-      var ktForSeed = {}; try { ktForSeed = JSON.parse(localStorage.getItem('riq_lease_terms')||'{}'); } catch(e){}
-      propagateLeaseToTrackers({
-        address: ldForSeed.address || ktForSeed.address || '',
-        weeklyRent: ldForSeed.weeklyRent || ktForSeed.rentWeekly || '',
-        bond: ldForSeed.bond || ktForSeed.bondAmount || '',
-        keyTerms: ktForSeed
-      });
-      if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function') RIQPayments.promptCloudSync();
+      if (window.RIQPayments && typeof RIQPayments.promptCloudSync === 'function') RIQPayments.promptCloudSync();
     })
     .catch(function(err){
-      console.error('Lease analysis error:',err);
-      showToast('Analysis note','Using cached demo analysis','📄');
-      finishAnimation();
+      console.error('Lease analysis error:', err);
+      showAnalysisError('We couldn\'t reach the lease analyser. Check your connection and try again.');
     });
+}
+
+function showAnalysisError(message){
+  var container = document.getElementById('clauseContainer');
+  if (container) {
+    container.innerHTML =
+      '<div style="background:rgba(232,64,64,.05);border:1px solid rgba(232,64,64,.25);border-radius:16px;padding:22px 20px;text-align:center">'+
+        '<div style="font-size:30px;margin-bottom:8px">🤔</div>'+
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:15px;color:#7A1F1F;margin-bottom:6px">Analysis didn\'t complete</div>'+
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:#8A3333;line-height:1.6;margin-bottom:16px">'+(message||'Something went wrong while reviewing your lease.')+'</div>'+
+        '<button onclick="switchView(\'A\');" style="background:var(--blue);color:#fff;border:none;border-radius:12px;padding:11px 22px;font-family:Sora,sans-serif;font-weight:800;font-size:13px;cursor:pointer">Try again</button>'+
+      '</div>';
+  }
+  // Stop the progress animation cleanly
+  var lastIcon = document.getElementById('lIcon-3');
+  if (lastIcon) { lastIcon.style.animation = 'none'; lastIcon.textContent = '⚠'; }
+  setTimeout(function(){ switchView('C'); }, 400);
 }
 
 function finishAnimation(){
@@ -904,6 +1127,103 @@ function renderSummary(data){
     });
     standardEl.innerHTML=shtml;
   }
+
+  renderExtractedTerms();
+}
+
+// Render the editable "Tenancy details we extracted" card on the summary
+// view. The user confirms or corrects each field here before it flows to
+// the rent tracker, bond tracker or active tenancy record.
+function renderExtractedTerms(){
+  var host = document.getElementById('extractedTerms');
+  var body = document.getElementById('extractedTermsBody');
+  var missingEl = document.getElementById('extractedTermsMissing');
+  if(!host || !body) return;
+
+  var kt = {}; try { kt = JSON.parse(localStorage.getItem('riq_lease_terms')||'{}'); } catch(e){}
+  var ld = {}; try { ld = JSON.parse(localStorage.getItem('riq-lease-data')||'{}'); } catch(e){}
+
+  var STATE_CODES = ['NSW','VIC','QLD','WA','SA','TAS','ACT','NT'];
+
+  var inferredState = (kt.bondAuthorityState || '').toUpperCase();
+  if (!inferredState && kt.address) {
+    var m = (kt.address.toUpperCase()).match(/\b(NSW|VIC|QLD|WA|SA|TAS|ACT|NT)\b/);
+    if (m) inferredState = m[1];
+  }
+
+  var fields = [
+    { key:'address',        label:'Property address', value: ld.address || kt.address || '', type:'text' },
+    { key:'rentWeekly',     label:'Rent (weekly)',    value: ld.weeklyRent || kt.rentWeekly || '', type:'text', placeholder:'$650' },
+    { key:'rentFrequency',  label:'Rent frequency',   value: kt.rentFrequency || 'weekly', type:'select', options:[{v:'weekly',l:'Weekly'},{v:'fortnightly',l:'Fortnightly'},{v:'monthly',l:'Monthly'}] },
+    { key:'rentDueDay',     label:'Rent due',         value: kt.rentDueDay != null ? String(kt.rentDueDay) : '', type:'text', placeholder:'Monday, or 1-28 for monthly' },
+    { key:'bondAmount',     label:'Bond amount',      value: ld.bond || kt.bondAmount || '', type:'text', placeholder:'$2,600' },
+    { key:'bondAuthorityState', label:'Bond held with', value: inferredState, type:'select', options: [{v:'',l:'— select —'}].concat(STATE_CODES.map(function(s){ return {v:s,l:s}; })) },
+    { key:'leaseStart',     label:'Lease starts',     value: ld.startDate || kt.leaseStart || '', type:'date' },
+    { key:'leaseEnd',       label:'Lease ends',       value: ld.endDate || kt.leaseEnd || '', type:'date' },
+    { key:'agent',          label:'Agency',           value: ld.agencyName || kt.agent || '', type:'text' },
+    { key:'pmName',         label:'Property manager', value: ld.pmName || kt.pmName || '', type:'text' },
+    { key:'pmPhone',        label:'PM phone',         value: ld.pmPhone || kt.pmPhone || '', type:'tel' },
+    { key:'pmEmail',        label:'PM email',         value: ld.agentEmail || kt.pmEmail || '', type:'email' }
+  ];
+
+  var missing = [];
+  var html = '';
+  fields.forEach(function(f){
+    var filled = !!(f.value && String(f.value).trim());
+    if (!filled && ['address','rentWeekly','bondAmount'].indexOf(f.key) !== -1) missing.push(f.label);
+
+    var input;
+    if (f.type === 'select') {
+      input = '<select data-extract-key="'+f.key+'" class="extract-field" style="width:100%;padding:9px 11px;border:1.5px solid var(--border-lt);border-radius:10px;font-family:Nunito,sans-serif;font-weight:700;font-size:13px;color:var(--text);background:#fff;-webkit-appearance:none;appearance:none">' +
+        f.options.map(function(o){ return '<option value="'+o.v+'"'+(String(f.value)===String(o.v)?' selected':'')+'>'+o.l+'</option>'; }).join('') +
+      '</select>';
+    } else {
+      input = '<input data-extract-key="'+f.key+'" class="extract-field" type="'+f.type+'" value="'+String(f.value||'').replace(/"/g,'&quot;')+'"'+(f.placeholder?(' placeholder="'+f.placeholder+'"'):'')+' style="width:100%;padding:9px 11px;border:1.5px solid var(--border-lt);border-radius:10px;font-family:Nunito,sans-serif;font-weight:700;font-size:13px;color:var(--text);background:#fff;box-sizing:border-box">';
+    }
+
+    html += '<label style="display:block">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+        '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">'+f.label+'</span>'+
+        '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:9.5px;color:'+(filled?'var(--teal-dk)':'var(--amber)')+';letter-spacing:.4px">'+(filled?'FOUND':'MISSING')+'</span>'+
+      '</div>'+
+      input+
+    '</label>';
+  });
+  body.innerHTML = html;
+
+  if (missing.length && missingEl) {
+    missingEl.innerHTML = 'We couldn\'t pull these from your lease — please add them before saving: <strong>'+missing.join(', ')+'</strong>.';
+    missingEl.style.display = 'block';
+  } else if (missingEl) {
+    missingEl.style.display = 'none';
+  }
+
+  host.style.display = 'block';
+
+  // Persist edits back to riq_lease_terms + riq-lease-data as the user types
+  body.querySelectorAll('.extract-field').forEach(function(el){
+    var handler = function(){
+      var key = el.getAttribute('data-extract-key');
+      var val = el.value;
+      var kt2 = {}; try { kt2 = JSON.parse(localStorage.getItem('riq_lease_terms')||'{}'); } catch(e){}
+      var ld2 = {}; try { ld2 = JSON.parse(localStorage.getItem('riq-lease-data')||'{}'); } catch(e){}
+      // Mirror the user-editable fields into both stores so saveToVault picks the fresh value
+      kt2[key] = val;
+      if (key === 'address') ld2.address = val;
+      if (key === 'rentWeekly') ld2.weeklyRent = val;
+      if (key === 'bondAmount') ld2.bond = val;
+      if (key === 'leaseStart') ld2.startDate = val;
+      if (key === 'leaseEnd') ld2.endDate = val;
+      if (key === 'agent') ld2.agencyName = val;
+      if (key === 'pmName') ld2.pmName = val;
+      if (key === 'pmPhone') ld2.pmPhone = val;
+      if (key === 'pmEmail') ld2.agentEmail = val;
+      localStorage.setItem('riq_lease_terms', JSON.stringify(kt2));
+      localStorage.setItem('riq-lease-data', JSON.stringify(ld2));
+    };
+    el.addEventListener('change', handler);
+    el.addEventListener('input', handler);
+  });
 }
 
 // Clause Review
@@ -982,6 +1302,25 @@ function saveToVault(){
     fileMimeType: uploadedFile ? uploadedFile.type : ''
   };
 
+  // Always store the uploaded file on-device (IndexedDB) so the renter can
+  // open it later without cloud sync. The record keeps a flag so the vault
+  // detail view knows a local copy exists.
+  if (uploadedFile && window.RIQLocalFiles) {
+    record.hasLocalFile = true;
+    RIQLocalFiles.put(record.id, uploadedFile).catch(function(err){
+      console.warn('Local file save failed:', err);
+    });
+  } else if (existingId) {
+    // Re-saving an existing lease without a new upload — preserve the flag
+    // so the stored blob stays linked to the record.
+    try {
+      var existingList = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+      var existingRec = existingList.find(function(l){ return l && l.id === existingId; });
+      if (existingRec && existingRec.hasLocalFile) record.hasLocalFile = true;
+      if (existingRec && existingRec.fileUrl) { record.fileUrl = existingRec.fileUrl; record.filePath = existingRec.filePath; }
+    } catch(e){}
+  }
+
   // Mirror to the "active tenancy" record
   localStorage.setItem('riq-lease-record', JSON.stringify(record));
 
@@ -1001,6 +1340,32 @@ function saveToVault(){
   // Cloud sync (best-effort). On success we re-save with fileUrl so the
   // vault detail view can link to the original document.
   syncLeaseToCloud(record);
+
+  // Paint the storage status card on the confirmation view
+  renderStorageStatusCard();
+}
+
+function renderStorageStatusCard(){
+  var host = document.getElementById('storageStatusCard');
+  if (!host) return;
+  var cloudEnabled = !!(window.RIQPayments && typeof RIQPayments.isCloudSyncEnabled === 'function' && RIQPayments.isCloudSyncEnabled());
+  if (cloudEnabled) {
+    host.innerHTML =
+      '<div style="display:flex;align-items:flex-start;gap:12px">'+
+        '<div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--teal),var(--teal-dk));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">☁️</div>'+
+        '<div style="flex:1"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);letter-spacing:-.1px">Also synced to the cloud</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55">Your lease is available on every device you sign into. You can always reach it from the Vault.</div></div>'+
+      '</div>';
+  } else {
+    host.innerHTML =
+      '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px">'+
+        '<div style="width:38px;height:38px;border-radius:11px;background:var(--blue-xl);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📱</div>'+
+        '<div style="flex:1">'+
+          '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);letter-spacing:-.1px">Saved to this device</div>'+
+          '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.6">Your lease is stored locally on this phone or browser. <strong style="color:var(--text)">It won\'t appear on your other devices</strong>, and if you clear this browser\'s storage or lose the device, the file is gone with it.</div>'+
+        '</div>'+
+      '</div>'+
+      '<button onclick="if(window.RIQPayments&&RIQPayments.promptCloudSync)RIQPayments.promptCloudSync()" style="width:100%;background:linear-gradient(135deg,var(--teal),var(--teal-dk));color:#fff;border:none;border-radius:12px;padding:13px 16px;font-family:Sora,sans-serif;font-weight:800;font-size:13.5px;cursor:pointer;box-shadow:0 4px 14px rgba(0,200,150,.25)">Unlock cloud sync — $14.99 one-time</button>';
+  }
 }
 
 function propagateLeaseToTrackers(record){
@@ -1192,41 +1557,17 @@ function startPostSigningSetup() {
     localStorage.setItem('renteriq_tracked_properties', JSON.stringify(tracked));
   } catch(e) {}
 
-  // Pre-fill bond tracker from lease terms
-  if (terms.bondAmount) {
-    try {
-      var bondData = JSON.parse(localStorage.getItem('riq_bond_tracker') || '{}');
-      if (!bondData.amount) {
-        var amt = String(terms.bondAmount).replace(/[^0-9.]/g, '');
-        if (amt) bondData.amount = parseFloat(amt);
-        if (terms.address) bondData.address = terms.address;
-        localStorage.setItem('riq_bond_tracker', JSON.stringify(bondData));
-      }
-    } catch(e) {}
-  }
+  // Seed rent + bond trackers from the (possibly user-edited) key terms.
+  // propagateLeaseToTrackers handles the full field set including authority,
+  // reference, payment method, rent due day — keeps logic in one place.
+  var ld2 = {}; try { ld2 = JSON.parse(localStorage.getItem('riq-lease-data')||'{}'); } catch(e){}
+  propagateLeaseToTrackers({
+    address: ld2.address || terms.address || '',
+    weeklyRent: ld2.weeklyRent || terms.rentWeekly || '',
+    bond: ld2.bond || terms.bondAmount || '',
+    keyTerms: terms
+  });
 
-  // Pre-fill rent tracker from lease terms
-  if (terms.rentWeekly) {
-    try {
-      var rentData = JSON.parse(localStorage.getItem('riq_rent_tracker') || '{}');
-      if (!rentData.amount) {
-        var rentAmt = String(terms.rentWeekly).replace(/[^0-9.]/g, '');
-        if (rentAmt) rentData.amount = parseFloat(rentAmt);
-        if (terms.rentFrequency) {
-          var freq = terms.rentFrequency.toLowerCase();
-          if (freq.indexOf('fortnight') !== -1) rentData.frequency = 'fortnightly';
-          else if (freq.indexOf('month') !== -1) rentData.frequency = 'monthly';
-          else rentData.frequency = 'weekly';
-        } else {
-          rentData.frequency = 'weekly';
-        }
-        if (!rentData.payments) rentData.payments = [];
-        localStorage.setItem('riq_rent_tracker', JSON.stringify(rentData));
-      }
-    } catch(e) {}
-  }
-
-  // Show guided setup modal
   showPostSigningModal(terms);
 }
 

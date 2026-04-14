@@ -1,6 +1,6 @@
 // Service worker: network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v57';
+var CACHE_NAME = 'renteriq-shell-v64';
 
 var APP_SHELL = [
   '/app/index.html',
@@ -12,6 +12,7 @@ var APP_SHELL = [
   '/app/js/pdf-export.js',
   '/app/js/push-notifications.js',
   '/app/js/firebase-init.js',
+  '/app/js/local-files.js',
   '/app/js/auth-guard.js',
   '/app/js/searchService.js',
   '/app/manifest.json',
@@ -92,15 +93,29 @@ self.addEventListener('fetch', function (event) {
   var isHTML = event.request.mode === 'navigate'
     || (event.request.headers.get('accept') || '').includes('text/html');
 
+  // Safe cache write — skip responses/requests that can't be cached (opaque
+  // cross-origin responses, partials, no-store, wrong scheme) and swallow
+  // any put() errors so they don't bubble as uncaught promise rejections.
+  function safeCachePut(request, response) {
+    try {
+      if (!response || response.status !== 200) return;
+      if (response.type === 'opaque' || response.type === 'error') return;
+      if (request.method !== 'GET') return;
+      var scheme = new URL(request.url).protocol;
+      if (scheme !== 'http:' && scheme !== 'https:') return;
+      var cc = response.headers.get('cache-control') || '';
+      if (/no-store/i.test(cc)) return;
+      var clone = response.clone();
+      caches.open(CACHE_NAME)
+        .then(function (cache) { return cache.put(request, clone); })
+        .catch(function () {});
+    } catch (e) {}
+  }
+
   if (isHTML) {
     event.respondWith(
       fetch(event.request).then(function (response) {
-        if (response && response.status === 200) {
-          var clone = response.clone();
-          caches.open(CACHE_NAME).then(function (cache) {
-            cache.put(event.request, clone);
-          });
-        }
+        safeCachePut(event.request, response);
         return response;
       }).catch(function () {
         return caches.match(event.request, matchOpts);
@@ -113,24 +128,13 @@ self.addEventListener('fetch', function (event) {
   event.respondWith(
     caches.match(event.request, matchOpts).then(function (cached) {
       if (cached) {
-        // Background refresh so the next load has the newest asset
         fetch(event.request).then(function (response) {
-          if (response && response.status === 200) {
-            var clone = response.clone();
-            caches.open(CACHE_NAME).then(function (cache) {
-              cache.put(event.request, clone);
-            });
-          }
+          safeCachePut(event.request, response);
         }).catch(function () {});
         return cached;
       }
       return fetch(event.request).then(function (response) {
-        if (response && response.status === 200) {
-          var clone = response.clone();
-          caches.open(CACHE_NAME).then(function (cache) {
-            cache.put(event.request, clone);
-          });
-        }
+        safeCachePut(event.request, response);
         return response;
       });
     })

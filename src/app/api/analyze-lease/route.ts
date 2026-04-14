@@ -2,14 +2,44 @@ import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { requireAuth } from '@/lib/api-auth';
 
-const SYSTEM_PROMPT = `You are an Australian tenancy lease analyst for RenterIQ.
-You receive lease/tenancy agreement text from a renter. Your job is to:
+const STATE_CONTEXT: Record<string, { name: string; act: string; authority: string; bondWeeks: number; bondAuthority: string }> = {
+  NSW: { name: 'New South Wales', act: 'Residential Tenancies Act 2010 (NSW)', authority: 'NSW Fair Trading', bondWeeks: 4, bondAuthority: 'Rental Bond Board' },
+  VIC: { name: 'Victoria', act: 'Residential Tenancies Act 1997 (Vic)', authority: 'Consumer Affairs Victoria', bondWeeks: 4, bondAuthority: 'Residential Tenancies Bond Authority (RTBA)' },
+  QLD: { name: 'Queensland', act: 'Residential Tenancies and Rooming Accommodation Act 2008 (Qld)', authority: 'Residential Tenancies Authority (RTA)', bondWeeks: 4, bondAuthority: 'RTA Queensland' },
+  WA:  { name: 'Western Australia', act: 'Residential Tenancies Act 1987 (WA)', authority: 'Consumer Protection WA', bondWeeks: 4, bondAuthority: 'Bond Administrator (Consumer Protection WA)' },
+  SA:  { name: 'South Australia', act: 'Residential Tenancies Act 1995 (SA)', authority: 'Consumer and Business Services (CBS) SA', bondWeeks: 4, bondAuthority: 'Consumer and Business Services' },
+  TAS: { name: 'Tasmania', act: 'Residential Tenancy Act 1997 (Tas)', authority: 'Consumer, Building and Occupational Services (CBOS)', bondWeeks: 4, bondAuthority: 'Rental Deposit Authority' },
+  ACT: { name: 'Australian Capital Territory', act: 'Residential Tenancies Act 1997 (ACT)', authority: 'ACT Civil and Administrative Tribunal (ACAT)', bondWeeks: 4, bondAuthority: 'Office of Rental Bonds (ACT)' },
+  NT:  { name: 'Northern Territory', act: 'Residential Tenancies Act 1999 (NT)', authority: 'NT Consumer Affairs', bondWeeks: 4, bondAuthority: 'NT Consumer Affairs' }
+};
 
-1. Break the lease into individual clauses
-2. For each clause, determine if it is "standard", "unusual", or "warning" (potentially unfair or illegal)
+function buildStatePrefix(stateCode: string | null): string {
+  const code = (stateCode || '').toUpperCase();
+  const ctx = code && STATE_CONTEXT[code];
+  if (!ctx) {
+    return 'This lease is for an Australian residential tenancy. If the lease does not explicitly name the state or territory, infer it from the property address (postcode ranges: 2xxx NSW/ACT, 3xxx VIC, 4xxx QLD, 5xxx SA, 6xxx WA, 7xxx TAS, 0800-0899 NT). If the state is still indeterminable, analyse cautiously and note the uncertainty in key_concerns.';
+  }
+  return [
+    'IMPORTANT — jurisdiction:',
+    `This lease is governed by the law of ${ctx.name} (${code}). You MUST compare every clause to ${ctx.name} residential tenancy practice and to the ${ctx.act}.`,
+    `The tenancy authority is ${ctx.authority}. The bond authority is ${ctx.bondAuthority}.`,
+    `Do NOT reference Victorian, NSW or other state acts unless you are specifically comparing. When you cite a law_reference it must be the ${ctx.act}.`,
+    `When extracting bond_authority_state, set it to "${code}" unless the property address clearly places the tenancy in another state.`,
+    ''
+  ].join('\n');
+}
+
+const SYSTEM_PROMPT = `You are an Australian tenancy lease analyst for RenterIQ.
+You receive a residential lease/tenancy agreement from an Australian renter. Be thorough and accurate — this record becomes the tenant's evidence trail.
+
+Your job:
+
+1. Extract every substantive clause. Do not skip routine ones. Include at minimum: rent, bond, term, entry/inspection, maintenance & repairs, pets, alterations/fixtures, break lease / early termination, utilities, insurance, cleaning at end of tenancy, smoke alarms, subletting. If the lease contains any of these, a clause MUST appear. If truly absent, mark as absent in key_concerns.
+2. For each clause, determine "standard", "unusual", or "warning" (potentially unfair or overly one-sided against the renter)
 3. Provide a plain-English explanation of what each clause means
-4. Flag any clauses that deviate from the standard Residential Tenancy Agreement for the relevant Australian state
+4. Flag any clauses that deviate from the typical Australian residential tenancy norms for the relevant state
 5. Give an overall risk rating: "low", "medium", or "high"
+6. Extract every tenancy key term listed in the summary schema. Check the standard form fields at the front of the lease first (Landlord/Lessor, Tenant, Premises, Term, Rent, Bond, Bond Authority, Day Rent is Payable, Bank Details, Agent). Then scan the body for break-lease clauses, notice periods, and bond authority references. Extract what you can find — leave only truly indeterminable fields as null.
 
 Respond ONLY with valid JSON in this exact format:
 {
@@ -17,7 +47,7 @@ Respond ONLY with valid JSON in this exact format:
     {
       "number": 1,
       "title": "Short title of the clause",
-      "original": "Original clause text (abbreviated if very long)",
+      "original": "Original clause text. Keep to 400 characters max — quote the key operative sentence, not the whole paragraph. If longer, end with … so we know it was trimmed.",
       "explanation": "Plain-English explanation of what this means for you as a renter",
       "rating": "standard" | "unusual" | "warning",
       "flag": "Optional — why this clause is unusual or concerning (null if standard)",
@@ -56,17 +86,55 @@ Respond ONLY with valid JSON in this exact format:
 }
 
 Rules:
-- Compare clauses to common Australian tenancy practice (default to VIC if state not specified)
-- Flag clauses that look unusual, one-sided, or worth double-checking with the state tenancy authority — but phrase it as a flag, never as advice. Use soft language: "looks unusual", "worth asking the agent about", "check with [state] Consumer Affairs before signing" — never "this is illegal", "you cannot be required to", "you are entitled to", or similar absolute legal claims
-- Flag excessive break fees, unreasonable inspection access, or non-standard cleaning requirements as "worth a closer look" rather than legally invalid
-- Flag clauses about tenant paying for normal wear and tear as unusual — suggest the renter asks the agent about it
+- Compare clauses to the tenancy practice of the specific state/territory named in the jurisdiction context above. If no state is supplied, infer from the property address. Never assume Victoria as a default.
+- Phrase every flag as a flag, never as advice. Use soft language: "looks unusual", "worth asking the agent about", "check with [state] Consumer Affairs before signing" — never "this is illegal", "you cannot be required to", "you are entitled to", or similar absolute legal claims
 - Be practical and fair — most standard lease terms are fine
 - Always provide the plain-English explanation even for standard clauses
-- This is a plain-English understanding helper, NEVER legal advice. Do not cite specific Act section numbers inline in explanations. law_reference may name the Act in passing ("Residential Tenancies Act 1997 (Vic)") but never quote specific section numbers that sound prescriptive
-- Limit to the 12 most important clauses if the lease is very long
-- For bond_authority_state, map the property's state to the code: NSW, VIC, QLD, WA, SA, TAS, ACT, NT. If the lease names an authority (e.g. "RTBA"), still set the state code
-- Dates must be ISO format (YYYY-MM-DD) so the app can use them directly
-- Be conservative — if a field is not clearly stated, return null rather than guess. The app will fall back to asking the user`;
+- This is a plain-English understanding helper, NEVER legal advice. Do not cite specific Act section numbers inline in explanations. law_reference may name the Act in passing but MUST match the jurisdiction stated at the top of this prompt — never assume or substitute a different state's Act. Never quote specific section numbers that sound prescriptive.
+
+Deterministic flagging — apply these rules consistently so the same lease always produces the same output. Rate a clause:
+
+"warning" ONLY when one or more of these is true:
+  • Break fee exceeds 6 weeks rent or scales open-endedly with the remaining term
+  • Tenant is required to pay for normal wear and tear, professional cleaning, or steam cleaning of carpets with no conditional trigger
+  • Rent increases are allowed more than once per 12 months, or with under 60 days notice
+  • Landlord entry is allowed without notice, or with under 24 hours notice
+  • The lease purports to waive a statutory tenant right (repairs, quiet enjoyment, bond lodgement)
+  • A blanket ban on pets or modifications is stated as absolute with no review process
+  • Bond exceeds 4 weeks rent in states where that is the statutory cap
+  • Tenant is required to pay the landlord's insurance, rates, or body corporate fees
+
+"unusual" when the clause is non-standard but not clearly against the tenant's interest:
+  • Garden / lawn maintenance requirements that are more detailed than typical
+  • Specific painting / colour restrictions
+  • Unusual utility or service arrangements
+  • Approval required for normal-use things (e.g. hanging a picture) — but with a review process
+  • Requirements that look odd in wording but match normal tenancy practice
+
+"standard" for all other clauses. The default rating is "standard" unless a rule above applies.
+
+If a clause doesn't match any warning or unusual rule, it must be "standard". Do not invent concerns.
+- Aim for 15-25 clauses for a typical residential lease. Do not cap at 12. If the lease is genuinely short, return fewer; if it is long and dense, return more.
+- For bond_authority_state, map the property's state to the code: NSW, VIC, QLD, WA, SA, TAS, ACT, NT. If the lease names an authority (e.g. "RTBA", "Rental Bond Board", "RTA") still set the corresponding state code
+- Dates must be ISO format (YYYY-MM-DD). Convert Australian date formats (dd/mm/yyyy) when reading
+- Be precise, not cautious. For the key-term fields below, extract whenever the value is stated anywhere in the document. Only return null when the field is truly not mentioned.
+
+Extraction heuristics — where to look:
+
+• rent_amount: usually listed in the standard-form "Rent" field at the front. Often stated as "$X per week", "$X per fortnight" or "$X per calendar month". Convert to weekly where sensible (fortnightly → divide by 2, monthly → multiply by 12 and divide by 52). Return as a dollar string like "$650".
+• rent_frequency: read directly — "per week" → "weekly", "per fortnight" → "fortnightly", "per calendar month" / "per month" → "monthly".
+• rent_due_day: the lease will state "payable on the Nth of each month" or "every [Weekday]". Return integer 1-28 for monthly, 0-6 for weekly/fortnightly (0=Sunday … 6=Saturday).
+• rent_payment_method: look for "by direct debit", "via [Agency] portal", "BPAY", "electronic funds transfer". Return one of: 'direct debit' | 'BPAY' | 'bank transfer' | 'agency portal' | 'other'.
+• rent_first_payment_date: the first rent date — may be stated separately from the lease start date. ISO format.
+• bond_amount: the "Bond" or "Security Deposit" field. Usually equals 4 weeks rent. Return as dollar string.
+• bond_authority_state: infer from the Premises address if not named. Postcode ranges: 1000-2999 NSW/ACT (ACT uses 2600-2618, 2900-2920), 3000-3999 VIC, 4000-4999 QLD, 5000-5999 SA, 6000-6999 WA, 7000-7999 TAS, 0800-0899 NT.
+• bond_authority_name: look for named authorities — RTBA, Rental Bond Board, RTA Queensland, Consumer Protection (WA), CBS (SA), Rental Deposit Authority (TAS), NT Consumer Affairs, Office of Rental Bonds (ACT).
+• bond_reference / bond_lodge_date: often NOT in the lease itself — usually issued after lodgement. Return null if not present.
+• notice_period: the break-lease notice period in days (e.g. "28 days notice" → 28).
+• break_clause: a one-sentence plain-English summary of what breaking the lease costs.
+• agent_name / agent_email / agent_phone: the property manager's details at the top of the lease or in the contact section.
+
+Stay consistent with the schema keys above — do not invent new keys.`;
 
 type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } };
 
@@ -95,14 +163,17 @@ export async function POST(request: Request) {
     const contentType = request.headers.get('content-type') || '';
     let leaseText = '';
     let file: File | null = null;
+    let stateCode = '';
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
       file = (formData.get('file') as File) || null;
       leaseText = (formData.get('text') as string) || '';
+      stateCode = (formData.get('state') as string) || '';
     } else {
       const body = await request.json();
       leaseText = body.text || '';
+      stateCode = body.state || '';
     }
 
     // No file AND no text → demo mode
@@ -111,9 +182,25 @@ export async function POST(request: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        temperature: 0,
+        topP: 0.8,
+        // A dense lease produces 15-25 clauses each with title, original, explanation
+        // and metadata. 8k tokens was truncating mid-response. 32k gives headroom.
+        maxOutputTokens: 32768,
+        responseMimeType: 'application/json',
+      },
+    });
 
-    const parts: GeminiPart[] = [{ text: SYSTEM_PROMPT }];
+    const statePrefix = buildStatePrefix(stateCode);
+    const code = (stateCode || '').toUpperCase();
+    const ctx = code && STATE_CONTEXT[code];
+    const stateReminder = ctx
+      ? `\n\nFINAL REMINDER: every law_reference in your response MUST be "${ctx.act}". The bond_authority_state MUST be "${code}". Do not output any reference to any other state's Act in this analysis.`
+      : '\n\nFINAL REMINDER: infer the state from the property address (postcode or suburb), then use the Residential Tenancies Act for THAT state in every law_reference. Never use Victoria as a fallback.';
+    const parts: GeminiPart[] = [{ text: statePrefix + '\n\n' + SYSTEM_PROMPT + stateReminder }];
 
     if (file) {
       if (file.size > MAX_FILE_BYTES) {
@@ -146,10 +233,16 @@ export async function POST(request: Request) {
       const analysis = JSON.parse(jsonStr);
       return NextResponse.json(analysis);
     } catch {
-      console.error('Failed to parse lease analysis JSON:', text);
+      // If the response was truncated mid-clause, try to salvage it by finding
+      // the last complete clause and closing the JSON manually.
+      const recovered = tryRecoverTruncatedJson(jsonStr);
+      if (recovered) {
+        return NextResponse.json(recovered);
+      }
+      console.error('Failed to parse lease analysis JSON:', text.slice(0, 500));
       return NextResponse.json(
-        { error: 'Failed to parse AI analysis', raw: text },
-        { status: 500 }
+        { error: 'The analyser returned an incomplete response. Please try again.' },
+        { status: 502 }
       );
     }
   } catch (error) {
@@ -158,6 +251,49 @@ export async function POST(request: Request) {
       { error: 'Failed to analyse lease' },
       { status: 500 }
     );
+  }
+}
+
+// Attempt to recover a truncated JSON response by finding the last complete
+// clause object and closing the structure. Returns null if no salvageable
+// data is found.
+function tryRecoverTruncatedJson(raw: string): unknown {
+  try {
+    const start = raw.indexOf('{');
+    if (start === -1) return null;
+    const body = raw.slice(start);
+    // Find the position just after the last complete clause object inside the
+    // clauses array. A complete clause ends with "}," or "}]".
+    const clausesMatch = body.match(/"clauses"\s*:\s*\[/);
+    if (!clausesMatch) return null;
+    const clausesStart = (clausesMatch.index || 0) + clausesMatch[0].length;
+
+    let depth = 0;
+    let inString = false;
+    let escape = false;
+    let lastGoodEnd = -1;
+
+    for (let i = clausesStart; i < body.length; i++) {
+      const ch = body[i];
+      if (escape) { escape = false; continue; }
+      if (ch === '\\') { escape = true; continue; }
+      if (ch === '"') { inString = !inString; continue; }
+      if (inString) continue;
+      if (ch === '{') depth++;
+      else if (ch === '}') {
+        depth--;
+        if (depth === 0) lastGoodEnd = i; // end of a complete clause object
+      }
+      else if (ch === ']' && depth === 0) break; // closed array — already valid
+    }
+
+    if (lastGoodEnd === -1) return null;
+    // Build a minimal valid JSON: array of complete clauses, no summary.
+    const clausesSegment = body.slice(clausesStart, lastGoodEnd + 1);
+    const patched = '{"clauses":[' + clausesSegment + ']}';
+    return JSON.parse(patched);
+  } catch {
+    return null;
   }
 }
 
@@ -284,11 +420,27 @@ function getMockLeaseAnalysis() {
         'Professional carpet cleaning requirement may be unenforceable',
         'Garden maintenance clause includes plant replacement at tenant cost'
       ],
-      rent_amount: '$520/week',
+      rent_amount: '$520',
+      rent_frequency: 'weekly',
+      rent_due_day: 1,
+      rent_payment_method: 'direct debit',
+      rent_first_payment_date: null,
       bond_amount: '$2,260',
-      lease_start: '1 July 2025',
-      lease_end: '30 June 2026',
-      property_address: null
+      bond_authority_state: 'VIC',
+      bond_authority_name: 'RTBA',
+      bond_reference: null,
+      bond_lodge_date: null,
+      lease_start: '2025-07-01',
+      lease_end: '2026-06-30',
+      lease_type: 'fixed term',
+      notice_period: null,
+      break_clause: 'Early exit may require up to 6 weeks rent as a break fee',
+      property_address: '12 Smith Street, Richmond VIC 3121',
+      landlord_name: null,
+      agency_name: 'Ray White Richmond',
+      agent_name: 'Sarah Chen',
+      agent_email: null,
+      agent_phone: '03 9427 1000'
     }
   };
 }

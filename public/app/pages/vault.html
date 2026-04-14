@@ -1527,6 +1527,7 @@ function deleteLease(id, addr){
       var doomed = leases.find(function(x){ return x && x.id === id; });
       vaultRemoveLocalById('riq-vault-leases', id);
       vaultRemoveCloud('leases', id, doomed && doomed.filePath);
+      if (window.RIQLocalFiles) RIQLocalFiles.remove(id).catch(function(){});
       loadLeases(); loadVaultCounts();
       showToast('Lease deleted', 'Removed from your Vault', '🗑');
     }
@@ -2004,6 +2005,106 @@ function loadExitReports(){
 /* ── Report detail viewer (View J) ── */
 function vaultEsc(s){if(s==null)return'';return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
+function riqOpenLocalLease(id){
+  if (!window.RIQLocalFiles){ showToast('File unavailable','Local storage helper is still loading','⚠️'); return; }
+  RIQLocalFiles.openInNewTab(id).then(function(rec){
+    if (!rec) showToast('File not found','Local copy is missing — re-upload via the Lease Reviewer','⚠️');
+  }).catch(function(){
+    showToast('Could not open file','Re-upload via the Lease Reviewer','⚠️');
+  });
+}
+
+// Toggle a clause's "discussed" flag on a saved lease record + re-render
+function riqToggleClauseDiscussed(leaseId, clauseIdx, discussed){
+  try {
+    var list = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+    var idx = list.findIndex(function(l){ return l && l.id === leaseId; });
+    if (idx === -1) return;
+    var rec = list[idx];
+    if (!Array.isArray(rec.clauses) || !rec.clauses[clauseIdx]) return;
+    rec.clauses[clauseIdx].discussed = !!discussed;
+    rec.clauses[clauseIdx].discussedAt = discussed ? Date.now() : null;
+    list[idx] = rec;
+    localStorage.setItem('riq-vault-leases', JSON.stringify(list));
+    // Keep active tenancy mirror in sync when relevant
+    try {
+      var active = JSON.parse(localStorage.getItem('riq-lease-record')||'null');
+      if (active && active.id === leaseId) localStorage.setItem('riq-lease-record', JSON.stringify(rec));
+    } catch(e){}
+    if (window.RIQStore) {
+      RIQStore.ready.then(function(){ if (RIQStore.isAuthed()) RIQStore.write('leases', rec.id, rec).catch(function(){}); });
+    }
+    currentDetailRecord = rec;
+    renderLeaseDetail(rec);
+  } catch(e){ console.error('toggle clause discussed:', e); }
+}
+
+// Draft a polite plain-English email asking the agent about a specific clause
+function riqDraftAgentEmail(leaseId, clauseIdx){
+  try {
+    var list = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');
+    var rec = list.find(function(l){ return l && l.id === leaseId; });
+    if (!rec) return;
+    var clause = rec.clauses && rec.clauses[clauseIdx];
+    if (!clause) return;
+
+    var tenantName = '';
+    try { tenantName = (JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}').fullName) || ''; } catch(e){}
+
+    var addr = rec.address || 'the property';
+    var title = clause.title || 'a clause in the lease';
+    var subject = 'Question about ' + title + ' — ' + addr;
+    var lines = [
+      'Hi' + ((rec.pmName) ? ' ' + rec.pmName : ' there') + ',',
+      '',
+      'I\'m going through the lease for ' + addr + ' and wanted to ask about the "' + title + '" clause before I sign.',
+      '',
+      'My read of it is: ' + (clause.explanation || '') + '',
+      ''
+    ];
+    if (clause.flag) lines.push('What I wanted to double-check: ' + clause.flag);
+    if (clause.original) {
+      lines.push('');
+      lines.push('The wording I\'m looking at:');
+      lines.push('"' + clause.original + '"');
+    }
+    lines.push('');
+    lines.push('Could you walk me through how this typically plays out, and whether there\'s anything I should note? Happy to chat on the phone if easier.');
+    lines.push('');
+    lines.push('Thanks,');
+    lines.push(tenantName || 'Renter');
+
+    var to = encodeURIComponent(rec.agentEmail || rec.pmEmail || '');
+    var mailto = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+    window.open(mailto, '_self');
+
+    // Log into communications so the trail stays in the vault
+    try {
+      var commId = 'comm_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+      var cm = {
+        id: commId,
+        type: 'lease_clause_query',
+        to: rec.agentEmail || rec.pmEmail || rec.agencyName || rec.pmName || 'Agent',
+        subject: subject,
+        body: lines.join('\n'),
+        date: Date.now(),
+        source: 'lease-review',
+        leaseId: leaseId,
+        clauseNumber: clause.number || (clauseIdx + 1),
+        propertyAddress: addr
+      };
+      var comms = JSON.parse(localStorage.getItem('riq_communications')||'[]');
+      comms.unshift(cm);
+      localStorage.setItem('riq_communications', JSON.stringify(comms));
+      if (window.RIQStore) {
+        RIQStore.ready.then(function(){ if (RIQStore.isAuthed()) RIQStore.write('communications', cm.id, cm).catch(function(){}); });
+      }
+    } catch(e){}
+
+    showToast('Email drafted ✓','Saved a copy in your Vault → Communications','✉️');
+  } catch(e){ console.error('draft agent email:', e); }
+}
+
 var reportDetailReturnView='C';
 var currentDetailKind=null;
 var currentDetailRecord=null;
@@ -2077,7 +2178,9 @@ function renderLeaseDetail(l){
     }
   }
   var clauses = Array.isArray(l.clauses) ? l.clauses : [];
-  var flaggedClauses = clauses.filter(function(c){ return c && c.rating !== 'standard'; });
+  var warningClauses = clauses.filter(function(c){ return c && c.rating === 'warning'; });
+  var unusualClauses = clauses.filter(function(c){ return c && c.rating === 'unusual'; });
+  var flaggedClauses = warningClauses.concat(unusualClauses);
   var flagged = l.flaggedCount || flaggedClauses.length;
   var totalClauses = l.totalClauses || clauses.length;
 
@@ -2085,16 +2188,29 @@ function renderLeaseDetail(l){
     '<div style="background:linear-gradient(135deg,var(--blue),var(--blue-md));border-radius:18px;padding:18px 20px;margin-bottom:14px;color:#fff">'
       +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:6px">Lease Agreement</div>'
       +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;margin-bottom:14px">'+vaultEsc(l.address||'Property')+'</div>'
-      +'<div style="display:flex;gap:14px">'
-        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+totalClauses+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Clauses</div></div>'
-        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+flagged+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Flagged</div></div>'
+      +'<div style="display:flex;gap:18px;flex-wrap:wrap">'
+        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+totalClauses+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Clauses reviewed</div></div>'
+        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:#FFB4B4">'+warningClauses.length+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Warnings</div></div>'
+        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:#FFD48A">'+unusualClauses.length+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Unusual</div></div>'
         +(daysLeft?'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:14px;line-height:22px">'+daysLeft+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Status</div></div>':'')
       +'</div>'
     +'</div>';
 
-  // Original file — surface this near the top so the user can always grab the contract
-  if(l.fileUrl){
+  // Overall severity banner
+  if (warningClauses.length > 0) {
+    html += '<div style="background:rgba(232,64,64,.06);border:1px solid rgba(232,64,64,.25);border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px"><span style="font-size:18px;flex-shrink:0">🚨</span><div><div style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:#7A1F1F;margin-bottom:3px">'+warningClauses.length+' serious concern'+(warningClauses.length!==1?'s':'')+' to address</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:#8A3333;line-height:1.55">Clauses below look one-sided or outside typical Australian rental norms. Read them carefully before signing or raising with your agent.</div></div></div>';
+  } else if (unusualClauses.length > 0) {
+    html += '<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.25);border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px"><span style="font-size:18px;flex-shrink:0">⚠️</span><div><div style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:#7A5500;margin-bottom:3px">'+unusualClauses.length+' clause'+(unusualClauses.length!==1?'s':'')+' worth a closer look</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:#8A6500;line-height:1.55">Nothing critical — but worth reading the detail and asking the agent if anything doesn\'t sit right.</div></div></div>';
+  } else if (clauses.length) {
+    html += '<div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px"><span style="font-size:18px;flex-shrink:0">✓</span><div><div style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:var(--teal-dk);margin-bottom:3px">This lease looks standard</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--teal-dk);line-height:1.55">All '+totalClauses+' clauses match typical Australian residential tenancy practice. No flags raised.</div></div></div>';
+  }
+
+  // Original file — prefer cloud URL, fall back to locally stored blob
+  if (l.fileUrl) {
     html += '<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="window.open(\''+vaultEsc(l.fileUrl)+'\',\'_blank\')"><span>📄</span> Open original lease</button>';
+  } else if (l.hasLocalFile) {
+    html += '<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="riqOpenLocalLease(\''+vaultEsc(l.id)+'\')"><span>📄</span> Open original lease</button>';
+    html += '<div style="display:flex;align-items:center;gap:6px;padding:8px 14px;margin-bottom:14px;font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);line-height:1.5"><span>📱</span><span>Stored on this device only — not synced to the cloud.</span></div>';
   } else if (!clauses.length) {
     html += '<div style="background:rgba(27,80,200,.05);border:1px solid var(--blue-lt);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">💡 Re-upload your lease in the Lease Reviewer to restore the original file and the full clause-by-clause breakdown.</div>';
   }
@@ -2123,24 +2239,37 @@ function renderLeaseDetail(l){
   html += termRow('PM phone', l.pmPhone, true);
   html += '</div>';
 
-  // Flagged clauses — plain English + original wording expander
+  // Flagged clauses — plain English + original wording expander + actions
+  var openConcerns = flaggedClauses.filter(function(c){ return !c.discussed; });
+  var discussedConcerns = flaggedClauses.filter(function(c){ return c.discussed; });
+
   if (flaggedClauses.length) {
-    html += '<div class="sec-label" style="padding:0 0 10px">⚠️ Clauses to review ('+flaggedClauses.length+')</div>';
+    html += '<div class="sec-label" style="padding:0 0 10px">⚠️ Clauses to review ('+openConcerns.length+' open'+(discussedConcerns.length?', '+discussedConcerns.length+' discussed':'')+')</div>';
     html += '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">';
-    flaggedClauses.forEach(function(c, i){
+    flaggedClauses.forEach(function(c){
+      var idx = clauses.indexOf(c);
       var isWarn = c.rating === 'warning';
       var accent = isWarn ? '#E84040' : '#F5A623';
-      var bg = isWarn ? 'rgba(232,64,64,.05)' : 'rgba(245,166,35,.05)';
-      var border = isWarn ? 'rgba(232,64,64,.2)' : 'rgba(245,166,35,.25)';
-      var badge = isWarn ? 'Warning' : 'Unusual';
-      html += '<div style="background:'+bg+';border:1px solid '+border+';border-radius:14px;padding:14px 16px">'
-        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-family:Sora,sans-serif;font-weight:800;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:'+accent+';background:#fff;border:1px solid '+border+';border-radius:100px;padding:3px 10px">'+badge+'</span>'
-        +'<span style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:var(--text)">'+vaultEsc(c.title||('Clause '+(c.number||(i+1))))+'</span></div>'
+      var bg = c.discussed ? '#F7FAFF' : (isWarn ? 'rgba(232,64,64,.05)' : 'rgba(245,166,35,.05)');
+      var border = c.discussed ? 'var(--border-lt)' : (isWarn ? 'rgba(232,64,64,.2)' : 'rgba(245,166,35,.25)');
+      var badge = c.discussed ? 'Discussed' : (isWarn ? 'Warning' : 'Unusual');
+      var badgeColor = c.discussed ? 'var(--teal-dk)' : accent;
+      var title = vaultEsc(c.title||('Clause '+(c.number||(idx+1))));
+
+      html += '<div style="background:'+bg+';border:1px solid '+border+';border-radius:14px;padding:14px 16px;'+(c.discussed?'opacity:.7':'')+'">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><span style="font-family:Sora,sans-serif;font-weight:800;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:'+badgeColor+';background:#fff;border:1px solid '+border+';border-radius:100px;padding:3px 10px">'+badge+'</span>'
+        +'<span style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:var(--text)">'+title+'</span></div>'
         +'<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.6;margin-bottom:8px">'+vaultEsc(c.explanation||'')+'</div>'
         +(c.flag ? '<div style="font-family:Nunito,sans-serif;font-weight:700;font-size:12px;color:'+accent+';line-height:1.55;margin-bottom:8px">Why it stands out: '+vaultEsc(c.flag)+'</div>' : '')
         +(c.law_reference ? '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-bottom:8px">Reference: '+vaultEsc(c.law_reference)+'</div>' : '')
-        +(c.original ? '<details style="margin-top:4px"><summary style="cursor:pointer;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;color:var(--blue);padding:4px 0">Show original wording</summary><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;padding:10px 12px;background:#fff;border:1px solid var(--border-lt);border-radius:10px;white-space:pre-wrap">'+vaultEsc(c.original)+'</div></details>' : '')
-        +'</div>';
+        +(c.original ? '<details style="margin-top:4px;margin-bottom:10px"><summary style="cursor:pointer;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;color:var(--blue);padding:4px 0">Show original wording</summary><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;padding:10px 12px;background:#fff;border:1px solid var(--border-lt);border-radius:10px;white-space:pre-wrap">'+vaultEsc(c.original)+'</div></details>' : '')
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">'
+          +(c.discussed
+            ? '<button onclick="riqToggleClauseDiscussed(\''+vaultEsc(l.id)+'\','+idx+',false)" style="background:#fff;color:var(--muted);border:1px solid var(--border-lt);border-radius:10px;padding:8px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;cursor:pointer">↶ Reopen</button>'
+            : '<button onclick="riqDraftAgentEmail(\''+vaultEsc(l.id)+'\','+idx+')" style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:8px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;cursor:pointer">📧 Ask the agent</button>'
+              +'<button onclick="riqToggleClauseDiscussed(\''+vaultEsc(l.id)+'\','+idx+',true)" style="background:#fff;color:var(--teal-dk);border:1px solid rgba(0,200,150,.35);border-radius:10px;padding:8px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;cursor:pointer">✓ Mark as discussed</button>')
+        +'</div>'
+      +'</div>';
     });
     html += '</div>';
   } else if (clauses.length) {
@@ -3698,5 +3827,6 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
+<script src="/app/js/local-files.js" defer></script>
 </body>
 </html>
