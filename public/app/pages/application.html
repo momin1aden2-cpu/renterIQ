@@ -16,12 +16,13 @@
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
+<script src="/app/js/secure-docs.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
-<title>Rental Application — RenterIQ</title>
+<title>Renter Resume — RenterIQ</title>
 <script src="/app/js/pwa-init.js" defer></script>
 <style>
 .sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
@@ -164,10 +165,10 @@
         <span class="sh-back-arrow">‹</span>
         <span class="sh-label">HOME</span>
       </button>
-      <button class="sh-help" onclick="showToast('Rental Application','Your saved renter resume powers every application you make','💡')">?</button>
+      <button class="sh-help" onclick="showToast('Renter Resume','Fill it once — copy it into any agency portal in minutes','💡')">?</button>
     </div>
-    <div class="sh-title">Rental Application</div>
-    <div class="sh-sub">Everything an agency needs — ready in one place</div>
+    <div class="sh-title">Renter Resume</div>
+    <div class="sh-sub">Prepare once. Apply anywhere — fast.</div>
   </header>
 
   <!-- Resume Score -->
@@ -452,6 +453,16 @@
   </div>
 
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
+
+    <!-- Privacy reassurance — sits between the ID score and the first doc
+         card so renters see the commitment the moment they enter this view. -->
+    <div style="background:linear-gradient(135deg,rgba(0,200,150,.08),rgba(27,80,200,.05));border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:13px 15px;margin-bottom:14px;display:flex;gap:11px;align-items:flex-start">
+      <span style="font-size:20px;line-height:1;flex-shrink:0;margin-top:1px">🔒</span>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--teal-dk);letter-spacing:-.1px">Your IDs stay on this device</div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.55">Every file you add is AES-encrypted and stored in your browser only. RenterIQ servers never receive your passport, licence, Medicare or payslips. You copy them into agency portals yourself.</div>
+      </div>
+    </div>
 
     <!-- Primary ID -->
     <div class="sec-label">Primary ID <span style="font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600">— 70 pts each (add at least one)</span></div>
@@ -849,6 +860,21 @@
       <div id="portalProgress" style="font-weight:700;font-size:12px;color:var(--muted);margin-top:12px;text-align:center">0 of 9 steps complete</div>
     </div>
 
+    <!-- Export Pack — one-tap dump of everything ready to paste into any
+         portal. The renter opens this, hits "Copy Everything", and swings
+         over to 1Form/Snug/Domain with the entire application on the
+         clipboard. No RenterIQ branding in the output. -->
+    <div style="margin:14px 16px 0">
+      <button onclick="openExportPack()" style="width:100%;background:linear-gradient(135deg,var(--blue-dk),var(--blue));color:#fff;border:0;border-radius:16px;padding:16px 18px;font-family:'Sora',sans-serif;font-weight:800;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(10,36,96,.22)">
+        <span style="font-size:22px">📦</span>
+        <span style="flex:1;text-align:left">
+          <span style="display:block">Export Pack</span>
+          <span style="display:block;font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:rgba(255,255,255,.7);margin-top:2px;letter-spacing:0">Copy your whole resume in one tap</span>
+        </span>
+        <span style="font-size:20px;color:rgba(255,255,255,.7)">›</span>
+      </button>
+    </div>
+
     <!-- Quick Reference — populated from saved data -->
     <div style="margin:14px 16px 0;background:var(--blue-xl);border-radius:16px;padding:16px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:12px">Quick Reference — tap to copy</div>
@@ -1058,45 +1084,55 @@ function loadResume(){
     var section=document.getElementById('letterSection');
     if(section)section.style.display='block';
   }
-  // Restore uploaded doc metadata display
-  if(r.docs){
-    docMeta=r.docs;
-    Object.keys(docMeta).forEach(function(docId){
-      var meta=docMeta[docId];
+  restoreSecureDocs();
+  updateScore();
+  updateQuickRef(r);
+}
+
+// Rehydrate the doc cards from RIQSecureDocs (encrypted IndexedDB). Images
+// get a preview thumbnail decrypted to an object URL on demand.
+function restoreSecureDocs(){
+  if(!window.RIQSecureDocs)return;
+  RIQSecureDocs.list().then(function(rows){
+    docMeta={};
+    rows.forEach(function(meta){
+      var docId=meta.id;
+      docMeta[docId]={name:meta.name,size:meta.size,pts:meta.pts,ts:meta.ts,mimeType:meta.mimeType,secure:true};
+      if(meta.pts)uploadedDocs[docId]=meta.pts;
       var card=document.getElementById(docId);
       if(!card)return;
       var icon=card.querySelector('.doc-icon');
       var statusEl=card.querySelector('[id$="-status"]');
       var btn=card.querySelector('.upload-btn');
-      if(icon){icon.style.background='var(--teal-lt)';icon.textContent='✓';icon.style.color='var(--teal-dk)';icon.style.fontWeight='700';icon.style.fontFamily='Sora,sans-serif';icon.style.fontSize='16px';}
-      if(statusEl){statusEl.textContent='✓ '+meta.name;statusEl.style.color='var(--teal-dk)';}
+      if(icon){icon.style.background='var(--teal-lt)';icon.textContent='🔒';icon.style.color='var(--teal-dk)';icon.style.fontSize='16px';}
+      if(statusEl){statusEl.textContent='🔒 '+meta.name+' — encrypted on this device';statusEl.style.color='var(--teal-dk)';}
       if(btn){btn.textContent='Replace';btn.style.background='var(--border-lt)';btn.style.color='var(--muted)';}
-      if(meta.pts){uploadedDocs[docId]=meta.pts;}
-      // Restore image preview thumbnail
-      if(meta.data&&meta.mimeType&&meta.mimeType.startsWith('image/')){
+      if(meta.mimeType&&meta.mimeType.indexOf('image/')===0){
         var bar=card.querySelector('.upload-bar');
         if(bar&&!card.querySelector('.doc-preview-thumb')){
-          bar.style.display='block';
-          var thumb=document.createElement('div');
-          thumb.className='doc-preview-thumb';
-          thumb.style.cssText='margin-top:8px;border-radius:8px;overflow:hidden;height:72px;cursor:pointer;position:relative;';
-          var img=document.createElement('img');
-          img.src=meta.data;
-          img.style.cssText='width:100%;height:100%;object-fit:cover;';
-          img.onclick=function(){window.open(meta.data,'_blank');};
-          var viewLbl=document.createElement('span');
-          viewLbl.style.cssText='position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-family:Sora,sans-serif;font-weight:700;border-radius:4px;padding:2px 6px;';
-          viewLbl.textContent='View';
-          thumb.appendChild(img);
-          thumb.appendChild(viewLbl);
-          bar.parentNode.insertBefore(thumb,bar.nextSibling);
+          RIQSecureDocs.getObjectURL(docId).then(function(objUrl){
+            if(!objUrl)return;
+            bar.style.display='block';
+            var thumb=document.createElement('div');
+            thumb.className='doc-preview-thumb';
+            thumb.style.cssText='margin-top:8px;border-radius:8px;overflow:hidden;height:72px;cursor:pointer;position:relative;';
+            var img=document.createElement('img');
+            img.src=objUrl;
+            img.style.cssText='width:100%;height:100%;object-fit:cover;';
+            img.onclick=function(){window.open(objUrl,'_blank');};
+            var viewLbl=document.createElement('span');
+            viewLbl.style.cssText='position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-family:Sora,sans-serif;font-weight:700;border-radius:4px;padding:2px 6px;';
+            viewLbl.textContent='View';
+            thumb.appendChild(img);
+            thumb.appendChild(viewLbl);
+            bar.parentNode.insertBefore(thumb,bar.nextSibling);
+          });
         }
       }
     });
     updateIdScore();
-  }
-  updateScore();
-  updateQuickRef(r);
+    updateScore();
+  }).catch(function(e){console.warn('restoreSecureDocs:',e);});
 }
 
 function updateScore(){
@@ -1158,7 +1194,10 @@ function markChecked(checkId,statusId){
   }
 }
 
-/* ── Document Upload ──────────────────────────────────────── */
+/* ── Document Upload ──────────────────────────────────────────────────
+   Sensitive ID, payslips, bank statements are AES-GCM encrypted and stored
+   inside IndexedDB via RIQSecureDocs. Bytes never leave this device. Cloud
+   sync only sees metadata (name, size, type, upload time, points value). */
 function handleFileUpload(docId, pts, fileKey){
   var input=document.getElementById('file-'+fileKey);
   if(!input||!input.files||!input.files[0])return;
@@ -1168,44 +1207,49 @@ function handleFileUpload(docId, pts, fileKey){
     showToast('File type not supported','Please use PDF, JPG, PNG, HEIC or DOCX','⚠️');
     return;
   }
-  if(file.size>5*1024*1024){
-    showToast('File too large','Maximum 5MB per document — try compressing it first','⚠️');
+  if(file.size>10*1024*1024){
+    showToast('File too large','Maximum 10MB per document — try compressing it first','⚠️');
+    return;
+  }
+  if(!window.RIQSecureDocs){
+    showToast('Secure storage unavailable','Please reload the app and try again','⚠️');
     return;
   }
   var card=document.getElementById(docId);
   var btn=card?card.querySelector('.upload-btn'):null;
-  if(btn){btn.textContent='Reading…';btn.style.opacity='.6';btn.style.pointerEvents='none';}
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var dataUrl=e.target.result;
-    docMeta[docId]={name:file.name,size:file.size,pts:pts,ts:Date.now(),data:dataUrl,mimeType:file.type};
+  if(btn){btn.textContent='Encrypting…';btn.style.opacity='.6';btn.style.pointerEvents='none';}
+
+  RIQSecureDocs.put(docId,file,pts).then(function(meta){
+    docMeta[docId]={name:meta.name,size:meta.size,pts:pts,ts:meta.ts,mimeType:meta.mimeType,secure:true};
     if(pts>0)uploadedDocs[docId]=pts;
     if(card){
       var icon=card.querySelector('.doc-icon');
       var statusEl=card.querySelector('[id$="-status"]');
       var uploadBtn=card.querySelector('.upload-btn');
-      if(icon){icon.style.background='var(--teal-lt)';icon.textContent='✓';icon.style.color='var(--teal-dk)';icon.style.fontWeight='700';icon.style.fontFamily='Sora,sans-serif';icon.style.fontSize='16px';}
-      if(statusEl){statusEl.textContent='✓ '+file.name;statusEl.style.color='var(--teal-dk)';}
-      // Show image preview thumbnail for image files
-      if(file.type.startsWith('image/')){
+      if(icon){icon.style.background='var(--teal-lt)';icon.textContent='🔒';icon.style.color='var(--teal-dk)';icon.style.fontSize='16px';}
+      if(statusEl){statusEl.textContent='🔒 '+file.name+' — encrypted on this device';statusEl.style.color='var(--teal-dk)';}
+      if(file.type.indexOf('image/')===0){
         var bar=card.querySelector('.upload-bar');
         if(bar){
           bar.style.display='block';
           var existingImg=card.querySelector('.doc-preview-thumb');
           if(!existingImg){
-            var thumb=document.createElement('div');
-            thumb.className='doc-preview-thumb';
-            thumb.style.cssText='margin-top:8px;border-radius:8px;overflow:hidden;height:72px;cursor:pointer;position:relative;';
-            var img=document.createElement('img');
-            img.src=dataUrl;
-            img.style.cssText='width:100%;height:100%;object-fit:cover;';
-            img.onclick=function(){window.open(dataUrl,'_blank');};
-            var viewLbl=document.createElement('span');
-            viewLbl.style.cssText='position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-family:Sora,sans-serif;font-weight:700;border-radius:4px;padding:2px 6px;';
-            viewLbl.textContent='View';
-            thumb.appendChild(img);
-            thumb.appendChild(viewLbl);
-            bar.parentNode.insertBefore(thumb,bar.nextSibling);
+            RIQSecureDocs.getObjectURL(docId).then(function(objUrl){
+              if(!objUrl)return;
+              var thumb=document.createElement('div');
+              thumb.className='doc-preview-thumb';
+              thumb.style.cssText='margin-top:8px;border-radius:8px;overflow:hidden;height:72px;cursor:pointer;position:relative;';
+              var img=document.createElement('img');
+              img.src=objUrl;
+              img.style.cssText='width:100%;height:100%;object-fit:cover;';
+              img.onclick=function(){window.open(objUrl,'_blank');};
+              var viewLbl=document.createElement('span');
+              viewLbl.style.cssText='position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-family:Sora,sans-serif;font-weight:700;border-radius:4px;padding:2px 6px;';
+              viewLbl.textContent='View';
+              thumb.appendChild(img);
+              thumb.appendChild(viewLbl);
+              bar.parentNode.insertBefore(thumb,bar.nextSibling);
+            });
           }
         }
       }
@@ -1213,25 +1257,13 @@ function handleFileUpload(docId, pts, fileKey){
     }
     updateIdScore();
     updateScore();
-    try{
-      collectAndSave();
-      showToast('Document saved ✓',file.name,'📎');
-    }catch(storageErr){
-      if(storageErr&&storageErr.name==='QuotaExceededError'){
-        // Remove the file data to save space, keep metadata only
-        docMeta[docId].data=null;
-        showToast(file.name+' added','Storage limit reached — file tracked but not stored locally','⚠️');
-        try{collectAndSave();}catch(e){}
-      }else{
-        showToast('Document added ✓',file.name,'📎');
-      }
-    }
-  };
-  reader.onerror=function(){
+    try{collectAndSave();}catch(e){}
+    showToast('Saved securely 🔒',file.name+' · encrypted on this device','📎');
+  }).catch(function(err){
+    console.warn('Secure doc upload failed:',err);
     if(btn){btn.textContent='📎 Add';btn.style.opacity='1';btn.style.pointerEvents='auto';}
-    showToast('Could not read file','Please try a different format','⚠️');
-  };
-  reader.readAsDataURL(file);
+    showToast('Could not save','Please try a different file','⚠️');
+  });
 }
 
 function updateIdScore(){
@@ -1270,14 +1302,34 @@ async function generateCoverLetter(){
   var whyProperty=document.getElementById('cl-whyProperty').value.trim();
   var situation=document.getElementById('cl-situation').value.trim();
 
+  var r=getResume();
+
+  // Smart fallbacks — if the renter hasn't filled the 3 prompts, stitch a
+  // reasonable "who you are" from employment + rental history so the
+  // generator always has something concrete to work with.
+  if(!whoYouAre && (r.jobTitle || r.employer)){
+    var roleBits=[];
+    if(r.jobTitle) roleBits.push(r.jobTitle);
+    if(r.employer) roleBits.push('at '+r.employer);
+    if(r.empDuration) roleBits.push('for '+r.empDuration);
+    whoYouAre='I work as a '+roleBits.join(' ')+'. I pay my rent on time and look after the places I live in.';
+  }
+  if(!situation && r.prevAddress){
+    situation='My most recent tenancy was at '+r.prevAddress+
+      (r.prevDuration?(' for '+r.prevDuration):'')+
+      (r.prevReason?(', leaving because '+r.prevReason.toLowerCase()):'')+'.';
+  }
+  if(!whyProperty && r.applyingFor){
+    whyProperty='The property suits my lifestyle and commute, and I can move in on the date advertised.';
+  }
+
   if(!whoYouAre&&!whyProperty&&!situation){
-    showToast('Tell us about yourself first','Fill in at least one field above to personalise your letter','💡');
+    showToast('Add a few details first','Fill in the prompts, or complete your employment and rental history — we use those automatically','💡');
     return;
   }
 
   if(btn){btn.innerHTML='<span style="display:inline-block;animation:spin .8s linear infinite">↺</span> Generating…';btn.style.opacity='.7';btn.style.pointerEvents='none';}
 
-  var r=getResume();
   try{
     var resp=await fetch('/api/generate-cover-letter',{
       method:'POST',
@@ -1314,12 +1366,14 @@ async function generateCoverLetter(){
   }
 }
 
-/* ── Save Resume to Personal Documents Vault ──────────────── */
+/* ── Save Resume to Personal Documents Vault ──────────────────────────
+   Writes the resume + doc *metadata* to localStorage and Firestore. ID
+   file bytes stay encrypted in IndexedDB (RIQSecureDocs). The cloud payload
+   is metadata-only — RenterIQ servers never see ID photos or payslips. */
 function saveResumeToVault(){
   try{
     var r=getResume();
     var idScore=Math.min(100,Object.values(uploadedDocs).reduce(function(s,v){return s+(typeof v==='number'?v:0)},0));
-    // Build a clean resume snapshot
     var resumeSnapshot={};
     ['fullName','dob','email','mobile','currentAddress','timeAtAddress','reasonMoving',
      'employmentStatus','employer','jobTitle','empDuration','income',
@@ -1332,73 +1386,36 @@ function saveResumeToVault(){
      'ref2Name','ref2Company','ref2Phone','ref2Email','ref2Rel',
      'ref3Name','ref3Company','ref3Title','ref3Phone','ref3Email','ref3Duration'
     ].forEach(function(k){if(r[k])resumeSnapshot[k]=r[k];});
-    // Get existing personal docs record (preserve any user-added files)
-    var existing={userDocs:[]};
-    try{var ex=localStorage.getItem('riq_personal_docs');if(ex)existing=JSON.parse(ex);}catch(e){}
+
+    // Metadata-only copy of uploaded docs — never carries bytes.
+    var metaOnly={};
+    Object.keys(docMeta||{}).forEach(function(k){
+      var d=docMeta[k]||{};
+      metaOnly[k]={name:d.name,size:d.size,pts:d.pts,ts:d.ts,mimeType:d.mimeType,secure:true};
+    });
+
     var record={
       resume:resumeSnapshot,
       coverLetter:letterText||r.coverLetter||'',
       idScore:idScore,
-      uploadedDocs:docMeta,
-      userDocs:existing.userDocs||[],
+      uploadedDocs:metaOnly,
       updatedAt:Date.now()
     };
     localStorage.setItem('riq_personal_docs',JSON.stringify(record));
-    // Also keep the old key for backward compat
-    localStorage.setItem('riq_renter_resume_vault',JSON.stringify(Object.assign({},resumeSnapshot,{_savedToVault:Date.now(),_coverLetter:record.coverLetter,_idScore:idScore,_docCount:Object.keys(docMeta).length,docs:docMeta})));
-    showToast('Saved to Personal Documents','Find it anytime in your Vault','🗂️');
-    // ── Cloud sync (background) ──
+    localStorage.setItem('riq_renter_resume_vault',JSON.stringify(Object.assign({},resumeSnapshot,{_savedToVault:Date.now(),_coverLetter:record.coverLetter,_idScore:idScore,_docCount:Object.keys(metaOnly).length,docs:metaOnly})));
+    showToast('Resume saved 🔒','Your IDs stay encrypted on this device','🗂️');
     syncPersonalDocsToCloud(record);
   }catch(e){console.warn('saveResumeToVault:',e);}
-}
-
-function appDataURLToBlob(dataUrl){
-  try{
-    var parts=dataUrl.split(',');
-    var mime=(parts[0].match(/:(.*?);/)||[null,'application/octet-stream'])[1];
-    var bstr=atob(parts[1]);
-    var n=bstr.length;
-    var u8=new Uint8Array(n);
-    while(n--)u8[n]=bstr.charCodeAt(n);
-    return new Blob([u8],{type:mime});
-  }catch(e){return null}
 }
 
 function syncPersonalDocsToCloud(record){
   if(!window.RIQStore)return;
   RIQStore.ready.then(function(){
     if(!RIQStore.isAuthed())return;
-
-    var uploadJobs=[];
-    var uploadedDocsCloud={};
-    Object.keys(record.uploadedDocs||{}).forEach(function(docKey){
-      var doc=record.uploadedDocs[docKey];
-      if(!doc||!doc.data||doc.data.indexOf('data:')!==0){
-        // Already a URL or non-data — keep as-is (strip base64 if present)
-        var copy=Object.assign({},doc);
-        delete copy.data;
-        uploadedDocsCloud[docKey]=copy;
-        return;
-      }
-      var blob=appDataURLToBlob(doc.data);
-      if(!blob){return}
-      var ext=(doc.name&&doc.name.split('.').pop())||'bin';
-      var path='personal-docs/'+docKey+'.'+ext;
-      uploadJobs.push(
-        RIQStore.uploadFile(path,blob,{contentType:blob.type})
-          .then(function(res){
-            uploadedDocsCloud[docKey]={name:doc.name,size:doc.size,pts:doc.pts,ts:doc.ts,mimeType:doc.mimeType,url:res.url,path:res.path};
-          })
-          .catch(function(err){console.warn('Personal doc upload failed for '+docKey+':',err)})
-      );
-    });
-
-    Promise.all(uploadJobs).then(function(){
-      var cloudRecord=Object.assign({},record,{uploadedDocs:uploadedDocsCloud});
-      // Single doc per user — store under state/personal-docs
-      RIQStore.write('state','personal-docs',cloudRecord).catch(function(err){
-        console.warn('Personal docs cloud sync failed:',err);
-      });
+    // Metadata-only sync — we do NOT upload ID bytes. Users keep the files
+    // on-device; the cloud mirror is just the resume + file list.
+    RIQStore.write('state','personal-docs',record).catch(function(err){
+      console.warn('Personal docs cloud sync failed:',err);
     });
   });
 }
@@ -1471,6 +1488,131 @@ function copyValue(val,label){
   if(val==='—')return;
   if(navigator.clipboard){navigator.clipboard.writeText(val).then(function(){showToast(label+' copied','Paste into the portal','📋')})}
   else{showToast(label+' copied','','📋')}
+}
+
+/* ── Export Pack ─────────────────────────────────────────────────────
+   Full-resume dump formatted for pasting into any portal. No RenterIQ
+   branding in the output — agencies see a clean renter's summary. */
+function buildExportPackText(){
+  var r=getResume();
+  function line(l,v){return v?(l+': '+v):null}
+  function section(heading,rows){
+    rows=rows.filter(Boolean);
+    if(!rows.length)return '';
+    return heading+'\n'+rows.join('\n');
+  }
+  var idScore=Math.min(100,Object.values(uploadedDocs).reduce(function(s,v){return s+(typeof v==='number'?v:0)},0));
+  var docList=Object.keys(docMeta||{}).map(function(k){var d=docMeta[k]||{};return '• '+(d.name||k)+(d.pts?(' ('+d.pts+' pts)'):'')}).join('\n');
+  var out=[
+    section('PERSONAL',[
+      line('Full Name',r.fullName),line('Date of Birth',r.dob),line('Email',r.email),
+      line('Mobile',r.mobile),line('Current Address',r.currentAddress),
+      line('Time at Address',r.timeAtAddress),line('Reason for Moving',r.reasonMoving)
+    ]),
+    section('EMPLOYMENT',[
+      line('Status',r.employmentStatus),line('Employer',r.employer),
+      line('Job Title',r.jobTitle),line('Duration in Role',r.empDuration),
+      line('Annual Income (before tax)',r.income)
+    ]),
+    section('MOST RECENT RENTAL',[
+      line('Address',r.prevAddress),line('Weekly Rent',r.prevRent),
+      line('Agency / Landlord',r.prevAgency),line('Contact',r.prevContact),
+      line('Duration',r.prevDuration),line('Reason for Leaving',r.prevReason)
+    ]),
+    section('EARLIER RENTAL',[
+      line('Address',r.prev2Address),line('Weekly Rent',r.prev2Rent),
+      line('Agency / Landlord',r.prev2Agency),line('Contact',r.prev2Contact),
+      line('Duration',r.prev2Duration),line('Reason for Leaving',r.prev2Reason)
+    ]),
+    section('HOUSEHOLD',[
+      r.hasPets?line('Pets','Yes — '+(r.petType||'')+' '+(r.petBreed||'')+(r.petAge?(', '+r.petAge):'')+(r.petRego?(', Reg '+r.petRego):'')):'Pets: No',
+      line('Vehicles',r.vehicleCount),
+      line('Vehicle 1',r.vehicle1?(r.vehicle1+(r.vehicle1Rego?(' · '+r.vehicle1Rego):'')):''),
+      line('Vehicle 2',r.vehicle2),
+      line('Total Occupants',r.occupantCount),
+      line('Occupant 2',r.occ2Name?(r.occ2Name+(r.occ2Rel?(' ('+r.occ2Rel+')'):'')):''),
+      line('Occupant 3',r.occ3Name)
+    ]),
+    section('REFERENCE 1 — PREVIOUS LANDLORD',[
+      line('Name',r.ref1Name),line('Agency',r.ref1Agency),
+      line('Phone',r.ref1Phone),line('Email',r.ref1Email),
+      line('Relationship',r.ref1Rel),line('Period',r.ref1Period)
+    ]),
+    section('REFERENCE 2 — PERSONAL / PROFESSIONAL',[
+      line('Name',r.ref2Name),line('Company',r.ref2Company),
+      line('Phone',r.ref2Phone),line('Email',r.ref2Email),
+      line('Relationship',r.ref2Rel)
+    ]),
+    section('REFERENCE 3 — EMPLOYER (optional)',[
+      line('Name',r.ref3Name),line('Company',r.ref3Company),
+      line('Title',r.ref3Title),line('Phone',r.ref3Phone),
+      line('Email',r.ref3Email),line('Known for',r.ref3Duration)
+    ]),
+    section('ID & SUPPORTING DOCUMENTS',[
+      line('100-point ID check',idScore+'/100 points'),
+      docList?('Files ready to upload:\n'+docList):''
+    ]),
+    (letterText||r.coverLetter)?('COVER LETTER\n'+(letterText||r.coverLetter)):''
+  ].filter(Boolean).join('\n\n');
+  return out;
+}
+
+function openExportPack(){
+  // Save latest state before export
+  try{collectAndSave();}catch(e){}
+  var text=buildExportPackText();
+
+  var overlay=document.createElement('div');
+  overlay.id='riq-export-pack';
+  overlay.style.cssText='position:fixed;inset:0;z-index:100003;background:rgba(10,36,96,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;flex-direction:column;padding:16px;box-sizing:border-box';
+
+  var card=document.createElement('div');
+  card.style.cssText='background:#fff;border-radius:20px;max-width:520px;width:100%;margin:0 auto;flex:1;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)';
+
+  card.innerHTML=
+    '<div style="padding:16px 18px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">'+
+      '<div style="width:36px;height:36px;border-radius:10px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px">📦</div>'+
+      '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:15px;color:var(--text)">Export Pack</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:1px">Review, then paste into any portal</div></div>'+
+      '<button id="epClose" aria-label="Close" style="background:var(--blue-xl);border:0;border-radius:50%;width:34px;height:34px;font-size:18px;color:var(--muted);cursor:pointer">&times;</button>'+
+    '</div>'+
+    '<textarea id="epText" spellcheck="false" style="flex:1;border:0;outline:0;resize:none;padding:14px 18px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.6;color:var(--text);background:#FAFCFF">'+
+      text.replace(/</g,'&lt;').replace(/>/g,'&gt;')+
+    '</textarea>'+
+    '<div style="padding:12px 14px;border-top:1px solid var(--border-lt);display:flex;gap:10px;background:#fff">'+
+      '<button id="epCopy" style="flex:1;background:var(--blue);color:#fff;border:0;border-radius:12px;padding:13px;font-family:\'Sora\',sans-serif;font-weight:800;font-size:13.5px;cursor:pointer">Copy Everything</button>'+
+      '<button id="epShare" style="background:var(--blue-xl);color:var(--blue);border:0;border-radius:12px;padding:13px 16px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;cursor:pointer;display:none">Share</button>'+
+    '</div>';
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  function close(){if(overlay.parentNode)overlay.parentNode.removeChild(overlay);}
+  overlay.addEventListener('click',function(e){if(e.target===overlay)close();});
+  card.querySelector('#epClose').addEventListener('click',close);
+
+  card.querySelector('#epCopy').addEventListener('click',function(){
+    var ta=card.querySelector('#epText');
+    var val=ta.value;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(val).then(function(){
+        showToast('Copied ✓','Paste into the agency portal','📋');
+      }).catch(function(){
+        ta.select();document.execCommand('copy');
+        showToast('Copied ✓','Paste into the agency portal','📋');
+      });
+    }else{
+      ta.select();document.execCommand('copy');
+      showToast('Copied ✓','Paste into the agency portal','📋');
+    }
+  });
+
+  if(navigator.share){
+    var shareBtn=card.querySelector('#epShare');
+    shareBtn.style.display='inline-block';
+    shareBtn.addEventListener('click',function(){
+      navigator.share({title:'My Renter Resume',text:card.querySelector('#epText').value}).catch(function(){});
+    });
+  }
 }
 
 /* ── Portal Checklist ─────────────────────────────────────── */
