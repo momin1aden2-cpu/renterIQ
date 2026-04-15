@@ -1683,7 +1683,8 @@ function exportInspectionPDF(){
   if(scan.worried) sections.push({heading: '⚠️ One thing I\'m worried about', content: scan.worried});
 
   if((scan.photos || []).length){
-    sections.push({heading: 'Photos', photos: scan.photos.map(function(p){ return p.url || p; })});
+    var photoUrls = scan.photos.map(function(p){ return (p && p.url) || (typeof p === 'string' ? p : ''); }).filter(function(u){ return u && u.length > 10; });
+    if(photoUrls.length) sections.push({heading: 'Photos', photos: photoUrls});
   }
 
   // Legacy support — older inspections used `areas` instead of `scan`

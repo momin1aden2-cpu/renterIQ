@@ -70,11 +70,14 @@
           });
         }
         if (sec.photos && sec.photos.length) {
-          html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">';
-          sec.photos.forEach(function(photo) {
-            html += '<img src="' + photo + '" style="width:120px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #E8EFF8">';
-          });
-          html += '</div>';
+          var validPhotos = sec.photos.filter(function(p) { return p && typeof p === 'string' && p.length > 10; });
+          if (validPhotos.length) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">';
+            validPhotos.forEach(function(photo) {
+              html += '<img src="' + photo + '" style="width:120px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #E8EFF8">';
+            });
+            html += '</div>';
+          }
         }
         html += '</div>';
       });
@@ -250,22 +253,89 @@
     return html;
   }
 
-  function runPdf(container, filename, cb) {
-    var pdfOpts = {
-      margin: [10, 10, 10, 10],
-      filename: filename || 'renteriq-condition-report.pdf',
+  function waitForImages(container) {
+    var imgs = container.querySelectorAll('img');
+    return Promise.all(Array.prototype.map.call(imgs, function(img) {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise(function(res) {
+        img.onload = img.onerror = function() { res(); };
+        setTimeout(res, 2500);
+      });
+    })).then(function() {
+      return new Promise(function(r) { requestAnimationFrame(function() { requestAnimationFrame(r); }); });
+    });
+  }
+
+  function buildPdfOpts(filename) {
+    return {
+      margin: [10, 8, 10, 8],
+      filename: filename,
       image: { type: 'jpeg', quality: 0.92 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
+      html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 720 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] }
+      pagebreak: { mode: ['css', 'legacy'] },
+      enableLinks: false
     };
-    html2pdf().set(pdfOpts).from(container).save().then(function() {
-      document.body.removeChild(container);
+  }
+
+  // In-app PDF viewer — preview-only, no download. Renders the PDF blob inside
+  // an iframe overlay with an optional native Share for users who want to send
+  // it out (mail, drive, messaging).
+  function openViewer(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var existing = document.getElementById('riq-pdf-viewer');
+    if (existing) existing.parentNode.removeChild(existing);
+
+    var overlay = document.createElement('div');
+    overlay.id = 'riq-pdf-viewer';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,36,96,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+
+    var toolbar = document.createElement('div');
+    toolbar.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.1);color:#fff;flex-shrink:0';
+    toolbar.innerHTML =
+      '<button id="riq-pdf-close" aria-label="Close" style="background:rgba(255,255,255,.1);color:#fff;border:0;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">&times;</button>' +
+      '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(filename) + '</div><div style="font-size:10.5px;color:rgba(255,255,255,.6);font-weight:600;margin-top:1px">RenterIQ Report · Preview</div></div>' +
+      '<button id="riq-pdf-share" style="background:#fff;color:#0A2460;border:0;border-radius:100px;padding:9px 16px;font-weight:800;font-size:12px;cursor:pointer;letter-spacing:.2px;display:none">Share</button>';
+
+    var frameWrap = document.createElement('div');
+    frameWrap.style.cssText = 'flex:1;min-height:0;background:#2a2a2a;position:relative';
+    frameWrap.innerHTML = '<iframe src="' + url + '#toolbar=0&navpanes=0" style="width:100%;height:100%;border:0;display:block" title="PDF preview"></iframe>';
+
+    overlay.appendChild(toolbar);
+    overlay.appendChild(frameWrap);
+    document.body.appendChild(overlay);
+
+    function cleanup() {
+      try { URL.revokeObjectURL(url); } catch (e) {}
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }
+    overlay.querySelector('#riq-pdf-close').addEventListener('click', cleanup);
+
+    if (navigator.canShare && typeof File !== 'undefined') {
+      try {
+        var file = new File([blob], filename, { type: 'application/pdf' });
+        if (navigator.canShare({ files: [file] })) {
+          var shareBtn = overlay.querySelector('#riq-pdf-share');
+          shareBtn.style.display = 'inline-block';
+          shareBtn.addEventListener('click', function() {
+            navigator.share({ files: [file], title: filename }).catch(function() {});
+          });
+        }
+      } catch (e) {}
+    }
+  }
+
+  function runPdf(container, filename, cb) {
+    waitForImages(container).then(function() {
+      return html2pdf().set(buildPdfOpts(filename)).from(container).outputPdf('blob');
+    }).then(function(blob) {
+      if (container.parentNode) document.body.removeChild(container);
+      openViewer(blob, filename);
       if (cb) cb();
     }).catch(function(e) {
-      document.body.removeChild(container);
+      if (container.parentNode) document.body.removeChild(container);
       console.error('PDF export failed:', e);
-      if (typeof showToast === 'function') showToast('Error', 'PDF generation failed', '⚠️');
+      if (typeof showToast === 'function') showToast('Error', 'PDF generation failed — try again', '⚠️');
     });
   }
 
@@ -279,45 +349,25 @@
         }
         var container = document.createElement('div');
         container.innerHTML = buildConditionHTML(opts);
-        container.style.cssText = 'position:absolute;left:-9999px;top:0;width:720px';
+        container.style.cssText = 'position:fixed;left:-10000px;top:0;width:720px;background:#fff;pointer-events:none';
         document.body.appendChild(container);
         var filename = opts.filename || ('RenterIQ-Entry-Condition-Report-' + new Date().toISOString().split('T')[0] + '.pdf');
-        runPdf(container, filename, function() {
-          if (typeof showToast === 'function') showToast('PDF saved', filename, '✓');
-        });
+        runPdf(container, filename);
       });
     },
     generate: function(opts) {
       if (typeof showToast === 'function') showToast('Generating PDF', 'Preparing your report…', '📄');
-
       loadLib(function(err) {
         if (err) {
           if (typeof showToast === 'function') showToast('Error', 'Could not load PDF library', '⚠️');
           return;
         }
-
         var container = document.createElement('div');
         container.innerHTML = buildHTML(opts);
-        container.style.cssText = 'position:absolute;left:-9999px;top:0;width:700px';
+        container.style.cssText = 'position:fixed;left:-10000px;top:0;width:720px;background:#fff;pointer-events:none';
         document.body.appendChild(container);
-
-        var pdfOpts = {
-          margin: [8, 8, 8, 8],
-          filename: opts.filename || 'renteriq-report.pdf',
-          image: { type: 'jpeg', quality: 0.92 },
-          html2canvas: { scale: 2, useCORS: true, logging: false },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        html2pdf().set(pdfOpts).from(container).save().then(function() {
-          document.body.removeChild(container);
-          if (typeof showToast === 'function') showToast('PDF saved', opts.filename || 'Report downloaded', '✓');
-        }).catch(function(e) {
-          document.body.removeChild(container);
-          console.error('PDF export failed:', e);
-          if (typeof showToast === 'function') showToast('Error', 'PDF generation failed', '⚠️');
-        });
+        var filename = opts.filename || 'renteriq-report.pdf';
+        runPdf(container, filename);
       });
     }
   };
