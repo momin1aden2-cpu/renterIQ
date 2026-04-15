@@ -2447,9 +2447,16 @@ function homeLoadVaultStats() {
     if (el) el.textContent = n > 99 ? '99+' : String(n);
   }
 
-  // Lease Agreements — saved leases from lease.html
+  // Lease Agreements — only real lease documents (match vault.html's folder filter)
+  // Quick-start tenancies ('already-renting' with no file) are kept in the same
+  // store for the tenancy dashboard, but don't count as lease documents here.
   var leases = homeSafeJSON('riq-vault-leases', []);
-  setCount('vsCountLeases', Array.isArray(leases) ? leases.length : 0);
+  var leaseDocs = Array.isArray(leases)
+    ? leases.filter(function (l) {
+        return l && l.source !== 'already-renting' && (l.fileName || l.fileUrl || l.totalClauses);
+      })
+    : [];
+  setCount('vsCountLeases', leaseDocs.length);
 
   // Move-in Records — only what vault.html's loadConditionReports actually renders.
   // Open-home Quick Scans live on the inspection page now and no longer count here.
@@ -2459,11 +2466,13 @@ function homeLoadVaultStats() {
     : 0;
   setCount('vsCountReports', moveInCount);
 
-  // Maintenance Log — only the maintenance items collection (vault's folder D).
-  // Routine inspections live in their own folder and have their own badge.
+  // Maintenance Log — count only what's ACTIONABLE (pending/unresolved).
+  // Resolved items are history and don't need to nag the user from home.
   var maint = homeSafeJSON('riq_maintenance_items', []);
-  var maintCount = Array.isArray(maint) ? maint.length : 0;
-  setCount('vsCountMaint', maintCount);
+  var maintOpenCount = Array.isArray(maint)
+    ? maint.filter(function (m) { return m && m.status !== 'resolved'; }).length
+    : 0;
+  setCount('vsCountMaint', maintOpenCount);
 
   // Receipts Saved
   var receipts = homeSafeJSON('riq_receipts', []);
@@ -2831,35 +2840,20 @@ function homeRenderResumeDraft(){
 // ── Already-renting quick start ─────────────────────────────
 // Shows on an empty home for users who are already in a tenancy and just want
 // to start using RenterIQ from where they are — no lease upload required.
+// Legacy big card — kept as a no-op so existing refreshes don't crash.
+// The quick-start entry point is now a slim inline row inside the journey
+// card (rendered by homeRenderJourney), so users see ONE card, not two.
 function homeRenderAlreadyRenting(){
   var container = document.getElementById('alreadyRentingCard');
-  if(!container) return;
-
-  // Hide once they've added a tenancy (any source) or skipped it
-  var hasLease = false;
-  try {
-    var list = JSON.parse(localStorage.getItem('riq-vault-leases') || '[]');
-    if(Array.isArray(list) && list.length) hasLease = true;
-  } catch(e){}
-  var skipped = false;
-  try { skipped = localStorage.getItem('riq-already-renting-skipped') === '1'; } catch(e){}
-  if(hasLease || skipped){ container.style.display = 'none'; return; }
-
-  container.innerHTML =
-    '<div style="background:linear-gradient(135deg,#0F2A6B,#1B50C8);border-radius:20px;padding:18px 18px 16px;color:#fff;box-shadow:0 10px 26px rgba(27,80,200,.28);position:relative">' +
-      '<button onclick="homeSkipAlreadyRenting()" aria-label="Dismiss" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>' +
-      '<div style="display:flex;align-items:center;gap:6px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;opacity:.85;margin-bottom:6px"><span>🏠</span>Already renting?</div>' +
-      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;line-height:1.25;margin-bottom:6px;letter-spacing:-.2px">Pick up from where you are</div>' +
-      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;line-height:1.55;color:rgba(255,255,255,.88);margin-bottom:14px">No lease document needed. Just tell us a few basics so we can help with rent, inspections and maintenance from today.</div>' +
-      '<button onclick="openAlreadyRentingSheet()" style="background:#fff;color:var(--blue);border:none;border-radius:12px;padding:12px 18px;font-family:Sora,sans-serif;font-weight:800;font-size:13px;cursor:pointer;letter-spacing:.2px;display:flex;align-items:center;gap:8px">Start from here →</button>' +
-    '</div>';
-  container.style.display = 'block';
+  if(container){ container.innerHTML = ''; container.style.display = 'none'; }
 }
 
 function homeSkipAlreadyRenting(){
   try { localStorage.setItem('riq-already-renting-skipped', '1'); } catch(e){}
   var c = document.getElementById('alreadyRentingCard');
   if(c) c.style.display = 'none';
+  var row = document.getElementById('journeyQuickStart');
+  if(row) row.remove();
 }
 
 // Bottom-sheet form — minimal fields, everything except address is optional
@@ -2871,51 +2865,62 @@ function openAlreadyRentingSheet(){
   sheet.id = 'alreadyRentingSheet';
   sheet.innerHTML =
     '<style>' +
-      '#alreadyRentingSheet{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;animation:arsFade .2s ease}' +
-      '@keyframes arsFade{from{opacity:0}to{opacity:1}}' +
-      '#alreadyRentingSheet .ars-sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:520px;max-height:92vh;display:flex;flex-direction:column;animation:arsSlide .3s cubic-bezier(.2,.8,.3,1)}' +
-      '@keyframes arsSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}' +
-      '#alreadyRentingSheet .ars-grab{width:40px;height:4px;background:#CBD5E1;border-radius:100px;margin:10px auto 0}' +
-      '#alreadyRentingSheet .ars-head{padding:12px 22px 14px;border-bottom:1px solid var(--border-lt)}' +
-      '#alreadyRentingSheet .ars-title{font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.2px}' +
-      '#alreadyRentingSheet .ars-sub{font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}' +
-      '#alreadyRentingSheet .ars-body{flex:1;overflow-y:auto;padding:18px 22px 16px;display:flex;flex-direction:column;gap:14px}' +
+      // Overlay sits ABOVE the mobile bottom-nav (which is z-index 99999),
+      // otherwise the sheet's foot buttons end up hidden under the nav bar.
+      '#alreadyRentingSheet{position:fixed;inset:0;z-index:100010;background:rgba(10,36,96,.55);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .22s ease}' +
+      '#alreadyRentingSheet.ars-open{opacity:1}' +
+      // Sheet: airy rounded bottom-sheet with clear max-height so the keyboard doesn\'t push the foot off-screen.
+      '#alreadyRentingSheet .ars-sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:min(86vh,760px);display:flex;flex-direction:column;transform:translateY(100%);transition:transform .32s cubic-bezier(.25,1.25,.5,1);box-shadow:0 -8px 40px rgba(10,36,96,.22)}' +
+      '#alreadyRentingSheet.ars-open .ars-sheet{transform:translateY(0)}' +
+      '#alreadyRentingSheet .ars-grab{width:38px;height:4px;background:#D5E2F8;border-radius:100px;margin:9px auto 0}' +
+      '#alreadyRentingSheet .ars-head{padding:10px 20px 14px;text-align:left}' +
+      '#alreadyRentingSheet .ars-title{font-family:Sora,sans-serif;font-weight:800;font-size:17px;color:var(--text);letter-spacing:-.3px;line-height:1.25}' +
+      '#alreadyRentingSheet .ars-sub{font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}' +
+      '#alreadyRentingSheet .ars-body{flex:1;overflow-y:auto;padding:6px 20px 18px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}' +
       '#alreadyRentingSheet label{display:block}' +
-      '#alreadyRentingSheet .ars-label{font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}' +
-      '#alreadyRentingSheet .ars-optional{font-family:Sora,sans-serif;font-weight:600;font-size:10px;color:var(--muted);opacity:.7;margin-left:6px;text-transform:none;letter-spacing:0}' +
-      '#alreadyRentingSheet input,#alreadyRentingSheet select{width:100%;padding:13px 14px;border:1.5px solid var(--border-lt);border-radius:12px;font-family:Nunito,sans-serif;font-weight:600;font-size:14px;color:var(--text);background:#fff;box-sizing:border-box;-webkit-appearance:none;appearance:none}' +
-      '#alreadyRentingSheet input:focus,#alreadyRentingSheet select:focus{outline:none;border-color:var(--blue)}' +
-      '#alreadyRentingSheet .ars-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}' +
-      '#alreadyRentingSheet .ars-foot{padding:14px 22px 22px;border-top:1px solid var(--border-lt);display:flex;gap:10px;background:#fff}' +
-      '#alreadyRentingSheet .ars-btn{flex:1;padding:14px;border-radius:13px;font-family:Sora,sans-serif;font-weight:800;font-size:14px;cursor:pointer;border:none;letter-spacing:.2px}' +
-      '#alreadyRentingSheet .ars-btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-md,#2E63E0));color:#fff}' +
-      '#alreadyRentingSheet .ars-btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border-lt)}' +
-      '#alreadyRentingSheet .ars-note{font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);line-height:1.55;background:var(--blue-xl,#EEF3FF);border-radius:10px;padding:10px 12px}' +
+      '#alreadyRentingSheet .ars-label{font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px}' +
+      '#alreadyRentingSheet .ars-optional{font-family:Sora,sans-serif;font-weight:600;font-size:10px;color:var(--muted);opacity:.65;margin-left:6px;text-transform:none;letter-spacing:0}' +
+      '#alreadyRentingSheet input,#alreadyRentingSheet select{width:100%;padding:12px 13px;border:1.5px solid var(--border-lt);border-radius:12px;font-family:Nunito,sans-serif;font-weight:600;font-size:14px;color:var(--text);background:#fff;box-sizing:border-box;-webkit-appearance:none;appearance:none;transition:border-color .15s, box-shadow .15s}' +
+      '#alreadyRentingSheet input:focus,#alreadyRentingSheet select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(27,80,200,.12)}' +
+      '#alreadyRentingSheet .ars-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}' +
+      '#alreadyRentingSheet .ars-more-btn{background:var(--blue-xl);color:var(--blue);border:1px dashed var(--blue-lt);border-radius:12px;padding:11px 14px;font-family:Sora,sans-serif;font-weight:700;font-size:12.5px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;-webkit-tap-highlight-color:transparent}' +
+      '#alreadyRentingSheet .ars-more-btn:active{background:var(--blue-lt)}' +
+      '#alreadyRentingSheet .ars-more{display:none;flex-direction:column;gap:12px;padding-top:4px}' +
+      '#alreadyRentingSheet .ars-more.open{display:flex}' +
+      // Sticky foot — padding-bottom accounts for home-indicator safe area and NEVER covered by the bottom-nav because our sheet z-index now beats it.
+      '#alreadyRentingSheet .ars-foot{padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);display:flex;gap:10px;background:#fff;border-radius:0 0 0 0}' +
+      '#alreadyRentingSheet .ars-btn{flex:1;padding:13px;border-radius:13px;font-family:Sora,sans-serif;font-weight:800;font-size:14px;cursor:pointer;border:none;letter-spacing:.2px;min-height:48px;-webkit-tap-highlight-color:transparent;transition:transform .12s}' +
+      '#alreadyRentingSheet .ars-btn:active{transform:scale(.97)}' +
+      '#alreadyRentingSheet .ars-btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-md,#2E63E0));color:#fff;box-shadow:0 4px 14px rgba(27,80,200,.3)}' +
+      '#alreadyRentingSheet .ars-btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border-lt);flex:0 0 auto;padding-left:18px;padding-right:18px}' +
+      '#alreadyRentingSheet .ars-note{font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);line-height:1.5;background:var(--blue-xl,#EEF3FF);border-radius:10px;padding:9px 12px;display:flex;gap:7px;align-items:flex-start}' +
     '</style>' +
     '<div class="ars-sheet" onclick="event.stopPropagation()">' +
       '<div class="ars-grab"></div>' +
       '<div class="ars-head">' +
-        '<div class="ars-title">Start from where you are</div>' +
-        '<div class="ars-sub">Only the address is required. Fill in what you know — you can add the rest later.</div>' +
+        '<div class="ars-title">Add your tenancy</div>' +
+        '<div class="ars-sub">Only the address is needed — everything else is optional and can be filled in later.</div>' +
       '</div>' +
       '<div class="ars-body">' +
-        '<div class="ars-note">💡 No lease document? No problem. You can still use RenterIQ for rent tracking, maintenance reports, inspections and exit records.</div>' +
-        '<label><div class="ars-label">Rental Address</div><input id="arsAddr" type="text" placeholder="e.g. 12 Smith St, Surry Hills NSW 2010" autocomplete="street-address"></label>' +
+        '<label><div class="ars-label">Rental address</div><input id="arsAddr" type="text" placeholder="e.g. 12 Smith St, Surry Hills NSW 2010" autocomplete="street-address"></label>' +
         '<div class="ars-row">' +
-          '<label><div class="ars-label">Weekly Rent<span class="ars-optional">optional</span></div><input id="arsRent" type="text" inputmode="decimal" placeholder="$650"></label>' +
-          '<label><div class="ars-label">Bond<span class="ars-optional">optional</span></div><input id="arsBond" type="text" inputmode="decimal" placeholder="$2,600"></label>' +
+          '<label><div class="ars-label">Weekly rent<span class="ars-optional">opt.</span></div><input id="arsRent" type="text" inputmode="decimal" placeholder="$650"></label>' +
+          '<label><div class="ars-label">Lease end<span class="ars-optional">opt.</span></div><input id="arsEnd" type="date"></label>' +
         '</div>' +
-        '<div class="ars-row">' +
-          '<label><div class="ars-label">Lease Start<span class="ars-optional">optional</span></div><input id="arsStart" type="date"></label>' +
-          '<label><div class="ars-label">Lease End<span class="ars-optional">optional</span></div><input id="arsEnd" type="date"></label>' +
-        '</div>' +
-        '<label><div class="ars-label">Lease Type<span class="ars-optional">optional</span></div>' +
-          '<select id="arsType"><option value="">Select…</option><option value="fixed">Fixed term</option><option value="periodic">Rolling / month-to-month</option><option value="unknown">Not sure</option></select>' +
-        '</label>' +
-        '<label><div class="ars-label">Agency / Landlord<span class="ars-optional">optional</span></div><input id="arsAgency" type="text" placeholder="e.g. Ray White Bondi"></label>' +
-        '<div class="ars-row">' +
-          '<label><div class="ars-label">Property Manager<span class="ars-optional">optional</span></div><input id="arsPm" type="text" placeholder="Full name"></label>' +
-          '<label><div class="ars-label">PM Phone<span class="ars-optional">optional</span></div><input id="arsPmPhone" type="tel" placeholder="04xx xxx xxx"></label>' +
+        '<button type="button" class="ars-more-btn" onclick="arsToggleMore(this)"><span id="arsMoreChev">▾</span><span id="arsMoreLabel">More details</span></button>' +
+        '<div class="ars-more" id="arsMore">' +
+          '<div class="ars-row">' +
+            '<label><div class="ars-label">Bond<span class="ars-optional">opt.</span></div><input id="arsBond" type="text" inputmode="decimal" placeholder="$2,600"></label>' +
+            '<label><div class="ars-label">Lease start<span class="ars-optional">opt.</span></div><input id="arsStart" type="date"></label>' +
+          '</div>' +
+          '<label><div class="ars-label">Lease type<span class="ars-optional">opt.</span></div>' +
+            '<select id="arsType"><option value="">Select…</option><option value="fixed">Fixed term</option><option value="periodic">Rolling / month-to-month</option><option value="unknown">Not sure</option></select>' +
+          '</label>' +
+          '<label><div class="ars-label">Agency / landlord<span class="ars-optional">opt.</span></div><input id="arsAgency" type="text" placeholder="e.g. Ray White Bondi"></label>' +
+          '<div class="ars-row">' +
+            '<label><div class="ars-label">Property manager<span class="ars-optional">opt.</span></div><input id="arsPm" type="text" placeholder="Full name"></label>' +
+            '<label><div class="ars-label">PM phone<span class="ars-optional">opt.</span></div><input id="arsPmPhone" type="tel" placeholder="04xx xxx xxx"></label>' +
+          '</div>' +
         '</div>' +
       '</div>' +
       '<div class="ars-foot">' +
@@ -2925,7 +2930,19 @@ function openAlreadyRentingSheet(){
     '</div>';
   sheet.addEventListener('click', closeAlreadyRentingSheet);
   document.body.appendChild(sheet);
-  setTimeout(function(){ var a = document.getElementById('arsAddr'); if(a) a.focus(); }, 350);
+  requestAnimationFrame(function(){ sheet.classList.add('ars-open'); });
+  setTimeout(function(){ var a = document.getElementById('arsAddr'); if(a) a.focus({preventScroll:true}); }, 360);
+}
+
+// Toggle the collapsible "More details" section inside the already-renting sheet
+function arsToggleMore(btn){
+  var more = document.getElementById('arsMore');
+  var chev = document.getElementById('arsMoreChev');
+  var label = document.getElementById('arsMoreLabel');
+  if(!more) return;
+  var open = more.classList.toggle('open');
+  if(chev) chev.textContent = open ? '▴' : '▾';
+  if(label) label.textContent = open ? 'Hide details' : 'More details';
 }
 
 function closeAlreadyRentingSheet(){
@@ -3063,8 +3080,48 @@ function homeRenderMoveInReminder(){
   container.style.display = 'block';
 }
 
+// ── Auto-promote a confirmed tracked property into an active tenancy.
+// If the renter's marked a property as applied/signed/moved-in and there's
+// no active tenancy yet, seed one from the tracked data. Runs before the
+// tenancy card renders so the card picks up the new entry immediately.
+function homeAutoPromoteTenancy(){
+  try {
+    var leases = []; try { leases = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]'); } catch(e){}
+    if(!Array.isArray(leases)) leases = [];
+    var props = homeGetTracked();
+    if(!Array.isArray(props) || !props.length) return;
+
+    var promotable = props.filter(function(p){
+      var s = (p && p.status || '').toString().toLowerCase();
+      return s === 'applied' || s === 'signed' || s === 'moved-in' || s === 'confirmed' || s === 'active';
+    });
+    if(!promotable.length) return;
+
+    promotable.sort(function(a,b){ return new Date(b.updatedAt||b.savedAt||0).getTime() - new Date(a.updatedAt||a.savedAt||0).getTime(); });
+    var best = promotable[0];
+    var addr = best.address || best.label || '';
+    if(!addr) return;
+
+    // Already present as a lease/tenancy? skip.
+    var match = leases.find(function(l){ return l && (l.trackedId === best.id || (l.address && l.address.toLowerCase() === addr.toLowerCase())); });
+    if(match) return;
+
+    leases.push({
+      id: 'tenancy-' + best.id,
+      trackedId: best.id,
+      source: 'already-renting',
+      address: addr,
+      weeklyRent: best.price || '',
+      savedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    localStorage.setItem('riq-vault-leases', JSON.stringify(leases));
+  } catch(e){}
+}
+
 // ── Tenancy summary card — condensed glance of the active lease
 function homeRenderTenancy(){
+  homeAutoPromoteTenancy();
   var container = document.getElementById('tenancySummaryCard');
   if(!container) return;
 
@@ -3107,15 +3164,16 @@ function homeRenderTenancy(){
 
   var shortAddr = lease.address.length > 42 ? lease.address.slice(0, 40) + '…' : lease.address;
 
+  var leaseId = lease.id || '';
   container.innerHTML =
-    '<div style="background:#fff;border:1px solid var(--border-lt);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-card);cursor:pointer" onclick="navigate(\'/app/pages/profile.html?view=C\')">' +
+    '<div style="background:#fff;border:1px solid var(--border-lt);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-card);position:relative">' +
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:' + (pct>0?'10px':'0') + '">' +
         '<div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#1B50C8,#2E63E0);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏠</div>' +
-        '<div style="flex:1;min-width:0">' +
+        '<div style="flex:1;min-width:0;cursor:pointer" onclick="navigate(\'/app/pages/profile.html?view=C\')">' +
           '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + shortAddr + '</div>' +
           '<div style="font-family:Nunito,sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-top:2px">' + statusLine + (rent ? ' · ' + rent + '/wk' : '') + '</div>' +
         '</div>' +
-        '<span style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--blue)">›</span>' +
+        '<button aria-label="Tenancy options" onclick="homeTenancyMenu(\'' + leaseId + '\')" style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:10px;width:36px;height:36px;font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0">⋯</button>' +
       '</div>' +
       (pct > 0 ?
         '<div style="height:6px;background:var(--border-lt);border-radius:100px;overflow:hidden">' +
@@ -3123,6 +3181,86 @@ function homeRenderTenancy(){
         '</div>' : '') +
     '</div>';
   container.style.display = 'block';
+}
+
+// ── Tenancy menu: Edit / Remove ─────────────────────────────────────
+function homeTenancyMenu(leaseId){
+  var existing = document.getElementById('riq-tenancy-menu');
+  if(existing){ existing.remove(); return; }
+
+  var overlay = document.createElement('div');
+  overlay.id = 'riq-tenancy-menu';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(10,36,96,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s';
+
+  var sheet = document.createElement('div');
+  sheet.style.cssText = 'width:100%;max-width:430px;background:#fff;border-radius:22px 22px 0 0;padding:18px 18px calc(env(safe-area-inset-bottom,0px)+14px);transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.56,.64,1)';
+  sheet.innerHTML =
+    '<div style="width:40px;height:4px;background:var(--border);border-radius:100px;margin:0 auto 14px"></div>' +
+    '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:15px;color:var(--text);text-align:center;margin-bottom:12px">Active tenancy</div>' +
+    '<button onclick="homeTenancyEdit(\'' + leaseId + '\')" style="width:100%;background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;font-family:Sora,sans-serif;font-weight:700;font-size:14px;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:8px;text-align:left"><span style="font-size:18px">✏️</span>Edit address, rent &amp; dates</button>' +
+    '<button onclick="homeTenancyRemove(\'' + leaseId + '\')" style="width:100%;background:rgba(232,64,64,.06);border:1px solid rgba(232,64,64,.2);border-radius:14px;padding:14px 16px;font-family:Sora,sans-serif;font-weight:700;font-size:14px;color:var(--red);cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:6px;text-align:left"><span style="font-size:18px">🗑</span>Remove tenancy</button>' +
+    '<button onclick="document.getElementById(\'riq-tenancy-menu\').remove()" style="width:100%;background:none;border:none;padding:12px;font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer">Cancel</button>';
+
+  overlay.appendChild(sheet);
+  overlay.onclick = function(e){ if(e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    overlay.style.opacity = '1';
+    requestAnimationFrame(function(){ sheet.style.transform = 'translateY(0)'; });
+  });
+}
+
+function homeTenancyEdit(leaseId){
+  var menu = document.getElementById('riq-tenancy-menu'); if(menu) menu.remove();
+  var list = []; try { list = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]'); } catch(e){}
+  var idx = list.findIndex(function(x){ return x && x.id === leaseId; });
+  if(idx < 0){
+    list.sort(function(a,b){ return new Date(b.savedAt||0).getTime() - new Date(a.savedAt||0).getTime(); });
+    idx = 0;
+  }
+  var lease = list[idx] || {};
+
+  var newAddr = prompt('Address of your rental', lease.address || '');
+  if(newAddr === null) return;
+  var newRent = prompt('Weekly rent (numbers only, e.g. 520)', (lease.weeklyRent || '').toString().replace(/[^\d]/g, ''));
+  if(newRent === null) return;
+  var newEnd = prompt('Lease end date (YYYY-MM-DD, leave blank if unknown)', lease.endDate || '');
+  if(newEnd === null) return;
+
+  list[idx] = Object.assign({}, lease, {
+    id: lease.id || ('tenancy-' + Date.now()),
+    address: newAddr.trim(),
+    weeklyRent: newRent.trim() ? '$' + newRent.trim() : '',
+    endDate: newEnd.trim() || '',
+    source: lease.source || 'already-renting',
+    savedAt: lease.savedAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+
+  try { localStorage.setItem('riq-vault-leases', JSON.stringify(list)); } catch(e){}
+  if(window.RIQStore){ RIQStore.ready.then(function(){ if(RIQStore.isAuthed()) RIQStore.write('leases', list[idx].id, list[idx]); }); }
+
+  homeRenderTenancy();
+  homeLoadVaultStats();
+}
+
+function homeTenancyRemove(leaseId){
+  var menu = document.getElementById('riq-tenancy-menu'); if(menu) menu.remove();
+  if(!confirm('Remove this tenancy from your home screen? Your saved lease documents in the Vault will not be deleted.')) return;
+  var list = []; try { list = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]'); } catch(e){}
+  // If no matching id, remove the top (most-recent) one — which is what the home is showing.
+  var beforeLen = list.length;
+  var filtered = list.filter(function(x){ return x && x.id !== leaseId; });
+  if(filtered.length === beforeLen){
+    filtered = list.slice();
+    filtered.sort(function(a,b){ return new Date(b.savedAt||0).getTime() - new Date(a.savedAt||0).getTime(); });
+    filtered.shift();
+  }
+  try { localStorage.setItem('riq-vault-leases', JSON.stringify(filtered)); } catch(e){}
+  if(window.RIQStore && leaseId){ RIQStore.ready.then(function(){ if(RIQStore.isAuthed()) RIQStore.delete('leases', leaseId); }); }
+
+  homeRenderTenancy();
+  homeLoadVaultStats();
 }
 
 // ── Journey progress strip ─────────────────────────────────────
@@ -3232,6 +3370,39 @@ function homeRenderJourney(){
   track.innerHTML = html;
   caption.textContent = captionText;
   strip.style.display = 'block';
+
+  // ── Inline quick-start row (for users with no lease yet) ──
+  // Replaces the old giant "Already renting?" card. Sits INSIDE the journey
+  // card so everything lives in one tidy surface instead of two.
+  var hasLease = false;
+  try {
+    var list = JSON.parse(localStorage.getItem('riq-vault-leases') || '[]');
+    if(Array.isArray(list) && list.length) hasLease = true;
+  } catch(e){}
+  var skipped = false;
+  try { skipped = localStorage.getItem('riq-already-renting-skipped') === '1'; } catch(e){}
+
+  var journeyCard = strip.firstElementChild;
+  if(!journeyCard) return;
+  var existingRow = document.getElementById('journeyQuickStart');
+  if(hasLease || skipped){
+    if(existingRow) existingRow.remove();
+    return;
+  }
+  if(existingRow) return; // already rendered, don't double-inject
+
+  var row = document.createElement('div');
+  row.id = 'journeyQuickStart';
+  row.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px solid var(--border-lt);display:flex;align-items:center;gap:10px';
+  row.innerHTML =
+    '<span style="font-size:16px">🏠</span>' +
+    '<div style="flex:1;min-width:0">' +
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:12.5px;color:var(--text);letter-spacing:-.1px">Already renting?</div>' +
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:var(--muted);line-height:1.4;margin-top:1px">Jump in from where you are.</div>' +
+    '</div>' +
+    '<button onclick="openAlreadyRentingSheet()" style="background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:100px;padding:7px 14px;font-family:Sora,sans-serif;font-weight:800;font-size:11.5px;cursor:pointer;letter-spacing:.2px;-webkit-tap-highlight-color:transparent;flex-shrink:0">Start →</button>' +
+    '<button onclick="homeSkipAlreadyRenting()" aria-label="Dismiss" style="background:none;border:none;color:var(--muted);font-size:16px;line-height:1;cursor:pointer;padding:4px 2px;-webkit-tap-highlight-color:transparent;flex-shrink:0">×</button>';
+  journeyCard.appendChild(row);
 }
 
 function homeOpenFollowUpSheet(propId){
@@ -3350,27 +3521,59 @@ function homeIdleInit() {
   homeUpdateBellBadge();
   homePullTrackedFromCloud();
 }
+// Central refresh — re-renders everything that depends on localStorage data.
+// Called on DOMContentLoaded, tab-focus, and on cross-tab storage changes.
+function homeRefreshAll(){
+  try { homeRenderTracked(); } catch(e){}
+  try { homeRenderUpcoming(); } catch(e){}
+  try { homeCheckReminders(); } catch(e){}
+  try { homeLoadVaultStats(); } catch(e){}
+  try { homeRenderRentCard(); } catch(e){}
+  try { homeRenderBondCard(); } catch(e){}
+  try { homeRenderFollowups(); } catch(e){}
+  try { homeRenderJourney(); } catch(e){}
+  try { homeRenderResumeDraft(); } catch(e){}
+  try { homeRenderLeaseRenewal(); } catch(e){}
+  try { homeRenderTenancy(); } catch(e){}
+  try { homeRenderMoveInReminder(); } catch(e){}
+  try { homeRenderAlreadyRenting(); } catch(e){}
+  try { homeUpdateBellBadge(); } catch(e){}
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-  // Critical above-the-fold renders — synchronous, fast
-  homeRenderTracked();
-  homeRenderUpcoming();
-  homeCheckReminders();
-  homeLoadVaultStats();
-  homeRenderRentCard();
-  homeRenderBondCard();
-  homeRenderFollowups();
-  homeRenderJourney();
-  homeRenderResumeDraft();
-  homeRenderLeaseRenewal();
-  homeRenderTenancy();
-  homeRenderMoveInReminder();
-  homeRenderAlreadyRenting();
+  homeRefreshAll();
   // Defer everything else until the browser is idle
   if ('requestIdleCallback' in window) {
     requestIdleCallback(homeIdleInit, { timeout: 1500 });
   } else {
     setTimeout(homeIdleInit, 200);
   }
+
+  // ── Live refresh ──
+  // 1) Another tab writes localStorage → re-render straight away
+  // 2) User comes back to this tab (PWA resume, tab-switch) → re-render
+  // Debounced so rapid bursts don't thrash the layout.
+  var _refreshTimer = null;
+  function scheduleRefresh(){
+    clearTimeout(_refreshTimer);
+    _refreshTimer = setTimeout(homeRefreshAll, 120);
+  }
+  // Keys that actually affect visible home state — ignore noisy unrelated keys.
+  var WATCH_KEYS = [
+    'riq-vault-leases','riq-tracked-properties','riq_maintenance_items',
+    'renteriq_vault_reports','riq_receipts','riq_rent_tracker','riq_bond_tracker',
+    'riq_notifications','riq_notifications_state','riq_personal_docs'
+  ];
+  window.addEventListener('storage', function(e){
+    if(!e.key || WATCH_KEYS.indexOf(e.key) !== -1) scheduleRefresh();
+  });
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible') scheduleRefresh();
+  });
+  window.addEventListener('pageshow', function(e){
+    // Back-forward cache restore — content is stale, refresh
+    if(e.persisted) scheduleRefresh();
+  });
 });
 
 // Update header avatar with user initials
