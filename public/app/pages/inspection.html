@@ -106,12 +106,6 @@
 
 /* Quick Scan styles */
 .scan-group-title{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.3px;margin:0 4px 10px}
-.vibe-btn{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth);font-family:'Sora',sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);min-height:68px}
-.vibe-btn .vibe-emoji{font-size:22px;line-height:1}
-.vibe-btn.sel[data-vibe="love"]{background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(16,185,129,.05));border-color:#10B981;color:#065F46}
-.vibe-btn.sel[data-vibe="would"]{background:rgba(59,130,246,.08);border-color:var(--blue);color:var(--blue)}
-.vibe-btn.sel[data-vibe="backup"]{background:rgba(245,158,11,.08);border-color:var(--amber);color:#78350F}
-.vibe-btn.sel[data-vibe="pass"]{background:rgba(239,68,68,.08);border-color:var(--red);color:#7F1D1D}
 .scan-item{background:#fff;border:1.5px solid var(--border-lt);border-radius:12px;padding:11px 12px;display:flex;align-items:center;gap:10px;margin-bottom:6px;transition:border-color .15s}
 .scan-item.ok{border-color:var(--teal);background:rgba(0,200,150,.04)}
 .scan-item.issue{border-color:var(--amber);background:rgba(245,166,35,.05)}
@@ -230,18 +224,17 @@
     </div>
 
     <div class="card" style="margin-bottom:13px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:13px">How the Quick Scan works</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:13px">How the Open Home Scan works</div>
       <div style="display:flex;flex-direction:column;gap:11px">
-        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Walk through — tap ✓ for things that look fine, ⚠ for anything off. Designed to take 2–3 minutes, not a full documentation exercise.</div></div>
-        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Tap "Ask the agent 💬" for a cheat-sheet of the right questions to bring up while you're there.</div></div>
-        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Leave the open home with a clear verdict — Apply, Maybe, or Pass. Compare later with the other places you saw that weekend.</div></div>
+        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Walk through — tap ✓ for things that look fine, ⚠ for anything off. 2 to 3 minutes, not a full documentation exercise.</div></div>
+        <div style="display:flex;gap:11px;align-items:flex-start"><div style="width:27px;height:27px;border-radius:8px;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">Leave with a clear verdict — Apply, Maybe, or Pass. Compare later with the other places you saw that weekend.</div></div>
       </div>
     </div>
     <div class="tip-box" style="margin-bottom:16px">
       <span style="font-size:18px;flex-shrink:0;margin-top:1px">💡</span>
-      <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.6">You'll do a full condition report <em>after</em> you sign the lease. This Quick Scan is just to help you decide whether to apply.</div>
+      <div style="font-weight:600;font-size:13px;color:#005040;line-height:1.6">You'll do a full condition report <em>after</em> you sign the lease. This Open Home Scan is just to help you decide whether to apply.</div>
     </div>
-    <button class="btn-blue" style="margin-bottom:10px" onclick="startWalkthrough()">Start Quick Scan →</button>
+    <button class="btn-blue" style="margin-bottom:10px" onclick="startWalkthrough()">Start Open Home Scan →</button>
     <button class="btn-outline" onclick="switchView('A')">Not yet — go back</button>
   </div>
 </div>
@@ -251,24 +244,12 @@
   <header class="sh" style="padding-bottom:0">
     <div class="sh-row">
       <button class="sh-back" onclick="switchView('B')"><span class="sh-back-arrow">‹</span><span class="sh-label">Setup</span></button>
-      <button class="btn-ghost" onclick="openQuestionsSheet()">Ask the agent 💬</button>
     </div>
-    <div class="sh-title" style="margin-top:6px" id="wcTitle">Quick Scan</div>
+    <div class="sh-title" style="margin-top:6px" id="wcTitle">Open Home Scan</div>
     <div class="sh-sub" id="wcAddr">Tap ✓ for OK, ⚠ for concerns. Skip anything that doesn't apply.</div>
   </header>
 
   <div style="flex:1;overflow-y:auto;padding:14px 16px 180px">
-
-    <!-- Vibe rating (top) -->
-    <div class="card" style="margin-bottom:16px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">First impression</div>
-      <div id="vibeRow" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
-        <button class="vibe-btn" data-vibe="love"  onclick="setVibe('love')"><span class="vibe-emoji">😍</span><span>Love it</span></button>
-        <button class="vibe-btn" data-vibe="would" onclick="setVibe('would')"><span class="vibe-emoji">🙂</span><span>Would do</span></button>
-        <button class="vibe-btn" data-vibe="backup" onclick="setVibe('backup')"><span class="vibe-emoji">😐</span><span>Backup</span></button>
-        <button class="vibe-btn" data-vibe="pass"  onclick="setVibe('pass')"><span class="vibe-emoji">👎</span><span>Pass</span></button>
-      </div>
-    </div>
 
     <!-- Quick-check items -->
     <div class="scan-group-title">Inside the property</div>
@@ -290,33 +271,20 @@
 
     <!-- Optional photos -->
     <div class="scan-group-title">Photos (optional · max 3)</div>
-    <div class="card" style="margin-bottom:10px">
+    <div class="card" style="margin-bottom:16px">
       <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.55">Snap a couple of things you want to show a partner, flatmate, or remember later. No need to document everything.</div>
       <div id="scanPhotos" class="photos-grid">
         <div class="ph-add" onclick="addScanPhoto()"><span style="font-size:20px">📷</span><span style="font-size:9px;font-family:'Sora',sans-serif;font-weight:700;color:var(--muted)">Add</span></div>
       </div>
     </div>
+
   </div>
 
   <div style="position:sticky;bottom:0;background:linear-gradient(transparent,var(--blue-xl) 28%);padding:20px 16px 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5">
     <button class="btn-blue" id="finishBtn" onclick="finishWalkthrough()">See my summary →</button>
-    <div style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-top:7px" id="finishHint">Pick a vibe to continue</div>
+    <div style="font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-top:7px" id="finishHint">Decide Apply / Maybe / Pass on the next screen</div>
   </div>
 </div>
-
-<!-- QUESTIONS CHEAT-SHEET BOTTOM SHEET -->
-<div class="picker-overlay" id="questionsSheet" style="display:none" onclick="closeQuestionsSheet(event)">
-  <div class="picker-sheet" onclick="event.stopPropagation()">
-    <div class="sheet-handle"></div>
-    <div style="text-align:center;margin-bottom:16px">
-      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:4px">💬 Ask the agent</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted)">Tap each one once you've asked. No need to record answers — just trigger the memory.</div>
-    </div>
-    <div id="questionsList" style="max-height:60vh;overflow-y:auto;padding-bottom:12px"></div>
-    <button class="btn-outline" onclick="closeQuestionsSheet()">Done</button>
-  </div>
-</div>
-
 
 <!-- VIEW E: SUMMARY -->
 <div class="view" id="viewE" style="display:none">
@@ -326,12 +294,6 @@
     <div class="sh-sub" id="sumAddr">Your notes from today</div>
   </header>
   <div class="content" style="padding:16px 16px 120px">
-
-    <!-- Vibe recap -->
-    <div class="card" id="sumVibeCard" style="margin-bottom:14px;text-align:center">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.3px;margin-bottom:6px">Your first impression</div>
-      <div id="sumVibeDisplay" style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text)">—</div>
-    </div>
 
     <!-- Verdict -->
     <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Next step</div>
@@ -368,12 +330,6 @@
           <div style="font-size:38px;line-height:1;margin-bottom:8px">🎉</div>
           <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff;letter-spacing:-.3px">You've decided — let's apply!</div>
           <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.85);line-height:1.55;margin-top:6px">Your inspection is saved. Here's what you've got ready for the application.</div>
-        </div>
-
-        <!-- Readiness checklist -->
-        <div style="background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border-lt);margin-bottom:14px">
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:14px">Application Readiness</div>
-          <div style="display:flex;flex-direction:column;gap:10px" id="readinessChecklist"></div>
         </div>
 
         <button class="btn-blue" style="margin-bottom:10px;font-size:15px;padding:16px" onclick="saveAndApply()">Start Application →</button>
@@ -1128,45 +1084,26 @@ function switchView(v){
   currentView=v;
 }
 
-// Quick Scan data — 12 high-value checks renters actually worry about
-// when walking through an open home. Each item has a `flag` — the red-flag
-// phrasing that gets auto-added to the summary if the renter taps ⚠.
+// Open Home Scan — the 6 checks renters actually have time to do in 5 mins.
+// Everything else was noise. Each item has a `flag` — the red-flag phrasing
+// auto-added to the summary when the renter taps ⚠.
 var SCAN_ITEMS={
   inside:[
-    {id:'light',       icon:'💡', label:'Natural light',    hint:'Feels bright without lights on?',      flag:'Dark / poor natural light'},
-    {id:'mould',       icon:'🦠', label:'Mould / damp',     hint:'Any marks, bubbling paint or smell',   flag:'Signs of mould or damp'},
-    {id:'smell',       icon:'👃', label:'Smell',            hint:'Musty, smoke, pets, or chemicals',     flag:'Unpleasant smell'},
-    {id:'water',       icon:'💧', label:'Water pressure',   hint:'Run a tap — is the flow strong?',      flag:'Low water pressure'},
-    {id:'storage',     icon:'📦', label:'Storage',          hint:'Enough cupboards / wardrobes',         flag:'Not enough storage'},
-    {id:'security',    icon:'🔒', label:'Locks & windows',  hint:'Feels secure, windows latch',          flag:'Security concern (locks/windows)'}
+    {id:'light',    icon:'💡', label:'Natural light', hint:'Bright without lights on?',          flag:'Dark / poor natural light'},
+    {id:'mould',    icon:'🦠', label:'Damp / mould',  hint:'Marks, bubbling paint, musty smell', flag:'Signs of mould or damp'},
+    {id:'water',    icon:'💧', label:'Water pressure',hint:'Run a tap — is the flow strong?',    flag:'Low water pressure'}
   ],
   practical:[
-    {id:'noise',       icon:'🔊', label:'Street noise',     hint:'Traffic, neighbours, trains',          flag:'Noisy location'},
-    {id:'signal',      icon:'📶', label:'Phone signal',     hint:'Check bars in each room',              flag:'Poor mobile signal'},
-    {id:'parking',     icon:'🚗', label:'Parking reality',  hint:'As advertised? Street permit needed?', flag:'Parking issue'},
-    {id:'bathroom',    icon:'🛁', label:'Bathroom',         hint:'Clean, modern enough, exhaust works',  flag:'Bathroom condition concern'},
-    {id:'kitchen',     icon:'🍳', label:'Kitchen',          hint:'Appliance age, bench + cupboard look', flag:'Kitchen condition concern'},
-    {id:'outdoor',     icon:'🌿', label:'Outdoor / balcony',hint:'Useable? Skip if N/A',                 flag:'Outdoor area concern'}
+    {id:'noise',    icon:'🔊', label:'Street noise',  hint:'Traffic, neighbours, trains',        flag:'Noisy location'},
+    {id:'kitchen',  icon:'🍳', label:'Kitchen',       hint:'Appliances, bench, cupboards',       flag:'Kitchen condition concern'},
+    {id:'bathroom', icon:'🛁', label:'Bathroom',      hint:'Clean, tiles intact, exhaust works', flag:'Bathroom condition concern'}
   ]
 };
 
-var QUESTIONS=[
-  {cat:'Property basics', q:'How long has it been vacant?'},
-  {cat:'Property basics', q:"What's included — whitegoods, blinds, air-con?"},
-  {cat:'Property basics', q:'Are pets allowed? Any restrictions?'},
-  {cat:'Property basics', q:'When is the property available from?'},
-  {cat:'Property basics', q:'Any maintenance issues or pending repairs?'},
-  {cat:'Costs & utilities', q:'Is water billed separately?'},
-  {cat:'Costs & utilities', q:'Is NBN connected? What speed tier?'},
-  {cat:'Application',     q:'How many applications so far?'},
-  {cat:'Application',     q:'Preferred lease length — 6 or 12 months?'},
-  {cat:'Application',     q:'What documents are needed to apply?'}
-];
-
 var inspectionData={
   address:'', rent:'', beds:'', propertyType:'', trackedId:'',
-  scan:{ vibe:'', items:{}, liked:'', worried:'', photos:[] },
-  questionsAsked:{}, verdict:'', notes:''
+  scan:{ items:{}, liked:'', worried:'', photos:[] },
+  verdict:'', notes:''
 };
 
 document.addEventListener('DOMContentLoaded',function(){ renderInspectionList(); });
@@ -1206,9 +1143,7 @@ function renderQuickScan(){
     });
     container.innerHTML=html;
   });
-  // Paint vibe + free-text on (re)render
-  var vibeBtns=document.querySelectorAll('#vibeRow .vibe-btn');
-  vibeBtns.forEach(function(b){ b.classList.toggle('sel', b.getAttribute('data-vibe')===inspectionData.scan.vibe); });
+  // Paint free-text on (re)render
   document.getElementById('scanLiked').value=inspectionData.scan.liked||'';
   document.getElementById('scanWorried').value=inspectionData.scan.worried||'';
   document.getElementById('scanLiked').oninput=function(){ inspectionData.scan.liked=this.value; };
@@ -1223,23 +1158,13 @@ function setScanItem(id,state){
   updateScanFinishState();
 }
 
-function setVibe(v){
-  inspectionData.scan.vibe=v;
-  renderQuickScan();
-  updateScanFinishState();
-}
-
 function updateScanFinishState(){
   var btn=document.getElementById('finishBtn');
   var hint=document.getElementById('finishHint');
   if(!btn||!hint)return;
-  if(inspectionData.scan.vibe){
-    btn.style.opacity='1'; btn.style.pointerEvents='auto';
-    hint.textContent='Tap to see your summary';
-  } else {
-    btn.style.opacity='.4'; btn.style.pointerEvents='none';
-    hint.textContent='Pick a vibe to continue';
-  }
+  // Finish is always available — no vibe gate. Renter can summarise any time.
+  btn.style.opacity='1'; btn.style.pointerEvents='auto';
+  hint.textContent='Decide Apply / Maybe / Pass on the next screen';
 }
 
 function addScanPhoto(){
@@ -1275,42 +1200,11 @@ function renderScanPhotos(){
   grid.innerHTML=html;
 }
 
-function openQuestionsSheet(){
-  var list=document.getElementById('questionsList');
-  var lastCat='';
-  var html='';
-  QUESTIONS.forEach(function(item,i){
-    if(item.cat!==lastCat){ html+='<div class="qsheet-cat">'+item.cat+'</div>'; lastCat=item.cat; }
-    var asked=!!inspectionData.questionsAsked[i];
-    html+='<div class="qsheet-row '+(asked?'done':'')+'" id="qs-'+i+'" onclick="toggleQuestionAsked('+i+')">'+
-      '<div class="qsheet-tick">'+(asked?'✓':'')+'</div>'+
-      '<div class="qsheet-txt">'+item.q+'</div></div>';
-  });
-  list.innerHTML=html;
-  document.getElementById('questionsSheet').style.display='flex';
-}
-
-function closeQuestionsSheet(e){
-  if(e && e.target && e.target.closest && e.target.closest('.picker-sheet') && e.type==='click' && e.target.tagName!=='BUTTON')return;
-  document.getElementById('questionsSheet').style.display='none';
-}
-
-function toggleQuestionAsked(i){
-  inspectionData.questionsAsked[i]=!inspectionData.questionsAsked[i];
-  var row=document.getElementById('qs-'+i);
-  if(!row)return;
-  row.classList.toggle('done', inspectionData.questionsAsked[i]);
-  row.querySelector('.qsheet-tick').textContent=inspectionData.questionsAsked[i]?'✓':'';
-}
-
 function finishWalkthrough(){ renderSummary(); switchView('E'); }
 
 function renderSummary(){
   var addr=inspectionData.address||'Property';
   document.getElementById('sumAddr').textContent=addr;
-
-  var vibeMap={love:'😍 Love it',would:'🙂 Would do',backup:'😐 Backup',pass:'👎 Pass'};
-  document.getElementById('sumVibeDisplay').textContent=vibeMap[inspectionData.scan.vibe]||'—';
 
   // Highlights: liked + worried + photos count
   var hlHtml='';
@@ -1343,9 +1237,8 @@ function renderSummary(){
     document.getElementById('sumFlagsWrap').style.display='none';
   }
 
-  // Default verdict from vibe
-  var suggested={love:'yes',would:'yes',backup:'maybe',pass:'no'}[inspectionData.scan.vibe];
-  if(suggested && !inspectionData.verdict){ setVerdict(suggested); }
+  // Restore previous verdict if the renter navigates back and forth
+  if(inspectionData.verdict){ setVerdict(inspectionData.verdict); }
 }
 
 function collectScanFlags(){
@@ -1371,47 +1264,8 @@ function setVerdict(v){
   // Show move-in link for "yes" verdict
   document.getElementById('moveInLink').style.display=v==='yes'?'block':'none';
 
-  // Build readiness checklist for "Would Apply"
-  if(v==='yes') buildReadinessChecklist();
-
   // Smooth scroll to actions
   setTimeout(function(){ document.getElementById('verdictActions').scrollIntoView({behavior:'smooth',block:'start'}); },200);
-}
-
-function buildReadinessChecklist(){
-  var list=document.getElementById('readinessChecklist');
-  if(!list)return;
-
-  var resume={};
-  try{resume=JSON.parse(localStorage.getItem('riq-resume')||'{}');}catch(e){}
-
-  var personalDocs={};
-  try{personalDocs=JSON.parse(localStorage.getItem('riq_personal_docs')||'{}');}catch(e){}
-
-  var checks=[
-    {label:'Personal Details',sub:'Name, email, mobile, address',ready:!!(resume.fullName&&resume.email&&resume.mobile),icon:'👤'},
-    {label:'Employment Info',sub:'Employer, job title, income',ready:!!(resume.employer&&resume.jobTitle),icon:'💼'},
-    {label:'Rental History',sub:'Previous address and landlord/agent',ready:!!(resume.prevAddress&&resume.prevAgency),icon:'🏠'},
-    {label:'ID Documents',sub:'100-point ID check',ready:!!(personalDocs.idScore&&personalDocs.idScore>=100),icon:'🪪'},
-    {label:'Pay Slips',sub:'Recent pay evidence',ready:!!(personalDocs.uploadedDocs&&(personalDocs.uploadedDocs['payslip1']||personalDocs.uploadedDocs.payslip1)),icon:'💰'},
-    {label:'References',sub:'At least 2 references',ready:!!(resume.ref1Name&&resume.ref2Name),icon:'📞'},
-    {label:'Cover Letter',sub:'Personalised letter for this property',ready:!!(resume.coverLetter||personalDocs.coverLetter),icon:'✉️'}
-  ];
-
-  var readyCount=checks.filter(function(c){return c.ready}).length;
-
-  var html='';
-  checks.forEach(function(c){
-    html+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;'+(c!==checks[checks.length-1]?'border-bottom:1px solid var(--border-lt);':'')+'">'
-      +'<div style="width:36px;height:36px;border-radius:10px;background:'+(c.ready?'rgba(16,185,129,.1)':'rgba(239,68,68,.06)')+';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">'+(c.ready?'✓':c.icon)+'</div>'
-      +'<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+c.label+'</div><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:'+(c.ready?'var(--teal-dk)':'var(--muted)')+'">'+( c.ready?'Ready':'Not yet — add in your application')+'</div></div>'
-      +'<span style="font-size:16px">'+(c.ready?'<span style="color:var(--teal-dk)">✓</span>':'<span style="color:var(--border)">○</span>')+'</span>'
-    +'</div>';
-  });
-
-  html+='<div style="margin-top:12px;padding:10px 12px;background:'+(readyCount>=5?'rgba(16,185,129,.08)':'var(--blue-xl)')+';border-radius:10px;text-align:center;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:'+(readyCount>=5?'var(--teal-dk)':'var(--blue)')+'">'+readyCount+' of '+checks.length+' ready'+(readyCount<checks.length?' — the app will guide you through the rest':'')+'</div>';
-
-  list.innerHTML=html;
 }
 
 function saveAndApply(){
@@ -1576,9 +1430,12 @@ function saveAndGoHome(){
   setTimeout(function(){navigate('/app/index.html')},1500)
 }
 
-// ── Weekend Quick Scan comparison ──
-// Side-by-side mini-cards of every saved scan so the renter can decide
-// which 1-3 to actually apply for. Sorted by vibe (Love → Would → Backup → Pass).
+// ── Side-by-side comparison matrix ──────────────────────────────────
+// Renter sees 2–3 properties as columns with all scan items as rows so
+// the winner is obvious. ✓ / ⚠ / — per cell, plus rent, verdict, liked,
+// worried. If they've saved more than 3 they can pick which to compare.
+var _compareSelected = [];
+
 function openScanCompareSheet(){
   var saved = [];
   for(var i = 0; i < localStorage.length; i++){
@@ -1587,85 +1444,31 @@ function openScanCompareSheet(){
       try { saved.push({ key:k, data:JSON.parse(localStorage.getItem(k) || '{}') }); } catch(e){}
     }
   }
-  if(!saved.length){ showToast('Nothing to compare', 'Complete a few Quick Scans first', 'ℹ️'); return; }
+  if(saved.length < 2){ showToast('Need 2 to compare', 'Complete one more Open Home Scan', 'ℹ️'); return; }
 
-  // Sort by vibe ranking, then by save time desc
-  var rank = { love:0, would:1, backup:2, pass:3, '':4 };
+  // Sort newest first — default selection is the most recent 3
   saved.sort(function(a, b){
-    var av = (a.data.scan && a.data.scan.vibe) || '';
-    var bv = (b.data.scan && b.data.scan.vibe) || '';
-    var rd = rank[av] - rank[bv];
-    if(rd !== 0) return rd;
     var at = parseInt((a.key.split('_')[3] || '0'), 10);
     var bt = parseInt((b.key.split('_')[3] || '0'), 10);
     return bt - at;
   });
 
-  var vibeMap = {
-    love:   { label:'😍 Loved it',  color:'#065F46', bg:'rgba(16,185,129,.14)', border:'#10B981' },
-    would:  { label:'🙂 Would do',  color:'#1B50C8', bg:'var(--blue-xl)',       border:'var(--blue)' },
-    backup: { label:'😐 Backup',    color:'#78350F', bg:'rgba(245,158,11,.14)', border:'var(--amber)' },
-    pass:   { label:'👎 Pass',      color:'#7F1D1D', bg:'rgba(239,68,68,.12)',  border:'var(--red)' }
-  };
-
-  var rowsHtml = saved.map(function(s){
-    var d = s.data || {};
-    var scan = d.scan || {};
-    var vibe = scan.vibe || '';
-    var v = vibeMap[vibe] || { label:'No verdict', color:'var(--muted)', bg:'var(--blue-xl)', border:'var(--border)' };
-    var ts = parseInt((s.key.split('_')[3] || '0'), 10);
-    var dateStr = ts ? new Date(ts).toLocaleDateString('en-AU', { day:'numeric', month:'short' }) : '';
-
-    // Pull a couple of one-line takeaways
-    var takeaways = [];
-    if(scan.liked) takeaways.push('💚 ' + scan.liked.slice(0, 90));
-    if(scan.worried) takeaways.push('⚠️ ' + scan.worried.slice(0, 90));
-
-    // Issue items count
-    var issueCount = 0;
-    if(scan.items){
-      Object.keys(scan.items).forEach(function(k){ if(scan.items[k] === 'issue') issueCount++; });
-    }
-
-    var meta = [];
-    if(d.rent) meta.push(d.rent);
-    if(d.beds) meta.push(d.beds + ' bed');
-    if(dateStr) meta.push(dateStr);
-
-    return '<div style="background:#fff;border:2px solid ' + v.border + ';border-radius:14px;padding:14px 14px;margin-bottom:10px;cursor:pointer" onclick="loadSavedInspection(\'' + s.key + '\')">'+
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px">'+
-        '<div style="flex:1;min-width:0">'+
-          '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);line-height:1.3">' + (d.address || 'Property') + '</div>'+
-          '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">' + meta.join(' · ') + '</div>'+
-        '</div>'+
-        '<span style="display:inline-block;font-family:Sora,sans-serif;font-weight:800;font-size:11px;color:' + v.color + ';background:' + v.bg + ';border-radius:100px;padding:5px 11px;white-space:nowrap;flex-shrink:0">' + v.label + '</span>'+
-      '</div>'+
-      (takeaways.length ? '<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">' + takeaways.map(function(t){ return '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--text);line-height:1.45">' + t + (t.length >= 92 ? '…' : '') + '</div>'; }).join('') + '</div>' : '') +
-      (issueCount > 0 ? '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--amber);background:rgba(245,158,11,.1);border-radius:6px;padding:3px 8px;display:inline-block;margin-top:8px">⚠ ' + issueCount + ' concern' + (issueCount>1?'s':'') + ' flagged</div>' : '') +
-    '</div>';
-  }).join('');
-
-  var loveCount = saved.filter(function(s){ return (s.data.scan && s.data.scan.vibe) === 'love'; }).length;
-  var wouldCount = saved.filter(function(s){ return (s.data.scan && s.data.scan.vibe) === 'would'; }).length;
-  var topPicks = loveCount + wouldCount;
-
-  var headerLine = topPicks > 0
-    ? topPicks + ' ' + (topPicks === 1 ? 'place worth' : 'places worth') + ' applying for · sorted by your vibe'
-    : 'Nothing stood out yet — keep looking?';
+  // Default: first 3 most recent. If only 2 saved → pick both.
+  _compareSelected = saved.slice(0, Math.min(3, saved.length)).map(function(s){ return s.key; });
 
   var overlay = document.createElement('div');
   overlay.id = 'scanCompareSheet';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,36,96,.55);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);z-index:100010;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .22s ease';
   overlay.innerHTML =
-    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:88vh;display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">'+
-      '<div style="padding:14px 20px 12px;border-bottom:1px solid var(--border-lt);flex-shrink:0">'+
-        '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px"></div>'+
-        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.3px">📊 Compare your inspections</div>'+
-        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5">' + headerLine + '</div>'+
+    '<div class="cmp-sheet" style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:540px;max-height:min(92vh,900px);display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1);box-shadow:0 -8px 40px rgba(10,36,96,.22)">'+
+      '<div style="padding:10px 20px 12px;border-bottom:1px solid var(--border-lt);flex-shrink:0">'+
+        '<div style="width:38px;height:4px;border-radius:100px;background:#D5E2F8;margin:0 auto 12px"></div>'+
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:17px;color:var(--text);letter-spacing:-.3px">Compare side-by-side</div>'+
+        '<div id="cmpHeaderLine" style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45"></div>'+
       '</div>'+
-      '<div style="flex:1;overflow-y:auto;padding:14px 16px">' + rowsHtml + '</div>'+
-      '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0">'+
-        '<button id="scanCompareCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer">Close</button>'+
+      '<div id="cmpBody" style="flex:1;overflow-y:auto;padding:0;-webkit-overflow-scrolling:touch"></div>'+
+      '<div style="padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0;background:#fff">'+
+        '<button id="scanCompareCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:13px;border-radius:12px;cursor:pointer;min-height:48px">Close</button>'+
       '</div>'+
     '</div>';
   document.body.appendChild(overlay);
@@ -1676,6 +1479,159 @@ function openScanCompareSheet(){
   var close = function(){ overlay.style.opacity = '0'; setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 200); };
   document.getElementById('scanCompareCloseBtn').onclick = close;
   overlay.onclick = function(e){ if(e.target === overlay) close(); };
+
+  // Stash saved list on the overlay so renderCompareMatrix can re-use it
+  overlay._saved = saved;
+  renderCompareMatrix();
+}
+
+function toggleCompareSelection(key){
+  var idx = _compareSelected.indexOf(key);
+  if(idx >= 0){
+    if(_compareSelected.length <= 2){
+      showToast('At least 2 needed', 'Keep 2 or 3 properties to compare', 'ℹ️');
+      return;
+    }
+    _compareSelected.splice(idx, 1);
+  } else {
+    if(_compareSelected.length >= 3){
+      showToast('Max 3 at a time', 'Tap another one to swap it out', 'ℹ️');
+      return;
+    }
+    _compareSelected.push(key);
+  }
+  renderCompareMatrix();
+}
+
+function renderCompareMatrix(){
+  var overlay = document.getElementById('scanCompareSheet');
+  var body = document.getElementById('cmpBody');
+  var headerLine = document.getElementById('cmpHeaderLine');
+  if(!overlay || !body) return;
+  var saved = overlay._saved || [];
+
+  // Selected inspection objects, in the order the user picked them
+  var selectedObjs = _compareSelected.map(function(k){
+    return saved.find(function(s){ return s.key === k; });
+  }).filter(Boolean);
+  var n = selectedObjs.length;
+
+  if(headerLine){
+    headerLine.textContent = n + ' of ' + saved.length + ' properties' + (saved.length > 3 ? ' · tap below to swap in others' : '');
+  }
+
+  // Value helpers
+  var scanRows = [
+    { id:'light',    label:'Natural light' },
+    { id:'mould',    label:'Damp / mould' },
+    { id:'water',    label:'Water pressure' },
+    { id:'noise',    label:'Street noise' },
+    { id:'kitchen',  label:'Kitchen' },
+    { id:'bathroom', label:'Bathroom' }
+  ];
+  function cellIcon(state){
+    if(state === 'ok') return '<span style="color:var(--teal);font-weight:800;font-size:16px">✓</span>';
+    if(state === 'issue') return '<span style="color:var(--amber);font-weight:800;font-size:16px">⚠</span>';
+    return '<span style="color:var(--border);font-weight:700;font-size:14px">—</span>';
+  }
+  function verdictChip(v){
+    var map = { yes:['✓ Apply','var(--teal-dk)','rgba(0,200,150,.14)'], maybe:['🤔 Maybe','#7A4500','rgba(245,166,35,.14)'], no:['✗ Pass','#7F1D1D','rgba(232,64,64,.1)'] };
+    var m = map[v]; if(!m) return '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:9.5px;color:var(--muted)">—</span>';
+    return '<span style="display:inline-block;font-family:Sora,sans-serif;font-weight:800;font-size:9.5px;color:'+m[1]+';background:'+m[2]+';border-radius:100px;padding:3px 7px;white-space:nowrap">'+m[0]+'</span>';
+  }
+
+  // ── Build header column cards ──
+  var colTplStart = 'grid-template-columns:110px repeat('+n+',1fr)';
+  var colTplMobile = 'grid-template-columns:90px repeat('+n+',1fr)';
+
+  var headerCols = selectedObjs.map(function(s){
+    var d = s.data || {};
+    var scan = d.scan || {};
+    var thumb = (scan.photos && scan.photos[0] && scan.photos[0].url) || '';
+    // Small, centred thumbnail — circular for a tighter premium feel
+    var thumbHtml = thumb
+      ? '<div style="width:44px;height:44px;background:#E8EEF8 url(\''+thumb+'\') center/cover;border-radius:12px;margin:0 auto;border:1.5px solid #fff;box-shadow:0 2px 6px rgba(10,36,96,.12)"></div>'
+      : '<div style="width:44px;height:44px;background:linear-gradient(135deg,#E8EEF8,#F4F7FF);border-radius:12px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:18px;opacity:.55;border:1.5px solid #fff">🏠</div>';
+    var addrShort = (d.address || 'Property').split(',')[0];
+    var issueCount = 0;
+    if(scan.items){ Object.keys(scan.items).forEach(function(k){ if(scan.items[k] === 'issue') issueCount++; }); }
+    return '<div style="padding:2px 2px;min-width:0;text-align:center">'+
+      // Address first (on top), tight 2-line clamp
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:11.5px;color:var(--text);line-height:1.25;letter-spacing:-.1px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.5em;margin-bottom:8px">'+addrShort+'</div>'+
+      // Smaller thumbnail sits below the address
+      thumbHtml +
+      '<div style="font-family:Nunito,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);margin-top:7px">'+(d.rent || '—')+(d.beds ? ' · '+d.beds+'bd' : '')+'</div>'+
+      '<div style="margin-top:5px">'+verdictChip(d.verdict || '')+'</div>'+
+      (issueCount > 0 ? '<div style="margin-top:4px"><span style="font-family:Sora,sans-serif;font-weight:700;font-size:9.5px;color:var(--amber);background:rgba(245,158,11,.12);border-radius:100px;padding:3px 7px">⚠ '+issueCount+'</span></div>' : '')+
+    '</div>';
+  }).join('');
+
+  // ── Build scan rows ──
+  var scanRowsHtml = scanRows.map(function(row){
+    var cells = selectedObjs.map(function(s){
+      var state = (s.data && s.data.scan && s.data.scan.items && s.data.scan.items[row.id]) || '';
+      return '<div style="text-align:center;padding:11px 4px">'+cellIcon(state)+'</div>';
+    }).join('');
+    return '<div style="display:grid;'+colTplStart+';align-items:center;border-top:1px solid var(--border-lt)">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;color:var(--text);padding:11px 12px">'+row.label+'</div>'+
+      cells +
+    '</div>';
+  }).join('');
+
+  // ── Liked / Worried rows (text per column) ──
+  function textRow(label, field, color){
+    var cells = selectedObjs.map(function(s){
+      var v = (s.data && s.data.scan && s.data.scan[field]) || '';
+      var snippet = v ? v.slice(0, 80) : '—';
+      return '<div style="padding:10px 6px;font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:'+(v?'var(--text)':'var(--muted)')+';line-height:1.45;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">'+snippet+(v&&v.length>80?'…':'')+'</div>';
+    }).join('');
+    return '<div style="display:grid;'+colTplStart+';align-items:start;border-top:1px solid var(--border-lt)">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:11.5px;color:'+color+';padding:10px 12px">'+label+'</div>'+
+      cells +
+    '</div>';
+  }
+
+  // ── Header row: label column + N property headers ──
+  var headerRow = '<div style="display:grid;'+colTplStart+';align-items:end;padding:16px 0 12px 0">'+
+    '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);padding-left:12px;letter-spacing:.6px;text-transform:uppercase">Property</div>'+
+    headerCols +
+  '</div>';
+
+  // ── Picker strip (only if more than 3 saved) ──
+  var pickerHtml = '';
+  if(saved.length > 3){
+    var pills = saved.map(function(s){
+      var d = s.data || {};
+      var addrShort = (d.address || 'Property').split(',')[0].slice(0, 28);
+      var selected = _compareSelected.indexOf(s.key) >= 0;
+      return '<button onclick="toggleCompareSelection(\''+s.key+'\')" style="flex:0 0 auto;background:'+(selected?'var(--blue)':'#fff')+';color:'+(selected?'#fff':'var(--text)')+';border:1.5px solid '+(selected?'var(--blue)':'var(--border-lt)')+';border-radius:100px;padding:8px 14px;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap;box-shadow:'+(selected?'0 2px 8px rgba(27,80,200,.25)':'none')+'">'+(selected?'✓ ':'')+addrShort+'</button>';
+    }).join('');
+    pickerHtml = '<div style="padding:12px 16px 4px;border-bottom:1px solid var(--border-lt);background:var(--blue-xl)">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);margin-bottom:8px;letter-spacing:.6px;text-transform:uppercase">Pick up to 3 to compare</div>'+
+      '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none">'+pills+'</div>'+
+    '</div>';
+  }
+
+  // ── Winner call-out (if exactly one Apply verdict stands out) ──
+  var applyOnes = selectedObjs.filter(function(s){ return (s.data && s.data.verdict) === 'yes'; });
+  var winnerHtml = '';
+  if(applyOnes.length === 1){
+    var winnerAddr = ((applyOnes[0].data && applyOnes[0].data.address) || 'Property').split(',')[0];
+    winnerHtml = '<div style="margin:12px 16px 0;padding:12px 14px;background:linear-gradient(135deg,rgba(0,200,150,.12),rgba(0,200,150,.04));border:1px solid rgba(0,200,150,.28);border-radius:12px;display:flex;gap:10px;align-items:center">'+
+      '<span style="font-size:18px;flex-shrink:0">🎯</span>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:700;font-size:12.5px;color:var(--teal-dk);line-height:1.45">Your only Apply pick — <strong>'+winnerAddr+'</strong></div>'+
+    '</div>';
+  }
+
+  body.innerHTML =
+    pickerHtml +
+    winnerHtml +
+    '<div style="padding:0 16px 16px">'+
+      headerRow +
+      scanRowsHtml +
+      textRow('💚 Liked',   'liked',   'var(--teal-dk)') +
+      textRow('⚠️ Worried', 'worried', 'var(--amber)') +
+    '</div>';
 }
 
 function exportInspectionPDF(){
@@ -1699,14 +1655,13 @@ function exportInspectionPDF(){
     items: propertyLines.length ? propertyLines : ['Inspection details']
   });
 
-  // Verdict + vibe
+  // Verdict
   var verdictLabel = {yes:'Would Apply', maybe:'Maybe', no:'Pass'}[inspectionData.verdict] || '';
-  var vibeLabel = {love:'😍 Loved it', would:'🙂 Would do', backup:'😐 Backup', pass:'👎 Pass'}[scan.vibe] || '';
-  if(verdictLabel || vibeLabel){
+  if(verdictLabel){
     sections.push({
       heading: 'My verdict',
-      badge: verdictLabel === 'Would Apply' ? 'Good' : verdictLabel === 'Maybe' ? 'Issues' : verdictLabel === 'Pass' ? 'Concerns' : '',
-      content: [verdictLabel, vibeLabel].filter(Boolean).join('  ·  ')
+      badge: verdictLabel === 'Would Apply' ? 'Good' : verdictLabel === 'Maybe' ? 'Issues' : 'Concerns',
+      content: verdictLabel
     });
   }
 
@@ -1750,7 +1705,7 @@ function exportInspectionPDF(){
   var allFlags = (typeof collectScanFlags === 'function') ? collectScanFlags() : [];
 
   RIQExport.generate({
-    title: 'Open Home Quick Scan',
+    title: 'Open Home Scan',
     subtitle: inspectionData.address || 'Property Inspection',
     date: new Date(),
     sections: sections,
@@ -1772,7 +1727,6 @@ function saveToConditionReportsVault(data){
       rent:data.rent||'',
       beds:data.beds||'2',
       verdict:data.verdict||'',
-      vibe:(data.scan&&data.scan.vibe)||'',
       notes:data.notes||'',
       scan:data.scan||{},
       date:Date.now()
@@ -1884,12 +1838,10 @@ function renderInspectionList(){
       var repKey=inspectedUrls[(p.url||p.originalLink||'')] || inspectedAddrs[normAddr(addr)] || p.inspectionKey || '';
       var repData={};
       try{repData=JSON.parse(localStorage.getItem(repKey)||'{}');}catch(e){}
-      var vibe=(repData.scan&&repData.scan.vibe)||'';
       var verdict=repData.verdict||'';
-      var vibeMap={love:{t:'😍 Loved it',c:'#065F46',bg:'rgba(16,185,129,.14)'},would:{t:'🙂 Would do',c:'var(--blue)',bg:'var(--blue-xl)'},backup:{t:'😐 Backup',c:'#78350F',bg:'rgba(245,158,11,.14)'},pass:{t:'👎 Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
-      var verdictMap={yes:{t:'Would apply',c:'var(--teal-dk)',bg:'rgba(0,200,150,.14)'},maybe:{t:'Maybe',c:'#78350F',bg:'rgba(245,158,11,.12)'},no:{t:'Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
+      var verdictMap={yes:{t:'✓ Apply',c:'var(--teal-dk)',bg:'rgba(0,200,150,.14)'},maybe:{t:'🤔 Maybe',c:'#78350F',bg:'rgba(245,158,11,.12)'},no:{t:'✗ Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
       var chipHtml='';
-      var chip=vibeMap[vibe]||verdictMap[verdict];
+      var chip=verdictMap[verdict];
       if(chip){chipHtml='<span style="display:inline-block;font-family:\'Sora\',sans-serif;font-weight:700;font-size:10.5px;color:'+chip.c+';background:'+chip.bg+';border-radius:100px;padding:3px 10px;margin-top:6px">'+chip.t+'</span>';}
       html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);margin-bottom:10px;border-left:3px solid var(--teal);box-shadow:var(--shadow-card)">'
         +'<div style="display:flex;align-items:flex-start;gap:12px">'
@@ -1930,45 +1882,46 @@ function renderInspectionList(){
     });
   }
 
-  // ── Completed reports without a matching tracked property ──
-  // Exclude saved inspections that are already shown under a tracked card,
-  // by URL or by address.
-  var trackedUrlSet={};
-  var trackedAddrSet={};
-  tracked.forEach(function(t){
-    if(!t)return;
-    var u=t.url||t.originalLink||'';
-    if(u)trackedUrlSet[u]=true;
-    var ak=normAddr(t.address||t.label);
-    if(ak)trackedAddrSet[ak]=true;
-  });
-  var orphanSaved=saved.filter(function(s){
-    if(!s||!s.data)return true;
-    var u=s.data.sourceUrl||'';
-    if(u && trackedUrlSet[u])return false;
-    var ak=normAddr(s.data.address);
-    if(ak && trackedAddrSet[ak])return false;
-    return true;
-  });
-  if(orphanSaved.length>0){
-    var totalSaved = orphanSaved.length + alreadyInspected.length;
-    var compareBtn = totalSaved >= 2
-      ? '<button onclick="openScanCompareSheet()" style="background:var(--blue-xl);color:var(--blue);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer">Compare side-by-side →</button>'
-      : '';
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px"><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase">Past Inspections</span>'+compareBtn+'</div>';
-    var vibeMap2={love:{t:'😍 Loved it',c:'#065F46',bg:'rgba(16,185,129,.14)'},would:{t:'🙂 Would do',c:'var(--blue)',bg:'var(--blue-xl)'},backup:{t:'😐 Backup',c:'#78350F',bg:'rgba(245,158,11,.14)'},pass:{t:'👎 Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
-    orphanSaved.forEach(function(item){
+  // ── Past Inspections ───────────────────────────────────────────────
+  // EVERY saved inspection appears here so nothing hides. Sorted newest
+  // first. The Compare button is always surfaced — greyed hint with 1
+  // saved, active with 2+. Gives the renter a clear home for their work.
+  if(saved.length>0){
+    var savedSorted = saved.slice().sort(function(a,b){
+      var at = parseInt((a.key.split('_')[3]||'0'),10);
+      var bt = parseInt((b.key.split('_')[3]||'0'),10);
+      return bt - at;
+    });
+    var compareCta = saved.length >= 2
+      ? '<button onclick="openScanCompareSheet()" style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:7px 14px;font-family:\'Sora\',sans-serif;font-size:11.5px;font-weight:800;cursor:pointer;box-shadow:0 2px 10px rgba(27,80,200,.25);-webkit-tap-highlight-color:transparent">📊 Compare '+saved.length+' →</button>'
+      : '<span style="font-family:\'Sora\',sans-serif;font-size:10.5px;font-weight:700;color:var(--muted);background:var(--blue-xl);border-radius:100px;padding:5px 11px">Save 1 more to compare</span>';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin:22px 0 12px"><span style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:12px;letter-spacing:1.2px;color:var(--text);text-transform:uppercase">Past Inspections · '+saved.length+'</span>'+compareCta+'</div>';
+    var verdictMap2={yes:{t:'✓ Apply',c:'var(--teal-dk)',bg:'rgba(0,200,150,.14)'},maybe:{t:'🤔 Maybe',c:'#78350F',bg:'rgba(245,158,11,.12)'},no:{t:'✗ Pass',c:'#7F1D1D',bg:'rgba(239,68,68,.12)'}};
+    savedSorted.forEach(function(item){
       var ts=parseInt((item.key.split('_')[3]||'0'),10);
-      var dateStr=ts?new Date(ts).toLocaleDateString('en-AU'):'';
-      var vibe=(item.data.scan&&item.data.scan.vibe)||'';
-      var vChip=vibeMap2[vibe];
-      html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-card)" onclick="loadSavedInspection(\''+item.key+'\')">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">'
+      var dateStr=ts?new Date(ts).toLocaleDateString('en-AU',{day:'numeric',month:'short'}):'';
+      var verdict=(item.data&&item.data.verdict)||'';
+      var vChip=verdictMap2[verdict];
+      var scanData=(item.data&&item.data.scan)||{};
+      var issueCount=0;
+      if(scanData.items){ Object.keys(scanData.items).forEach(function(k){ if(scanData.items[k]==='issue') issueCount++; }); }
+      var thumb=(scanData.photos&&scanData.photos[0]&&scanData.photos[0].url)||'';
+      var thumbHtml=thumb
+        ? '<div style="width:52px;height:52px;border-radius:10px;background:#E8EEF8 url(\''+thumb+'\') center/cover;flex-shrink:0"></div>'
+        : '<div style="width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,#E8EEF8,#F4F7FF);display:flex;align-items:center;justify-content:center;font-size:20px;opacity:.45;flex-shrink:0">🏠</div>';
+      var metaLine=[item.data.rent||'',item.data.beds?item.data.beds+' bed':'',dateStr].filter(Boolean).join(' · ');
+      html+='<div style="background:#fff;border-radius:14px;padding:12px 14px;border:1px solid var(--border-lt);margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-card)" onclick="loadSavedInspection(\''+item.key+'\')">'
+        +'<div style="display:flex;gap:12px;align-items:center">'
+          +thumbHtml
           +'<div style="flex:1;min-width:0">'
-            +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+(item.data.address||'Property')+'</div>'
-            +'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px">'+(item.data.rent||'')+(item.data.beds?' · '+item.data.beds+' bed':'')+(dateStr?' · '+dateStr:'')+'</div>'
+            +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:13.5px;color:var(--text);letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(item.data.address||'Property')+'</div>'
+            +(metaLine?'<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px">'+metaLine+'</div>':'')
+            +'<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">'
+              +(vChip?'<span style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:10px;color:'+vChip.c+';background:'+vChip.bg+';border-radius:100px;padding:3px 9px">'+vChip.t+'</span>':'')
+              +(issueCount>0?'<span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--amber);background:rgba(245,158,11,.12);border-radius:100px;padding:3px 8px">⚠ '+issueCount+'</span>':'')
+            +'</div>'
           +'</div>'
-          +(vChip?'<span style="display:inline-block;font-family:\'Sora\',sans-serif;font-weight:700;font-size:10.5px;color:'+vChip.c+';background:'+vChip.bg+';border-radius:100px;padding:4px 10px;white-space:nowrap;flex-shrink:0">'+vChip.t+'</span>':'')
+          +'<span style="font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:var(--muted);flex-shrink:0">›</span>'
         +'</div>'
       +'</div>';
     });
@@ -2127,8 +2080,7 @@ var viewingSavedKey=null;
 function loadSavedInspection(key){
   try{
     var loaded=JSON.parse(localStorage.getItem(key)||'{}');
-    if(!loaded.scan)loaded.scan={vibe:'',items:{},liked:'',worried:'',photos:[]};
-    if(!loaded.questionsAsked)loaded.questionsAsked={};
+    if(!loaded.scan)loaded.scan={items:{},liked:'',worried:'',photos:[]};
     inspectionData=loaded;
     viewingSavedKey=key;
 
