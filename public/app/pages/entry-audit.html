@@ -1538,7 +1538,8 @@ function extractAgencyReport(dataUrl, mimeType, fileName, type){
     loadAgencyEntryDisplay();
     var roomCount=data.rooms.length;
     var itemCount=data.totalItems||data.rooms.reduce(function(s,r){return s+(r.items?r.items.length:0)},0);
-    showToast('Report extracted ✓',roomCount+' rooms, '+itemCount+' items found — will be used in your exit comparison','🔍');
+    showToast('Report extracted ✓',roomCount+' rooms, '+itemCount+' items — comparing against your record…','🔍');
+    runEntryComparison(data);
   })
   .catch(function(err){
     console.warn('Agency report extraction failed:',err);
@@ -1547,6 +1548,205 @@ function extractAgencyReport(dataUrl, mimeType, fileName, type){
   });
 }
 
+
+/* ── Entry Comparison: renter vs agent move-in report ─────────────────
+   Fires after the agency report is extracted. Compares item-by-item
+   against the renter's own record and shows disagreements immediately
+   so the renter can push back within the statutory return window. */
+var _entryComparisonData = null;
+
+function runEntryComparison(agentExtracted){
+  if(!agentExtracted || !agentExtracted.rooms || !agentExtracted.rooms.length) return;
+
+  // Get the renter's own room data
+  var renterRooms = [];
+  try {
+    var saved = localStorage.getItem('renteriq_entry_audit');
+    if(saved){
+      var parsed = JSON.parse(saved);
+      Object.keys(parsed).forEach(function(roomId){
+        var r = parsed[roomId];
+        if(!r || !r.items) return;
+        var items = [];
+        Object.keys(r.items).forEach(function(itemId){
+          var it = r.items[itemId];
+          items.push({ label: it.label || itemId, clean: it.clean, undamaged: it.undamaged, working: it.working, comment: it.comment || '' });
+        });
+        renterRooms.push({ name: r.name || roomId, emoji: r.emoji || '🏠', items: items });
+      });
+    }
+  } catch(e){}
+
+  if(!renterRooms.length){
+    showToast('Complete your rooms first','Once you\'ve recorded your own inspection, we\'ll compare against the agent\'s report','💡');
+    return;
+  }
+
+  var propertyAddress = '';
+  try { var setup = JSON.parse(localStorage.getItem('renteriq_entry_property_setup')||'{}'); propertyAddress = setup.address || ''; } catch(e){}
+  var tenantName = '';
+  try { tenantName = localStorage.getItem('riq-user-name') || (JSON.parse(localStorage.getItem('riq-resume')||'{}').fullName) || ''; } catch(e){}
+  var agentName = agentExtracted.agentName || '';
+  var state = '';
+  try { state = localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || 'VIC'; } catch(e){}
+
+  fetch('/api/compare-entry', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      renterRooms: renterRooms,
+      agentRooms: agentExtracted.rooms,
+      propertyAddress: propertyAddress,
+      tenantName: tenantName,
+      agentName: agentName,
+      state: state
+    })
+  })
+  .then(function(resp){
+    if(!resp.ok) throw new Error('Comparison failed');
+    return resp.json();
+  })
+  .then(function(data){
+    _entryComparisonData = data;
+    if(!data.items || !data.items.length || data.summary.urgency === 'none'){
+      showToast('All clear ✓','Your record matches the agent\'s report — no disagreements found','🎉');
+      return;
+    }
+    showEntryComparisonSheet(data);
+  })
+  .catch(function(err){
+    console.warn('Entry comparison failed:', err);
+  });
+}
+
+function showEntryComparisonSheet(data){
+  var existing = document.getElementById('entryCompSheet');
+  if(existing) existing.remove();
+
+  var s = data.summary || {};
+  var disagreements = (data.items || []).filter(function(it){ return it.status !== 'match'; });
+  var matches = (s.matches || 0);
+
+  var statusConfig = {
+    renterFlagged: { label:'You noted · agent missed', color:'var(--amber)', bg:'rgba(245,166,35,.08)', icon:'📸' },
+    agentFlagged:  { label:'Agent noted · you didn\'t', color:'var(--blue)', bg:'rgba(27,80,200,.06)', icon:'🔍' },
+    disagree:      { label:'Different assessment', color:'var(--red)', bg:'rgba(232,64,64,.06)', icon:'⚠️' },
+    renterOnly:    { label:'Only in your record', color:'var(--muted)', bg:'var(--blue-xl)', icon:'📝' },
+    agentOnly:     { label:'Only in agent\'s report', color:'var(--muted)', bg:'var(--blue-xl)', icon:'📋' }
+  };
+
+  var itemsHtml = disagreements.map(function(it, idx){
+    var cfg = statusConfig[it.status] || statusConfig.disagree;
+    return '<div style="background:#fff;border-radius:14px;border:1.5px solid var(--border-lt);overflow:hidden;margin-bottom:10px">' +
+      '<div style="padding:12px 14px;background:'+cfg.bg+';display:flex;align-items:center;gap:10px">' +
+        '<span style="font-size:16px">'+it.emoji+'</span>' +
+        '<div style="flex:1"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+it.room+' · '+it.itemLabel+'</div>' +
+        '<div style="font-weight:600;font-size:11px;color:'+cfg.color+';margin-top:2px">'+cfg.icon+' '+cfg.label+'</div></div>' +
+      '</div>' +
+      '<div style="padding:12px 14px">' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
+          '<div style="background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.12);border-radius:8px;padding:8px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--teal-dk);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">Your record</div><div style="font-weight:600;font-size:11px;color:var(--text);line-height:1.4">'+(it.renterState||'—')+'</div></div>' +
+          '<div style="background:rgba(147,51,234,.04);border:1px solid rgba(147,51,234,.1);border-radius:8px;padding:8px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:#7C3AED;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">Agent\'s report</div><div style="font-weight:600;font-size:11px;color:var(--text);line-height:1.4">'+(it.agentState||'—')+'</div></div>' +
+        '</div>' +
+        '<div style="font-weight:600;font-size:12px;color:var(--text);line-height:1.55">'+it.note+'</div>' +
+        (it.actionAdvice ? '<div style="margin-top:6px;font-weight:600;font-size:11.5px;color:var(--blue);line-height:1.5">💡 '+it.actionAdvice+'</div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  var hasDraft = data.responseEmailDraft && data.responseEmailDraft.body;
+
+  var overlay = document.createElement('div');
+  overlay.id = 'entryCompSheet';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10001;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease';
+
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:90vh;display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">' +
+      '<div style="padding:14px 20px 10px;flex-shrink:0">' +
+        '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 14px"></div>' +
+        '<div style="text-align:center">' +
+          '<div style="font-size:30px;line-height:1;margin-bottom:6px">🔍</div>' +
+          '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.3px">Move-in Report Comparison</div>' +
+          '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:6px;max-width:320px;margin-left:auto;margin-right:auto">' +
+            matches+' items match · '+disagreements.length+' difference'+(disagreements.length!==1?'s':'')+' found' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      (disagreements.length ? '<div style="padding:6px 20px 2px"><div style="background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start"><span style="font-size:14px;flex-shrink:0;margin-top:1px">⏰</span><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:#7A5500;line-height:1.5">You typically have 3–7 days to respond to the agent\'s condition report. Flag these now so they\'re on record at bond time.</div></div></div>' : '') +
+      '<div style="flex:1;overflow-y:auto;padding:14px 20px;-webkit-overflow-scrolling:touch">' +
+        (disagreements.length ? itemsHtml : '<div style="text-align:center;padding:20px"><div style="font-size:36px;margin-bottom:10px">🎉</div><div style="font-family:Sora,sans-serif;font-weight:700;font-size:15px;color:var(--teal-dk)">Perfect match</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6">Your record and the agent\'s report agree on everything. You\'re well protected.</div></div>') +
+      '</div>' +
+      '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0;display:flex;flex-direction:column;gap:8px">' +
+        (hasDraft ? '<button id="ecDraftBtn" style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:13px;font-family:Sora,sans-serif;font-weight:800;font-size:13.5px;cursor:pointer">Send response to agent →</button>' : '') +
+        '<button id="ecCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer">'+(hasDraft?'Close':'Done')+'</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    overlay.style.opacity = '1';
+    var sheet = overlay.firstElementChild; if(sheet) sheet.style.transform = 'translateY(0)';
+  });
+
+  var close = function(){ overlay.style.opacity = '0'; setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 200); };
+
+  overlay.querySelector('#ecCloseBtn').addEventListener('click', close);
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+
+  if(hasDraft){
+    overlay.querySelector('#ecDraftBtn').addEventListener('click', function(){
+      openEntryResponseEmail(data.responseEmailDraft);
+      close();
+    });
+  }
+}
+
+function openEntryResponseEmail(draft){
+  if(!draft || !draft.body) return;
+
+  // Try to get agent email from lease record
+  var agentEmail = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}');
+    agentEmail = lease.agentEmail || lease.pmEmail || '';
+  } catch(e){}
+
+  var subject = encodeURIComponent(draft.subject || 'Move-in condition report — items for your records');
+  var body = encodeURIComponent(draft.body);
+  var mailto = 'mailto:' + agentEmail + '?subject=' + subject + '&body=' + body;
+
+  // Save to comms log
+  try {
+    var comms = JSON.parse(localStorage.getItem('riq_communications')||'[]');
+    var record = {
+      id: 'entry_response_' + Date.now(),
+      type: 'email_draft',
+      direction: 'outbound',
+      subject: draft.subject,
+      body: draft.body,
+      date: new Date().toISOString(),
+      category: 'entry-condition',
+      threadId: 'entry_comparison_' + Date.now()
+    };
+    comms.push(record);
+    localStorage.setItem('riq_communications', JSON.stringify(comms));
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(RIQStore.isAuthed()) RIQStore.write('communications', record.id, record).catch(function(){});
+      });
+    }
+  } catch(e){}
+
+  // Copy to clipboard as fallback
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(draft.body).then(function(){
+      showToast('Email copied ✓','Opening your email app — paste if needed','📧');
+    }).catch(function(){});
+  }
+
+  showToast('Opening email','Your response is ready to send','📧');
+  setTimeout(function(){ window.location.href = mailto; }, 600);
+}
 
 function exportEntryReportPDF(data){
   if(!window.RIQExport||!RIQExport.generateConditionReport)return;
