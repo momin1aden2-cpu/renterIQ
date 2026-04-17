@@ -1120,28 +1120,100 @@ async function runExitGenerationCore(){
 function exportExitReportPDF(data){
   if(!window.RIQExport||!data)return;
   var sections=[];
+  var summary=data.summary||{};
+  var hasFourWay=summary.hasAgencyEntry||summary.hasAgencyExit;
+
+  // Property + comparison mode header
+  var address='';
+  try{var lease=JSON.parse(localStorage.getItem('riq-lease-record')||'{}');address=lease.address||'';}catch(e){}
+  var modeLabel=hasFourWay?(summary.hasAgencyEntry&&summary.hasAgencyExit?'Four-way comparison':'Three-way comparison'):'Renter entry vs exit';
+  sections.push({
+    heading:'Comparison Overview',
+    content:'Property: '+(address||'—')+'\n'+
+      'Mode: '+modeLabel+'\n'+
+      'Areas checked: '+(summary.areasChecked||0)+'\n'+
+      'Matching: '+(summary.matches||0)+'\n'+
+      'Items to review: '+(summary.reviewItems||0)+'\n'+
+      'Chargeable items: '+(summary.chargeableItems||0)+
+      (summary.contradictions?('\nAgent contradictions: '+summary.contradictions):'')+
+      (summary.bondAtRiskEstimate?('\nBond at risk estimate: '+summary.bondAtRiskEstimate):'')
+  });
+
+  // Room overview
   if(data.areas&&data.areas.length){
-    data.areas.forEach(function(area){
-      var content='';
-      if(area.entryCondition)content+='Entry: '+area.entryCondition+'\n';
-      if(area.exitCondition)content+='Exit: '+area.exitCondition+'\n';
-      if(area.comparison)content+=area.comparison+'\n';
-      if(area.suggestion)content+='Suggestion: '+area.suggestion;
+    var roomLines=data.areas.map(function(a){
+      var st=a.status==='match'?'Match ✓':a.status==='contradiction'?'Contradiction (in your favour)':a.status==='chargeable'?'Chargeable':a.status==='review'?'Review':'—';
+      return(a.emoji||'')+' '+a.room+' — '+st;
+    });
+    sections.push({heading:'Room Overview',items:roomLines});
+  }
+
+  // Discrepancies with four-way sources
+  var disc=data.discrepancies||[];
+  if(disc.length){
+    disc.forEach(function(d){
+      var lines=[];
+      lines.push(d.description||'');
+      if(d.sources){
+        lines.push('');
+        lines.push('Your move-in: '+(d.sources.renterEntry||'—'));
+        lines.push('Agent move-in: '+(d.sources.agentEntry||'Not uploaded'));
+        lines.push('Your exit: '+(d.sources.renterExit||'—'));
+        lines.push('Agent exit: '+(d.sources.agentExit||'Not uploaded'));
+      } else {
+        if(d.entryContext) lines.push('Move-in: '+d.entryContext);
+        if(d.exitContext) lines.push('Exit: '+d.exitContext);
+      }
+      if(d.contradictionNote){
+        lines.push('');
+        lines.push('AGENT CONTRADICTION: '+d.contradictionNote);
+      }
+      if(d.evidenceNote){
+        lines.push('');
+        lines.push('Evidence: '+d.evidenceNote);
+      }
+      if(d.evidenceRefs&&d.evidenceRefs.length){
+        lines.push('References: '+d.evidenceRefs.join(', '));
+      }
+      var sev=d.severity==='contradiction'?'Contradiction':d.severity==='chargeable'?'Concerns':d.severity==='review'?'Issues':'Good';
       sections.push({
-        heading:area.name||'Area',
-        badge:area.status||area.match||'',
-        content:content||'No comparison data'
+        heading:(d.emoji||'')+' '+d.room+(d.itemLabel?(' · '+d.itemLabel):''),
+        badge:sev,
+        content:lines.join('\n')
       });
     });
   }
-  if(data.summary)sections.push({heading:'Summary',content:data.summary});
-  if(data.bondRecovery)sections.push({heading:'Bond Recovery',content:data.bondRecovery});
+
+  // Bond recovery suggestions
+  var recovery=data.bondRecovery||[];
+  if(recovery.length){
+    var recItems=recovery.map(function(r){
+      return(r.emoji||'')+' '+r.room+': '+r.issue+
+        '\n  Fix: '+r.suggestion+
+        '\n  Time: '+(r.timeEst||'—')+' · Cost: '+(r.costEst||'—')+' · Difficulty: '+(r.difficulty||'—');
+    });
+    sections.push({heading:'Fix Before Handover',items:recItems});
+  }
+
+  // Tenant decisions
+  var confirmed=Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='confirmed'}).length;
+  var dismissed=Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='dismissed'}).length;
+  if(confirmed||dismissed){
+    sections.push({
+      heading:'Your Decisions',
+      content:'Items confirmed as happened during tenancy: '+confirmed+'\nItems dismissed as pre-existing / wear & tear: '+dismissed
+    });
+  }
+
+  var tenantName='';
+  try{tenantName=localStorage.getItem('riq-user-name')||(JSON.parse(localStorage.getItem('riq-resume')||'{}').fullName)||'';}catch(e){}
+
   RIQExport.generate({
-    title:'Exit-Guard Bond Shield Report',
-    subtitle:'Exit Condition Comparison',
+    title:'Exit Condition Report',
+    subtitle:address||'Bond Protection Record',
     date:new Date(),
     sections:sections,
-    filename:'RenterIQ-ExitGuard-Report-'+new Date().toISOString().split('T')[0]+'.pdf'
+    filename:'RenterIQ-Exit-Report-'+new Date().toISOString().split('T')[0]+'.pdf'
   });
 }
 
