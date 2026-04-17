@@ -1510,7 +1510,6 @@ function renderCompareMatrix(){
   if(!overlay || !body) return;
   var saved = overlay._saved || [];
 
-  // Selected inspection objects, in the order the user picked them
   var selectedObjs = _compareSelected.map(function(k){
     return saved.find(function(s){ return s.key === k; });
   }).filter(Boolean);
@@ -1520,7 +1519,6 @@ function renderCompareMatrix(){
     headerLine.textContent = n + ' of ' + saved.length + ' properties' + (saved.length > 3 ? ' · tap below to swap in others' : '');
   }
 
-  // Value helpers
   var scanRows = [
     { id:'light',    label:'Natural light' },
     { id:'mould',    label:'Damp / mould' },
@@ -1539,72 +1537,95 @@ function renderCompareMatrix(){
     var m = map[v]; if(!m) return '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:9.5px;color:var(--muted)">—</span>';
     return '<span style="display:inline-block;font-family:Sora,sans-serif;font-weight:800;font-size:9.5px;color:'+m[1]+';background:'+m[2]+';border-radius:100px;padding:3px 7px;white-space:nowrap">'+m[0]+'</span>';
   }
+  function truncateWord(s, max){
+    if(!s || s.length <= max) return s || '';
+    var cut = s.lastIndexOf(' ', max);
+    if(cut < max * 0.5) cut = max;
+    return s.slice(0, cut) + '…';
+  }
 
-  // ── Build header column cards ──
-  var colTplStart = 'grid-template-columns:110px repeat('+n+',1fr)';
-  var colTplMobile = 'grid-template-columns:90px repeat('+n+',1fr)';
+  // Responsive column template — narrower label on small screens
+  var isMobile = window.innerWidth < 400;
+  var labelW = isMobile ? '78px' : '104px';
+  var colTpl = 'grid-template-columns:'+labelW+' repeat('+n+',1fr)';
 
   var headerCols = selectedObjs.map(function(s){
     var d = s.data || {};
     var scan = d.scan || {};
     var thumb = (scan.photos && scan.photos[0] && scan.photos[0].url) || '';
-    // Small, centred thumbnail — circular for a tighter premium feel
+    var thumbSize = isMobile ? '38px' : '44px';
     var thumbHtml = thumb
-      ? '<div style="width:44px;height:44px;background:#E8EEF8 url(\''+thumb+'\') center/cover;border-radius:12px;margin:0 auto;border:1.5px solid #fff;box-shadow:0 2px 6px rgba(10,36,96,.12)"></div>'
-      : '<div style="width:44px;height:44px;background:linear-gradient(135deg,#E8EEF8,#F4F7FF);border-radius:12px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:18px;opacity:.55;border:1.5px solid #fff">🏠</div>';
+      ? '<div style="width:'+thumbSize+';height:'+thumbSize+';background:#E8EEF8 url(\''+thumb+'\') center/cover;border-radius:10px;margin:0 auto;border:1.5px solid #fff;box-shadow:0 2px 6px rgba(10,36,96,.12)"></div>'
+      : '<div style="width:'+thumbSize+';height:'+thumbSize+';background:linear-gradient(135deg,#E8EEF8,#F4F7FF);border-radius:10px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;opacity:.55;border:1.5px solid #fff">🏠</div>';
     var addrShort = (d.address || 'Property').split(',')[0];
     var issueCount = 0;
     if(scan.items){ Object.keys(scan.items).forEach(function(k){ if(scan.items[k] === 'issue') issueCount++; }); }
+    var fs = isMobile ? '10.5px' : '11.5px';
     return '<div style="padding:2px 2px;min-width:0;text-align:center">'+
-      // Address first (on top), tight 2-line clamp
-      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:11.5px;color:var(--text);line-height:1.25;letter-spacing:-.1px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.5em;margin-bottom:8px">'+addrShort+'</div>'+
-      // Smaller thumbnail sits below the address
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:'+fs+';color:var(--text);line-height:1.25;letter-spacing:-.1px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.4em;margin-bottom:6px">'+addrShort+'</div>'+
       thumbHtml +
-      '<div style="font-family:Nunito,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);margin-top:7px">'+(d.rent || '—')+(d.beds ? ' · '+d.beds+'bd' : '')+'</div>'+
-      '<div style="margin-top:5px">'+verdictChip(d.verdict || '')+'</div>'+
-      (issueCount > 0 ? '<div style="margin-top:4px"><span style="font-family:Sora,sans-serif;font-weight:700;font-size:9.5px;color:var(--amber);background:rgba(245,158,11,.12);border-radius:100px;padding:3px 7px">⚠ '+issueCount+'</span></div>' : '')+
+      '<div style="font-family:Nunito,sans-serif;font-weight:700;font-size:10px;color:var(--muted);margin-top:6px">'+(d.rent || '—')+(d.beds ? ' · '+d.beds+'bd' : '')+'</div>'+
+      '<div style="margin-top:4px">'+verdictChip(d.verdict || '')+'</div>'+
+      (issueCount > 0 ? '<div style="margin-top:3px"><span style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--amber);background:rgba(245,158,11,.12);border-radius:100px;padding:2px 6px">⚠ '+issueCount+'</span></div>' : '')+
     '</div>';
   }).join('');
 
-  // ── Build scan rows ──
   var scanRowsHtml = scanRows.map(function(row){
     var cells = selectedObjs.map(function(s){
       var state = (s.data && s.data.scan && s.data.scan.items && s.data.scan.items[row.id]) || '';
-      return '<div style="text-align:center;padding:11px 4px">'+cellIcon(state)+'</div>';
+      return '<div style="text-align:center;padding:10px 2px">'+cellIcon(state)+'</div>';
     }).join('');
-    return '<div style="display:grid;'+colTplStart+';align-items:center;border-top:1px solid var(--border-lt)">'+
-      '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;color:var(--text);padding:11px 12px">'+row.label+'</div>'+
+    return '<div style="display:grid;'+colTpl+';align-items:center;border-top:1px solid var(--border-lt)">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:'+(isMobile?'10.5px':'11.5px')+';color:var(--text);padding:10px '+(isMobile?'8px':'12px')+'">'+row.label+'</div>'+
       cells +
     '</div>';
   }).join('');
 
-  // ── Liked / Worried rows (text per column) ──
+  // Photos row — show up to 3 thumbnails per property
+  var hasAnyPhotos = selectedObjs.some(function(s){ return s.data && s.data.scan && s.data.scan.photos && s.data.scan.photos.length; });
+  var photoRowHtml = '';
+  if(hasAnyPhotos){
+    var photoCells = selectedObjs.map(function(s){
+      var photos = (s.data && s.data.scan && s.data.scan.photos) || [];
+      if(!photos.length) return '<div style="text-align:center;padding:10px 4px;color:var(--muted);font-size:11px;font-weight:600">No photos</div>';
+      var thumbs = photos.slice(0, 3).map(function(p){
+        var url = p.url || p.data || p;
+        if(!url || typeof url !== 'string') return '';
+        return '<div style="width:32px;height:32px;border-radius:6px;background:#E8EEF8 url(\''+url+'\') center/cover;border:1px solid rgba(255,255,255,.6);box-shadow:0 1px 3px rgba(0,0,0,.1);flex-shrink:0"></div>';
+      }).join('');
+      var extra = photos.length > 3 ? '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--muted)">+'+( photos.length - 3)+'</span>' : '';
+      return '<div style="display:flex;gap:3px;align-items:center;justify-content:center;padding:8px 2px;flex-wrap:wrap">'+thumbs+extra+'</div>';
+    }).join('');
+    photoRowHtml = '<div style="display:grid;'+colTpl+';align-items:center;border-top:1px solid var(--border-lt);background:var(--blue-xl)">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:'+(isMobile?'10.5px':'11.5px')+';color:var(--text);padding:10px '+(isMobile?'8px':'12px')+'">📷 Photos</div>'+
+      photoCells +
+    '</div>';
+  }
+
   function textRow(label, field, color){
     var cells = selectedObjs.map(function(s){
       var v = (s.data && s.data.scan && s.data.scan[field]) || '';
-      var snippet = v ? v.slice(0, 80) : '—';
-      return '<div style="padding:10px 6px;font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:'+(v?'var(--text)':'var(--muted)')+';line-height:1.45;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">'+snippet+(v&&v.length>80?'…':'')+'</div>';
+      var snippet = truncateWord(v, isMobile ? 60 : 90);
+      return '<div style="padding:10px '+(isMobile?'4px':'6px')+';font-family:Nunito,sans-serif;font-weight:600;font-size:'+(isMobile?'10.5px':'11px')+';color:'+(v?'var(--text)':'var(--muted)')+';line-height:1.45;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">'+(snippet||'—')+'</div>';
     }).join('');
-    return '<div style="display:grid;'+colTplStart+';align-items:start;border-top:1px solid var(--border-lt)">'+
-      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:11.5px;color:'+color+';padding:10px 12px">'+label+'</div>'+
+    return '<div style="display:grid;'+colTpl+';align-items:start;border-top:1px solid var(--border-lt)">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:'+(isMobile?'10.5px':'11.5px')+';color:'+color+';padding:10px '+(isMobile?'8px':'12px')+'">'+label+'</div>'+
       cells +
     '</div>';
   }
 
-  // ── Header row: label column + N property headers ──
-  var headerRow = '<div style="display:grid;'+colTplStart+';align-items:end;padding:16px 0 12px 0">'+
-    '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);padding-left:12px;letter-spacing:.6px;text-transform:uppercase">Property</div>'+
+  var headerRow = '<div style="display:grid;'+colTpl+';align-items:end;padding:14px 0 10px 0">'+
+    '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:10px;color:var(--muted);padding-left:'+(isMobile?'8px':'12px')+';letter-spacing:.6px;text-transform:uppercase">Property</div>'+
     headerCols +
   '</div>';
 
-  // ── Picker strip (only if more than 3 saved) ──
   var pickerHtml = '';
   if(saved.length > 3){
     var pills = saved.map(function(s){
       var d = s.data || {};
-      var addrShort = (d.address || 'Property').split(',')[0].slice(0, 28);
+      var addrShort = (d.address || 'Property').split(',')[0].slice(0, isMobile ? 22 : 28);
       var selected = _compareSelected.indexOf(s.key) >= 0;
-      return '<button onclick="toggleCompareSelection(\''+s.key+'\')" style="flex:0 0 auto;background:'+(selected?'var(--blue)':'#fff')+';color:'+(selected?'#fff':'var(--text)')+';border:1.5px solid '+(selected?'var(--blue)':'var(--border-lt)')+';border-radius:100px;padding:8px 14px;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap;box-shadow:'+(selected?'0 2px 8px rgba(27,80,200,.25)':'none')+'">'+(selected?'✓ ':'')+addrShort+'</button>';
+      return '<button onclick="toggleCompareSelection(\''+s.key+'\')" style="flex:0 0 auto;background:'+(selected?'var(--blue)':'#fff')+';color:'+(selected?'#fff':'var(--text)')+';border:1.5px solid '+(selected?'var(--blue)':'var(--border-lt)')+';border-radius:100px;padding:7px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap;min-height:44px;box-shadow:'+(selected?'0 2px 8px rgba(27,80,200,.25)':'none')+'">'+(selected?'✓ ':'')+addrShort+'</button>';
     }).join('');
     pickerHtml = '<div style="padding:12px 16px 4px;border-bottom:1px solid var(--border-lt);background:var(--blue-xl)">'+
       '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);margin-bottom:8px;letter-spacing:.6px;text-transform:uppercase">Pick up to 3 to compare</div>'+
@@ -1612,7 +1633,6 @@ function renderCompareMatrix(){
     '</div>';
   }
 
-  // ── Winner call-out (if exactly one Apply verdict stands out) ──
   var applyOnes = selectedObjs.filter(function(s){ return (s.data && s.data.verdict) === 'yes'; });
   var winnerHtml = '';
   if(applyOnes.length === 1){
@@ -1623,15 +1643,64 @@ function renderCompareMatrix(){
     '</div>';
   }
 
+  // Share button builds a plain-text comparison summary
+  var shareHtml = '<div style="padding:12px 16px 4px;text-align:center">'+
+    '<button onclick="shareComparisonSummary()" style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:10px;padding:9px 16px;font-family:Sora,sans-serif;font-weight:700;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px">📤 Share comparison</button>'+
+  '</div>';
+
   body.innerHTML =
     pickerHtml +
     winnerHtml +
-    '<div style="padding:0 16px 16px">'+
+    '<div style="padding:0 16px 0">'+
       headerRow +
       scanRowsHtml +
+      photoRowHtml +
       textRow('💚 Liked',   'liked',   'var(--teal-dk)') +
       textRow('⚠️ Worried', 'worried', 'var(--amber)') +
-    '</div>';
+    '</div>' +
+    shareHtml;
+}
+
+function shareComparisonSummary(){
+  var overlay = document.getElementById('scanCompareSheet');
+  if(!overlay) return;
+  var saved = overlay._saved || [];
+  var selectedObjs = _compareSelected.map(function(k){
+    return saved.find(function(s){ return s.key === k; });
+  }).filter(Boolean);
+
+  var scanLabels = { light:'Natural light', mould:'Damp/mould', water:'Water pressure', noise:'Street noise', kitchen:'Kitchen', bathroom:'Bathroom' };
+  var verdictLabels = { yes:'Would Apply', maybe:'Maybe', no:'Pass' };
+
+  var lines = ['Open Home Comparison\n'];
+  selectedObjs.forEach(function(s, idx){
+    var d = s.data || {};
+    var scan = d.scan || {};
+    lines.push((idx+1)+'. '+(d.address||'Property'));
+    lines.push('   Rent: '+(d.rent||'—')+' · Beds: '+(d.beds||'—'));
+    lines.push('   Verdict: '+(verdictLabels[d.verdict]||'—'));
+    var items = [];
+    Object.keys(scanLabels).forEach(function(id){
+      var st = (scan.items && scan.items[id]) || '';
+      items.push(scanLabels[id]+': '+(st==='ok'?'✓':st==='issue'?'⚠':'—'));
+    });
+    lines.push('   '+items.join(' · '));
+    if(scan.liked) lines.push('   Liked: '+scan.liked);
+    if(scan.worried) lines.push('   Worried: '+scan.worried);
+    lines.push('');
+  });
+  lines.push('Compared with RenterIQ');
+
+  var text = lines.join('\n');
+  if(navigator.share){
+    navigator.share({ title:'Open Home Comparison', text:text }).catch(function(){});
+  } else if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Copied ✓','Share with your housemate or partner','📤');
+    });
+  } else {
+    showToast('Comparison ready','Copy not supported on this browser','⚠️');
+  }
 }
 
 function exportInspectionPDF(){
