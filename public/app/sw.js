@@ -1,6 +1,6 @@
 // Service worker: network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v78';
+var CACHE_NAME = 'renteriq-shell-v79';
 
 var APP_SHELL = [
   '/app/index.html',

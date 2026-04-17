@@ -1062,11 +1062,21 @@ async function runExitGenerationCore(){
   } catch(e){}
 
   var agencyEntryReport = null, agencyExitReport = null;
-  try { agencyEntryReport = JSON.parse(localStorage.getItem('riq_agency_entry_report') || 'null'); } catch(e){}
-  try { agencyExitReport  = JSON.parse(localStorage.getItem('riq_agency_exit_report')  || 'null'); } catch(e){}
-  // Strip the dataUrl payload from agency reports to keep request body tiny
-  if (agencyEntryReport && agencyEntryReport.dataUrl) agencyEntryReport = {fileName: agencyEntryReport.fileName, uploadedAt: agencyEntryReport.uploadedAt};
-  if (agencyExitReport  && agencyExitReport.dataUrl)  agencyExitReport  = {fileName: agencyExitReport.fileName,  uploadedAt: agencyExitReport.uploadedAt};
+  var agencyEntryItems = null, agencyExitItems = null;
+  try {
+    var aeRaw = JSON.parse(localStorage.getItem('riq_agency_entry_report') || 'null');
+    if(aeRaw){
+      agencyEntryReport = {fileName: aeRaw.fileName, uploadedAt: aeRaw.uploadedAt};
+      if(aeRaw.extractedData && aeRaw.extractedData.rooms) agencyEntryItems = aeRaw.extractedData;
+    }
+  } catch(e){}
+  try {
+    var axRaw = JSON.parse(localStorage.getItem('riq_agency_exit_report') || 'null');
+    if(axRaw){
+      agencyExitReport = {fileName: axRaw.fileName, uploadedAt: axRaw.uploadedAt};
+      if(axRaw.extractedData && axRaw.extractedData.rooms) agencyExitItems = axRaw.extractedData;
+    }
+  } catch(e){}
 
   try {
     var resp = await fetch('/api/compare-exit', {
@@ -1079,7 +1089,9 @@ async function runExitGenerationCore(){
         communications: communications,
         routineHistory: routineHistory,
         agencyEntryReport: agencyEntryReport,
-        agencyExitReport: agencyExitReport
+        agencyExitReport: agencyExitReport,
+        agencyEntryItems: agencyEntryItems,
+        agencyExitItems: agencyExitItems
       })
     });
     if (resp.ok) {
@@ -1329,8 +1341,9 @@ function renderComparisonResults(data){
     var rows = data.areas.map(function(a, idx){
       var isLast = idx === data.areas.length - 1;
       var status = a.status || 'match';
-      var bg = status === 'chargeable' ? 'rgba(232,64,64,.05)' : status === 'review' ? 'rgba(245,166,35,.03)' : '';
-      var tag = status === 'chargeable' ? '<span class="tag" style="background:rgba(232,64,64,.12);color:var(--red)">Chargeable</span>'
+      var bg = status === 'chargeable' ? 'rgba(232,64,64,.05)' : status === 'review' ? 'rgba(245,166,35,.03)' : status === 'contradiction' ? 'rgba(147,51,234,.05)' : '';
+      var tag = status === 'contradiction' ? '<span class="tag" style="background:rgba(147,51,234,.12);color:#7C3AED">🛡 Contradiction</span>'
+              : status === 'chargeable' ? '<span class="tag" style="background:rgba(232,64,64,.12);color:var(--red)">Chargeable</span>'
               : status === 'review' ? '<span class="tag tag-amber">Review</span>'
               : '<span class="tag tag-teal">Match ✓</span>';
       return '<div style="padding:10px 14px;'+(isLast?'':'border-bottom:1px solid var(--border-lt);')+'display:flex;align-items:center;gap:10px;background:'+bg+'">'+
@@ -1367,12 +1380,15 @@ function renderComparisonResults(data){
   var cards=document.getElementById('discCards');
   disc.forEach(function(d,n){
     var sev = d.severity || 'review';
-    var border = sev === 'chargeable' ? 'var(--red)' : 'var(--amber)';
-    var headBg = sev === 'chargeable' ? 'rgba(232,64,64,.08)' : 'rgba(245,166,35,.08)';
-    var iconBg = sev === 'chargeable' ? 'rgba(232,64,64,.15)' : 'rgba(245,166,35,.15)';
-    var subText = sev === 'chargeable' ? 'Likely chargeable — see below' : 'Worth checking';
-    var subColor = sev === 'chargeable' ? '#7A1F1F' : '#8A6500';
-    var sevTag = sev === 'chargeable'
+    var isContradiction = sev === 'contradiction';
+    var border = isContradiction ? '#7C3AED' : sev === 'chargeable' ? 'var(--red)' : 'var(--amber)';
+    var headBg = isContradiction ? 'rgba(147,51,234,.08)' : sev === 'chargeable' ? 'rgba(232,64,64,.08)' : 'rgba(245,166,35,.08)';
+    var iconBg = isContradiction ? 'rgba(147,51,234,.15)' : sev === 'chargeable' ? 'rgba(232,64,64,.15)' : 'rgba(245,166,35,.15)';
+    var subText = isContradiction ? 'Agent\'s own reports contradict — in your favour' : sev === 'chargeable' ? 'Likely chargeable — see below' : 'Worth checking';
+    var subColor = isContradiction ? '#5B21B6' : sev === 'chargeable' ? '#7A1F1F' : '#8A6500';
+    var sevTag = isContradiction
+      ? '<span class="tag" style="background:rgba(147,51,234,.15);color:#7C3AED">🛡 Contradiction</span>'
+      : sev === 'chargeable'
       ? '<span class="tag" style="background:rgba(232,64,64,.15);color:var(--red)">🔴 Chargeable</span>'
       : '<span class="tag tag-amber">⚠️ Review</span>';
     var itemTitle = d.itemLabel ? d.itemLabel : 'Difference noted';
@@ -1406,17 +1422,34 @@ function renderComparisonResults(data){
         +'<div style="font-weight:600;font-size:13.5px;color:var(--text);line-height:1.75">'+d.description+'</div>'
       +'</div>'
       +evidenceHtml
-      +'<div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
-        +'<div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Move-in</div><div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-blue">'+d.emoji+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">'+d.entryContext+'</div></div>'
-        +'<div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Exit</div><div style="width:80px;height:80px;border-radius:10px;overflow:hidden;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px" class="ph-teal">'+d.emoji+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">'+d.exitContext+'</div></div>'
-      +'</div>'
-      +'<div id="discQuestion-'+n+'" style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl)">'
-        +'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Is this something that happened during your tenancy?</div>'
-        +'<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report and RenterIQ will suggest how to fix it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>'
-        +'<div style="display:flex;gap:10px">'
-          +'<button style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed('+n+')">Yes — this happened during my tenancy</button>'
-          +'<button style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed('+n+')">No — pre-existing / wear &amp; tear</button>'
+      +(d.contradictionNote?'<div style="padding:0 16px 12px"><div style="background:rgba(147,51,234,.06);border:1px solid rgba(147,51,234,.2);border-radius:10px;padding:10px 12px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:14px">🛡</span><span style="font-family:Sora,sans-serif;font-weight:800;font-size:10.5px;color:#7C3AED;text-transform:uppercase;letter-spacing:.8px">Agent contradiction found</span></div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--text);line-height:1.5">'+d.contradictionNote+'</div></div></div>':'')
+      +(d.sources?
+        '<div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+          +'<div style="background:rgba(27,80,200,.04);border:1px solid rgba(27,80,200,.1);border-radius:10px;padding:9px 10px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Your move-in</div><div style="font-weight:600;font-size:11px;color:var(--text);line-height:1.4">'+(d.sources.renterEntry||'<span style="color:var(--muted)">—</span>')+'</div></div>'
+          +'<div style="background:rgba(147,51,234,.04);border:1px solid rgba(147,51,234,.1);border-radius:10px;padding:9px 10px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:#7C3AED;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Agent move-in</div><div style="font-weight:600;font-size:11px;color:var(--text);line-height:1.4">'+(d.sources.agentEntry||'<span style="color:var(--muted)">Not uploaded</span>')+'</div></div>'
+          +'<div style="background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.12);border-radius:10px;padding:9px 10px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--teal-dk);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Your exit</div><div style="font-weight:600;font-size:11px;color:var(--text);line-height:1.4">'+(d.sources.renterExit||'<span style="color:var(--muted)">—</span>')+'</div></div>'
+          +'<div style="background:rgba(232,64,64,.04);border:1px solid rgba(232,64,64,.1);border-radius:10px;padding:9px 10px"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Agent exit</div><div style="font-weight:600;font-size:11px;color:var(--text);line-height:1.4">'+(d.sources.agentExit||'<span style="color:var(--muted)">Not uploaded</span>')+'</div></div>'
         +'</div>'
+        :
+        '<div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+          +'<div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Move-in</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">'+(d.entryContext||'')+'</div></div>'
+          +'<div style="background:var(--blue-xl);border-radius:12px;padding:10px;text-align:center"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Exit</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:5px">'+(d.exitContext||'')+'</div></div>'
+        +'</div>'
+      )
+      +'<div id="discQuestion-'+n+'" style="padding:14px 16px;border-top:1px solid var(--border-lt);background:'+(isContradiction?'rgba(147,51,234,.04)':'var(--blue-xl)')+'">'
+        +(isContradiction
+          ?'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:#5B21B6;margin-bottom:12px">Agent\'s own reports contradict on this item</div>'
+           +'<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">The agent noted this issue in their move-in report too. If they try to charge for it, you have strong grounds to dispute.</div>'
+           +'<div style="display:flex;gap:10px">'
+             +'<button style="flex:1;background:#7C3AED;color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed('+n+')">✓ Got it — pre-existing (in my favour)</button>'
+           +'</div>'
+          :'<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Is this something that happened during your tenancy?</div>'
+           +'<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">If yes: it will be included in your exit report and RenterIQ will suggest how to fix it to recover your bond.<br>If no: it will be recorded as pre-existing or within normal wear and tear — not your liability.</div>'
+           +'<div style="display:flex;gap:10px">'
+             +'<button style="flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 8px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantConfirmed('+n+')">Yes — this happened during my tenancy</button>'
+             +'<button style="flex:1;background:#fff;color:var(--blue);border:2px solid var(--border);border-radius:12px;padding:12px 8px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;line-height:1.3;text-align:center;cursor:pointer;min-height:44px" onclick="tenantDismissed('+n+')">No — pre-existing / wear &amp; tear</button>'
+           +'</div>'
+        )
       +'</div>'
       +'<div id="decidedState-'+n+'" style="display:none">'
         +'<div id="confirmedState-'+n+'" style="display:none;background:rgba(232,64,64,.06);border-top:1px solid rgba(232,64,64,.2);padding:14px 16px;gap:10px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">⚠️</span><div style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:13px;color:var(--red);line-height:1.5">Noted — included in your exit report. RenterIQ will suggest fixes in the next step.</div></div>'
@@ -1644,9 +1677,42 @@ function handleAgencyFileUpload(file, storageKey, toastLabel, cloudFolder, docId
       });
     }
     renderExitEvidence();
-    showToast('Saved ✓', toastLabel + ' stored', '📎');
+    showToast('Saved ✓', toastLabel + ' stored — now extracting room data…', '📎');
+    extractAgencyReportOnExit(meta.dataUrl, meta.mimeType, meta.fileName, storageKey);
   };
   reader.readAsDataURL(file);
+}
+
+function extractAgencyReportOnExit(dataUrl, mimeType, fileName, storageKey){
+  fetch('/api/extract-condition-report',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({fileData:dataUrl,mimeType:mimeType,fileName:fileName})
+  })
+  .then(function(resp){
+    if(!resp.ok) throw new Error('Extraction failed');
+    return resp.json();
+  })
+  .then(function(data){
+    if(!data.rooms||!data.rooms.length){
+      showToast('File saved','Couldn\'t auto-extract room data — the file is still stored for reference','⚠️');
+      return;
+    }
+    try{
+      var existing=JSON.parse(localStorage.getItem(storageKey)||'{}');
+      existing.extractedData=data;
+      existing.extractedAt=Date.now();
+      localStorage.setItem(storageKey,JSON.stringify(existing));
+    }catch(e){}
+    renderExitEvidence();
+    var rc=data.rooms.length;
+    var ic=data.totalItems||data.rooms.reduce(function(s,r){return s+(r.items?r.items.length:0)},0);
+    showToast('Report extracted ✓',rc+' rooms, '+ic+' items found — will be used in your comparison','🔍');
+  })
+  .catch(function(err){
+    console.warn('Agency report extraction on exit failed:',err);
+    showToast('File saved ✓','Couldn\'t auto-extract room data, but the file is stored','📎');
+  });
 }
 
 function exitDataURLToBlob(dataUrl){

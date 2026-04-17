@@ -1439,10 +1439,20 @@ function loadAgencyEntryDisplay(){
     var sub = document.getElementById('agencyEntrySub');
     var action = document.getElementById('agencyEntryAction');
     var card = document.getElementById('agencyEntryCard');
-    if(title) title.textContent = '✓ Agent\'s move-in report saved';
-    if(sub) sub.textContent = meta.fileName + ' · ' + new Date(meta.uploadedAt||Date.now()).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+    var dateStr = new Date(meta.uploadedAt||Date.now()).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+    if(meta.extractedData && meta.extractedData.rooms){
+      var rc = meta.extractedData.rooms.length;
+      var ic = meta.extractedData.totalItems || 0;
+      if(title) title.textContent = '✓ Agent\'s report extracted';
+      if(sub) sub.textContent = meta.fileName + ' · ' + rc + ' rooms, ' + ic + ' items · ' + dateStr;
+      if(card) card.style.borderColor = 'var(--teal)';
+      if(card) card.style.background = 'rgba(0,200,150,.03)';
+    } else {
+      if(title) title.textContent = '✓ Agent\'s move-in report saved';
+      if(sub) sub.textContent = meta.fileName + ' · ' + dateStr;
+      if(card) card.style.borderColor = 'var(--teal)';
+    }
     if(action) action.innerHTML = '↻';
-    if(card) card.style.borderColor = 'var(--teal)';
   } catch(e){}
 }
 
@@ -1490,12 +1500,52 @@ document.addEventListener('DOMContentLoaded', function(){
           });
         }
         loadAgencyEntryDisplay();
-        showToast('Saved ✓','Agent\'s move-in report stored','📎');
+        showToast('Saved ✓','Agent\'s move-in report stored — now extracting room data…','📎');
+        extractAgencyReport(meta.dataUrl, meta.mimeType, meta.fileName, 'entry');
       };
       reader.readAsDataURL(file);
     });
   }
 });
+
+function extractAgencyReport(dataUrl, mimeType, fileName, type){
+  var card=document.getElementById('agencyEntryCard');
+  var sub=document.getElementById('agencyEntrySub');
+  if(sub) sub.textContent='Extracting rooms and items from '+fileName+'…';
+
+  fetch('/api/extract-condition-report',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({fileData:dataUrl,mimeType:mimeType,fileName:fileName})
+  })
+  .then(function(resp){
+    if(!resp.ok) throw new Error('Extraction failed');
+    return resp.json();
+  })
+  .then(function(data){
+    if(!data.rooms||!data.rooms.length){
+      showToast('Could not extract','We stored the file but couldn\'t read room data from it. That\'s OK — you can still use it at exit time.','⚠️');
+      loadAgencyEntryDisplay();
+      return;
+    }
+    var key=type==='entry'?'riq_agency_entry_report':'riq_agency_exit_report';
+    try{
+      var existing=JSON.parse(localStorage.getItem(key)||'{}');
+      existing.extractedData=data;
+      existing.extractedAt=Date.now();
+      localStorage.setItem(key,JSON.stringify(existing));
+    }catch(e){}
+    loadAgencyEntryDisplay();
+    var roomCount=data.rooms.length;
+    var itemCount=data.totalItems||data.rooms.reduce(function(s,r){return s+(r.items?r.items.length:0)},0);
+    showToast('Report extracted ✓',roomCount+' rooms, '+itemCount+' items found — will be used in your exit comparison','🔍');
+  })
+  .catch(function(err){
+    console.warn('Agency report extraction failed:',err);
+    loadAgencyEntryDisplay();
+    showToast('File saved ✓','Couldn\'t auto-extract room data, but the file is stored for exit comparison','📎');
+  });
+}
 
 
 function exportEntryReportPDF(data){
