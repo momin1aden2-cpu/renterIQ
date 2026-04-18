@@ -1,6 +1,6 @@
 // Service worker: network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v103';
+var CACHE_NAME = 'renteriq-shell-v104';
 
 var APP_SHELL = [
   '/app/index.html',
@@ -38,7 +38,7 @@ var APP_SHELL = [
   '/app/pages/webview.html',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',
-  '/assets/logo.svg'
+  '/assets/logo-new.png'
 ];
 
 // ── Install: pre-cache the entire app shell ──────────────────────────────────

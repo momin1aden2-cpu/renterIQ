@@ -51,7 +51,7 @@
     
     aside.innerHTML =
       '<a href="/" class="ds-brand">' +
-        '<img src="/assets/logo.svg" alt="RenterIQ" width="32" height="32" style="flex-shrink:0">' +
+        '<img src="/assets/logo-new.png" alt="RenterIQ" width="32" height="32" style="flex-shrink:0">' +
         '<div class="ds-brand-text">' +
           '<span class="ds-wordmark">RenterIQ</span>' +
           '<span class="ds-tagline">Rent smarter. Live safer.</span>' +
