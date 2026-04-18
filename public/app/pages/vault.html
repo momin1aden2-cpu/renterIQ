@@ -86,12 +86,6 @@
     <div class="sh-title">Your Vault</div>
     <div class="sh-sub">Your documents &amp; records</div>
   </header>
-  <div style="background:var(--blue-dk);padding:16px 24px;display:flex;justify-content:space-between;gap:8px">
-    <div class="vault-stat"><div class="vault-stat-num">0</div><div class="vault-stat-label">Documents</div></div>
-    <div class="vault-stat"><div class="vault-stat-num">0</div><div class="vault-stat-label">Photos</div></div>
-    <div class="vault-stat"><div class="vault-stat-num">0</div><div class="vault-stat-label">Reports</div></div>
-    <div class="vault-stat"><div class="vault-stat-num">—</div><div class="vault-stat-label">Protected</div></div>
-  </div>
   <div style="flex:1;overflow-y:auto;padding-bottom:100px">
     <div style="padding:20px 16px 10px"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Your Documents</div><div style="font-weight:600;font-size:12px;color:var(--muted)">All stored securely on this device</div></div>
     <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px">
@@ -102,15 +96,14 @@
       <div class="folder-card" onclick="switchView('E')"><div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#1A4A6B,#2299CC);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">💬</div><div style="flex:1;min-width:0"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Communications</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Save agent &amp; landlord messages</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="vault-count-e" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:3px 10px">0 saved</span><span style="color:var(--muted);font-size:20px">›</span></div></div>
       <div class="folder-card" onclick="switchView('F')"><div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#006B50,var(--teal));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🧾</div><div style="flex:1;min-width:0"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Receipts &amp; Payments</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Rent, bond &amp; repair receipts</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="vault-count-f" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:3px 10px">0 receipts</span><span style="color:var(--muted);font-size:20px">›</span></div></div>
       <div class="folder-card" onclick="switchView('G')"><div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue-dk),#4A2299);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🚪</div><div style="flex:1;min-width:0"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Exit Reports</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Bond back &amp; exit condition</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="vault-count-g" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:3px 10px">0 reports</span><span style="color:var(--muted);font-size:20px">›</span></div></div>
-      <!-- Personal Documents Folder — auto-created when resume is saved -->
-      <div class="folder-card" id="resumeFolderCard" style="display:none" onclick="loadPersonalDocuments();switchView('I')">
+      <div class="folder-card" id="resumeFolderCard" onclick="loadPersonalDocuments();switchView('I')">
         <div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#1B50C8,#4A90D9);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🗂️</div>
         <div style="flex:1;min-width:0">
           <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Personal Documents</div>
-          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Resume, IDs, payslips &amp; more</div>
+          <div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Resume, IDs, payslips &amp; cover letter</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <span id="resumeFolderBadge" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal-dk);background:rgba(0,200,150,.1);border-radius:100px;padding:3px 10px">0 docs</span>
+          <span id="resumeFolderBadge" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:3px 10px">0 files</span>
           <span style="color:var(--muted);font-size:20px">›</span>
         </div>
       </div>
@@ -2729,25 +2722,27 @@ function exportOpenHomePdf(doc,record){
 /* ── Personal Documents Folder ── */
 function checkResumeFolder(){
   try{
-    var card=document.getElementById('resumeFolderCard');
     var badge=document.getElementById('resumeFolderBadge');
-    if(!card)return;
-    // Check new key first
+    if(!badge)return;
     var raw=localStorage.getItem('riq_personal_docs');
     var baseRaw=localStorage.getItem('riq-resume');
+    var total=0;
     if(raw){
       var rec=JSON.parse(raw);
-      card.style.display='flex';
-      var uploadCount=Object.keys(rec.uploadedDocs||{}).length;
-      var userCount=(rec.userDocs||[]).length;
-      var total=uploadCount+userCount+(rec.coverLetter?1:0);
-      if(badge){badge.textContent=total+' file'+(total!==1?'s':'');badge.style.background='rgba(0,200,150,.1)';badge.style.color='var(--teal-dk)';}
+      total=Object.keys(rec.uploadedDocs||{}).length+(rec.userDocs||[]).length+(rec.coverLetter?1:0);
     }else if(baseRaw){
       var base=JSON.parse(baseRaw);
-      if(base.fullName||base.email){
-        card.style.display='flex';
-        if(badge){badge.textContent='In progress';badge.style.background='rgba(245,166,35,.1)';badge.style.color='#7A5500';}
-      }
+      if(base.fullName||base.email) total=-1; // signal "in progress"
+    }
+    if(total>0){
+      badge.textContent=total+' file'+(total!==1?'s':'');
+      badge.style.background='rgba(0,200,150,.1)';badge.style.color='var(--teal-dk)';
+    }else if(total===-1){
+      badge.textContent='In progress';
+      badge.style.background='rgba(245,166,35,.1)';badge.style.color='#7A5500';
+    }else{
+      badge.textContent='Empty';
+      badge.style.background='var(--blue-xl)';badge.style.color='var(--muted)';
     }
   }catch(e){}
 }
@@ -2759,7 +2754,6 @@ function loadPersonalDocuments(){
   try{
     var raw=localStorage.getItem('riq_personal_docs');
     var r=raw?JSON.parse(raw):null;
-    // Fall back to base resume if personal_docs not yet created
     if(!r){
       var baseRaw=localStorage.getItem('riq-resume');
       if(baseRaw){
@@ -2770,9 +2764,9 @@ function loadPersonalDocuments(){
     if(!r){
       container.innerHTML='<div style="text-align:center;padding:60px 20px">'+
         '<div style="font-size:48px;margin-bottom:16px">🗂️</div>'+
-        '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;color:var(--blue-dk);margin-bottom:8px">Personal Documents</div>'+
-        '<div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.55">Complete your Renter Resume to auto-populate this folder with your profile, IDs and financial documents. You can also add files manually any time.</div>'+
-        '<button style="background:var(--blue);color:#fff;border:none;border-radius:14px;padding:14px 24px;font-family:\'Sora\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(27,80,200,.2);min-height:44px" onclick="navigate(\'/app/pages/application.html\')">Build Renter Resume →</button>'+
+        '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;color:var(--blue-dk);margin-bottom:8px">Nothing here yet</div>'+
+        '<div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.55">Start your Renter Resume to auto-populate this folder, or add files manually using the button above.</div>'+
+        '<button style="background:var(--blue);color:#fff;border:none;border-radius:14px;padding:14px 24px;font-family:\'Sora\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(27,80,200,.2);min-height:44px" onclick="navigate(\'/app/pages/application.html\')">Start Renter Resume →</button>'+
         '</div>';
       return;
     }
@@ -2780,12 +2774,10 @@ function loadPersonalDocuments(){
     var updated=r.updatedAt?new Date(r.updatedAt).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}):'—';
     if(subtitle)subtitle.textContent='Last updated '+updated;
 
-    var idScore=r.idScore||0;
     var uploadedDocs=r.uploadedDocs||{};
     var docKeys=Object.keys(uploadedDocs);
     var userDocs=r.userDocs||[];
     var hasCover=!!(r.coverLetter);
-    var totalFiles=docKeys.length+userDocs.length+(hasCover?1:0);
 
     function row(label,val){
       if(!val)return'';
@@ -2794,51 +2786,44 @@ function loadPersonalDocuments(){
         '<span style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:14px;color:var(--text);flex:1;word-break:break-word">'+val+'</span>'+
         '</div>';
     }
-    function docRow(d,onDelete){
+    function docRow(d,docId,onDelete){
       var isImg=d.mimeType&&d.mimeType.startsWith('image/');
       var ext=(d.name||'').split('.').pop().toLowerCase();
       var icon=isImg?'🖼️':ext==='pdf'?'📄':ext==='docx'||ext==='doc'?'📝':'📎';
       var sizeStr=d.size>0?Math.round(d.size/1024)+'KB':'';
+      var isSecure=d.secure===true;
+      var viewBtn='';
+      if(isSecure&&docId){
+        viewBtn='<button onclick="viewSecureDoc(\''+docId+'\')" style="background:var(--blue-xl);color:var(--blue);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;min-height:36px">View</button>';
+      }else if(d.data){
+        viewBtn='<button onclick="window.open(\''+d.data+'\',\'_blank\')" style="background:var(--blue-xl);color:var(--blue);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;min-height:36px">View</button>';
+      }else if(d.url){
+        viewBtn='<button onclick="window.open(\''+d.url+'\',\'_blank\')" style="background:var(--blue-xl);color:var(--blue);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;min-height:36px">View</button>';
+      }
+      var statusText=isSecure?'🔒 Encrypted on device':(d.pts>0?'<span style="color:var(--teal-dk)">'+d.pts+' ID pts</span>':'');
       return'<div style="padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px">'+
         '<div style="width:38px;height:38px;border-radius:10px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+icon+'</div>'+
         '<div style="flex:1;min-width:0">'+
-        '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+d.name+'</div>'+
-        '<div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">'+(d.pts>0?'<span style="color:var(--teal-dk)">'+d.pts+' ID pts</span> · ':'')+sizeStr+'</div></div>'+
+        '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(d.name||'Document')+'</div>'+
+        '<div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:1px">'+(statusText?(statusText+(sizeStr?' · '+sizeStr:'')):sizeStr)+'</div></div>'+
         '<div style="display:flex;gap:6px;flex-shrink:0">'+
-        (d.data?'<button onclick="window.open(\''+d.data+'\',\'_blank\')" style="background:var(--blue-xl);color:var(--blue);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer">View</button>':'')+
-        (onDelete?'<button onclick="'+onDelete+'" style="background:rgba(232,64,64,.08);color:var(--red);border:1px solid rgba(232,64,64,.2);border-radius:8px;padding:5px 8px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer">✕</button>':'')+
+        viewBtn+
+        (onDelete?'<button onclick="'+onDelete+'" style="background:rgba(232,64,64,.08);color:var(--red);border:1px solid rgba(232,64,64,.2);border-radius:8px;padding:5px 8px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;min-height:36px">✕</button>':'')+
         '</div></div>';
     }
 
     var html='';
 
-    // Stats banner
-    html+='<div style="background:var(--blue-dk);border-radius:16px;padding:16px 18px;margin-bottom:16px;display:flex;gap:0;align-items:center;justify-content:space-between">'+
-      '<div style="text-align:center;flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:'+(idScore>=100?'var(--teal)':'#fff')+'">'+idScore+(idScore>100?'+':'')+'</div><div style="font-family:\'Nunito\',sans-serif;font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-top:2px">ID Points</div></div>'+
-      '<div style="width:1px;height:36px;background:rgba(255,255,255,.1)"></div>'+
-      '<div style="text-align:center;flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:#fff">'+totalFiles+'</div><div style="font-family:\'Nunito\',sans-serif;font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-top:2px">Files Saved</div></div>'+
-      '<div style="width:1px;height:36px;background:rgba(255,255,255,.1)"></div>'+
-      '<div style="text-align:center;flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px;color:'+(hasCover?'var(--teal)':'rgba(255,255,255,.3)')+'">'+( hasCover?'✓':'—')+'</div><div style="font-family:\'Nunito\',sans-serif;font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-top:2px">Cover Letter</div></div>'+
-      '</div>';
-
-    // Renter Resume section
+    // Renter Resume summary
     if(res.fullName||res.email||res.employer){
       html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);overflow:hidden;margin-bottom:14px">'+
         '<div style="background:var(--blue-xl);padding:12px 14px;display:flex;align-items:center;justify-content:space-between">'+
         '<span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px">Renter Resume</span>'+
-        '<button onclick="navigate(\'/app/pages/application.html\')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer">Edit</button>'+
+        '<button onclick="navigate(\'/app/pages/application.html\')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;min-height:36px">Edit</button>'+
         '</div>'+
-        row('Name',res.fullName)+row('DOB',res.dob)+row('Email',res.email)+row('Mobile',res.mobile)+
-        row('Address',res.currentAddress)+row('Moving reason',res.reasonMoving)+
+        row('Name',res.fullName)+row('Email',res.email)+row('Mobile',res.mobile)+
         (res.employer?row('Employer',res.employer+(res.jobTitle?' · '+res.jobTitle:'')):'')+(res.income?row('Income',res.income):'')+
-        (res.prevAddress?row('Prev. Address',res.prevAddress+(res.prevAgency?' — '+res.prevAgency:'')):'')+'</div>';
-    }
-
-    // References
-    if(res.ref1Name||res.ref2Name){
-      html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);overflow:hidden;margin-bottom:14px">'+
-        '<div style="background:var(--blue-xl);padding:12px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px">References</div>'+
-        (res.ref1Name?row('Ref 1',res.ref1Name+(res.ref1Agency?' — '+res.ref1Agency:'')+' · '+(res.ref1Phone||'')):'')+(res.ref2Name?row('Ref 2',res.ref2Name+(res.ref2Company?' — '+res.ref2Company:'')+' · '+(res.ref2Phone||'')):'')+'</div>';
+        (res.prevAddress?row('Prev. rental',res.prevAddress+(res.prevAgency?' — '+res.prevAgency:'')):'')+'</div>';
     }
 
     // Cover letter
@@ -2846,35 +2831,25 @@ function loadPersonalDocuments(){
       html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);overflow:hidden;margin-bottom:14px">'+
         '<div style="background:var(--blue-xl);padding:12px 14px;display:flex;align-items:center;justify-content:space-between">'+
         '<span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px">Cover Letter</span>'+
-        '<button onclick="(function(){if(navigator.clipboard)navigator.clipboard.writeText(document.getElementById(\'cvLetterText\').textContent).then(function(){showToast(\'Copied\',\'Paste into the agency portal\',\'📋\')})})()" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer">Copy</button>'+
+        '<button onclick="(function(){if(navigator.clipboard)navigator.clipboard.writeText(document.getElementById(\'cvLetterText\').textContent).then(function(){showToast(\'Copied\',\'Paste into the agency portal\',\'📋\')})})()" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;min-height:36px">Copy</button>'+
         '</div>'+
-        '<div id="cvLetterText" style="padding:14px 16px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;background:rgba(27,80,200,.03)">'+r.coverLetter+'</div></div>';
+        '<div id="cvLetterText" style="padding:14px 16px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;max-height:200px;overflow-y:auto">'+r.coverLetter+'</div></div>';
     }
 
-    // ID & Financial Documents (from resume builder)
+    // ID & Documents (from resume builder — may be encrypted)
     if(docKeys.length>0){
-      var idDocs=docKeys.filter(function(k){return (uploadedDocs[k].pts||0)>0;});
-      var financialDocs=docKeys.filter(function(k){return (uploadedDocs[k].pts||0)===0;});
-      if(idDocs.length>0){
-        html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);overflow:hidden;margin-bottom:14px">'+
-          '<div style="background:var(--blue-xl);padding:12px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px">Identity Documents ('+idDocs.length+')</div>';
-        idDocs.forEach(function(k){html+=docRow(uploadedDocs[k],null);});
-        html+='</div>';
-      }
-      if(financialDocs.length>0){
-        html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);overflow:hidden;margin-bottom:14px">'+
-          '<div style="background:var(--blue-xl);padding:12px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px">Financial &amp; Supporting Documents ('+financialDocs.length+')</div>';
-        financialDocs.forEach(function(k){html+=docRow(uploadedDocs[k],null);});
-        html+='</div>';
-      }
+      html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);overflow:hidden;margin-bottom:14px">'+
+        '<div style="background:var(--blue-xl);padding:12px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px">ID &amp; Supporting Documents ('+docKeys.length+')</div>';
+      docKeys.forEach(function(k){html+=docRow(uploadedDocs[k],k,null);});
+      html+='</div>';
     }
 
-    // User-added documents
+    // User-added files
     if(userDocs.length>0){
       html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);overflow:hidden;margin-bottom:14px">'+
         '<div style="background:var(--blue-xl);padding:12px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:1px">Your Added Files ('+userDocs.length+')</div>';
       userDocs.forEach(function(d,idx){
-        html+=docRow(d,'deletePersonalDoc('+idx+')');
+        html+=docRow(d,null,'deletePersonalDoc('+idx+')');
       });
       html+='</div>';
     }
@@ -2894,6 +2869,21 @@ function loadPersonalDocuments(){
     container.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:32px;margin-bottom:8px">⚠️</div><div style="font-size:13px">Could not load documents</div></div>';
     console.error('loadPersonalDocuments:',e);
   }
+}
+
+function viewSecureDoc(docId){
+  if(!window.RIQSecureDocs||!RIQSecureDocs.supported){
+    showToast('Not supported','Encrypted docs require Chrome or Safari','⚠️');
+    return;
+  }
+  showToast('Decrypting…','Opening your file','🔒');
+  RIQSecureDocs.getObjectURL(docId).then(function(url){
+    if(!url){showToast('File not found','This document may have been removed','⚠️');return;}
+    window.open(url,'_blank');
+  }).catch(function(err){
+    console.warn('viewSecureDoc failed:',err);
+    showToast('Could not open','Try reloading the app','⚠️');
+  });
 }
 
 function handlePersonalDocUpload(input){
@@ -3815,6 +3805,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
 <script src="/api/firebase-config" defer></script>
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
+<script src="/app/js/secure-docs.js" defer></script>
 <script src="/app/js/local-files.js" defer></script>
 </body>
 </html>

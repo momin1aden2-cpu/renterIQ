@@ -300,7 +300,6 @@
         <div class="form-field"><label class="form-label">How long there?</label><input id="r-timeAtAddress" class="form-input" placeholder="e.g. 2 years" oninput="autosave()"></div>
         <div class="form-field"><label class="form-label">Reason for moving</label><input id="r-reasonMoving" class="form-input" placeholder="Quick reason — needs more space, closer to work, etc." oninput="autosave()"></div>
       </div>
-      <button class="btn-muted-c btn-full" style="border-radius:10px;margin-top:10px;font-size:13px" onclick="copySection('personal')">📋 Copy this step</button>
     </section>
 
     <!-- ── STEP 2 — EMPLOYMENT ─────────────────────────────────────────── -->
@@ -325,7 +324,6 @@
           <div class="form-note">Agencies usually ask for a few payslips to verify</div>
         </div>
       </div>
-      <button class="btn-muted-c btn-full" style="border-radius:10px;margin-top:10px;font-size:13px" onclick="copySection('employment')">📋 Copy this step</button>
     </section>
 
     <!-- ── STEP 3 — RENTAL HISTORY ─────────────────────────────────────── -->
@@ -419,9 +417,9 @@
     </section>
   </div>
 
-  <div class="sticky-footer">
-    <button class="btn-outline-c" id="bStepFooterBack" onclick="bStepBack()">← Back</button>
-    <button class="btn-blue-c flex-1" id="bStepFooterNext" style="border-radius:12px" onclick="bStepNext()">Next →</button>
+  <div class="sticky-footer" style="box-shadow:0 -4px 16px rgba(10,36,96,.08);padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px))">
+    <button class="btn-outline-c" id="bStepFooterBack" style="min-height:48px;border-radius:12px" onclick="bStepBack()">← Back</button>
+    <button class="btn-blue-c flex-1" id="bStepFooterNext" style="border-radius:12px;min-height:48px;font-size:14px" onclick="bStepNext()">Next →</button>
   </div>
 </div>
 

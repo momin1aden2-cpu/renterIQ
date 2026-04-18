@@ -28,12 +28,12 @@
 .rh-back{background:none;border:none;color:var(--text);display:flex;align-items:center;gap:6px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
 .rh-back-arrow{font-size:22px;font-weight:700;line-height:1}
 .rh-back-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;opacity:.7}
-.rh-search{background:var(--glass-surface-2);border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rh-search{background:rgba(255,255,255,.12);border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .rh-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);margin-top:8px}
 .rh-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:3px}
 .pill-row{display:flex;gap:8px;overflow-x:auto;padding:14px 0;margin-top:14px;-ms-overflow-style:none;scrollbar-width:none}
 .pill-row::-webkit-scrollbar{display:none}
-.state-pill{border-radius:100px;padding:7px 16px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;flex-shrink:0;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth);background:var(--glass-surface-2);color:var(--muted);border:1px solid var(--border);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.state-pill{border-radius:100px;padding:7px 16px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;flex-shrink:0;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth);background:#fff;color:var(--muted);border:1px solid var(--border)}
 .state-pill:active{transform:scale(.95)}
 .rights-link-row{padding:11px 0;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s}
 .rights-link-row:last-child{border-bottom:none}
@@ -50,18 +50,18 @@
 .right-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .right-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
 .right-desc{font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.55}
-.state-hdr{margin:16px;border-radius:20px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
-.state-abbr{font-family:'Sora',sans-serif;font-weight:800;font-size:42px;color:var(--text);line-height:1}
-.state-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--muted);margin-top:4px}
-.state-tag{font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:6px}
-.state-free{background:var(--glass-surface-2);border:1px solid rgba(255,255,255,.25);border-radius:100px;padding:5px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--text);display:inline-block;margin-top:12px}
-.sp-card{background:var(--glass-surface-3);border-radius:16px;margin:0 16px 10px;padding:15px 16px;border:1px solid rgba(27,80,200,.12);transition:transform .18s var(--ease-smooth)}
+.state-hdr{margin:16px;border-radius:20px;padding:22px 20px;box-shadow:0 4px 20px rgba(10,36,96,.18)}
+.state-abbr{font-family:'Sora',sans-serif;font-weight:800;font-size:42px;color:#fff;line-height:1;letter-spacing:-1px}
+.state-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:rgba(255,255,255,.85);margin-top:5px}
+.state-tag{font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:rgba(255,255,255,.6);margin-top:6px}
+.state-free{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:100px;padding:5px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:#fff;display:inline-block;margin-top:12px}
+.sp-card{background:#fff;border-radius:16px;margin:0 16px 10px;padding:15px 16px;border:1px solid var(--border-lt);transition:transform .18s var(--ease-smooth)}
 .sp-card:active{transform:scale(.98)}
 .sp-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);margin-bottom:10px}
 .sp-point{display:flex;gap:8px;align-items:flex-start}
 .sp-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
 .sp-text{font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55}
-.disp-card{background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 20px;padding:14px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
+.disp-card{background:#fff;border-radius:16px;margin:0 16px 20px;padding:14px 16px;border:1px solid var(--border-lt);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
 .disp-card:active{transform:scale(.97);box-shadow:none}
 .teal-lt{background:rgba(0,200,150,.1)}
 .amber-lt{background:rgba(245,166,35,.1)}
@@ -108,21 +108,21 @@
     <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin-bottom:16px">Select Your State</div>
     <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px">Choose your state to see relevant tenancy information</div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-      <button onclick="saveUserState('NSW')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">NSW</button>
-      <button onclick="saveUserState('VIC')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">VIC</button>
-      <button onclick="saveUserState('QLD')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">QLD</button>
-      <button onclick="saveUserState('WA')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">WA</button>
-      <button onclick="saveUserState('SA')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">SA</button>
-      <button onclick="saveUserState('TAS')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">TAS</button>
-      <button onclick="saveUserState('ACT')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">ACT</button>
-      <button onclick="saveUserState('NT')" style="background:var(--glass-surface-1);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">NT</button>
+      <button onclick="saveUserState('NSW')" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">NSW</button>
+      <button onclick="saveUserState('VIC')" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">VIC</button>
+      <button onclick="saveUserState('QLD')" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">QLD</button>
+      <button onclick="saveUserState('WA')" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">WA</button>
+      <button onclick="saveUserState('SA')" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">SA</button>
+      <button onclick="saveUserState('TAS')" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">TAS</button>
+      <button onclick="saveUserState('ACT')" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">ACT</button>
+      <button onclick="saveUserState('NT')" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">NT</button>
     </div>
     <button onclick="closeStateSelect()" style="background:transparent;color:var(--muted);border:none;border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:16px;width:100%">Cancel</button>
   </div>
 </div>
 
 <!-- INTRO CARD -->
-<div style="margin:16px;background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
+<div style="margin:16px;background:#fff; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:18px;padding:18px;border:1px solid var(--border-lt)">
   <div style="display:flex;gap:12px;align-items:center">
     <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-md));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">⚖️</div>
     <div>
@@ -143,7 +143,7 @@
   <div class="sec-title">Rights you have as a renter</div>
   <div class="sec-sub">Applies everywhere in Australia</div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 16px;border:1px solid var(--border-lt);overflow:hidden">
+<div style="background:#fff; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 16px;border:1px solid var(--border-lt);overflow:hidden">
   <div class="right-row"><div class="right-icon" style="background:var(--blue-xl)">🔑</div><div><div class="right-title">Bond Protection</div><div class="right-desc">Your bond must be lodged with the state bond authority — not held by the landlord or agent. You are entitled to a lodgement receipt.</div></div></div>
   <div class="right-row"><div class="right-icon amber-lt">🔧</div><div><div class="right-title">Repairs & Maintenance</div><div class="right-desc">Your landlord must maintain the property in good repair. Urgent repairs must be fixed promptly. You can report non-urgent repairs in writing.</div></div></div>
   <div class="right-row"><div class="right-icon" style="background:var(--blue-xl)">📅</div><div><div class="right-title">Entry Notice Required</div><div class="right-desc">Landlords and agents must give written notice before entering — usually 24 hours minimum. Emergency entry is an exception.</div></div></div>
@@ -162,7 +162,7 @@
 
 <!-- STATE: VIC -->
 <div class="state-section" id="state-VIC">
-<div class="state-hdr" style="background:linear-gradient(135deg,#003580,#1B50C8)">
+<div class="state-hdr" style="background:linear-gradient(135deg,#0A1E4A,#162F6E)">
   <div class="state-abbr">VIC</div>
   <div class="state-name">Victoria</div>
   <div class="state-tag">Consumer Affairs Victoria · VCAT</div>
@@ -179,7 +179,7 @@
     <div class="qf-item"><div class="qf-num">14 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
   </div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
+<div style="background:#fff;border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.consumer.vic.gov.au/housing/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Consumer Affairs Victoria</div><div class="rights-link-desc">Tenancy advice, guides and dispute help</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
@@ -209,7 +209,7 @@
 
 <!-- STATE: NSW -->
 <div class="state-section" id="state-NSW">
-<div class="state-hdr" style="background:linear-gradient(135deg,#00205B,#003DA5)">
+<div class="state-hdr" style="background:linear-gradient(135deg,#0A1E4A,#162F6E)">
   <div class="state-abbr">NSW</div>
   <div class="state-name">New South Wales</div>
   <div class="state-tag">NSW Fair Trading · NCAT</div>
@@ -226,7 +226,7 @@
     <div class="qf-item"><div class="qf-num">14 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
   </div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
+<div style="background:#fff;border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">NSW Fair Trading — Renting</div><div class="rights-link-desc">Official renting guide for NSW tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
@@ -256,7 +256,7 @@
 
 <!-- STATE: QLD -->
 <div class="state-section" id="state-QLD">
-<div class="state-hdr" style="background:linear-gradient(135deg,#4B0000,#9B1C1C)">
+<div class="state-hdr" style="background:linear-gradient(135deg,#0A1E4A,#162F6E)">
   <div class="state-abbr">QLD</div>
   <div class="state-name">Queensland</div>
   <div class="state-tag">Residential Tenancies Authority · QCAT</div>
@@ -273,7 +273,7 @@
     <div class="qf-item"><div class="qf-num">7 days</div><div class="qf-label">Non-urgent repair (Form 9)</div></div>
   </div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
+<div style="background:#fff;border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.rta.qld.gov.au/')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Residential Tenancies Authority</div><div class="rights-link-desc">Queensland's dedicated rental authority</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
@@ -303,7 +303,7 @@
 
 <!-- STATE: WA -->
 <div class="state-section" id="state-WA">
-<div class="state-hdr" style="background:linear-gradient(135deg,#004B23,#007A3D)">
+<div class="state-hdr" style="background:linear-gradient(135deg,#0A1E4A,#162F6E)">
   <div class="state-abbr">WA</div>
   <div class="state-name">Western Australia</div>
   <div class="state-tag">Consumer Protection WA · Magistrates Court</div>
@@ -320,7 +320,7 @@
     <div class="qf-item"><div class="qf-num">14 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
   </div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
+<div style="background:#fff;border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.consumerprotection.wa.gov.au/renting-home')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Consumer Protection WA — Renting</div><div class="rights-link-desc">Official renting guide for WA tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
@@ -350,7 +350,7 @@
 
 <!-- STATE: SA -->
 <div class="state-section" id="state-SA">
-<div class="state-hdr" style="background:linear-gradient(135deg,#1A1A4E,#2E2E8F)">
+<div class="state-hdr" style="background:linear-gradient(135deg,#0A1E4A,#162F6E)">
   <div class="state-abbr">SA</div>
   <div class="state-name">South Australia</div>
   <div class="state-tag">Consumer and Business Services · SACAT</div>
@@ -367,7 +367,7 @@
     <div class="qf-item"><div class="qf-num">Reasonable</div><div class="qf-label">Non-urgent repair timeframe</div></div>
   </div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
+<div style="background:#fff;border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://cbs.sa.gov.au/sections/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">CBS SA — Renting Guide</div><div class="rights-link-desc">Consumer and Business Services SA</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
@@ -397,7 +397,7 @@
 
 <!-- STATE: TAS -->
 <div class="state-section" id="state-TAS">
-<div class="state-hdr" style="background:linear-gradient(135deg,#0D3D0D,#1A7A1A)">
+<div class="state-hdr" style="background:linear-gradient(135deg,#0A1E4A,#162F6E)">
   <div class="state-abbr">TAS</div>
   <div class="state-name">Tasmania</div>
   <div class="state-tag">CBOS Tasmania · Magistrates Court</div>
@@ -414,7 +414,7 @@
     <div class="qf-item"><div class="qf-num">28 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
   </div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
+<div style="background:#fff;border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.cbos.tas.gov.au/topics/housing/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">CBOS — Renting in Tasmania</div><div class="rights-link-desc">Consumer, Building and Occupational Services</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
@@ -444,7 +444,7 @@
 
 <!-- STATE: ACT -->
 <div class="state-section" id="state-ACT">
-<div class="state-hdr" style="background:linear-gradient(135deg,#1A0050,#4B0082)">
+<div class="state-hdr" style="background:linear-gradient(135deg,#0A1E4A,#162F6E)">
   <div class="state-abbr">ACT</div>
   <div class="state-name">Australian Capital Territory</div>
   <div class="state-tag">Access Canberra · ACAT</div>
@@ -461,7 +461,7 @@
     <div class="qf-item"><div class="qf-num">4 weeks</div><div class="qf-label">Non-urgent repair timeframe</div></div>
   </div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
+<div style="background:#fff;border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://www.act.gov.au/housing-planning-and-property/renting')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">Access Canberra — Renting</div><div class="rights-link-desc">Official renting information for ACT tenants</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
@@ -491,7 +491,7 @@
 
 <!-- STATE: NT -->
 <div class="state-section" id="state-NT">
-<div class="state-hdr" style="background:linear-gradient(135deg,#7A3800,#CC6600)">
+<div class="state-hdr" style="background:linear-gradient(135deg,#0A1E4A,#162F6E)">
   <div class="state-abbr">NT</div>
   <div class="state-name">Northern Territory</div>
   <div class="state-tag">NT Consumer Affairs · NTCAT</div>
@@ -508,7 +508,7 @@
     <div class="qf-item"><div class="qf-num">14 days</div><div class="qf-label">Non-urgent repair timeframe</div></div>
   </div>
 </div>
-<div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
+<div style="background:#fff;border-radius:16px;margin:0 16px 10px;padding:16px;border:1px solid var(--border-lt)">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:12px">Key Contacts</div>
   <div style="display:flex;flex-direction:column;gap:0">
     <div class="rights-link-row" onclick="openLink('https://consumeraffairs.nt.gov.au/for-consumers/residential-tenancies')"><div class="rights-link-icon" style="background:var(--blue-xl)">🏛</div><div style="flex:1"><div class="rights-link-title">NT Consumer Affairs — Renting</div><div class="rights-link-desc">Bond, repairs, ending tenancy &amp; full tenant guide</div></div><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue)">→</span></div>
@@ -539,17 +539,17 @@
   <div class="sec-sub">If your situation is urgent</div>
 </div>
 <div style="display:flex;flex-direction:column;gap:10px;margin:0 16px">
-  <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--red);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('tel:1800468746')">
+  <div style="background:#fff; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--red);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('tel:1800468746')">
     <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" class="red-lt">🏠</div>
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Housing & Homelessness</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">1800 HOUSING (1800 468 746) — national free call</div></div>
     <span style="font-size:16px;flex-shrink:0">📞</span>
   </div>
-  <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('tel:1800737732')">
+  <div style="background:#fff; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--amber);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('tel:1800737732')">
     <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" class="amber-lt">💜</div>
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Domestic Violence Tenancy Help</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">1800RESPECT — 1800 737 732 · 24/7 free service</div></div>
     <span style="font-size:16px;flex-shrink:0">📞</span>
   </div>
-  <div style="background:var(--glass-surface-1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--blue);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://nationallegalaid.org/')">
+  <div style="background:#fff; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border-left:3px solid var(--blue);border-right:1px solid var(--border-lt);border-top:1px solid var(--border-lt);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://nationallegalaid.org/')">
     <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" style="background:var(--blue-xl)">🆘</div>
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Legal Aid</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Free legal advice in your state — peak body for all legal aid commissions</div></div>
     <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
@@ -562,22 +562,22 @@
   <div class="sec-sub">Helpful for renters in any state or territory</div>
 </div>
 <div style="display:flex;flex-direction:column;gap:10px;margin:0 16px 16px">
-  <div style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('tel:1800007007')">
+  <div style="background:#fff;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('tel:1800007007')">
     <div style="width:40px;height:40px;border-radius:11px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💸</div>
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Debt Helpline — 1800 007 007</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Free financial counselling for rent stress &amp; debt — every state</div></div>
     <span style="font-size:16px;flex-shrink:0">📞</span>
   </div>
-  <div style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://ndh.org.au/')">
+  <div style="background:#fff;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://ndh.org.au/')">
     <div style="width:40px;height:40px;border-radius:11px;background:rgba(27,80,200,.08);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏦</div>
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Debt Helpline — Online</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Self-help guides for rent arrears &amp; financial hardship</div></div>
     <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
   </div>
-  <div style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://www.tenants.org.au/nato')">
+  <div style="background:#fff;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://www.tenants.org.au/nato')">
     <div style="width:40px;height:40px;border-radius:11px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤝</div>
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">National Renters' Organisations</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">Peak body linking every state &amp; territory tenant union</div></div>
     <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
   </div>
-  <div style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://www.betterrenting.org.au/')">
+  <div style="background:#fff;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openLink('https://www.betterrenting.org.au/')">
     <div style="width:40px;height:40px;border-radius:11px;background:rgba(0,200,150,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏘️</div>
     <div style="flex:1"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Better Renting</div><div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">National housing-justice campaigns &amp; renter research</div></div>
     <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0">→</span>
@@ -591,7 +591,7 @@
 </div>
 
 <div style="margin:0 16px 24px">
-  <div id="stateToggleRow" style="background:var(--glass-surface-1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleAllStates()">
+  <div id="stateToggleRow" style="background:#fff;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;padding:14px 16px;border:1px solid var(--border-lt);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="toggleAllStates()">
     <div style="width:38px;height:38px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🗺️</div>
     <div style="flex:1">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)" id="stateToggleTitle">Compare with other states</div>
@@ -811,7 +811,7 @@ function setActiveState(stateId) {
       pill.style.color = 'var(--blue)';
       pill.style.border = 'none';
     } else {
-      pill.style.background = 'var(--glass-surface-2)';
+      pill.style.background = '#fff';
       pill.style.color = 'rgba(255,255,255,.8)';
       pill.style.border = '1px solid rgba(255,255,255,.25)';
     }
