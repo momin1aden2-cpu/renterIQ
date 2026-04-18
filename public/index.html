@@ -706,28 +706,9 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 
     <p class="hero-sub">The free app that helps Australian renters protect their bond and know their rights.</p>
 
-    <!-- Rights Search — lets visitors experience the product instantly -->
-    <div style="max-width:520px;margin:28px auto 0">
-      <div style="background:rgba(255,255,255,.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.18);border-radius:20px;padding:16px 18px">
-        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;letter-spacing:1.8px;color:rgba(255,255,255,.6);text-transform:uppercase;margin-bottom:8px">How can we help?</div>
-        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.95);border-radius:14px;padding:12px 14px">
-          <span style="font-size:17px;color:#9AA4B8;flex-shrink:0">🔍</span>
-          <input id="heroSearchInput" type="text" placeholder="e.g. bond return, rent increase, repairs…" autocomplete="off" autocorrect="off" spellcheck="false" style="flex:1;border:none;outline:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:#1A2B4A;min-width:0" oninput="heroRightsSearch(this.value)">
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px" id="heroChips">
-          <button onclick="heroRightsChip('bond return')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Bond return</button>
-          <button onclick="heroRightsChip('rent increase')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Rent increase</button>
-          <button onclick="heroRightsChip('repairs')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Repairs</button>
-          <button onclick="heroRightsChip('entry notice')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Entry notice</button>
-          <button onclick="heroRightsChip('breaking lease')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Breaking a lease</button>
-        </div>
-        <div id="heroSearchResults" style="margin-top:10px;display:none"></div>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
       <a href="/app/index.html" class="hero-search-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:14px 28px;font-size:15px">Open the App →</a>
-      <a href="#features" class="hero-search-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:14px 28px;font-size:15px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);box-shadow:none">See Features ↓</a>
+      <a href="#how-it-works" class="hero-search-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:14px 28px;font-size:15px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);box-shadow:none">How It Works ↓</a>
     </div>
 
     <div class="hero-trust">
@@ -743,42 +724,29 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
 </section>
 
-<!-- Smart Search Hub (shown after search) -->
-<section class="smart-search-hub" id="search" style="display:none">
-  <div class="container">
-    <h2 class="ss-hub-title">Browse Properties</h2>
-    <p class="ss-hub-subtitle">Choose a platform to search rentals in your area</p>
-    <div class="ss-hub-location" id="ssLocation">Perth 6000</div>
-    <div class="ss-providers" id="ssProviders"></div>
-    <div class="ss-track-box">
-      <div class="ss-track-title">🔗 Track a Property</div>
-      <form class="ss-track-form" onsubmit="trackFromUrl(event)">
-        <input type="url" class="ss-track-input" id="ssPropertyUrl" placeholder="Paste a property URL here…" required>
-        <button type="submit" class="ss-track-btn">Track It</button>
-      </form>
-      <div class="ss-track-hint">
-        💡 <strong>Tip:</strong> Find a property you love, copy its URL, and paste it here to save it to your Property Tracker.
+<!-- ========== RIGHTS SEARCH (below hero, white bg) ========== -->
+<section style="background:#fff;padding:40px 0 32px">
+  <div class="container" style="max-width:560px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:var(--blue-dk);letter-spacing:-.3px">Got a tenancy question?</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55">Type anything — bond, rent increase, repairs, entry notice. Instant answers for your state.</div>
+    </div>
+    <div style="background:var(--blue-xl);border:1.5px solid var(--border-lt);border-radius:20px;padding:16px 18px">
+      <div style="display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--border-lt);border-radius:14px;padding:12px 14px">
+        <span style="font-size:17px;color:#9AA4B8;flex-shrink:0">🔍</span>
+        <input id="heroSearchInput" type="text" placeholder="e.g. bond return, rent increase, repairs…" autocomplete="off" autocorrect="off" spellcheck="false" style="flex:1;border:none;outline:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:#1A2B4A;min-width:0" oninput="heroRightsSearch(this.value)">
       </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px" id="heroChips">
+        <button onclick="heroRightsChip('bond return')" style="background:#fff;color:var(--blue);border:1px solid var(--border-lt);border-radius:100px;padding:7px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Bond return</button>
+        <button onclick="heroRightsChip('rent increase')" style="background:#fff;color:var(--blue);border:1px solid var(--border-lt);border-radius:100px;padding:7px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Rent increase</button>
+        <button onclick="heroRightsChip('repairs')" style="background:#fff;color:var(--blue);border:1px solid var(--border-lt);border-radius:100px;padding:7px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Repairs</button>
+        <button onclick="heroRightsChip('entry notice')" style="background:#fff;color:var(--blue);border:1px solid var(--border-lt);border-radius:100px;padding:7px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Entry notice</button>
+        <button onclick="heroRightsChip('breaking lease')" style="background:#fff;color:var(--blue);border:1px solid var(--border-lt);border-radius:100px;padding:7px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Breaking a lease</button>
+      </div>
+      <div id="heroSearchResults" style="margin-top:10px;display:none"></div>
     </div>
   </div>
 </section>
-
-<div class="ls-modal-overlay" id="lsModalOverlay" onclick="if(event.target===this)lsCloseModal()">
-  <div class="ls-modal" id="lsModal">
-    <div class="ls-modal-handle"></div>
-    <div class="ls-modal-icon">📱</div>
-    <h3>Save this property in the app</h3>
-    <p>Your saved properties, inspection notes, and documents live in the RenterIQ App — free to use.</p>
-    <div class="ls-modal-prop">
-      <div class="lmp-addr" id="lsModalAddr"></div>
-      <div class="lmp-price" id="lsModalPrice"></div>
-    </div>
-    <div class="ls-modal-btns">
-      <button class="ls-modal-btn-primary" onclick="window.open('/app/index.html','_blank')">📲 Open in App &amp; Save</button>
-      <button class="ls-modal-btn-ghost" onclick="lsCloseModal()">Continue browsing</button>
-    </div>
-  </div>
-</div>
 
 
 <!-- ========== HOW IT WORKS ========== -->
@@ -1629,17 +1597,17 @@ function heroRightsSearch(val){
 
   var html=matches.slice(0,2).map(function(item){
     var a=item.answer(sd);
-    var numsHtml=a.nums.length?'<div style="display:flex;gap:6px;margin-top:8px">'+a.nums.map(function(n){return'<div style="background:rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;flex:1;text-align:center"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:#fff">'+heroEscHtml(n.n)+'</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:9px;color:rgba(255,255,255,.6);margin-top:2px">'+heroEscHtml(n.l)+'</div></div>';}).join('')+'</div>':'';
-    return'<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px;margin-bottom:8px">'+
-      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">'+item.icon+'</span><span style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:#fff">'+heroEscHtml(a.title)+'</span><span style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.12);border-radius:100px;padding:2px 8px">'+stateCode+'</span></div>'+
-      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:rgba(255,255,255,.85);line-height:1.6">'+heroEscHtml(a.text)+'</div>'+
+    var numsHtml=a.nums.length?'<div style="display:flex;gap:6px;margin-top:8px">'+a.nums.map(function(n){return'<div style="background:var(--blue-xl);border-radius:8px;padding:6px 10px;flex:1;text-align:center"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:var(--blue-dk)">'+heroEscHtml(n.n)+'</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:9px;color:var(--muted);margin-top:2px">'+heroEscHtml(n.l)+'</div></div>';}).join('')+'</div>':'';
+    return'<div style="background:#fff;border:1px solid var(--border-lt);border-radius:14px;padding:14px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.04)">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">'+item.icon+'</span><span style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text)">'+heroEscHtml(a.title)+'</span><span style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:2px 8px">'+stateCode+'</span></div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.6">'+heroEscHtml(a.text)+'</div>'+
       numsHtml+
-      '<div style="margin-top:8px;display:flex;align-items:center;gap:8px"><a href="tel:'+a.phone.replace(/\s/g,'')+'" style="text-decoration:none;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:5px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px"><span>📞</span>'+heroEscHtml(a.phone)+'</a></div>'+
-      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:rgba(255,255,255,.45);margin-top:8px;line-height:1.5;border-top:1px solid rgba(255,255,255,.08);padding-top:8px">General information for '+heroEscHtml(sd.name)+' renters. For your specific situation, contact '+heroEscHtml(a.contact)+' on '+heroEscHtml(a.phone)+'. RenterIQ is an information tool, not a legal service.</div>'+
+      '<div style="margin-top:8px;display:flex;align-items:center;gap:8px"><a href="tel:'+a.phone.replace(/\s/g,'')+'" style="text-decoration:none;background:var(--blue-xl);color:var(--blue);border:1px solid var(--border-lt);border-radius:8px;padding:5px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px"><span>📞</span>'+heroEscHtml(a.phone)+'</a></div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px solid var(--border-lt);padding-top:8px">General information for '+heroEscHtml(sd.name)+' renters. For your specific situation, contact '+heroEscHtml(a.contact)+' on '+heroEscHtml(a.phone)+'. RenterIQ is an information tool, not a legal service.</div>'+
     '</div>';
   }).join('');
 
-  html+='<div style="text-align:center;margin-top:4px"><a href="/app/index.html" style="font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.8);text-decoration:none">Open the app for more →</a></div>';
+  html+='<div style="text-align:center;margin-top:8px"><a href="/app/index.html" style="font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-decoration:none">Open the app for more →</a></div>';
 
   results.innerHTML=html;
   results.style.display='block';
