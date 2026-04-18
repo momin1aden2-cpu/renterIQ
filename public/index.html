@@ -706,7 +706,26 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 
     <p class="hero-sub">From your first inspection to bond return — condition reports, plain-English lease reviews, encrypted document vault and four-way bond comparison. The only app that's 100% on the renter's side.</p>
 
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px">
+    <!-- Rights Search — lets visitors experience the product instantly -->
+    <div style="max-width:520px;margin:28px auto 0">
+      <div style="background:rgba(255,255,255,.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.18);border-radius:20px;padding:16px 18px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;letter-spacing:1.8px;color:rgba(255,255,255,.6);text-transform:uppercase;margin-bottom:8px">How can we help?</div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.95);border-radius:14px;padding:12px 14px">
+          <span style="font-size:17px;color:#9AA4B8;flex-shrink:0">🔍</span>
+          <input id="heroSearchInput" type="text" placeholder="e.g. bond return, rent increase, repairs…" autocomplete="off" autocorrect="off" spellcheck="false" style="flex:1;border:none;outline:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:600;font-size:15px;color:#1A2B4A;min-width:0" oninput="heroRightsSearch(this.value)">
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px" id="heroChips">
+          <button onclick="heroRightsChip('bond return')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Bond return</button>
+          <button onclick="heroRightsChip('rent increase')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Rent increase</button>
+          <button onclick="heroRightsChip('repairs')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Repairs</button>
+          <button onclick="heroRightsChip('entry notice')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Entry notice</button>
+          <button onclick="heroRightsChip('breaking lease')" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Breaking a lease</button>
+        </div>
+        <div id="heroSearchResults" style="margin-top:10px;display:none"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
       <a href="/app/index.html" class="hero-search-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:14px 28px;font-size:15px">Open the App →</a>
       <a href="#features" class="hero-search-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:14px 28px;font-size:15px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);box-shadow:none">See Features ↓</a>
     </div>
@@ -716,7 +735,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
       <span class="hero-trust-sep"></span>
       <span class="hero-trust-item">Works on iPhone &amp; Android</span>
       <span class="hero-trust-sep"></span>
-      <span class="hero-trust-item">All 8 states &amp; territories</span>
+      <span class="hero-trust-item">All states &amp; territories</span>
       <span class="hero-trust-sep"></span>
       <span class="hero-trust-item">IDs encrypted on your device</span>
     </div>
@@ -1530,6 +1549,83 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
 // Actual initialization is deferred to DOMContentLoaded — by that point all deferred
 // SDK scripts have already executed and window.__FIREBASE_CONFIG__ is populated.
 let auth, db;
+
+// ── Hero Rights Search ──────────────────────────────────────────────
+var HERO_STATE_DATA = {
+  VIC:{name:'Victoria',authority:'Consumer Affairs Victoria',phone:'1300 55 81 81',bondAuth:'RTBA',bondMax:'1 month (rent ≤$350/wk)',rentNotice:'60 days',entryNotice:'24 hours',repairDays:'14 days',inspFreq:'every 6 months'},
+  NSW:{name:'New South Wales',authority:'NSW Fair Trading',phone:'13 32 20',bondAuth:'Rental Bond Board',bondMax:'4 weeks',rentNotice:'60 days',entryNotice:'24 hours',repairDays:'14 days',inspFreq:'up to 4 per year'},
+  QLD:{name:'Queensland',authority:'RTA Queensland',phone:'1300 366 311',bondAuth:'RTA Queensland',bondMax:'4 weeks',rentNotice:'60 days',entryNotice:'24 hours',repairDays:'14 days',inspFreq:'every 3 months'},
+  WA:{name:'Western Australia',authority:'Consumer Protection WA',phone:'1300 304 054',bondAuth:'Bond Administrator (WA)',bondMax:'4 weeks',rentNotice:'60 days',entryNotice:'24–72 hours',repairDays:'14 days',inspFreq:'every 3 months'},
+  SA:{name:'South Australia',authority:'CBS South Australia',phone:'131 882',bondAuth:'CBS SA',bondMax:'4 weeks',rentNotice:'60 days',entryNotice:'24 hours',repairDays:'14 days',inspFreq:'every 4 weeks (max)'},
+  TAS:{name:'Tasmania',authority:'CBOS Tasmania',phone:'1300 654 499',bondAuth:'Rental Deposit Authority',bondMax:'4 weeks',rentNotice:'60 days',entryNotice:'24 hours',repairDays:'14 days',inspFreq:'every 3 months'},
+  ACT:{name:'ACT',authority:'ACT Revenue Office',phone:'(02) 6207 0028',bondAuth:'Office of Rental Bonds',bondMax:'4 weeks',rentNotice:'8 weeks',entryNotice:'1 week',repairDays:'14 days',inspFreq:'every 6 months'},
+  NT:{name:'Northern Territory',authority:'NT Consumer Affairs',phone:'1800 019 319',bondAuth:'NT Consumer Affairs',bondMax:'4 weeks',rentNotice:'30 days',entryNotice:'24 hours',repairDays:'14 days',inspFreq:'every 3 months'}
+};
+
+var HERO_KB = [
+  {topic:'bond',keywords:'bond deposit return refund claim deduction',icon:'💰',answer:function(s){return{title:'Bond Return',text:'Your bond is held by '+s.bondAuth+'. At the end of your tenancy, both you and the landlord must agree on any deductions. If you disagree, you can apply for dispute resolution through '+s.authority+'.',nums:[{n:s.bondMax,l:'Maximum bond'},{n:'14 days',l:'Typical refund timeline'}],contact:s.authority,phone:s.phone};}},
+  {topic:'rent_increase',keywords:'rent increase raise hike notice how much',icon:'📈',answer:function(s){return{title:'Rent Increases',text:'In '+s.name+', your landlord must give you at least '+s.rentNotice+' written notice before increasing rent. Rent can only go up once every 12 months on a periodic lease.',nums:[{n:s.rentNotice,l:'Written notice required'},{n:'12 months',l:'Min between increases'}],contact:s.authority,phone:s.phone};}},
+  {topic:'repairs',keywords:'repair fix broken maintenance urgent not working heater hot water leak',icon:'🔧',answer:function(s){return{title:'Repairs & Maintenance',text:'Your landlord is responsible for keeping the property in reasonable condition. Urgent repairs must be arranged as soon as possible. Non-urgent repairs should be completed within '+s.repairDays+'.',nums:[{n:'ASAP',l:'Urgent repairs'},{n:s.repairDays,l:'Non-urgent repairs'}],contact:s.authority,phone:s.phone};}},
+  {topic:'entry_notice',keywords:'entry notice landlord enter inspection privacy access',icon:'🚪',answer:function(s){return{title:'Entry & Privacy',text:'Your landlord or agent must give you at least '+s.entryNotice+' written notice before entering the property for an inspection. They can only enter for specific reasons.',nums:[{n:s.entryNotice,l:'Minimum entry notice'},{n:s.inspFreq,l:'Inspection frequency'}],contact:s.authority,phone:s.phone};}},
+  {topic:'breaking_lease',keywords:'break lease early end terminate leave move out penalty',icon:'📋',answer:function(s){return{title:'Breaking a Lease Early',text:'If you need to leave before your lease ends, you may need to pay re-letting fees and rent until a new tenant is found. Contact '+s.authority+' to understand your options — some situations allow early exit without penalty.',nums:[],contact:s.authority,phone:s.phone};}},
+  {topic:'eviction',keywords:'evict eviction notice vacate kick out',icon:'⚠️',answer:function(s){return{title:'Eviction & Notice',text:'A landlord cannot ask you to leave without a valid reason and proper notice. Contact '+s.authority+' before taking any action if you receive a notice to leave.',nums:[],contact:s.authority,phone:s.phone};}}
+];
+
+function heroDetectState(){
+  try{var tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';var m={'Australia/Perth':'WA','Australia/Sydney':'NSW','Australia/Melbourne':'VIC','Australia/Brisbane':'QLD','Australia/Adelaide':'SA','Australia/Hobart':'TAS','Australia/Darwin':'NT','Australia/Canberra':'ACT'};return m[tz]||'VIC';}catch(e){return'VIC';}
+}
+
+function heroRightsChip(topic){
+  var inp=document.getElementById('heroSearchInput');
+  if(inp) inp.value=topic;
+  var chips=document.getElementById('heroChips');
+  if(chips) chips.style.display='none';
+  heroRightsSearch(topic);
+}
+
+function heroEscHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function heroRightsSearch(val){
+  var results=document.getElementById('heroSearchResults');
+  var chips=document.getElementById('heroChips');
+  if(!results)return;
+  if(val.trim().length<2){results.style.display='none';results.innerHTML='';if(chips)chips.style.display='flex';return;}
+  if(chips)chips.style.display='none';
+
+  var ql=val.toLowerCase().trim();
+  var stateCode=heroDetectState();
+  var sd=HERO_STATE_DATA[stateCode]||HERO_STATE_DATA.VIC;
+
+  var qWords=ql.split(/\s+/).filter(function(w){return w.length>=2;});
+  var matches=HERO_KB.map(function(item){
+    var allKw=item.keywords+' '+item.topic.replace(/_/g,' ');
+    var score=0;
+    qWords.forEach(function(qw){
+      if(allKw.includes(qw))score+=2;
+      else{var stems=allKw.split(' ');if(stems.some(function(s){return s.startsWith(qw)||qw.startsWith(s);}))score+=1;}
+    });
+    return{item:item,score:score};
+  }).filter(function(r){return r.score>0;}).sort(function(a,b){return b.score-a.score;}).map(function(r){return r.item;});
+
+  if(!matches.length){results.innerHTML='<div style="padding:12px;text-align:center;font-weight:600;font-size:12px;color:rgba(255,255,255,.6)">No results — try "bond", "rent increase", or "repairs"</div>';results.style.display='block';return;}
+
+  var html=matches.slice(0,2).map(function(item){
+    var a=item.answer(sd);
+    var numsHtml=a.nums.length?'<div style="display:flex;gap:6px;margin-top:8px">'+a.nums.map(function(n){return'<div style="background:rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;flex:1;text-align:center"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:#fff">'+heroEscHtml(n.n)+'</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:9px;color:rgba(255,255,255,.6);margin-top:2px">'+heroEscHtml(n.l)+'</div></div>';}).join('')+'</div>':'';
+    return'<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px;margin-bottom:8px">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">'+item.icon+'</span><span style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:#fff">'+heroEscHtml(a.title)+'</span><span style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.12);border-radius:100px;padding:2px 8px">'+stateCode+'</span></div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:rgba(255,255,255,.85);line-height:1.6">'+heroEscHtml(a.text)+'</div>'+
+      numsHtml+
+      '<div style="margin-top:8px;display:flex;align-items:center;gap:8px"><a href="tel:'+a.phone.replace(/\s/g,'')+'" style="text-decoration:none;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:5px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px"><span>📞</span>'+heroEscHtml(a.phone)+'</a></div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:rgba(255,255,255,.45);margin-top:8px;line-height:1.5;border-top:1px solid rgba(255,255,255,.08);padding-top:8px">General information for '+heroEscHtml(sd.name)+' renters. For your specific situation, contact '+heroEscHtml(a.contact)+' on '+heroEscHtml(a.phone)+'. RenterIQ is an information tool, not a legal service.</div>'+
+    '</div>';
+  }).join('');
+
+  html+='<div style="text-align:center;margin-top:4px"><a href="/app/index.html" style="font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.8);text-decoration:none">Open the app for more →</a></div>';
+
+  results.innerHTML=html;
+  results.style.display='block';
+}
 
 // Mobile nav toggle
 function toggleMobileNav() {
