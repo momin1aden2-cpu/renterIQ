@@ -3148,7 +3148,7 @@ function loadRecentActivity(){
     // Take last 10
     activities = activities.slice(0, 10);
     var list = document.getElementById('recentActivityList');
-    if (!activities.length) return;
+    if (!list || !activities.length) return;
     var html = '';
     activities.forEach(function(a) {
       var date = new Date(a.date).toLocaleDateString('en-AU', {day: 'numeric', month: 'short'});
