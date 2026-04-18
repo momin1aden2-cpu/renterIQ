@@ -1128,7 +1128,7 @@ function loadComms(){
   } catch(e) { console.error('loadComms:', e); }
 }
 
-function openNewCommsSheet() { showToast('Save Communication', 'Use the Routine Inspection feature to auto-save emails, or manually paste messages here — full feature coming soon', '💬'); }
+function openNewCommsSheet() { showToast('Save Communication', 'Use the Routine Inspection feature to auto-save emails, or paste messages from your agent here', '💬'); }
 
 function openNewReceiptSheet() { 
   var o=document.getElementById('receiptsOverlay'),s=document.getElementById('receiptsSheet');
@@ -3771,7 +3771,7 @@ function deleteCustomFolder(id){
 }
 
 function openCustomFolder(id){
-  showToast('Custom Folder', 'Folder view coming soon — you can add items here in the next update', '📁');
+  showToast('Custom Folder', 'Tap the + button inside your folder to add files', '📁');
 }
 
 document.getElementById('addFolderOverlay')?.addEventListener('click',function(e){if(e.target===this)closeAddFolderModal()});

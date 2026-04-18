@@ -100,4 +100,16 @@
       }
     };
   }
+
+  // Lightweight usage counter — no personal data, just aggregate feature counts.
+  // Call: riqEvent('entry_audit_complete') or riqEvent('exit_report_generated')
+  // Data lives in Firestore at metrics/events/{eventName} with a count field.
+  window.riqEvent = function(name) {
+    try {
+      if (!firebase.apps || !firebase.apps.length) return;
+      var db = firebase.firestore();
+      var ref = db.collection('metrics').doc(name);
+      ref.set({ count: firebase.firestore.FieldValue.increment(1), lastAt: Date.now() }, { merge: true }).catch(function(){});
+    } catch(e){}
+  };
 })();

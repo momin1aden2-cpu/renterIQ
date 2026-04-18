@@ -316,7 +316,6 @@
   // Kick off legacy migration on load — quiet, best-effort.
   try {
     API.migrateFromLegacy().then(function (n) {
-      if (n > 0) console.info('[RIQSecureDocs] migrated ' + n + ' legacy docs to encrypted store');
-    }).catch(function (e) { console.warn('[RIQSecureDocs] migration failed', e); });
+    }).catch(function () {});
   } catch (e) {}
 })();

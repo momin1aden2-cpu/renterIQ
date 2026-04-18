@@ -1024,7 +1024,8 @@ function buildPhotoStrip(item,state){
     var cell=document.createElement('div');
     cell.className='item-photo';
     cell.onclick=function(e){ e.stopPropagation(); if(photo.data)window.open(photo.data,'_blank'); };
-    cell.innerHTML='<img src="'+photo.data+'" alt=""><span class="tag">'+photo.time+'</span>';
+    var img=document.createElement('img');img.src=photo.data;img.alt='';cell.appendChild(img);
+    var tag=document.createElement('span');tag.className='tag';tag.textContent=photo.time||'';cell.appendChild(tag);
     wrap.appendChild(cell);
   });
   var add=document.createElement('button');
@@ -1284,6 +1285,7 @@ function confirmSignature(){
 }
 
 function generateEntryReportCore(){
+  if(window.riqEvent) riqEvent('entry_audit_complete');
   showToast('Generating report','Creating your entry condition report...','📄');
 
   var auditId='entry_audit_'+Date.now();

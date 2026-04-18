@@ -1626,6 +1626,7 @@ function markFixed(n){
 }
 
 function generateExitReport(){
+  if(window.riqEvent) riqEvent('exit_report_complete');
   var disc=aiComparisonData?aiComparisonData.discrepancies||[]:[];
   var confirmed=Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='confirmed'}).length;
   var auditId='exit_audit_'+Date.now();

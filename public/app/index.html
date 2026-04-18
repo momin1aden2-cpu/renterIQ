@@ -1899,6 +1899,7 @@ function homeRightsSearch(val){
     return;
   }
 
+  if(window.riqEvent && !window._riqSearched){ window._riqSearched=true; riqEvent('rights_search'); }
   var stateNudge = stateWasDetected ? '<div style="padding:12px 14px;background:rgba(0,200,150,.06);border-bottom:1px solid var(--border-lt);display:flex;gap:8px;align-items:center"><span style="font-size:14px">📍</span><div style="flex:1;font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--teal-dk);line-height:1.5">Detected '+sd.name+' from your location. <span onclick="navigate(\'/app/pages/profile.html\')" style="color:var(--blue);font-weight:700;cursor:pointer">Change →</span></div></div>' : '';
 
   var html = stateNudge + matches.slice(0,4).map(function(item){
@@ -1973,7 +1974,7 @@ function homeOpenSuburbSearch(){
       '</div>'+
       '<div id="suburbSearchResults" style="flex:1;overflow-y:auto;padding:0 20px 10px;-webkit-overflow-scrolling:touch;min-height:60px"></div>'+
       '<div id="suburbProviderLinks" style="display:none;overflow-y:auto;padding:0 20px 10px;-webkit-overflow-scrolling:touch"></div>'+
-      '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0">'+
+      '<div style="padding:12px 20px calc(72px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0">'+
         '<button id="suburbSearchClose" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:14px;border-radius:14px;cursor:pointer;min-height:48px">Close</button>'+
       '</div>'+
     '</div>';

@@ -1147,6 +1147,10 @@ function updateScore(){
   if(label)label.textContent=pct+'% complete';
 }
 
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function updateQuickRef(r){
   var grid=document.getElementById('quickRefGrid');
   if(!grid)return;
@@ -1158,9 +1162,14 @@ function updateQuickRef(r){
     ['EMPLOYER',r.employer||'—'],
     ['ADDRESS',r.currentAddress||'—']
   ];
-  grid.innerHTML=rows.map(function(row){
-    return '<div class="qr-cell" onclick="copyValue(\''+row[1]+'\',\''+row[0]+'\')"><div class="qr-label">'+row[0]+'</div><div class="qr-value">'+row[1]+'</div><span class="qr-copy">📋</span></div>';
-  }).join('');
+  grid.innerHTML='';
+  rows.forEach(function(row){
+    var cell=document.createElement('div');
+    cell.className='qr-cell';
+    cell.innerHTML='<div class="qr-label">'+escHtml(row[0])+'</div><div class="qr-value">'+escHtml(row[1])+'</div><span class="qr-copy">📋</span>';
+    cell.addEventListener('click',function(){copyValue(row[1],row[0]);});
+    grid.appendChild(cell);
+  });
 }
 
 /* ── Checklist ────────────────────────────────────────────── */
@@ -1860,13 +1869,14 @@ document.getElementById('agentFormInput').addEventListener('change', function(e)
       if (data.type === 'filled_pdf' && data.pdf) {
         agentFormResultText = '';
         var fieldsEl = document.getElementById('agentFormFields');
+        var safePdfUrl = (typeof data.pdf === 'string' && (data.pdf.startsWith('https://') || data.pdf.startsWith('blob:'))) ? data.pdf : '';
         fieldsEl.innerHTML =
           '<div style="text-align:center;padding:16px">' +
             '<div style="font-size:36px;margin-bottom:12px">✅</div>' +
-            '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">' + data.message + '</div>' +
+            '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">' + escHtml(data.message || 'Form processed') + '</div>' +
             '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px">Download, open the PDF, and review every field before sending to the agent.</div>' +
-            '<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:8px 12px;margin-bottom:16px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:#7A5500">⚠️ Check every field — some may need correction or completion.</div>' +
-            '<a href="' + data.pdf + '" download="Application-Filled.pdf" style="display:inline-block;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer">Download Filled PDF</a>' +
+            '<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:8px 12px;margin-bottom:16px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:#7A5500">Check every field — some may need correction or completion.</div>' +
+            (safePdfUrl ? '<a href="' + escHtml(safePdfUrl) + '" download="Application-Filled.pdf" style="display:inline-block;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer">Download Filled PDF</a>' : '') +
           '</div>';
         result.style.display = 'block';
       } else {

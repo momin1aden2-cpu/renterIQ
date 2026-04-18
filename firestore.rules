@@ -59,6 +59,15 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Anonymous usage counters — aggregate only, no personal data.
+    // Clients can increment counts; reads restricted to authenticated users
+    // (Mumin can view in Firebase Console regardless).
+    match /metrics/{eventName} {
+      allow create, update: if true;
+      allow read: if request.auth != null;
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
