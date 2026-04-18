@@ -1826,14 +1826,47 @@ var STATE_DATA = {
   NT:  { name:'Northern Territory', authority:'NT Consumer Affairs',    phone:'1800 019 319',  bondAuth:'NT Consumer Affairs',       bondMax:'4 weeks',                 rentNotice:'30 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' }
 };
 
+function detectStateFromTimezone(){
+  try {
+    var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    var map = {
+      'Australia/Perth':'WA','Australia/West':'WA',
+      'Australia/Sydney':'NSW','Australia/Lord_Howe':'NSW',
+      'Australia/Melbourne':'VIC',
+      'Australia/Brisbane':'QLD','Australia/Lindeman':'QLD',
+      'Australia/Adelaide':'SA','Australia/Broken_Hill':'SA',
+      'Australia/Hobart':'TAS','Australia/Currie':'TAS',
+      'Australia/Darwin':'NT',
+      'Australia/Canberra':'ACT','Australia/ACT':'ACT'
+    };
+    return map[tz] || '';
+  } catch(e){ return ''; }
+}
+
 function getUserState(){
-  try { return (localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'').toUpperCase(); } catch(e){ return ''; }
+  try {
+    var saved = (localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'').toUpperCase();
+    if(saved && STATE_DATA[saved]) return saved;
+    var detected = detectStateFromTimezone();
+    return detected || '';
+  } catch(e){ return ''; }
 }
 
 function homeRightsChip(topic){
   var inp = document.getElementById('homeSearchInput');
   if(inp){ inp.value = topic; }
+  var clear = document.getElementById('homeSearchClear');
+  if(clear) clear.style.display = 'block';
+  var chips = document.getElementById('homeTopicChips');
+  if(chips) chips.style.display = 'none';
   homeRightsSearch(topic);
+  // Scroll the results into view after a tick
+  setTimeout(function(){
+    var drop = document.getElementById('homeSearchDrop');
+    if(drop && drop.classList.contains('open')){
+      drop.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+  }, 200);
 }
 
 function homeRightsSearch(val){
@@ -1849,10 +1882,14 @@ function homeRightsSearch(val){
   if(chips) chips.style.display = 'none';
 
   var ql = val.toLowerCase().trim();
-  var stateCode = getUserState() || 'VIC';
+  var stateCode = getUserState();
+  var stateWasDetected = false;
+  if(!stateCode){
+    stateCode = detectStateFromTimezone() || 'VIC';
+    stateWasDetected = true;
+  }
   var sd = STATE_DATA[stateCode] || STATE_DATA.VIC;
 
-  // Split query into individual words for flexible matching
   var qWords = ql.split(/\s+/).filter(function(w){ return w.length >= 2; });
   var matches = RIGHTS_KB.map(function(item){
     var allKw = item.keywords + ' ' + item.topic.replace(/_/g,' ');
@@ -1860,7 +1897,6 @@ function homeRightsSearch(val){
     qWords.forEach(function(qw){
       if(allKw.includes(qw)) score += 2;
       else {
-        // Partial/stem match: "breaking" matches "break", "landlord" matches "landlord"
         var stems = allKw.split(' ');
         if(stems.some(function(s){ return s.startsWith(qw) || qw.startsWith(s); })) score += 1;
       }
@@ -1868,19 +1904,15 @@ function homeRightsSearch(val){
     return { item:item, score:score };
   }).filter(function(r){ return r.score > 0; }).sort(function(a,b){ return b.score - a.score; }).map(function(r){ return r.item; });
 
-  if(!stateCode || !STATE_DATA[stateCode]){
-    drop.innerHTML = '<div style="padding:16px;text-align:center"><div style="font-size:28px;margin-bottom:8px">📍</div><div style="font-family:Sora,sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px">Set your state first</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:12px">Tenancy rules are different in every state. Set yours so we can show the right information.</div><button onclick="navigate(\'/app/pages/profile.html?view=A\')" style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-family:Sora,sans-serif;font-weight:700;font-size:13px;cursor:pointer;min-height:44px">Set my state →</button></div>';
-    drop.classList.add('open');
-    return;
-  }
-
   if(!matches.length){
     drop.innerHTML = '<div style="padding:16px;text-align:center"><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">No results for "'+val+'" in '+sd.name+'</div><div style="font-weight:600;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer" onclick="navigate(\'/app/pages/rights.html\')">Browse all renter rights →</div></div>';
     drop.classList.add('open');
     return;
   }
 
-  var html = matches.slice(0,4).map(function(item){
+  var stateNudge = stateWasDetected ? '<div style="padding:12px 14px;background:rgba(0,200,150,.06);border-bottom:1px solid var(--border-lt);display:flex;gap:8px;align-items:center"><span style="font-size:14px">📍</span><div style="flex:1;font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--teal-dk);line-height:1.5">Detected '+sd.name+' from your location. <span onclick="navigate(\'/app/pages/profile.html\')" style="color:var(--blue);font-weight:700;cursor:pointer">Change →</span></div></div>' : '';
+
+  var html = stateNudge + matches.slice(0,4).map(function(item){
     var a = item.answer(sd);
     var numsHtml = a.nums.length ? '<div style="display:flex;gap:8px;margin-top:10px">'+a.nums.map(function(n){return '<div style="background:var(--blue-xl);border-radius:8px;padding:6px 10px;flex:1;text-align:center"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--blue-dk)">'+n.n+'</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:9px;color:var(--muted);margin-top:2px">'+n.l+'</div></div>';}).join('')+'</div>' : '';
     return '<div style="padding:14px;border-bottom:1px solid var(--border-lt)">'+
@@ -1889,7 +1921,7 @@ function homeRightsSearch(val){
       numsHtml+
       '<div style="margin-top:10px;display:flex;align-items:center;gap:8px">'+
         (a.phone?'<a href="tel:'+a.phone.replace(/\s/g,'')+'" style="text-decoration:none;background:var(--blue-xl);color:var(--blue);border:1px solid var(--border-lt);border-radius:8px;padding:6px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px;min-height:36px"><span>📞</span>'+a.phone+'</a>':'')+
-        '<span onclick="navigate(\'/app/pages/rights.html\')" style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--blue);cursor:pointer">See all '+stateCode+' rights →</span>'+
+        '<span onclick="navigate(\'/app/pages/rights.html#state-'+stateCode+'\')" style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--blue);cursor:pointer">See all '+stateCode+' rights →</span>'+
       '</div>'+
       '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px solid var(--border-lt);padding-top:8px">General information for '+sd.name+' renters. For your specific situation, contact '+a.contact+' on '+a.phone+'.</div>'+
     '</div>';
@@ -1974,9 +2006,11 @@ function homeClearSearch() {
 }
 
 document.addEventListener('click', function(e) {
-  if (!e.target.closest('.sc-input-wrap')) {
+  if (!e.target.closest('.search-card')) {
     var drop = document.getElementById('homeSearchDrop');
-    if (drop) { drop.classList.remove('open'); }
+    if (drop) { drop.classList.remove('open'); drop.innerHTML = ''; }
+    var chips = document.getElementById('homeTopicChips');
+    if (chips) chips.style.display = 'flex';
   }
 });
 

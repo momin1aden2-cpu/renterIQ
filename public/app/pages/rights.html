@@ -905,7 +905,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // If a hash was passed (e.g. /rights.html#NSW), honour it as a one-off view
   var hash = window.location.hash;
   if (hash) {
-    var hs = hash.replace('#', '').toUpperCase();
+    var hs = hash.replace('#', '').replace('state-', '').toUpperCase();
     if (states.indexOf(hs) !== -1) setTimeout(function() { setActiveState(hs); }, 200);
   }
 });
