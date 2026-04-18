@@ -3309,11 +3309,18 @@ function homeRenderJourney(){
   // Strip is ALWAYS visible once the user is signed in — it's how they see
   // where they are in the journey. Empty state just sits at "Search".
 
+  // Check if entry audit has been completed — this signals "settled in"
+  var entryAuditDone = false;
+  try {
+    var vr = JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+    if(Array.isArray(vr)) entryAuditDone = vr.some(function(r){return r && r.type==='entry-audit';});
+  } catch(e){}
+
   props.forEach(function(p){
     if(!p) return;
     var phase;
     if(p.status === 'lease_signed'){
-      phase = (p.bondSetup && p.rentSetup) ? 'living' : 'movein';
+      phase = (entryAuditDone || p.bondSetup || p.rentSetup) ? 'living' : 'movein';
     } else if(p.status === 'lease_offered'){
       phase = 'lease';
     } else if(p.status === 'applied'){
@@ -3325,6 +3332,9 @@ function homeRenderJourney(){
     }
     if(rank[phase] > rank[current]) current = phase;
   });
+
+  // If no tracked properties but entry audit exists, user is at least at move-in
+  if(current === 'search' && entryAuditDone) current = 'living';
 
   // Move-out beats Living once we've detected it
   if(movingOut) current = 'moveout';

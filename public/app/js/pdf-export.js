@@ -291,9 +291,9 @@
     overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,36,96,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
 
     var toolbar = document.createElement('div');
-    toolbar.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.1);color:#fff;flex-shrink:0';
+    toolbar.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.1);color:#fff;flex-shrink:0';
     toolbar.innerHTML =
-      '<button id="riq-pdf-close" aria-label="Close" style="background:rgba(255,255,255,.1);color:#fff;border:0;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">&times;</button>' +
+      '<button id="riq-pdf-close" aria-label="Close" style="background:rgba(255,255,255,.1);color:#fff;border:0;width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">&times;</button>' +
       '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(filename) + '</div><div style="font-size:10.5px;color:rgba(255,255,255,.6);font-weight:600;margin-top:1px">RenterIQ Report · Preview</div></div>' +
       '<button id="riq-pdf-share" style="background:#fff;color:#0A2460;border:0;border-radius:100px;padding:9px 16px;font-weight:800;font-size:12px;cursor:pointer;letter-spacing:.2px;display:none">Share</button>';
 

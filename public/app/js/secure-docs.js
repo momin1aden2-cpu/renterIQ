@@ -28,10 +28,27 @@
 (function () {
   'use strict';
 
+  var _supported = ('indexedDB' in window) && (window.crypto && crypto.subtle && typeof crypto.subtle.generateKey === 'function');
+  if (!_supported) {
+    window.RIQSecureDocs = {
+      put: function () { return Promise.reject(new Error('Secure storage not supported on this browser')); },
+      get: function () { return Promise.resolve(null); },
+      getObjectURL: function () { return Promise.resolve(null); },
+      remove: function () { return Promise.resolve(); },
+      list: function () { return Promise.resolve([]); },
+      has: function () { return Promise.resolve(false); },
+      meta: function () { return Promise.resolve(null); },
+      clear: function () { return Promise.resolve(); },
+      migrateFromLegacy: function () { return Promise.resolve(0); },
+      supported: false
+    };
+    return;
+  }
+
   var DB_NAME = 'riq-secure-docs';
   var DB_VERSION = 1;
-  var STORE_DOCS = 'docs';   // { id, name, size, mimeType, ts, iv, ciphertext }
-  var STORE_KEYS = 'keys';   // { id: 'master', key: CryptoKey }
+  var STORE_DOCS = 'docs';
+  var STORE_KEYS = 'keys';
   var MASTER_KEY_ID = 'master';
 
   var _dbPromise = null;
@@ -293,6 +310,7 @@
     } catch (e) { return null; }
   }
 
+  API.supported = true;
   window.RIQSecureDocs = API;
 
   // Kick off legacy migration on load — quiet, best-effort.

@@ -1211,8 +1211,8 @@ function handleFileUpload(docId, pts, fileKey){
     showToast('File too large','Maximum 10MB per document — try compressing it first','⚠️');
     return;
   }
-  if(!window.RIQSecureDocs){
-    showToast('Secure storage unavailable','Please reload the app and try again','⚠️');
+  if(!window.RIQSecureDocs || !RIQSecureDocs.supported){
+    showToast('Secure storage not supported','Your browser doesn\'t support encrypted storage — try Chrome or Safari','⚠️');
     return;
   }
   var card=document.getElementById(docId);

@@ -1147,6 +1147,19 @@ function saveRoomData(){
 
   showToast(currentRoom.name+' saved','Condition recorded · '+currentItems.length+' items','✓');
   backToOverview();
+
+  // If all rooms are now complete and an extracted agency report exists
+  // but the comparison hasn't been shown yet, trigger it automatically.
+  var allRooms=[].concat(standardRooms).concat(customRooms);
+  var allDone=allRooms.every(function(r){return roomData[r.id]&&roomData[r.id].completed});
+  if(allDone && !_entryComparisonData){
+    try{
+      var agencyRaw=JSON.parse(localStorage.getItem('riq_agency_entry_report')||'null');
+      if(agencyRaw && agencyRaw.extractedData && agencyRaw.extractedData.rooms && agencyRaw.extractedData.rooms.length){
+        setTimeout(function(){ runEntryComparison(agencyRaw.extractedData); }, 1200);
+      }
+    }catch(e){}
+  }
 }
 
 function loadRoomData(){
@@ -1677,8 +1690,8 @@ function showEntryComparisonSheet(data){
         (disagreements.length ? itemsHtml : '<div style="text-align:center;padding:20px"><div style="font-size:36px;margin-bottom:10px">🎉</div><div style="font-family:Sora,sans-serif;font-weight:700;font-size:15px;color:var(--teal-dk)">Perfect match</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6">Your record and the agent\'s report agree on everything. You\'re well protected.</div></div>') +
       '</div>' +
       '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0;display:flex;flex-direction:column;gap:8px">' +
-        (hasDraft ? '<button id="ecDraftBtn" style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:13px;font-family:Sora,sans-serif;font-weight:800;font-size:13.5px;cursor:pointer">Send response to agent →</button>' : '') +
-        '<button id="ecCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer">'+(hasDraft?'Close':'Done')+'</button>' +
+        (hasDraft ? '<button id="ecDraftBtn" style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:13px;font-family:Sora,sans-serif;font-weight:800;font-size:13.5px;cursor:pointer;min-height:48px">Send response to agent →</button>' : '') +
+        '<button id="ecCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer;min-height:48px">'+(hasDraft?'Close':'Done')+'</button>' +
       '</div>' +
     '</div>';
 
