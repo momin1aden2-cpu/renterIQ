@@ -1627,64 +1627,33 @@ function renderActivityFeed() {
 var obStep = 0;
 var obSteps = [
   {
-    icon: '🏡', iconBg: 'linear-gradient(135deg,var(--blue),var(--blue-md))',
-    title: 'Welcome to RenterIQ',
-    sub: 'A friendly helper for Australian renters. We\'ll walk with you from first search through to key-handover — and nudge you at the right moments along the way.',
+    icon: '🛡️', iconBg: 'linear-gradient(135deg,var(--blue),var(--blue-md))',
+    title: 'Your records. Your protection.',
+    sub: 'RenterIQ helps you keep proper records throughout your tenancy — so when it matters, you have evidence that counts.',
     features: [
-      { icon: '🔍', bg: 'var(--blue-lt)', text: 'Track places · Open Home Scan to decide' },
-      { icon: '📑', bg: 'rgba(124,58,237,.15)', text: 'Lease review in plain English' },
-      { icon: '🏠', bg: 'var(--teal-lt)', text: 'Move-in + exit records to protect your bond' },
-      { icon: '🔧', bg: 'rgba(245,166,35,.15)', text: 'Log issues, email agents, track follow-ups' }
-    ]
-  },
-  {
-    icon: '🔍', iconBg: 'var(--blue-lt)',
-    title: 'Find & inspect',
-    sub: 'Paste any listing URL or upload a screenshot. Book-in reminders set themselves. At the open home, a 2-minute scan captures your gut call so you can decide which to apply for.',
-    features: [
-      { icon: '📎', bg: 'var(--blue-lt)', text: 'URL paste, screenshot, or search' },
-      { icon: '🔔', bg: 'var(--teal-lt)', text: 'Auto reminders + add to calendar' },
-      { icon: '😍', bg: 'rgba(16,185,129,.14)', text: 'Open Home Scan with vibe + concerns' }
-    ]
-  },
-  {
-    icon: '✍️', iconBg: 'rgba(124,58,237,.15)',
-    title: 'Apply & review',
-    sub: 'Fill your renter profile once. If you love a place, your application comes together in minutes. When the lease lands, we break it down clause-by-clause in plain English.',
-    features: [
-      { icon: '📝', bg: 'var(--blue-lt)', text: 'Auto-saving renter resume' },
-      { icon: '✉️', bg: 'rgba(124,58,237,.15)', text: 'AI cover letter drafted for you' },
-      { icon: '📑', bg: 'var(--teal-lt)', text: 'Lease read-through — just a helper, not legal advice' }
+      { icon: '🔍', bg: 'var(--blue-lt)', text: 'Instant answers to any tenancy question for your state' },
+      { icon: '📸', bg: 'var(--teal-lt)', text: 'Timestamped condition reports with photos' },
+      { icon: '🔒', bg: 'rgba(124,58,237,.15)', text: 'IDs and documents encrypted on your device' }
     ]
   },
   {
     icon: '🏠', iconBg: 'var(--teal-lt)',
-    title: 'Move in & settle',
-    sub: 'Walk the property room-by-room and mark what\'s clean, undamaged and working. That record is your safety net at exit time. Set up rent and bond tracking so nothing slips.',
+    title: 'From first inspection to bond return.',
+    sub: 'Whether you\'re looking for a place, already renting, or about to move out — start from wherever you are.',
     features: [
-      { icon: '📸', bg: 'var(--teal-lt)', text: 'Itemised move-in record with photos' },
-      { icon: '💰', bg: 'rgba(245,166,35,.15)', text: 'Rent tracker + reminders before due' },
-      { icon: '🛡️', bg: 'var(--blue-lt)', text: 'Bond stored with reference number' }
+      { icon: '📋', bg: 'var(--blue-lt)', text: 'Inspect properties and compare side by side' },
+      { icon: '📑', bg: 'rgba(124,58,237,.15)', text: 'Lease review in plain English' },
+      { icon: '💰', bg: 'rgba(245,166,35,.15)', text: 'Four-way bond comparison at exit' }
     ]
   },
   {
-    icon: '🔧', iconBg: 'rgba(245,166,35,.15)',
-    title: 'Stay on top of it',
-    sub: 'Report maintenance issues with a friendly, AI-drafted email. If the agent doesn\'t reply, we nudge you to follow up. Every message lives in a thread so nothing gets lost.',
+    icon: '✓', iconBg: 'linear-gradient(135deg,#00C896,#00A87A)',
+    title: 'Free to use. Nothing hidden.',
+    sub: 'Everything day-to-day is free — rights search, inspections, renter resume, maintenance log, vault. You only pay for formal reports when you need them.',
     features: [
-      { icon: '🔧', bg: 'rgba(245,166,35,.15)', text: 'Report issues, auto-draft the email' },
-      { icon: '💬', bg: 'var(--blue-lt)', text: 'Threaded comms — never lose the trail' },
-      { icon: '🔍', bg: 'var(--teal-lt)', text: 'Routine inspection report helper' }
-    ]
-  },
-  {
-    icon: '🚪', iconBg: 'rgba(232,64,64,.1)',
-    title: 'Move out strong',
-    sub: 'At exit time, your move-in record is the baseline. We compare every item, flag what\'s changed, and help you draft a friendly bond-return email with all the evidence attached.',
-    features: [
-      { icon: '🔁', bg: 'var(--blue-lt)', text: 'Move-in vs move-out comparison' },
-      { icon: '🛡️', bg: 'var(--teal-lt)', text: 'Bond-return guidance, your call' },
-      { icon: '🗄️', bg: 'rgba(232,64,64,.1)', text: 'Every record kept safely in your Vault' }
+      { icon: '🆓', bg: 'var(--teal-lt)', text: 'No subscription, no recurring charges' },
+      { icon: '📱', bg: 'var(--blue-lt)', text: 'Works on any phone — no app store needed' },
+      { icon: '🇦🇺', bg: 'rgba(245,166,35,.15)', text: 'Built for every state and territory' }
     ]
   }
 ];
