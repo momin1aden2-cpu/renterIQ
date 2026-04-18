@@ -808,65 +808,104 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
     <div class="steps-header">
       <span class="section-eyebrow">How It Works</span>
       <h2 class="section-h2">Your full rental journey.<br>Covered at every step.</h2>
-      <p class="section-sub text-center" style="margin:0 auto">From the first search to getting your bond back — RenterIQ covers every stage.</p>
+      <p class="section-sub text-center" style="margin:0 auto">Tap any step to jump straight into that feature.</p>
     </div>
+
+    <!-- Interactive journey strip — tap to open that feature in the app -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin:0 auto 32px;max-width:680px;overflow-x:auto;padding:0 16px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+      <a href="/app/pages/inspection.html" style="text-decoration:none;flex:1 1 0;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(27,80,200,.2)">🔍</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:9px;color:var(--text);text-align:center">Search</span>
+      </a>
+      <div style="flex:0 0 12px;height:2px;background:var(--border-lt);margin-top:-12px"></div>
+      <a href="/app/pages/inspection.html" style="text-decoration:none;flex:1 1 0;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--border-lt);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:16px">📋</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:9px;color:var(--muted);text-align:center">Inspect</span>
+      </a>
+      <div style="flex:0 0 12px;height:2px;background:var(--border-lt);margin-top:-12px"></div>
+      <a href="/app/pages/application.html" style="text-decoration:none;flex:1 1 0;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--border-lt);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:16px">✍️</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:9px;color:var(--muted);text-align:center">Apply</span>
+      </a>
+      <div style="flex:0 0 12px;height:2px;background:var(--border-lt);margin-top:-12px"></div>
+      <a href="/app/pages/lease.html" style="text-decoration:none;flex:1 1 0;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--border-lt);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:16px">📑</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:9px;color:var(--muted);text-align:center">Lease</span>
+      </a>
+      <div style="flex:0 0 12px;height:2px;background:var(--border-lt);margin-top:-12px"></div>
+      <a href="/app/pages/entry-audit.html" style="text-decoration:none;flex:1 1 0;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--border-lt);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:16px">🏠</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:9px;color:var(--muted);text-align:center">Move in</span>
+      </a>
+      <div style="flex:0 0 12px;height:2px;background:var(--border-lt);margin-top:-12px"></div>
+      <a href="/app/pages/vault.html" style="text-decoration:none;flex:1 1 0;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--border-lt);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:16px">🌿</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:9px;color:var(--muted);text-align:center">Living</span>
+      </a>
+      <div style="flex:0 0 12px;height:2px;background:var(--border-lt);margin-top:-12px"></div>
+      <a href="/app/pages/exit.html" style="text-decoration:none;flex:1 1 0;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--border-lt);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:16px">🚪</div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:9px;color:var(--muted);text-align:center">Move out</span>
+      </a>
+    </div>
+
     <div class="steps-grid">
       <div class="steps-connector"></div>
 
-      <div class="step-card">
+      <div class="step-card" onclick="window.location='/app/pages/inspection.html'" style="cursor:pointer">
         <div class="step-num">1</div>
         <div class="step-emoji">🔍</div>
-        <h3>Property Search &amp; Tracker</h3>
-        <p>Save listings from REA, Domain, REIWA and Rent.com.au. Track inspections, compare properties side by side.</p>
-        <div class="step-tags"><span class="step-tag">Free</span><span class="step-tag"><a href="/rental-inspection-checklist.html" style="color:inherit;text-decoration:none">Learn more →</a></span></div>
+        <h3>Search &amp; Track</h3>
+        <p>Find listings on realestate.com.au, Domain and REIWA. Track properties, compare inspections side by side, and share with your housemates.</p>
+        <div class="step-tags"><span class="step-tag">Free</span></div>
       </div>
 
-      <div class="step-card">
+      <div class="step-card" onclick="window.location='/app/pages/inspection.html'" style="cursor:pointer">
         <div class="step-num">2</div>
         <div class="step-emoji">📋</div>
-        <h3>Property Inspection</h3>
-        <p>Walk through your tracked properties with a guided checklist. Rate every area, add photos, flag concerns.</p>
-        <div class="step-tags"><span class="step-tag">Free</span><span class="step-tag"><a href="/rental-inspection-checklist.html" style="color:inherit;text-decoration:none">Learn more →</a></span></div>
+        <h3>Open Home Scan</h3>
+        <p>Walk through each open home with a guided checklist. Rate condition, note concerns, take photos — compare all your inspections at a glance.</p>
+        <div class="step-tags"><span class="step-tag">Free</span></div>
       </div>
 
-      <div class="step-card">
+      <div class="step-card" onclick="window.location='/app/pages/application.html'" style="cursor:pointer">
         <div class="step-num">3</div>
-        <div class="step-emoji">📝</div>
-        <h3>Rental Application</h3>
-        <p>Build your renter resume once and reuse it. Auto-draft a personalised cover letter for every property.</p>
-        <div class="step-tags"><span class="step-tag">Free</span><span class="step-tag"><a href="/rental-cover-letter.html" style="color:inherit;text-decoration:none">Learn more →</a></span></div>
+        <div class="step-emoji">✍️</div>
+        <h3>Renter Resume</h3>
+        <p>Fill once — personal details, employment, rental history, references and cover letter. Export Pack copies everything into any agency portal in one tap. IDs encrypted on your device.</p>
+        <div class="step-tags"><span class="step-tag">Free</span></div>
       </div>
 
-      <div class="step-card">
+      <div class="step-card" onclick="window.location='/app/pages/lease.html'" style="cursor:pointer">
         <div class="step-num">4</div>
         <div class="step-emoji">📑</div>
         <h3>Lease Review</h3>
-        <p>Upload your lease and get a plain-English breakdown of every clause, with risks flagged for your state.</p>
-        <div class="step-tags"><span class="step-tag">1st free</span><span class="step-tag"><a href="/free-lease-review.html" style="color:inherit;text-decoration:none">Learn more →</a></span></div>
+        <p>Upload your lease and get a plain-English breakdown of every clause, with risks and key dates flagged for your state.</p>
+        <div class="step-tags"><span class="step-tag">1st free</span></div>
       </div>
 
-      <div class="step-card">
+      <div class="step-card" onclick="window.location='/app/pages/entry-audit.html'" style="cursor:pointer">
         <div class="step-num">5</div>
         <div class="step-emoji">🏠</div>
-        <h3>Entry Condition Report</h3>
-        <p>Document the property at move-in with timestamped photos — room by room. Protects your bond from day one.</p>
-        <div class="step-tags"><span class="step-tag">Bond shield</span><span class="step-tag"><a href="/entry-condition-report.html" style="color:inherit;text-decoration:none">Learn more →</a></span></div>
+        <h3>Move-in Report + Comparison</h3>
+        <p>Timestamped, room-by-room condition record with photos. Upload the agent's report — RenterIQ instantly compares them and helps you flag disagreements within the return window.</p>
+        <div class="step-tags"><span class="step-tag">Bond protection</span></div>
       </div>
 
-      <div class="step-card">
+      <div class="step-card" onclick="window.location='/app/pages/vault.html'" style="cursor:pointer">
         <div class="step-num">6</div>
-        <div class="step-emoji">🛡️</div>
-        <h3>Routine Inspection Response</h3>
-        <p>Upload your agent's report — items categorised, action plan built, professional response drafted for you.</p>
-        <div class="step-tags"><span class="step-tag">During tenancy</span><span class="step-tag">Per event</span></div>
+        <div class="step-emoji">🌿</div>
+        <h3>Living &amp; Maintaining</h3>
+        <p>Log maintenance issues with photos and dates. Save every communication with your agent. Routine inspection responses drafted for you. All stored as evidence.</p>
+        <div class="step-tags"><span class="step-tag">Free</span></div>
       </div>
 
-      <div class="step-card">
+      <div class="step-card" onclick="window.location='/app/pages/exit.html'" style="cursor:pointer">
         <div class="step-num">7</div>
         <div class="step-emoji">💰</div>
-        <h3>Exit Condition Report</h3>
-        <p>Document at move-out, compare against your entry photos, get bond recovery suggestions. Get every dollar back.</p>
-        <div class="step-tags"><span class="step-tag">Bond protection</span><span class="step-tag"><a href="/exit-condition-report.html" style="color:inherit;text-decoration:none">Learn more →</a></span></div>
+        <h3>Exit &amp; Bond Return</h3>
+        <p>Four-way comparison — your entry, agent's entry, your exit, agent's exit. Contradictions surfaced. Bond return email drafted. Every dollar defended.</p>
+        <div class="step-tags"><span class="step-tag">Bond protection</span></div>
       </div>
 
     </div>
