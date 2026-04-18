@@ -253,6 +253,21 @@
   min-width: 0;
 }
 .sc-input::placeholder { color: var(--muted); }
+.sc-chip {
+  background: var(--blue-xl);
+  color: var(--blue);
+  border: 1px solid var(--border-lt);
+  border-radius: 100px;
+  padding: 7px 14px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 11.5px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 36px;
+  transition: all .15s;
+}
+.sc-chip:active { transform: scale(.96); background: var(--blue); color: #fff; }
 .sc-clear {
   background: none;
   border: none;
@@ -1182,28 +1197,39 @@
   <!-- ── Scrollable Content ──────────────────────────────── -->
   <div class="content">
 
-    <!-- ── Search Card (pulls up over header) ─────────────── -->
+    <!-- ── Rights Search Card ────────────────────────────────── -->
     <div style="padding:0 16px;margin-top:14px;position:relative;z-index:5">
       <div class="search-card">
-        <div class="sc-label">Find a Rental</div>
+        <div class="sc-label">How can we help?</div>
         <div class="sc-input-wrap">
           <div class="sc-input-row">
             <span class="sc-icon">🔍</span>
-            <input class="sc-input" id="homeSearchInput" type="text" placeholder="Search suburb, postcode or area…" autocomplete="off" autocorrect="off" spellcheck="false" oninput="homeHandleInput(this.value)">
+            <input class="sc-input" id="homeSearchInput" type="text" placeholder="e.g. bond return, rent increase, repairs…" autocomplete="off" autocorrect="off" spellcheck="false" oninput="homeRightsSearch(this.value)">
             <button class="sc-clear" id="homeSearchClear" onclick="homeClearSearch()">✕</button>
           </div>
           <div class="sc-drop" id="homeSearchDrop"></div>
         </div>
-        <div id="homeProviders" class="sc-providers" style="display:none"></div>
-        <div id="homeTrackBox" class="track-url-box" style="display:none">
-          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase">🔗 Track a Property</div>
-          <div class="track-url-row">
-            <input class="track-url-input" id="homeTrackUrl" type="url" placeholder="Paste property URL here…">
-            <button class="track-url-btn" onclick="homeTrackProperty()">Save</button>
-          </div>
-          <div id="homeTrackHint" style="font-size:11px;color:var(--muted);margin-top:7px;font-weight:600;line-height:1.55">💡 Paste a listing URL from any site above to track it.</div>
+        <!-- Quick topic chips -->
+        <div id="homeTopicChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+          <button class="sc-chip" onclick="homeRightsChip('bond return')">Bond return</button>
+          <button class="sc-chip" onclick="homeRightsChip('rent increase')">Rent increase</button>
+          <button class="sc-chip" onclick="homeRightsChip('repairs')">Repairs</button>
+          <button class="sc-chip" onclick="homeRightsChip('entry notice')">Entry notice</button>
+          <button class="sc-chip" onclick="homeRightsChip('breaking lease')">Breaking a lease</button>
+          <button class="sc-chip" onclick="homeRightsChip('inspection')">Inspections</button>
         </div>
       </div>
+      <!-- Track a property — secondary, always visible -->
+      <div style="margin-top:10px;background:#fff;border-radius:14px;border:1px solid var(--border-lt);padding:12px 14px;display:flex;align-items:center;gap:10px">
+        <div style="display:flex;gap:10px;align-items:center;flex:1;min-width:0">
+          <span style="font-size:16px;flex-shrink:0">🔗</span>
+          <div style="flex:1;min-width:0">
+            <input class="track-url-input" id="homeTrackUrl" type="url" placeholder="Paste a listing URL to track a property…" style="font-size:13px;padding:0;border:0;background:transparent;width:100%;font-family:'Nunito',sans-serif;font-weight:600;color:var(--text);outline:none">
+          </div>
+        </div>
+        <button onclick="homeTrackProperty()" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;flex-shrink:0;min-height:36px">Track</button>
+      </div>
+      <div id="homeTrackHint" style="font-size:10.5px;color:var(--muted);margin-top:5px;font-weight:600;line-height:1.5;padding:0 4px">From realestate.com.au, Domain, REIWA or Rent.com.au</div>
     </div>
 
     <!-- ── Resume-in-progress card (surfaces saved renter profile drafts) ── -->
@@ -1767,7 +1793,99 @@ function applyUpdate() {
   location.reload();
 }
 
-// Inline search widget
+// ── Rights search — searchable knowledge base per state ──────────────
+var RIGHTS_KB = [
+  { topic:'bond',         keywords:'bond deposit return refund claim deduction lodge rtba', icon:'💰',
+    answer: function(s){ return { title:'Bond Return', text:'Your bond is held by '+s.bondAuth+'. At the end of your tenancy, both you and the landlord must agree on any deductions. If you disagree, you can apply for dispute resolution through '+s.authority+'.', nums:[{n:s.bondMax,l:'Maximum bond'},{n:'14 days',l:'Typical refund timeline'}], contact:s.authority, phone:s.phone }; } },
+  { topic:'rent_increase', keywords:'rent increase raise hike notice how much', icon:'📈',
+    answer: function(s){ return { title:'Rent Increases', text:'In '+s.name+', your landlord must give you at least '+s.rentNotice+' written notice before increasing rent. Rent can only be increased once every 12 months on a periodic lease. During a fixed-term lease, rent can only go up if the increase is written into the agreement.', nums:[{n:s.rentNotice,l:'Written notice required'},{n:'12 months',l:'Minimum between increases'}], contact:s.authority, phone:s.phone }; } },
+  { topic:'repairs',      keywords:'repair fix broken maintenance urgent not working heater hot water stove leak plumber', icon:'🔧',
+    answer: function(s){ return { title:'Repairs & Maintenance', text:'Your landlord is responsible for keeping the property in reasonable condition. Urgent repairs (no hot water, gas leaks, major water leaks, dangerous electrical faults) must be arranged as soon as possible. Non-urgent repairs should be completed within '+s.repairDays+'. Put all repair requests in writing and keep a copy.', nums:[{n:'ASAP',l:'Urgent repair timeframe'},{n:s.repairDays,l:'Non-urgent repairs'}], contact:s.authority, phone:s.phone }; } },
+  { topic:'entry_notice', keywords:'entry notice landlord enter inspection privacy access keys', icon:'🚪',
+    answer: function(s){ return { title:'Entry & Privacy', text:'Your landlord or agent must give you at least '+s.entryNotice+' written notice before entering the property for an inspection. They can only enter for specific reasons (routine inspection, repairs, showing to prospective tenants). You do not have to agree to entry outside the rules.', nums:[{n:s.entryNotice,l:'Minimum entry notice'},{n:s.inspFreq,l:'Routine inspection frequency'}], contact:s.authority, phone:s.phone }; } },
+  { topic:'breaking_lease', keywords:'break lease early end terminate leave move out penalty fee', icon:'📋',
+    answer: function(s){ return { title:'Breaking a Lease Early', text:'If you need to leave before your lease ends, you may need to pay costs such as re-letting fees, advertising, and rent until a new tenant is found. In '+s.name+', there are some situations where you can end a lease early without penalty — such as hardship, family violence, or if the property is unsafe. Contact '+s.authority+' to understand your options.', nums:[], contact:s.authority, phone:s.phone }; } },
+  { topic:'inspection',   keywords:'inspection routine check agency agent quarterly how often', icon:'🔍',
+    answer: function(s){ return { title:'Routine Inspections', text:'In '+s.name+', your agent can conduct routine inspections '+s.inspFreq+'. They must give you '+s.entryNotice+' written notice. You can be present during the inspection but it\'s not required. The agent should leave a written report of any issues noted.', nums:[{n:s.inspFreq,l:'How often allowed'},{n:s.entryNotice,l:'Notice required'}], contact:s.authority, phone:s.phone }; } },
+  { topic:'eviction',     keywords:'evict eviction notice to leave vacate terminate kick out no grounds', icon:'⚠️',
+    answer: function(s){ return { title:'Eviction & Notice to Leave', text:'A landlord cannot simply ask you to leave without a valid reason and proper notice. The notice period depends on the reason and your lease type. If you receive a notice to leave, contact '+s.authority+' or your state tenant advisory service before taking any action.', nums:[], contact:s.authority, phone:s.phone }; } },
+  { topic:'pets',         keywords:'pet dog cat animal landlord refuse permission', icon:'🐾',
+    answer: function(s){ return { title:'Keeping Pets', text:'Rules about pets vary by state. In some states, landlords cannot unreasonably refuse a pet request. In others, it depends on your lease terms. Always declare pets on your application and get any pet approval in writing. Contact '+s.authority+' for your state\'s specific rules.', nums:[], contact:s.authority, phone:s.phone }; } },
+  { topic:'mould',        keywords:'mould mold damp moisture health ventilation', icon:'🏠',
+    answer: function(s){ return { title:'Mould & Dampness', text:'Mould caused by structural issues (leaks, poor ventilation, rising damp) is the landlord\'s responsibility to fix. Report it in writing with photos and request repairs. If the mould is caused by tenant behaviour (not using exhaust fans, drying clothes inside), the landlord may not be responsible. Persistent mould that affects health is considered an urgent repair.', nums:[], contact:s.authority, phone:s.phone }; } },
+  { topic:'flatmate',     keywords:'flatmate housemate share subletting sublet room', icon:'👥',
+    answer: function(s){ return { title:'Flatmates & Subletting', text:'If you want to add a flatmate or sublet a room, check your lease — most require the landlord\'s written consent. The landlord cannot unreasonably refuse in most states. Any new occupant should ideally be added to the lease for their own protection.', nums:[], contact:s.authority, phone:s.phone }; } }
+];
+
+var STATE_DATA = {
+  VIC: { name:'Victoria',     authority:'Consumer Affairs Victoria',     phone:'1300 55 81 81', bondAuth:'RTBA',                     bondMax:'1 month (rent ≤$350/wk)', rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 6 months' },
+  NSW: { name:'New South Wales', authority:'NSW Fair Trading',           phone:'13 32 20',      bondAuth:'Rental Bond Board',         bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'up to 4 per year' },
+  QLD: { name:'Queensland',   authority:'RTA Queensland',               phone:'1300 366 311',  bondAuth:'RTA Queensland',            bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' },
+  WA:  { name:'Western Australia', authority:'Consumer Protection WA',  phone:'1300 304 054',  bondAuth:'Bond Administrator (WA)',    bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24–72 hours', repairDays:'14 days', inspFreq:'every 3 months' },
+  SA:  { name:'South Australia', authority:'CBS South Australia',        phone:'131 882',       bondAuth:'CBS SA',                    bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours (7–14 days for inspection)', repairDays:'14 days', inspFreq:'every 4 weeks (max)' },
+  TAS: { name:'Tasmania',     authority:'CBOS Tasmania',                phone:'1300 654 499',  bondAuth:'Rental Deposit Authority',  bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' },
+  ACT: { name:'ACT',          authority:'ACT Revenue Office',           phone:'(02) 6207 0028',bondAuth:'Office of Rental Bonds',    bondMax:'4 weeks',                 rentNotice:'8 weeks', entryNotice:'1 week (general), 24 hrs (repairs)', repairDays:'14 days', inspFreq:'every 6 months' },
+  NT:  { name:'Northern Territory', authority:'NT Consumer Affairs',    phone:'1800 019 319',  bondAuth:'NT Consumer Affairs',       bondMax:'4 weeks',                 rentNotice:'30 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' }
+};
+
+function getUserState(){
+  try { return (localStorage.getItem('renteriq_user_state')||localStorage.getItem('riq-user-state')||'').toUpperCase(); } catch(e){ return ''; }
+}
+
+function homeRightsChip(topic){
+  var inp = document.getElementById('homeSearchInput');
+  if(inp){ inp.value = topic; }
+  homeRightsSearch(topic);
+}
+
+function homeRightsSearch(val){
+  var drop = document.getElementById('homeSearchDrop');
+  var clear = document.getElementById('homeSearchClear');
+  var chips = document.getElementById('homeTopicChips');
+  if(clear) clear.style.display = val.length ? 'block' : 'none';
+  if(val.trim().length < 2){
+    if(drop){ drop.innerHTML = ''; drop.classList.remove('open'); }
+    if(chips) chips.style.display = 'flex';
+    return;
+  }
+  if(chips) chips.style.display = 'none';
+
+  var ql = val.toLowerCase().trim();
+  var stateCode = getUserState() || 'VIC';
+  var sd = STATE_DATA[stateCode] || STATE_DATA.VIC;
+
+  var matches = RIGHTS_KB.filter(function(item){
+    return item.keywords.split(' ').some(function(kw){ return ql.includes(kw) || kw.includes(ql); }) ||
+           item.topic.replace(/_/g,' ').includes(ql);
+  });
+
+  if(!matches.length){
+    drop.innerHTML = '<div style="padding:16px;text-align:center"><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">No results for "'+val+'"</div><div style="font-weight:600;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer" onclick="navigate(\'/app/pages/rights.html\')">Browse all renter rights →</div></div>';
+    drop.classList.add('open');
+    return;
+  }
+
+  var html = matches.slice(0,4).map(function(item){
+    var a = item.answer(sd);
+    var numsHtml = a.nums.length ? '<div style="display:flex;gap:8px;margin-top:10px">'+a.nums.map(function(n){return '<div style="background:var(--blue-xl);border-radius:8px;padding:6px 10px;flex:1;text-align:center"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--blue-dk)">'+n.n+'</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:9px;color:var(--muted);margin-top:2px">'+n.l+'</div></div>';}).join('')+'</div>' : '';
+    return '<div style="padding:14px;border-bottom:1px solid var(--border-lt)">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">'+item.icon+'</span><div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text)">'+a.title+'</div><span style="font-family:Sora,sans-serif;font-weight:700;font-size:10px;color:var(--blue);background:var(--blue-xl);border-radius:100px;padding:2px 8px;flex-shrink:0">'+stateCode+'</span></div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.65">'+a.text+'</div>'+
+      numsHtml+
+      '<div style="margin-top:10px;display:flex;align-items:center;gap:8px">'+
+        (a.phone?'<a href="tel:'+a.phone.replace(/\s/g,'')+'" style="text-decoration:none;background:var(--blue-xl);color:var(--blue);border:1px solid var(--border-lt);border-radius:8px;padding:6px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px;min-height:36px"><span>📞</span>'+a.phone+'</a>':'')+
+        '<span onclick="navigate(\'/app/pages/rights.html\')" style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--blue);cursor:pointer">See all '+stateCode+' rights →</span>'+
+      '</div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px solid var(--border-lt);padding-top:8px">General information for '+sd.name+' renters. For your specific situation, contact '+a.contact+' on '+a.phone+'.</div>'+
+    '</div>';
+  }).join('');
+
+  drop.innerHTML = html;
+  drop.classList.add('open');
+}
+
+// Keep the old suburb search + provider functions for backward compat with
+// the URL tracking flow — they're just no longer the hero.
 var homeSuburbsData = [];
 var homeSelectedSuburb = null;
 
@@ -1794,68 +1912,13 @@ async function homeLoadSuburbs() {
   } catch(e) { homeSuburbsData = []; }
 }
 
-function homeFindSuburbs(q) {
-  if (!homeSuburbsData.length) return [];
-  var ql = q.toLowerCase().trim();
-  var matches = homeSuburbsData.filter(function(s) {
-    return s.name.toLowerCase().includes(ql) || s.postcode.toString().includes(ql);
-  });
-  matches.sort(function(a, b) {
-    var an = a.name.toLowerCase(), bn = b.name.toLowerCase();
-    if (an === ql && bn !== ql) return -1;
-    if (bn === ql && an !== ql) return 1;
-    var as = an.startsWith(ql), bs = bn.startsWith(ql);
-    if (as && !bs) return -1;
-    if (bs && !as) return 1;
-    return an.length - bn.length;
-  });
-  return matches.slice(0, 10);
-}
-
-function homeHandleInput(val) {
-  var drop = document.getElementById('homeSearchDrop');
-  var clear = document.getElementById('homeSearchClear');
-  if (clear) clear.style.display = val.length ? 'block' : 'none';
-  if (val.trim().length < 2) { if (drop) { drop.innerHTML = ''; drop.classList.remove('open'); } return; }
-  var matches = homeFindSuburbs(val);
-  if (!matches.length) {
-    drop.innerHTML = '<div class="sc-empty">No suburbs found — try a different search</div>';
-    drop.classList.add('open');
-    return;
-  }
-  drop.innerHTML = matches.map(function(s) {
-    return '<div class="sc-item" onclick="homeSelectSuburb(\'' + s.name.replace(/'/g,"&#39;") + '\',\'' + s.postcode + '\',\'' + s.state + '\')">' +
-      '<div class="sc-item-icon">📍</div>' +
-      '<span class="sc-item-name">' + s.name + '</span>' +
-      '<span class="sc-item-meta">' + s.state + ' · ' + s.postcode + '</span>' +
-      '</div>';
-  }).join('');
-  drop.classList.add('open');
-}
-
-function homeSelectSuburb(name, postcode, state) {
-  homeSelectedSuburb = { name: name, postcode: postcode, state: state };
-  var inp = document.getElementById('homeSearchInput');
-  if (inp) inp.value = name + ', ' + state + ' ' + postcode;
-  var drop = document.getElementById('homeSearchDrop');
-  if (drop) { drop.innerHTML = ''; drop.classList.remove('open'); }
-  homeShowProviders(name, postcode, state);
-}
-
-function homeGenerateUrls(name, state, postcode) {
-  var slug = name.toLowerCase().replace(/\s+/g, '-');
-  var st = (state || 'wa').toLowerCase();
-  var pc = postcode.toString().trim();
-  return {
-    realestate: 'https://www.realestate.com.au/rent/in-' + slug + ',+' + st + '+' + pc + '/list-1',
-    domain:     'https://www.domain.com.au/rent/' + slug + '-' + st + '-' + pc + '/',
-    reiwa:      state === 'WA' ? 'https://reiwa.com.au/rental-properties/' + slug + '-' + pc + '/' : '',
-    rent:       'https://www.rent.com.au/rentals/' + slug + '-' + st + '-' + pc
-  };
-}
-
 function homeShowProviders(name, postcode, state) {
-  var urls = homeGenerateUrls(name, state, postcode);
+  var urls = {
+    realestate: 'https://www.realestate.com.au/rent/in-' + name.toLowerCase().replace(/\s+/g,'-') + ',+' + (state||'wa').toLowerCase() + '+' + postcode + '/list-1',
+    domain:     'https://www.domain.com.au/rent/' + name.toLowerCase().replace(/\s+/g,'-') + '-' + (state||'wa').toLowerCase() + '-' + postcode + '/',
+    reiwa:      state === 'WA' ? 'https://reiwa.com.au/rental-properties/' + name.toLowerCase().replace(/\s+/g,'-') + '-' + postcode + '/' : '',
+    rent:       'https://www.rent.com.au/rentals/' + name.toLowerCase().replace(/\s+/g,'-') + '-' + (state||'wa').toLowerCase() + '-' + postcode
+  };
   var box = document.getElementById('homeProviders');
   if (!box) return;
   var html = '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;margin-top:4px">Browse listings in ' + name + '</div>';
@@ -1881,6 +1944,8 @@ function homeClearSearch() {
   if (inp) { inp.value = ''; inp.focus(); }
   var drop = document.getElementById('homeSearchDrop');
   if (drop) { drop.innerHTML = ''; drop.classList.remove('open'); }
+  var chips = document.getElementById('homeTopicChips');
+  if (chips) chips.style.display = 'flex';
   var box = document.getElementById('homeProviders');
   if (box) { box.innerHTML = ''; box.style.display = 'none'; }
   var clear = document.getElementById('homeSearchClear');
