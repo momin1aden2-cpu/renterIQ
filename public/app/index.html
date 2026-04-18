@@ -2642,7 +2642,7 @@ function homeRenderFollowups() {
             (!p.bondSetup ? '<button style="width:100%;background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px" onclick="navigate(\'/app/pages/bond-tracker.html\')"><span>🛡️</span>Set up bond tracker</button>' : '') +
             (!p.rentSetup ? '<button style="width:100%;background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px" onclick="navigate(\'/app/pages/rent-tracker.html\')"><span>💰</span>Set up rent payments</button>' : '') +
             '<button style="width:100%;background:rgba(0,200,150,.08);color:var(--teal-dk);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px" onclick="navigate(\'/app/pages/entry-audit.html\')"><span>📸</span>Do your move-in condition report</button>' +
-            '<button style="width:100%;background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px" onclick="homeOpenConnectionsGuide()"><span>⚡</span>Connect electricity, gas, internet</button>' +
+            (function(){ var cd=getConnectionsDone();var ct=Object.keys(cd).length;return '<button style="width:100%;background:var(--blue-xl);color:var(--blue);border:none;border-radius:10px;padding:10px 14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px" onclick="homeOpenConnectionsGuide()"><span>⚡</span>'+(ct>=6?'Utilities connected ✓':(ct>0?'Utilities — '+ct+'/6 done':'Connect electricity, gas, internet'))+'</button>'; })() +
           '</div>' +
         '</div>';
       }
@@ -2659,48 +2659,93 @@ function homeRenderFollowups() {
   if (typeof homeRenderJourney === 'function') homeRenderJourney();
 }
 
-// ── Connections guide sheet — gentle nudge for the move-in checklist of
-// utility setups. Doesn't tell the renter who to use, just lists what they
-// need to think about and links to good aggregators.
+// ── Connections guide — move-in utility checklist with completion tracking.
+// Persists ticked state in localStorage so the renter can open it again and
+// see what they've already handled. Address pre-fills from the lease record.
+var CONNECTIONS_KEY = 'riq_connections_done';
+
+function getConnectionsDone(){
+  try { return JSON.parse(localStorage.getItem(CONNECTIONS_KEY)||'{}'); } catch(e){ return {}; }
+}
+function setConnectionDone(id, done){
+  var state = getConnectionsDone();
+  if(done) state[id] = Date.now();
+  else delete state[id];
+  try { localStorage.setItem(CONNECTIONS_KEY, JSON.stringify(state)); } catch(e){}
+}
+
 function homeOpenConnectionsGuide(){
   if(document.getElementById('connectionsSheet')) return;
+
+  var address = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}');
+    address = lease.address || '';
+  } catch(e){}
+  if(!address){
+    try { address = localStorage.getItem('riq-user-address') || ''; } catch(e){}
+  }
+
+  var done = getConnectionsDone();
+
+  var items = [
+    { id:'power',   icon:'⚡', label:'Electricity & gas', sub:'Compare retailers — enter your postcode to see plans', url:'https://www.energymadeeasy.gov.au/' },
+    { id:'water',   icon:'💧', label:'Water', sub:'Usually stays with the property — check your lease', url:'' },
+    { id:'internet',icon:'🌐', label:'Internet (NBN)', sub:'Check what\'s available at your new address', url:'https://www.nbnco.com.au/connect-home-or-business/check-your-address' },
+    { id:'stream',  icon:'📺', label:'Streaming & subscriptions', sub:'Update your billing address on each service', url:'' },
+    { id:'mail',    icon:'🏛️', label:'Australia Post mail redirect', sub:'Forward post from your old place for 1–6 months', url:'https://auspost.com.au/receiving/manage-your-mail/redirect-hold-mail' },
+    { id:'roll',    icon:'🗳️', label:'Electoral roll update', sub:'Required by law within 8 weeks of moving', url:'https://www.aec.gov.au/enrol/' }
+  ];
+
+  var doneCount = items.filter(function(it){ return done[it.id]; }).length;
+
+  var rows = items.map(function(it){
+    var isDone = !!done[it.id];
+    var checkStyle = 'width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;cursor:pointer;-webkit-tap-highlight-color:transparent;border:2px solid ';
+    var checkHtml = isDone
+      ? '<div onclick="event.preventDefault();event.stopPropagation();toggleConnectionDone(\''+it.id+'\',false)" style="'+checkStyle+'var(--teal);background:var(--teal);color:#fff;font-weight:800">✓</div>'
+      : '<div onclick="event.preventDefault();event.stopPropagation();toggleConnectionDone(\''+it.id+'\',true)" style="'+checkStyle+'var(--border);background:#fff;min-height:44px;min-width:44px;padding:10px"></div>';
+
+    var cardBg = isDone ? 'rgba(0,200,150,.06)' : 'var(--blue-xl)';
+    var cardBorder = isDone ? 'var(--teal)' : (it.url ? 'var(--border)' : 'var(--border-lt)');
+    var titleStyle = isDone ? 'text-decoration:line-through;color:var(--muted)' : 'color:var(--text)';
+
+    var inner = '<div style="display:flex;align-items:center;gap:12px;padding:14px;background:'+cardBg+';border:1.5px solid '+cardBorder+';border-radius:14px;margin-bottom:8px">' +
+      checkHtml +
+      '<div style="width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;opacity:'+(isDone?'.5':'1')+'">' + it.icon + '</div>' +
+      '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;'+titleStyle+'">' + it.label + '</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4">' + it.sub + '</div></div>' +
+      (it.url ? '<span style="color:var(--blue);font-size:14px;font-weight:800;flex-shrink:0">↗</span>' : '') +
+    '</div>';
+
+    if(it.url){
+      return '<a href="' + it.url + '" target="_blank" rel="noopener" style="text-decoration:none">' + inner + '</a>';
+    }
+    return inner;
+  }).join('');
+
+  var addressHtml = '';
+  if(address){
+    addressHtml = '<div style="margin-bottom:10px;padding:10px 14px;background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:10px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="homeConnectionsCopyAddress()">' +
+      '<span style="font-size:14px">📍</span>' +
+      '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px">Your new address</div><div style="font-family:Nunito,sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + address + '</div></div>' +
+      '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--blue)">Copy</span>' +
+    '</div>';
+  }
+
   var overlay = document.createElement('div');
   overlay.id = 'connectionsSheet';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,36,96,.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease';
 
-  var items = [
-    { icon:'⚡', label:'Electricity & gas', sub:'Compare retailers in your state', url:'https://www.energymadeeasy.gov.au/' },
-    { icon:'💧', label:'Water', sub:'Usually stays with the property — check your lease', url:'' },
-    { icon:'🌐', label:'Internet (NBN)', sub:'Check what\'s available at your address', url:'https://www.nbnco.com.au/connect-home-or-business/check-your-address' },
-    { icon:'📺', label:'Streaming & subscriptions', sub:'Update your billing address', url:'' },
-    { icon:'🏛️', label:'Australia Post mail redirect', sub:'Forward post from your old place for 1–6 months', url:'https://auspost.com.au/receiving/manage-your-mail/redirect-hold-mail' },
-    { icon:'🗳️', label:'Update your address on the electoral roll', sub:'Required by law within 8 weeks of moving', url:'https://www.aec.gov.au/enrol/' }
-  ];
-
-  var rows = items.map(function(it){
-    if(it.url){
-      return '<a href="' + it.url + '" target="_blank" rel="noopener" style="text-decoration:none">'+
-        '<div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:14px;margin-bottom:8px">'+
-          '<div style="width:38px;height:38px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">' + it.icon + '</div>'+
-          '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">' + it.label + '</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4">' + it.sub + '</div></div>'+
-          '<span style="color:var(--blue);font-size:14px;font-weight:800">↗</span>'+
-        '</div></a>';
-    }
-    return '<div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--blue-xl);border:1.5px solid var(--border-lt);border-radius:14px;margin-bottom:8px">'+
-      '<div style="width:38px;height:38px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">' + it.icon + '</div>'+
-      '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">' + it.label + '</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4">' + it.sub + '</div></div>'+
-    '</div>';
-  }).join('');
-
   overlay.innerHTML =
-    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:85vh;display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">'+
-      '<div style="padding:14px 20px 10px;flex-shrink:0"><div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 14px"></div>'+
-        '<div style="text-align:center"><div style="font-size:30px;line-height:1;margin-bottom:6px">⚡</div><div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.3px">Get the basics connected</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:6px;max-width:300px;margin-left:auto;margin-right:auto">A quick checklist for the first week. RenterIQ doesn\'t take a kickback from any of these — pick what works.</div></div>'+
-      '</div>'+
-      '<div style="flex:1;overflow-y:auto;padding:14px 20px">' + rows + '</div>'+
-      '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0">'+
-        '<button id="connectionsCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer">Close</button>'+
-      '</div>'+
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:90vh;display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">' +
+      '<div style="padding:14px 20px 10px;flex-shrink:0"><div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 14px"></div>' +
+        '<div style="text-align:center"><div style="font-size:30px;line-height:1;margin-bottom:6px">⚡</div><div style="font-family:Sora,sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.3px">Move-in Checklist</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:6px;max-width:300px;margin-left:auto;margin-right:auto">Tick each one off as you go. Your progress is saved.</div></div>' +
+        '<div id="connectionsProgress" style="margin-top:12px;text-align:center;font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:'+(doneCount===items.length?'var(--teal-dk)':'var(--muted)')+'">'+doneCount+' of '+items.length+' done'+(doneCount===items.length?' ✓':'')+'</div>' +
+      '</div>' +
+      '<div style="flex:1;overflow-y:auto;padding:14px 20px;-webkit-overflow-scrolling:touch">' + addressHtml + rows + '</div>' +
+      '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0">' +
+        '<button id="connectionsCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:13px;border-radius:12px;cursor:pointer;min-height:48px">Done</button>' +
+      '</div>' +
     '</div>';
 
   document.body.appendChild(overlay);
@@ -2711,6 +2756,27 @@ function homeOpenConnectionsGuide(){
   var close = function(){ overlay.style.opacity = '0'; setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 200); };
   document.getElementById('connectionsCloseBtn').onclick = close;
   overlay.onclick = function(e){ if(e.target === overlay) close(); };
+}
+
+function toggleConnectionDone(id, done){
+  setConnectionDone(id, done);
+  var sheet = document.getElementById('connectionsSheet');
+  if(sheet) sheet.remove();
+  homeOpenConnectionsGuide();
+}
+
+function homeConnectionsCopyAddress(){
+  var address = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}');
+    address = lease.address || '';
+  } catch(e){}
+  if(!address){ try { address = localStorage.getItem('riq-user-address') || ''; } catch(e){} }
+  if(address && navigator.clipboard){
+    navigator.clipboard.writeText(address).then(function(){
+      showToast('Address copied','Paste it into the signup form','📍');
+    });
+  }
 }
 
 // ── Lease renewal card — appears as the lease end date approaches.
