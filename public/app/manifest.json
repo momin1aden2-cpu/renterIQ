@@ -1,7 +1,7 @@
 {
   "name": "RenterIQ",
   "short_name": "RenterIQ",
-  "description": "The complete renting guide for Australian tenants — from search to vacate.",
+  "description": "Protect your bond and know your rights — condition reports, lease reviews, encrypted vault and bond comparison for Australian renters.",
   "start_url": "/app/index.html",
   "scope": "/app/",
   "display": "standalone",
