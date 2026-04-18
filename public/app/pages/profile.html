@@ -1697,6 +1697,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
   var hash=window.location.hash;
   if(hash==='#notifications')switchView('D');
+  if(hash==='#review')setTimeout(function(){openRatingModal();},500);
   if(hash==='#credits'||hash==='#subscription')switchView('E');
   if(hash==='#privacy')switchView('F');
 

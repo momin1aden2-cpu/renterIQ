@@ -566,6 +566,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
   #pricing .container > div:nth-child(2){grid-template-columns:1fr !important;max-width:400px !important}
   .steps-grid{grid-template-columns:1fr;gap:12px}
   .features-grid{grid-template-columns:1fr;gap:14px}
+  #landingReviews{grid-template-columns:1fr !important}
   .rights-grid{grid-template-columns:1fr}
   .vault-grid{grid-template-columns:1fr 1fr}
   
@@ -1062,6 +1063,22 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
         </div>
       </div>
       <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px;font-style:italic;line-height:1.6">Nothing enters your report without your review. RenterIQ is a documentation tool — not a legal service.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TESTIMONIALS ========== -->
+<section style="background:#fff;padding:64px 0" id="reviews">
+  <div class="container" style="max-width:800px">
+    <div style="text-align:center;margin-bottom:36px">
+      <span class="section-eyebrow">What Renters Say</span>
+      <h2 class="section-h2">Real reviews from Australian renters.</h2>
+    </div>
+    <div id="landingReviews" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="text-align:center;padding:40px;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;grid-column:span 2">Loading reviews…</div>
+    </div>
+    <div style="text-align:center;margin-top:24px">
+      <a href="/reviews.html" style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--blue);text-decoration:none">See all reviews →</a>
     </div>
   </div>
 </section>
@@ -1676,6 +1693,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+// Load live reviews from Firestore for the testimonials section
+function loadLandingReviews(){
+  var container=document.getElementById('landingReviews');
+  if(!container) return;
+  if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){
+    container.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;grid-column:span 2">Reviews loading…</div>';
+    setTimeout(loadLandingReviews, 1500);
+    return;
+  }
+  firebase.firestore().collection('reviews').orderBy('createdAtMs','desc').limit(6).get().then(function(snap){
+    if(snap.empty){
+      container.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;grid-column:span 2"><div style="font-size:32px;margin-bottom:8px">⭐</div>Be the first to share your experience.<br><a href="/app/index.html" style="color:var(--blue);font-weight:700;margin-top:8px;display:inline-block">Try RenterIQ free →</a></div>';
+      return;
+    }
+    var html='';
+    snap.forEach(function(doc){
+      var r=doc.data();
+      var stars='';for(var i=0;i<5;i++){stars+='<span style="color:'+(i<r.stars?'#FFC107':'#D5E2F8')+'">★</span>';}
+      var initial=(r.name&&r.name!=='Anonymous')?r.name.charAt(0).toUpperCase():'R';
+      var displayName=(r.name&&r.name!=='Anonymous')?r.name:'A renter';
+      var date='';if(r.createdAtMs){var d=new Date(r.createdAtMs);date=d.toLocaleDateString('en-AU',{month:'short',year:'numeric'});}
+      html+='<div style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:16px;padding:20px">'+
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'+
+          '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;display:flex;align-items:center;justify-content:center;font-family:Sora,sans-serif;font-weight:800;font-size:15px;flex-shrink:0">'+initial+'</div>'+
+          '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text)">'+displayName+'</div><div style="font-size:14px;letter-spacing:1px;margin-top:1px">'+stars+'</div></div>'+
+          (date?'<span style="font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:var(--muted);flex-shrink:0">'+date+'</span>':'')+
+        '</div>'+
+        (r.comment?'<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.65">'+r.comment.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>':'')+
+      '</div>';
+    });
+    container.innerHTML=html;
+  }).catch(function(){
+    container.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;grid-column:span 2">Could not load reviews.</div>';
+  });
+}
+setTimeout(loadLandingReviews, 2000);
 
 // Search hub provider selection
 let suburbsData = [];

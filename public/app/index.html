@@ -3362,6 +3362,49 @@ function homeAutoPromoteTenancy(){
   } catch(e){}
 }
 
+// ── Smart review prompt — shows once after a meaningful action ────────
+// Triggers: entry audit done, exit report done, lease review done, rights search used 3+ times
+// Shows a small, friendly card — not a modal. Dismissable. Only once ever.
+function maybeShowReviewPrompt(){
+  try{
+    if(localStorage.getItem('riq-review-prompted')==='1') return;
+    if(localStorage.getItem('riq-review-done')==='1') return;
+    // Check if the user has done something meaningful
+    var hasEntryAudit=false,hasLeaseReview=false,searchCount=0;
+    try{var vr=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');hasEntryAudit=vr.some(function(r){return r&&r.type==='entry-audit';});}catch(e){}
+    try{var leases=JSON.parse(localStorage.getItem('riq-vault-leases')||'[]');hasLeaseReview=leases.some(function(l){return l&&l.aiReview;});}catch(e){}
+    if(!hasEntryAudit&&!hasLeaseReview) return;
+    // They've done real work — show the prompt after a delay
+    setTimeout(function(){
+      if(document.getElementById('reviewPromptCard')) return;
+      var card=document.createElement('div');
+      card.id='reviewPromptCard';
+      card.style.cssText='position:fixed;bottom:calc(68px + env(safe-area-inset-bottom,10px));left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:400px;background:#fff;border-radius:16px;border:1.5px solid var(--border-lt);box-shadow:0 8px 32px rgba(10,36,96,.12);padding:16px 18px;z-index:99;opacity:0;transition:opacity .25s ease';
+      card.innerHTML=
+        '<div style="display:flex;align-items:flex-start;gap:12px">'+
+          '<div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#FFC107,#FFD54F);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">⭐</div>'+
+          '<div style="flex:1;min-width:0">'+
+            '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);letter-spacing:-.1px">Finding RenterIQ useful?</div>'+
+            '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5">A quick review helps other renters find us. Takes 30 seconds.</div>'+
+          '</div>'+
+          '<button onclick="dismissReviewPrompt()" aria-label="Dismiss" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0">&times;</button>'+
+        '</div>'+
+        '<div style="display:flex;gap:8px;margin-top:12px">'+
+          '<button onclick="dismissReviewPrompt();navigate(\'/app/pages/profile.html#review\')" style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:11px;font-family:Sora,sans-serif;font-weight:700;font-size:13px;cursor:pointer;min-height:44px">Leave a Review</button>'+
+          '<button onclick="dismissReviewPrompt()" style="background:var(--blue-xl);color:var(--muted);border:none;border-radius:10px;padding:11px 16px;font-family:Sora,sans-serif;font-weight:700;font-size:13px;cursor:pointer;min-height:44px">Not now</button>'+
+        '</div>';
+      document.body.appendChild(card);
+      requestAnimationFrame(function(){card.style.opacity='1';});
+    },3000);
+  }catch(e){}
+}
+
+function dismissReviewPrompt(){
+  try{localStorage.setItem('riq-review-prompted','1');}catch(e){}
+  var card=document.getElementById('reviewPromptCard');
+  if(card){card.style.opacity='0';setTimeout(function(){if(card.parentNode)card.remove();},250);}
+}
+
 // ── Tenancy summary card — condensed glance of the active lease
 function homeRenderTenancy(){
   homeAutoPromoteTenancy();
@@ -3792,6 +3835,7 @@ function homeRefreshAll(){
   try { homeRenderMoveInReminder(); } catch(e){}
   try { homeRenderAlreadyRenting(); } catch(e){}
   try { homeUpdateBellBadge(); } catch(e){}
+  try { maybeShowReviewPrompt(); } catch(e){}
 }
 
 document.addEventListener('DOMContentLoaded', function() {
