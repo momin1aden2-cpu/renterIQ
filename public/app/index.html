@@ -284,18 +284,16 @@
   justify-content: center;
 }
 .sc-drop {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
+  position: relative;
+  margin-top: 10px;
   background: #fff;
   border-radius: 16px;
   border: 1.5px solid var(--border-lt);
-  box-shadow: 0 8px 32px rgba(27,80,200,.14);
+  box-shadow: 0 4px 16px rgba(27,80,200,.08);
   z-index: 50;
   overflow: hidden;
   display: none;
-  max-height: 260px;
+  max-height: none;
   overflow-y: auto;
 }
 .sc-drop.open { display: block; animation: scDrop .14s ease; }
@@ -1854,13 +1852,30 @@ function homeRightsSearch(val){
   var stateCode = getUserState() || 'VIC';
   var sd = STATE_DATA[stateCode] || STATE_DATA.VIC;
 
-  var matches = RIGHTS_KB.filter(function(item){
-    return item.keywords.split(' ').some(function(kw){ return ql.includes(kw) || kw.includes(ql); }) ||
-           item.topic.replace(/_/g,' ').includes(ql);
-  });
+  // Split query into individual words for flexible matching
+  var qWords = ql.split(/\s+/).filter(function(w){ return w.length >= 2; });
+  var matches = RIGHTS_KB.map(function(item){
+    var allKw = item.keywords + ' ' + item.topic.replace(/_/g,' ');
+    var score = 0;
+    qWords.forEach(function(qw){
+      if(allKw.includes(qw)) score += 2;
+      else {
+        // Partial/stem match: "breaking" matches "break", "landlord" matches "landlord"
+        var stems = allKw.split(' ');
+        if(stems.some(function(s){ return s.startsWith(qw) || qw.startsWith(s); })) score += 1;
+      }
+    });
+    return { item:item, score:score };
+  }).filter(function(r){ return r.score > 0; }).sort(function(a,b){ return b.score - a.score; }).map(function(r){ return r.item; });
+
+  if(!stateCode || !STATE_DATA[stateCode]){
+    drop.innerHTML = '<div style="padding:16px;text-align:center"><div style="font-size:28px;margin-bottom:8px">📍</div><div style="font-family:Sora,sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px">Set your state first</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:12px">Tenancy rules are different in every state. Set yours so we can show the right information.</div><button onclick="navigate(\'/app/pages/profile.html?view=A\')" style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-family:Sora,sans-serif;font-weight:700;font-size:13px;cursor:pointer;min-height:44px">Set my state →</button></div>';
+    drop.classList.add('open');
+    return;
+  }
 
   if(!matches.length){
-    drop.innerHTML = '<div style="padding:16px;text-align:center"><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">No results for "'+val+'"</div><div style="font-weight:600;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer" onclick="navigate(\'/app/pages/rights.html\')">Browse all renter rights →</div></div>';
+    drop.innerHTML = '<div style="padding:16px;text-align:center"><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">No results for "'+val+'" in '+sd.name+'</div><div style="font-weight:600;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer" onclick="navigate(\'/app/pages/rights.html\')">Browse all renter rights →</div></div>';
     drop.classList.add('open');
     return;
   }
