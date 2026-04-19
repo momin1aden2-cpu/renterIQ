@@ -27,6 +27,7 @@
         urlStr.indexOf(window.location.origin + '/api/') === 0;
       if (!isApi) return originalFetch(input, init);
 
+      let attachedToken = false;
       try {
         const user =
           typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser
@@ -39,12 +40,15 @@
             headers.set('Authorization', 'Bearer ' + token);
           }
           init = Object.assign({}, init, { headers });
+          attachedToken = true;
         }
       } catch (_e) { /* fall through without token */ }
 
+      console.log('[RIQ api]', urlStr.replace(window.location.origin, ''), 'token?', attachedToken);
       return originalFetch(input, init);
     };
     window.__riqFetchPatched = true;
+    console.log('[RIQ] fetch patched for /api/* auth');
   }
 
   function initializeAuthGuard() {
