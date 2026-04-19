@@ -857,7 +857,7 @@ function loadMaintenanceItems(){
             (item.threadId ? '<button onclick="openThreadSheet(\'' + item.threadId + '\')" style="background:var(--blue-xl);color:var(--blue);border:none;border-radius:8px;padding:6px 12px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">💬 View thread</button>' : '') +
             (isStale && item.threadId ? '<button onclick="generateFollowUp(\'' + item.id + '\')" style="background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">✦ Send follow-up</button>' : '') +
             '<button onclick="resolveItem(\'' + item.id + '\')" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">Mark resolved</button>' +
-            '<button onclick="deleteMaintenanceItem(\'' + item.id + '\',\'' + vaultEsc(item.description||'').replace(/\x27/g,"\\\x27") + '\')" class="vault-del-btn">🗑 Delete</button>' +
+            '<button onclick="deleteMaintenanceItem(\'' + item.id + '\')" class="vault-del-btn">🗑 Delete</button>' +
           '</div></div>';
       });
     }
@@ -875,7 +875,7 @@ function loadMaintenanceItems(){
           '<div style="font-weight:600;font-size:13px;color:var(--text);padding-left:52px;text-decoration:line-through">' + item.description + '</div>' +
           '<div style="display:flex;gap:8px;padding-left:52px;flex-wrap:wrap">' +
           '<button onclick="resolveItem(\'' + item.id + '\')" style="background:var(--blue-xl);color:var(--blue);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-family:\'Sora\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">Reopen</button>' +
-          '<button onclick="deleteMaintenanceItem(\'' + item.id + '\',\'' + vaultEsc(item.description||'').replace(/\x27/g,"\\\x27") + '\')" class="vault-del-btn">🗑 Delete</button>' +
+          '<button onclick="deleteMaintenanceItem(\'' + item.id + '\')" class="vault-del-btn">🗑 Delete</button>' +
           '</div></div>';
       });
     }
@@ -1097,6 +1097,15 @@ function loadComms(){
     var raw = localStorage.getItem('riq_communications');
     var comms = raw ? JSON.parse(raw) : [];
     if (!Array.isArray(comms)) comms = [];
+    // Backfill legacy records that predate the id field so delete works on them.
+    var mutated = false;
+    comms.forEach(function(c, i){
+      if(c && !c.id){
+        c.id = 'comm_legacy_' + (c.date || Date.now()) + '_' + i;
+        mutated = true;
+      }
+    });
+    if(mutated){ try { localStorage.setItem('riq_communications', JSON.stringify(comms)); } catch(e){} }
     var list = document.getElementById('commsList');
     if (!comms.length) {
       if (list) list.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:44px;margin-bottom:12px">💬</div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px">Your message trail will live here</div><div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:280px;margin-left:auto;margin-right:auto">Every email RenterIQ drafts for you (maintenance, follow-ups, bond return) is saved automatically — easy to look up later.</div><button style="background:var(--blue-xl);color:var(--blue);border:1.5px solid var(--border);border-radius:12px;padding:12px 24px;font-family:\'Sora\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px" onclick="openNewCommsSheet()">+ Save a message manually</button></div>';
@@ -1118,7 +1127,7 @@ function loadComms(){
         '<span style="font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;color:' + typeColor + ';background:' + typeColor.replace(')', '').replace('var(--', 'rgba(') + ',.1);border-radius:8px;padding:3px 8px">' + typeLabel + '</span></div>' +
         '<div style="font-weight:600;font-size:13px;color:var(--text);padding-left:52px;white-space:pre-wrap">' + vaultEsc((c.body || '').substring(0, 200)) + ((c.body || '').length > 200 ? '…' : '') + '</div>' +
         '<div style="display:flex;justify-content:flex-end;width:100%;padding-left:52px;box-sizing:border-box">' +
-          '<button onclick="deleteCommunication(\'' + commId + '\',\'' + subjectEsc.replace(/\x27/g,"\\\x27") + '\')" class="vault-del-btn">🗑 Delete</button>' +
+          '<button onclick="deleteCommunication(\'' + commId + '\')" class="vault-del-btn">🗑 Delete</button>' +
         '</div>' +
         '</div>';
     });
@@ -1242,7 +1251,7 @@ function loadReceipts(){
         }
       }
       html += '<div style="display:flex;justify-content:flex-end;width:100%;padding-left:56px;box-sizing:border-box">' +
-        '<button onclick="deleteReceipt(\'' + r.id + '\',\'' + descEsc.replace(/\x27/g,"\\\x27") + '\')" class="vault-del-btn">🗑 Delete</button>' +
+        '<button onclick="deleteReceipt(\'' + r.id + '\')" class="vault-del-btn">🗑 Delete</button>' +
       '</div>';
       html += '</div>';
     });
@@ -1368,7 +1377,7 @@ function loadRoutineReports(){
         (origUrl
           ? '<div style="padding-left:56px;width:100%;box-sizing:border-box"><a href="'+origUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:var(--blue);text-decoration:none;background:var(--blue-xl);border-radius:8px;padding:7px 12px"><span>📄</span><span>View original report</span><span style="font-size:14px">↗</span></a></div>'
           : '<div style="padding-left:56px;width:100%;box-sizing:border-box"><button onclick="attachOriginalRoutine(\''+(insp.id||'')+'\')" style="display:inline-flex;align-items:center;gap:6px;font-family:Sora,sans-serif;font-weight:700;font-size:12px;color:var(--blue);background:var(--blue-xl);border:1.5px dashed var(--border);border-radius:8px;padding:7px 12px;cursor:pointer">📎 Attach the original file</button><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4">Saved before file storage was wired — upload the PDF/photo if you still have it</div></div>')+
-        '<div style="display:flex;justify-content:flex-end;width:100%;padding-left:56px;box-sizing:border-box"><button onclick="event.stopPropagation();deleteRoutineInspection(\''+(insp.id||'')+'\',\''+vaultEsc(insp.agency||'').replace(/\x27/g,"\\\x27")+'\')" class="vault-del-btn">🗑 Delete</button></div>'+
+        '<div style="display:flex;justify-content:flex-end;width:100%;padding-left:56px;box-sizing:border-box"><button onclick="event.stopPropagation();deleteRoutineInspection(\''+(insp.id||'')+'\')" class="vault-del-btn">🗑 Delete</button></div>'+
         '</div>';
     });
     list.innerHTML=html;
@@ -1499,13 +1508,14 @@ function vaultRemoveCloud(collection, docId, storagePath){
 }
 
 /* Per-folder delete entry points — short, friendly, all routed via vaultConfirmDelete */
-function deleteLease(id, addr){
+function deleteLease(id){
+  var leases = []; try { leases = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]'); } catch(e){}
+  var doomed = leases.find(function(x){ return x && x.id === id; });
+  var addrSafe = vaultEsc((doomed && (doomed.address || doomed.fileName)) || '');
   vaultConfirmDelete({
     title: 'Delete this lease record?',
-    body: 'We\'ll remove the saved lease<' + (addr ? ' for <strong>'+addr+'</strong>' : '') + '> and the original PDF from your Vault. Your renewal reminders for this lease will also stop.',
+    body: 'We\'ll remove the saved lease' + (addrSafe ? ' for <strong>'+addrSafe+'</strong>' : '') + ' and the original PDF from your Vault. Your renewal reminders for this lease will also stop.',
     onConfirm: function(){
-      var leases = []; try { leases = JSON.parse(localStorage.getItem('riq-vault-leases')||'[]'); } catch(e){}
-      var doomed = leases.find(function(x){ return x && x.id === id; });
       vaultRemoveLocalById('riq-vault-leases', id);
       vaultRemoveCloud('leases', id, doomed && doomed.filePath);
       if (window.RIQLocalFiles) RIQLocalFiles.remove(id).catch(function(){});
@@ -1515,36 +1525,72 @@ function deleteLease(id, addr){
   });
 }
 
-function deleteMoveInRecord(id, addr){
+function collectAuditPhotoPaths(record){
+  // Walk the audit record (entry or exit shape) and return every photo.path
+  // that was uploaded to Firebase Storage, so cloud cleanup can delete them.
+  var paths = [];
+  if(!record) return paths;
+  var rooms = (record.data && record.data.rooms) || record.rooms || [];
+  (rooms||[]).forEach(function(room){
+    var itemList = [];
+    if(Array.isArray(room.items)) itemList = room.items;
+    else if(room.items && typeof room.items === 'object') itemList = Object.keys(room.items).map(function(k){ return room.items[k]; });
+    itemList.forEach(function(item){
+      (item && item.photos || []).forEach(function(ph){
+        if(ph && ph.path) paths.push(ph.path);
+      });
+    });
+  });
+  return paths;
+}
+
+function deleteMoveInRecord(id){
+  var doomed = null;
+  try {
+    var preview = JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+    doomed = preview.find(function(r){ return r && ('entry-' + r.date) === id; });
+  } catch(e){}
+  var addrSafe = vaultEsc((doomed && doomed.data && doomed.data.propertyAddress) || '');
   vaultConfirmDelete({
     title: 'Delete this move-in record?',
-    body: 'Your move-in record' + (addr ? ' for <strong>'+addr+'</strong>' : '') + ' is your bond safety net at exit time. Are you sure?',
+    body: 'Your move-in record' + (addrSafe ? ' for <strong>'+addrSafe+'</strong>' : '') + ' is your bond safety net at exit time. Are you sure?',
     onConfirm: function(){
       try {
         var list = JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
         list = list.filter(function(r){ return !r || ('entry-' + r.date) !== id; });
         localStorage.setItem('renteriq_vault_reports', JSON.stringify(list));
       } catch(e){}
-      // Also clear from the entry-audit past summary if present
       try {
         var past = JSON.parse(localStorage.getItem('riq_entry_audit_past')||'[]');
-        // best-effort cleanup
+        var auditId = doomed && (doomed.data && doomed.data.auditId || doomed.id);
+        if(auditId) past = past.filter(function(x){ return !x || x.id !== auditId; });
         localStorage.setItem('riq_entry_audit_past', JSON.stringify(past));
       } catch(e){}
-      // Cloud cleanup (best-effort — record id isn't a Firestore id here)
+      // Cloud cleanup — iterate every uploaded photo path, then the Firestore doc.
+      if(window.RIQStore && doomed){
+        RIQStore.ready.then(function(){
+          if(!RIQStore.isAuthed()) return;
+          var auditId = (doomed.data && doomed.data.auditId) || doomed.id;
+          collectAuditPhotoPaths(doomed).forEach(function(p){
+            try { RIQStore.deleteFile(p); } catch(e){}
+          });
+          if(auditId){ try { RIQStore.delete('entry-audits', auditId); } catch(e){} }
+        });
+      }
       loadConditionReports(); loadVaultCounts();
       showToast('Move-in record deleted', 'Removed from your Vault', '🗑');
     }
   });
 }
 
-function deleteRoutineInspection(id, agency){
+function deleteRoutineInspection(id){
+  var list = []; try { list = JSON.parse(localStorage.getItem('riq_routine_inspection_past')||'[]'); } catch(e){}
+  var doomed = list.find(function(x){ return x && x.id === id; });
+  var agencySafe = vaultEsc((doomed && doomed.agency) || '');
   vaultConfirmDelete({
     title: 'Delete this routine inspection?',
-    body: 'We\'ll remove the analysis, action plan and the original report file' + (agency ? ' from <strong>'+agency+'</strong>' : '') + '. Any scheduled follow-up reminders will also stop.',
+    body: 'We\'ll remove the analysis, action plan and the original report file' + (agencySafe ? ' from <strong>'+agencySafe+'</strong>' : '') + '. Any scheduled follow-up reminders will also stop.',
     onConfirm: function(){
-      var list = []; try { list = JSON.parse(localStorage.getItem('riq_routine_inspection_past')||'[]'); } catch(e){}
-      var doomed = list.find(function(x){ return x && x.id === id; });
       vaultRemoveLocalById('riq_routine_inspection_past', id);
       var path = doomed && doomed.originalReport && doomed.originalReport.path;
       vaultRemoveCloud('routine-inspections', id, path);
@@ -1554,23 +1600,42 @@ function deleteRoutineInspection(id, agency){
   });
 }
 
-function deleteMaintenanceItem(id, desc){
+function deleteMaintenanceItem(id){
+  var list = []; try { list = JSON.parse(localStorage.getItem('riq_maintenance_items')||'[]'); } catch(e){}
+  var doomed = list.find(function(x){ return x && x.id === id; });
+  var descRaw = (doomed && doomed.description) || '';
+  var descSafe = vaultEsc(descRaw.slice(0, 80) + (descRaw.length > 80 ? '…' : ''));
   vaultConfirmDelete({
     title: 'Delete this maintenance item?',
-    body: 'We\'ll remove' + (desc ? ' "<strong>'+desc.slice(0,80)+(desc.length>80?'…':'')+'</strong>"' : ' this issue') + ' along with any photos, the message thread and follow-up reminder.',
+    body: 'We\'ll remove' + (descSafe ? ' "<strong>'+descSafe+'</strong>"' : ' this issue') + ' along with any photos, the message thread and follow-up reminder.',
     onConfirm: function(){
       vaultRemoveLocalById('riq_maintenance_items', id);
-      vaultRemoveCloud('maintenance-items', id);
+      if(window.RIQStore){
+        RIQStore.ready.then(function(){
+          if(!RIQStore.isAuthed()) return;
+          if(doomed && Array.isArray(doomed.photos)){
+            doomed.photos.forEach(function(p){
+              var path = p && (p.cloudPath || p.path);
+              if(path){ try { RIQStore.deleteFile(path); } catch(e){} }
+            });
+          }
+          try { RIQStore.delete('maintenance-items', id); } catch(e){}
+        });
+      }
       loadMaintenanceItems(); loadVaultCounts();
       showToast('Maintenance item deleted', 'Removed from your Vault', '🗑');
     }
   });
 }
 
-function deleteCommunication(id, subject){
+function deleteCommunication(id){
+  var list = []; try { list = JSON.parse(localStorage.getItem('riq_communications')||'[]'); } catch(e){}
+  var rec = list.find(function(x){ return x && x.id === id; });
+  var subjectRaw = (rec && rec.subject) || '';
+  var subjectSafe = vaultEsc(subjectRaw.slice(0, 80) + (subjectRaw.length > 80 ? '…' : ''));
   vaultConfirmDelete({
     title: 'Delete this saved message?',
-    body: 'Removes' + (subject ? ' "<strong>'+subject.slice(0,80)+(subject.length>80?'…':'')+'</strong>"' : ' this message') + ' from your Communications.',
+    body: 'Removes' + (subjectSafe ? ' "<strong>'+subjectSafe+'</strong>"' : ' this message') + ' from your Communications.',
     onConfirm: function(){
       vaultRemoveLocalById('riq_communications', id);
       vaultRemoveCloud('communications', id);
@@ -1580,13 +1645,15 @@ function deleteCommunication(id, subject){
   });
 }
 
-function deleteReceipt(id, desc){
+function deleteReceipt(id){
+  var list = []; try { list = JSON.parse(localStorage.getItem('riq_receipts')||'[]'); } catch(e){}
+  var doomed = list.find(function(x){ return x && x.id === id; });
+  var descRaw = (doomed && (doomed.description || doomed.type)) || '';
+  var descSafe = vaultEsc(descRaw.slice(0, 80) + (descRaw.length > 80 ? '…' : ''));
   vaultConfirmDelete({
     title: 'Delete this receipt?',
-    body: 'Removes' + (desc ? ' the <strong>'+desc.slice(0,80)+(desc.length>80?'…':'')+'</strong> receipt' : ' this receipt') + ' and any attached file.',
+    body: 'Removes' + (descSafe ? ' the <strong>'+descSafe+'</strong> receipt' : ' this receipt') + ' and any attached file.',
     onConfirm: function(){
-      var list = []; try { list = JSON.parse(localStorage.getItem('riq_receipts')||'[]'); } catch(e){}
-      var doomed = list.find(function(x){ return x && x.id === id; });
       vaultRemoveLocalById('riq_receipts', id);
       var path = doomed && doomed.photo && doomed.photo.path;
       vaultRemoveCloud('receipts', id, path);
@@ -1596,17 +1663,33 @@ function deleteReceipt(id, desc){
   });
 }
 
-function deleteExitReport(id, addr){
+function deleteExitReport(id){
+  var doomed = null;
+  try {
+    var preview = JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+    doomed = preview.find(function(r){ return r && r.id === id; });
+  } catch(e){}
+  var addrSafe = vaultEsc((doomed && (doomed.data && doomed.data.propertyAddress || doomed.address)) || '');
   vaultConfirmDelete({
     title: 'Delete this exit record?',
-    body: 'Your exit record' + (addr ? ' for <strong>'+addr+'</strong>' : '') + ' is what proves the property\'s state when you handed back the keys. Are you sure?',
+    body: 'Your exit record' + (addrSafe ? ' for <strong>'+addrSafe+'</strong>' : '') + ' is what proves the property\'s state when you handed back the keys. Are you sure?',
     onConfirm: function(){
       try {
         var list = JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
         list = list.filter(function(r){ return !r || r.id !== id; });
         localStorage.setItem('renteriq_vault_reports', JSON.stringify(list));
       } catch(e){}
-      vaultRemoveCloud('exit-audits', id);
+      if(window.RIQStore){
+        RIQStore.ready.then(function(){
+          if(!RIQStore.isAuthed()) return;
+          if(doomed){
+            collectAuditPhotoPaths(doomed).forEach(function(p){
+              try { RIQStore.deleteFile(p); } catch(e){}
+            });
+          }
+          try { RIQStore.delete('exit-audits', id); } catch(e){}
+        });
+      }
       loadExitReports(); loadVaultCounts();
       showToast('Exit record deleted', 'Removed from your Vault', '🗑');
     }
@@ -1854,7 +1937,7 @@ function loadLeaseAgreements(){
           +'<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+addrEsc+cloudIndicator+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">'+vaultEsc(meta)+'</div></div>'
           +flaggedTag
         +'</div>'
-        +'<div style="display:flex;justify-content:flex-end;width:100%;margin-top:8px"><button onclick="event.stopPropagation();deleteLease(\''+l.id+'\',\''+addrEsc.replace(/\x27/g,"\\\x27")+'\')" aria-label="Delete lease" class="vault-del-btn">🗑 Delete</button></div>'
+        +'<div style="display:flex;justify-content:flex-end;width:100%;margin-top:8px"><button onclick="event.stopPropagation();deleteLease(\''+l.id+'\')" aria-label="Delete lease" class="vault-del-btn">🗑 Delete</button></div>'
       +'</div>';
     });
     listEl.innerHTML=html;
@@ -1945,7 +2028,7 @@ function loadConditionReports(){
           +'<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+addrEsc+'</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">'+date+' · '+vaultEsc(r.meta)+'</div></div>'
           +'<span style="font-family:\'Sora\',sans-serif;font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-xl);border-radius:8px;padding:4px 10px">Move-in</span>'
         +'</div>'
-        +'<div style="display:flex;justify-content:flex-end;width:100%"><button onclick="event.stopPropagation();deleteMoveInRecord(\''+r.id+'\',\''+addrEsc.replace(/\x27/g,"\\\x27")+'\')" class="vault-del-btn">🗑 Delete</button></div>'
+        +'<div style="display:flex;justify-content:flex-end;width:100%"><button onclick="event.stopPropagation();deleteMoveInRecord(\''+r.id+'\')" class="vault-del-btn">🗑 Delete</button></div>'
       +'</div>';
     });
     list.innerHTML=html;
@@ -2007,7 +2090,7 @@ function loadExitReports(){
           +'<div style="flex:1;min-width:0"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">Exit inspection</div><div style="font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">'+date+(addrEsc?' · '+addrEsc:'')+' · '+r.areas+' areas · '+r.discrepancies+' flagged</div></div>'
           +statusTag
         +'</div>'
-        +'<div style="display:flex;justify-content:flex-end;width:100%"><button onclick="event.stopPropagation();deleteExitReport(\''+rawId+'\',\''+addrEsc.replace(/\x27/g,"\\\x27")+'\')" class="vault-del-btn">🗑 Delete</button></div>'
+        +'<div style="display:flex;justify-content:flex-end;width:100%"><button onclick="event.stopPropagation();deleteExitReport(\''+rawId+'\')" class="vault-del-btn">🗑 Delete</button></div>'
       +'</div>';
     });
     listEl.innerHTML=html;
@@ -3222,15 +3305,16 @@ function closeSharePicker(){
 }
 
 function getAllSources(){
-  // Get default sources
+  // Default sources. Some share the same localStorage key (renteriq_vault_reports
+  // holds both entry and exit audits) — use filterType to separate them.
   var sources = [
     {key: 'riq_receipts', label: 'Receipts & Payments', icon: '🧾', type: 'receipt', color: 'var(--teal)', view: 'F'},
     {key: 'riq_maintenance_items', label: 'Maintenance Log', icon: '🔧', type: 'maintenance', color: 'var(--amber)', view: 'D'},
-    {key: 'renteriq_vault_reports', label: 'Move-in Records', icon: '🏠', type: 'condition', color: 'var(--blue)', view: 'C'},
+    {key: 'renteriq_vault_reports', filterType: 'entry-audit', label: 'Move-in Records', icon: '🏠', type: 'condition', color: 'var(--blue)', view: 'C'},
     {key: 'riq_routine_inspection_past', label: 'Routine Inspections', icon: '🔍', type: 'routine', color: '#1A6B4A', view: 'H'},
     {key: 'riq_communications', label: 'Communications', icon: '💬', type: 'communication', color: '#1A4A6B', view: 'E'},
-    {key: 'renteriq_vault_reports', label: 'Lease Agreements', icon: '📑', type: 'lease', color: '#7C3AED', view: 'B'},
-    {key: 'riq_exit_reports', label: 'Exit Reports', icon: '🚪', type: 'exit', color: '#4A2299', view: 'G'}
+    {key: 'riq-vault-leases', label: 'Lease Agreements', icon: '📑', type: 'lease', color: '#7C3AED', view: 'B'},
+    {key: 'renteriq_vault_reports', filterType: 'exit-audit', label: 'Exit Reports', icon: '🚪', type: 'exit', color: '#4A2299', view: 'G'}
   ];
   // Add custom folders
   var customFolders = getCustomFolders();
@@ -3268,8 +3352,11 @@ function renderSharePickerFolders(){
     try{
       var raw = localStorage.getItem(source.key);
       if(raw) items = JSON.parse(raw);
+      if(Array.isArray(items) && source.filterType){
+        items = items.filter(function(r){ return r && r.type === source.filterType; });
+      }
     }catch(e){}
-    var count = items ? items.length : 0;
+    var count = Array.isArray(items) ? items.length : 0;
     
     html += '<div onclick="openFolderPicker(\'' + source.type + '\')" style="background:#fff;border:2px solid var(--border-lt);border-radius:16px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s">' +
       '<div style="font-size:28px;margin-bottom:8px">' + source.icon + '</div>' +
@@ -3331,6 +3418,9 @@ function renderFolderItems(folderType){
     try{
       var raw = localStorage.getItem(source.key);
       if(raw) items = JSON.parse(raw);
+      if(Array.isArray(items) && source.filterType){
+        items = items.filter(function(r){ return r && r.type === source.filterType; });
+      }
     }catch(e){}
   }
   
@@ -3356,8 +3446,17 @@ function renderFolderItems(folderType){
     
     items.forEach(function(item, idx){
       var id = source.type + '_' + idx;
-      var title = item.description || item.issueType || item.address || item.subject || item.agency || item.name || 'Item ' + (idx + 1);
-      var date = item.date ? new Date(item.date).toLocaleDateString('en-AU', {day:'numeric', month:'short', year:'numeric'}) : '';
+      var title = item.description
+        || item.issueType
+        || (item.data && item.data.propertyAddress)
+        || item.address
+        || item.subject
+        || item.agency
+        || item.fileName
+        || item.name
+        || 'Item ' + (idx + 1);
+      var rawDate = item.date || item.savedAt || item.uploadedAt;
+      var date = rawDate ? new Date(rawDate).toLocaleDateString('en-AU', {day:'numeric', month:'short', year:'numeric'}) : '';
       var isSelected = selectedItems.some(function(s){ return s.id === id; });
       
       html += '<div class="picker-item ' + (isSelected ? 'selected' : '') + '" onclick="toggleItem(this, \'' + id + '\', \'' + source.type + '\', ' + idx + ')" style="border:2px solid ' + (isSelected ? source.color : 'transparent') + ';border-radius:12px;margin-bottom:8px;padding:12px">' +

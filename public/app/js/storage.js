@@ -148,6 +148,9 @@
     uid: function() { return currentUid; },
     isAuthed: function() { return !!currentUid; },
 
+    /** Compress an image File/Blob for callers that store locally (e.g. Quick Scans). */
+    compressImage: function(file) { return compressImage(file); },
+
     /**
      * Write a single document. Always writes to localStorage cache first
      * (instant + offline), then mirrors to Firestore if signed in.

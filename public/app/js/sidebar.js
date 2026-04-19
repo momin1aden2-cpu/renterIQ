@@ -1,10 +1,10 @@
 /**
  * RenterIQ Desktop Sidebar — injects the sidebar nav on all app pages.
  * Loaded by every app page. On mobile it does nothing (CSS hides .desktop-sidebar).
- * Updated: 2025-04-05 - Move-In Inspector in Tools section
+ * Tools list mirrors /app/pages/tools.html exactly.
  */
 (function () {
-  
+
   var NAV_ITEMS = [
     { label: 'Home',    icon: '🏠', path: '/app/index.html' },
     { label: 'Inspect', icon: '📋', path: '/app/pages/inspection.html' },
@@ -17,11 +17,13 @@
   ];
 
   var TOOLS = [
-    { label: 'Move-In Inspector',  icon: '📸', path: '/app/pages/entry-audit.html' },
-    { label: 'Lease Review',  icon: '📑', path: '/app/pages/lease.html' },
-    { label: 'Routine Inspect', icon: '🔍', path: '/app/pages/routine-inspection.html' },
-    { label: 'Renter Rights', icon: '⚖️', path: '/app/pages/rights.html' },
-    { label: 'Move Out Inspector', icon: '🔑', path: '/app/pages/exit.html' },
+    { label: 'Property Inspection',          icon: '📋', path: '/app/pages/inspection.html' },
+    { label: 'Rental Application',           icon: '📝', path: '/app/pages/application.html' },
+    { label: 'Lease Review',                 icon: '📑', path: '/app/pages/lease.html' },
+    { label: 'Entry Condition Report',       icon: '🏠', path: '/app/pages/entry-audit.html' },
+    { label: 'Routine Inspection Response',  icon: '🔍', path: '/app/pages/routine-inspection.html' },
+    { label: 'Renter Rights',                icon: '⚖️', path: '/app/pages/rights.html' },
+    { label: 'Exit Condition Report',        icon: '🔑', path: '/app/pages/exit.html' },
   ];
   
 
