@@ -1277,7 +1277,6 @@ input:focus, textarea:focus, select:focus {
 
   .screen-header {
     border-radius: 20px;
-    overflow: hidden;
   }
 
   .sh {
