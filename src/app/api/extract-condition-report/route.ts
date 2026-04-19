@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/api-auth';
+import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface ExtractedItem {
@@ -83,7 +83,9 @@ Standard emoji mapping: Kitchen 🍳, Living Room 🛋️, Bedroom 🛏️, Bath
 Extract EVERYTHING — do not summarise or skip items. Every row in every table in the report should appear as an item.`;
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request, { limit: 8, allowAnonymous: true });
+  const killed = aiKillSwitch();
+  if (killed) return killed;
+  const auth = await requireAuth(request, { limit: 8 });
   if (!auth.ok) return auth.response;
 
   try {

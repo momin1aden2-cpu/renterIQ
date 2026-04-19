@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/api-auth';
+import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { PDFDocument } from 'pdf-lib';
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  const killed = aiKillSwitch();
+  if (killed) return killed;
+  const auth = await requireAuth(request, { limit: 10 });
   if (!auth.ok) return auth.response;
 
   try {

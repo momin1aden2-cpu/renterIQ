@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/api-auth';
+import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const SYSTEM_PROMPT = `You are an Australian rental inspection report analyst for RenterIQ.
@@ -57,7 +57,9 @@ Input format notes:
 - Handwritten notes on scanned forms should still be read — include them as items even if legibility is uncertain.`;
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  const killed = aiKillSwitch();
+  if (killed) return killed;
+  const auth = await requireAuth(request, { limit: 10 });
   if (!auth.ok) return auth.response;
 
   let reportText = '';

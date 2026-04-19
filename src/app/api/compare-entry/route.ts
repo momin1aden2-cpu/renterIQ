@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/api-auth';
+import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface ItemState {
@@ -87,7 +87,9 @@ If everything matches perfectly, return empty items array (only matches), urgenc
 Australian context only. Reference the statutory return window (typically 3–7 days depending on state) as a helpful note, not a legal instruction.`;
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  const killed = aiKillSwitch();
+  if (killed) return killed;
+  const auth = await requireAuth(request, { limit: 10 });
   if (!auth.ok) return auth.response;
 
   try {

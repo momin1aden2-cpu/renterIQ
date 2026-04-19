@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/api-auth';
+import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const SYSTEM_PROMPT = `You are an Australian rental property detail extractor for RenterIQ.
@@ -45,7 +45,9 @@ Rules:
 - Look for property features like bedrooms/bathrooms/parking icons (bed, bath, car symbols)`;
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  const killed = aiKillSwitch();
+  if (killed) return killed;
+  const auth = await requireAuth(request, { limit: 10 });
   if (!auth.ok) return auth.response;
 
   try {

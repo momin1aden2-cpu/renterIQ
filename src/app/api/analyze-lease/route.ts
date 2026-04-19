@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { requireAuth } from '@/lib/api-auth';
+import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
 
 const STATE_CONTEXT: Record<string, { name: string; act: string; authority: string; bondWeeks: number; bondAuthority: string }> = {
   NSW: { name: 'New South Wales', act: 'Residential Tenancies Act 2010 (NSW)', authority: 'NSW Fair Trading', bondWeeks: 4, bondAuthority: 'Rental Bond Board' },
@@ -151,7 +151,9 @@ const SUPPORTED_MIME_TYPES = new Set([
 const MAX_FILE_BYTES = 18 * 1024 * 1024; // Gemini inlineData hard cap is ~20MB; leave headroom
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request, { limit: 10, allowAnonymous: true });
+  const killed = aiKillSwitch();
+  if (killed) return killed;
+  const auth = await requireAuth(request, { limit: 10 });
   if (!auth.ok) return auth.response;
 
   try {

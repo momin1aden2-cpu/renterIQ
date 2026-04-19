@@ -6,6 +6,22 @@ export type AuthResult =
   | { ok: true; uid: string; anonymous: boolean }
   | { ok: false; response: NextResponse };
 
+/**
+ * Emergency kill switch for every AI-backed route. Set DISABLE_GEMINI_CALLS=true
+ * in the hosting environment to halt model usage without a redeploy. Call this
+ * at the top of an AI route before requireAuth so the short-circuit is instant
+ * and doesn't consume any rate-limit budget.
+ */
+export function aiKillSwitch(): NextResponse | null {
+  if (process.env.DISABLE_GEMINI_CALLS === 'true') {
+    return NextResponse.json(
+      { error: 'AI service is temporarily unavailable. Please try again shortly.' },
+      { status: 503 }
+    );
+  }
+  return null;
+}
+
 type Options = {
   /** Requests allowed per window. Defaults to 30. */
   limit?: number;
