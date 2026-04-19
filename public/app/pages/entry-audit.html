@@ -104,6 +104,11 @@
 .item-photo{width:58px;height:58px;border-radius:8px;overflow:hidden;position:relative;background:var(--border-lt)}
 .item-photo img{width:100%;height:100%;object-fit:cover}
 .item-photo .tag{position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,.6);color:#fff;font-family:'Sora',sans-serif;font-size:8px;font-weight:700;padding:1px 4px;border-radius:4px}
+.item-photo .upload-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;font-family:'Sora',sans-serif;font-size:9px;font-weight:800;letter-spacing:.3px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.item-photo .upload-overlay.done{background:rgba(0,168,120,.82)}
+.item-photo .upload-overlay.failed{background:rgba(232,64,64,.82);cursor:pointer}
+.item-photo .upload-spin{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;animation:riqspin .8s linear infinite;margin-bottom:2px}
+@keyframes riqspin{to{transform:rotate(360deg)}}
 .item-photo-add{width:58px;height:58px;border-radius:8px;border:1.5px dashed var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:var(--muted)}
 .item-comment{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;min-height:52px;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.55;resize:none;outline:none;box-sizing:border-box}
 .item-comment:focus{border-color:var(--blue)}
@@ -1023,9 +1028,17 @@ function buildPhotoStrip(item,state){
   (state.photos||[]).forEach(function(photo,idx){
     var cell=document.createElement('div');
     cell.className='item-photo';
-    cell.onclick=function(e){ e.stopPropagation(); if(photo.data)window.open(photo.data,'_blank'); };
-    var img=document.createElement('img');img.src=photo.data;img.alt='';cell.appendChild(img);
+    if(photo.photoId)cell.id='photoCell-'+photo.photoId;
+    cell.onclick=function(e){
+      e.stopPropagation();
+      if(photo.uploadState==='failed'){ retryPhotoUpload(item.id, photo.photoId); return; }
+      if(photo.data)window.open(photo.data,'_blank');
+      else if(photo.url)window.open(photo.url,'_blank');
+    };
+    var img=document.createElement('img');img.src=photo.data||photo.url||'';img.alt='';cell.appendChild(img);
     var tag=document.createElement('span');tag.className='tag';tag.textContent=photo.time||'';cell.appendChild(tag);
+    var overlay=buildUploadOverlay(photo);
+    if(overlay)cell.appendChild(overlay);
     wrap.appendChild(cell);
   });
   var add=document.createElement('button');
@@ -1034,6 +1047,32 @@ function buildPhotoStrip(item,state){
   add.onclick=function(e){ e.stopPropagation(); captureItemPhoto(item.id); };
   wrap.appendChild(add);
   return wrap;
+}
+
+function buildUploadOverlay(photo){
+  if(!photo||!photo.uploadState||photo.uploadState==='done')return null;
+  var ov=document.createElement('div');
+  ov.className='upload-overlay';
+  if(photo.uploadState==='uploading'){
+    var spin=document.createElement('div');spin.className='upload-spin';ov.appendChild(spin);
+    var pct=document.createElement('span');pct.textContent=(photo.progress||0)+'%';ov.appendChild(pct);
+  } else if(photo.uploadState==='failed'){
+    ov.classList.add('failed');
+    ov.textContent='Retry';
+  } else if(photo.uploadState==='pending'){
+    ov.textContent='Queued';
+  }
+  return ov;
+}
+
+function updatePhotoCellOverlay(photo){
+  if(!photo||!photo.photoId)return;
+  var cell=document.getElementById('photoCell-'+photo.photoId);
+  if(!cell)return;
+  var existing=cell.querySelector('.upload-overlay');
+  if(existing)existing.remove();
+  var fresh=buildUploadOverlay(photo);
+  if(fresh)cell.appendChild(fresh);
 }
 
 function toggleItem(itemId){
@@ -1058,16 +1097,117 @@ function captureItemPhoto(itemId){
       var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
       var state=roomData[currentRoom.id].items[itemId];
       if(!state.photos)state.photos=[];
-      state.photos.push({time:time,timestamp:now.toISOString(),data:ev.target.result,fileName:file.name});
+      var photo={
+        photoId:'p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
+        time:time,
+        timestamp:now.toISOString(),
+        data:ev.target.result,
+        fileName:file.name,
+        uploadState:'pending',
+        progress:0
+      };
+      state.photos.push(photo);
       persistRoomData();
       renderItems();
       var row=document.getElementById('itemRow-'+itemId);
       if(row)row.classList.add('expanded');
       showToast('Photo captured',time+' · Timestamped','📷');
+      startPhotoUpload(currentRoom.id, itemId, photo.photoId, file);
     };
     reader.readAsDataURL(file);
   };
   input.click();
+}
+
+function getOrCreateAuditId(){
+  if(!roomData._auditId){
+    roomData._auditId='entry_audit_'+Date.now();
+    persistRoomData();
+  }
+  return roomData._auditId;
+}
+
+function findPhotoInRoom(roomId, itemId, photoId){
+  var rd=roomData[roomId];
+  if(!rd||!rd.items||!rd.items[itemId]||!rd.items[itemId].photos)return null;
+  var list=rd.items[itemId].photos;
+  for(var i=0;i<list.length;i++){ if(list[i]&&list[i].photoId===photoId)return list[i]; }
+  return null;
+}
+
+function startPhotoUpload(roomId, itemId, photoId, file){
+  if(!window.RIQStore){ return; }
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed()){
+      // Anonymous capture — leave as pending; submit-time sync will handle it once signed in.
+      return;
+    }
+    var photo=findPhotoInRoom(roomId, itemId, photoId);
+    if(!photo)return;
+    photo.uploadState='uploading';
+    photo.progress=0;
+    persistRoomData();
+    updatePhotoCellOverlay(photo);
+
+    var auditId=getOrCreateAuditId();
+    var path='entry-audits/'+auditId+'/'+roomId+'/'+itemId+'/'+photoId+'.jpg';
+    var task=RIQStore.uploadFileResumable(path, file, {
+      metadata:{contentType:file.type||'image/jpeg'},
+      onProgress:function(pct){
+        var p=findPhotoInRoom(roomId, itemId, photoId);
+        if(!p||p.uploadState!=='uploading')return;
+        p.progress=pct;
+        updatePhotoCellOverlay(p);
+      }
+    });
+    task.promise.then(function(res){
+      var p=findPhotoInRoom(roomId, itemId, photoId);
+      if(!p)return;
+      p.uploadState='done';
+      p.progress=100;
+      p.url=res.url;
+      p.path=res.path;
+      persistRoomData();
+      updatePhotoCellOverlay(p);
+    }).catch(function(err){
+      console.warn('[entry-audit] photo upload failed:', err);
+      var p=findPhotoInRoom(roomId, itemId, photoId);
+      if(!p)return;
+      p.uploadState='failed';
+      persistRoomData();
+      updatePhotoCellOverlay(p);
+    });
+  });
+}
+
+function retryPhotoUpload(itemId, photoId){
+  if(!currentRoom)return;
+  var photo=findPhotoInRoom(currentRoom.id, itemId, photoId);
+  if(!photo||!photo.data)return;
+  var blob=dataURLToBlob(photo.data);
+  if(!blob)return;
+  startPhotoUpload(currentRoom.id, itemId, photoId, blob);
+}
+
+function getUploadStats(){
+  var stats={uploading:0, failed:0, pending:0, done:0, total:0};
+  Object.keys(roomData).forEach(function(rk){
+    if(rk.charAt(0)==='_')return;
+    var rd=roomData[rk];
+    if(!rd||!rd.items)return;
+    Object.keys(rd.items).forEach(function(ik){
+      var it=rd.items[ik];
+      (it.photos||[]).forEach(function(p){
+        if(!p)return;
+        stats.total++;
+        if(p.uploadState==='uploading')stats.uploading++;
+        else if(p.uploadState==='failed')stats.failed++;
+        else if(p.uploadState==='pending')stats.pending++;
+        else if(p.uploadState==='done'||p.url)stats.done++;
+      });
+    });
+  });
+  return stats;
 }
 
 function markRoomAllGood(){
@@ -1178,6 +1318,30 @@ function loadRoomData(){
     }
   }
   updateGenerateButton();
+  resumePendingUploads();
+}
+
+function resumePendingUploads(){
+  if(!window.RIQStore)return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed())return;
+    Object.keys(roomData).forEach(function(rk){
+      if(rk.charAt(0)==='_')return;
+      var rd=roomData[rk];
+      if(!rd||!rd.items)return;
+      Object.keys(rd.items).forEach(function(ik){
+        var it=rd.items[ik];
+        (it.photos||[]).forEach(function(p){
+          if(!p||!p.data)return;
+          if(p.url||p.uploadState==='done')return;
+          if(!p.photoId)p.photoId='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+          var blob=dataURLToBlob(p.data);
+          if(!blob)return;
+          startPhotoUpload(rk, ik, p.photoId, blob);
+        });
+      });
+    });
+  });
 }
 
 function updateGenerateButton(){
@@ -1200,6 +1364,7 @@ function updateGenerateButton(){
 }
 
 function generateEntryReport(){
+  if(!guardPendingUploads(function(){ generateEntryReport(); }))return;
   if(window.RIQPayments){
     RIQPayments.gate('entry_condition').then(function(ok){
       if(!ok)return;
@@ -1209,6 +1374,38 @@ function generateEntryReport(){
   }
   openSignatureModal();
 }
+
+function guardPendingUploads(retryFn){
+  var stats=getUploadStats();
+  if(stats.failed>0){
+    showToast(stats.failed+' photo'+(stats.failed>1?'s':'')+' failed to upload','Tap any red thumbnail to retry, or continue to upload at submit','⚠️');
+    // Don't block — let them continue; syncEntryAuditToCloud will re-try at submit.
+    return true;
+  }
+  if(stats.uploading>0){
+    showToast(stats.uploading+' photo'+(stats.uploading>1?'s':'')+' still uploading','Hang on a sec — we\'ll continue automatically','☁️');
+    // Poll every 1s until uploads clear, then continue.
+    var start=Date.now();
+    var poll=setInterval(function(){
+      var s=getUploadStats();
+      if(s.uploading===0||Date.now()-start>45000){
+        clearInterval(poll);
+        if(typeof retryFn==='function')retryFn();
+      }
+    },1000);
+    return false;
+  }
+  return true;
+}
+
+window.addEventListener('beforeunload', function(e){
+  var stats=getUploadStats();
+  if(stats.uploading>0){
+    e.preventDefault();
+    e.returnValue='Photos are still uploading — leave anyway?';
+    return e.returnValue;
+  }
+});
 
 // ── Signature capture ──
 var sigCtx=null, sigDrawing=false, sigHasInk=false, sigData=null, sigTenantName='';
@@ -1288,7 +1485,9 @@ function generateEntryReportCore(){
   if(window.riqEvent) riqEvent('entry_audit_complete');
   showToast('Generating report','Creating your entry condition report...','📄');
 
-  var auditId='entry_audit_'+Date.now();
+  var auditId=(roomData && roomData._auditId) || ('entry_audit_'+Date.now());
+  roomData._auditId=auditId;
+  persistRoomData();
   var reportDate=new Date().toISOString();
 
   var reportData={
@@ -1313,8 +1512,17 @@ function generateEntryReportCore(){
     var items=itemDefs.map(function(def){
       var s=(rd.items&&rd.items[def.id])||{};
       var photos=(s.photos||[]).map(function(p){
-        if(p&&p.data)reportData.totalPhotos++;
-        return {dataUrl:p.data||p.url||'',time:p.time||'',timestamp:p.timestamp||''};
+        if(p&&(p.data||p.url))reportData.totalPhotos++;
+        return {
+          photoId:p.photoId||'',
+          dataUrl:p.data||'',
+          url:p.url||'',
+          path:p.path||'',
+          time:p.time||'',
+          timestamp:p.timestamp||'',
+          roomId:room.id,
+          itemId:def.id
+        };
       });
       return {
         id:def.id,
@@ -1510,6 +1718,13 @@ document.addEventListener('DOMContentLoaded', function(){
               RIQStore.uploadFile(path, blob, { contentType: meta.mimeType }).then(function(res){
                 var slim = Object.assign({}, meta, { url: res.url, path: res.path, dataUrl: undefined });
                 RIQStore.write('agency-reports', 'entry', slim).catch(function(){});
+                // Mirror cloud URL back to the local copy so the Vault can render "Open original"
+                try {
+                  var existing = JSON.parse(localStorage.getItem('riq_agency_entry_report')||'{}');
+                  existing.url = res.url;
+                  existing.path = res.path;
+                  localStorage.setItem('riq_agency_entry_report', JSON.stringify(existing));
+                } catch(e){}
               }).catch(function(err){ console.warn('Agency entry upload failed:', err); });
             }
           });
@@ -1802,14 +2017,18 @@ function syncEntryAuditToCloud(vaultRecord){
     var rooms=(vaultRecord.data&&vaultRecord.data.rooms)||[];
     var uploadJobs=[];
 
-    // Upload every photo nested under each item across every room
+    // Upload every photo nested under each item across every room.
+    // Photos already uploaded at capture time have photo.url set — skip those.
     rooms.forEach(function(room){
       (room.items||[]).forEach(function(item){
         (item.photos||[]).forEach(function(photo,idx){
-          if(!photo||!photo.dataUrl)return;
+          if(!photo)return;
+          if(photo.url)return; // already uploaded at capture time
+          if(!photo.dataUrl)return;
           var blob=dataURLToBlob(photo.dataUrl);
           if(!blob)return;
-          var path='entry-audits/'+auditId+'/'+room.id+'/'+item.id+'/'+idx+'.jpg';
+          var pid=photo.photoId||idx;
+          var path='entry-audits/'+auditId+'/'+room.id+'/'+item.id+'/'+pid+'.jpg';
           uploadJobs.push(
             RIQStore.uploadFile(path,blob,{contentType:blob.type||'image/jpeg'})
               .then(function(res){

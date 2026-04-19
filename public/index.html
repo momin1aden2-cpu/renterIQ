@@ -2244,9 +2244,11 @@ document.addEventListener('click', (e) => {
 // Mobile app banner
 function showMobileAppBanner() {
   const banner = document.getElementById('mobileAppBanner');
-  if (banner && !localStorage.getItem('appBannerClosed') && window.innerWidth <= 768) {
-    setTimeout(() => { banner.classList.add('show'); document.body.classList.add('banner-open'); }, 3000);
-  }
+  if (!banner) return;
+  if (isStandalone()) return; // already installed — never nag
+  if (localStorage.getItem('appBannerClosed')) return;
+  if (window.innerWidth > 768) return;
+  setTimeout(() => { banner.classList.add('show'); document.body.classList.add('banner-open'); }, 3000);
 }
 
 function closeAppBanner() {

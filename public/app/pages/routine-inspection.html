@@ -145,6 +145,10 @@
 .plan-photo{width:52px;height:52px;border-radius:10px;overflow:hidden;position:relative;border:1px solid var(--border-lt);background:var(--blue-xl);flex-shrink:0}
 .plan-photo img{width:100%;height:100%;object-fit:cover;display:block}
 .plan-photo .ts{position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,.6);color:#fff;font-family:'Sora',sans-serif;font-size:8.5px;font-weight:700;padding:1.5px 5px;border-radius:4px;letter-spacing:.3px;pointer-events:none}
+.plan-photo .upload-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;font-family:'Sora',sans-serif;font-size:9px;font-weight:800;letter-spacing:.3px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.plan-photo .upload-overlay.failed{background:rgba(232,64,64,.82);cursor:pointer}
+.plan-photo .upload-spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;animation:riqspin .8s linear infinite;margin-bottom:2px}
+@keyframes riqspin{to{transform:rotate(360deg)}}
 .plan-photo-thumb{width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--border-lt)}
 .plan-photo-add{width:52px;height:52px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .2s}
 .plan-photo-add:active{border-color:var(--blue)}
@@ -941,15 +945,21 @@ function renderActionPlan() {
     tHtml += '<div class="plan-card" id="planCard' + globalIdx + '"><div class="plan-top"><div class="plan-priority ' + it.priority + '"></div><div class="plan-body"><div class="plan-title">' + esc(it.description) + '</div><div class="plan-desc">' + esc(it.action) + '</div>';
     if (it.deadline_days) tHtml += '<div class="plan-due"><span>⏰</span><span class="plan-due-text">Due in ' + it.deadline_days + ' days</span></div>';
     tHtml += '</div><div class="plan-check' + (done ? ' done' : '') + '" onclick="toggleTask(' + globalIdx + ')">' + (done ? '✓' : '') + '</div></div>';
-    // Photo row — supports both legacy string photos and new {url, time} objects
+    // Photo row — supports both legacy string photos and new {url, time, photoId, uploadState} objects
     tHtml += '<div class="plan-photo-row" id="photoRow' + globalIdx + '">';
     photos.forEach(function(p) {
-      var src = typeof p === 'string' ? p : (p && (p.url || p.data)) || '';
-      var ts = (p && p.time) || '';
+      var src = typeof p === 'string' ? p : (p && (p.url || p.cloudUrl || p.data)) || '';
+      var ts = (typeof p === 'object' && p && p.time) || '';
       if(!src) return;
-      tHtml += '<div class="plan-photo">'+
+      var pid = (typeof p === 'object' && p && p.photoId) || '';
+      var overlay = riUploadOverlayHtml(p);
+      var clickAttr = (typeof p === 'object' && p && p.uploadState === 'failed')
+        ? ' onclick="retryRoutinePhotoUpload(' + globalIdx + ',\'' + pid + '\')"'
+        : '';
+      tHtml += '<div class="plan-photo"' + (pid ? ' id="routinePhotoCell-' + pid + '"' : '') + clickAttr + '>'+
         '<img src="' + src + '" loading="lazy" decoding="async" alt="">'+
         (ts ? '<span class="ts">' + ts + '</span>' : '')+
+        overlay +
       '</div>';
     });
     tHtml += '<div class="plan-photo-add" onclick="addTaskPhoto(' + globalIdx + ')">+</div></div></div>';
@@ -1005,22 +1015,164 @@ function addTaskPhoto(idx) {
 document.getElementById('taskPhotoInput').addEventListener('change', function(e) {
   var file = e.target.files[0];
   if (!file || currentPhotoTaskIdx < 0) return;
+  var taskIdx = currentPhotoTaskIdx;
   var reader = new FileReader();
   reader.onload = function(ev) {
-    if (!taskPhotos[currentPhotoTaskIdx]) taskPhotos[currentPhotoTaskIdx] = [];
+    if (!taskPhotos[taskIdx]) taskPhotos[taskIdx] = [];
     var now = new Date();
     var time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-    taskPhotos[currentPhotoTaskIdx].push({
+    var photo = {
+      photoId: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
       url: ev.target.result,
       time: time,
-      timestamp: now.toISOString()
-    });
+      timestamp: now.toISOString(),
+      uploadState: 'pending',
+      progress: 0
+    };
+    taskPhotos[taskIdx].push(photo);
     renderActionPlan();
     showToast('Photo added · ' + time, 'Timestamped to your action plan', '📸');
     saveState();
+    startRoutinePhotoUpload(taskIdx, photo.photoId, file);
   };
   reader.readAsDataURL(file);
   e.target.value = '';
+});
+
+function getOrCreateRoutineInspectionId() {
+  try {
+    var id = localStorage.getItem(STORAGE_KEY + '_inspId');
+    if (!id) {
+      id = 'routine_' + Date.now();
+      localStorage.setItem(STORAGE_KEY + '_inspId', id);
+    }
+    return id;
+  } catch(e) { return 'routine_' + Date.now(); }
+}
+
+function findRoutinePhoto(taskIdx, photoId) {
+  var list = taskPhotos[taskIdx] || [];
+  for (var i = 0; i < list.length; i++) {
+    if (list[i] && typeof list[i] === 'object' && list[i].photoId === photoId) return list[i];
+  }
+  return null;
+}
+
+function riUploadOverlayHtml(photo) {
+  if (!photo || typeof photo !== 'object') return '';
+  if (!photo.uploadState || photo.uploadState === 'done') return '';
+  if (photo.uploadState === 'uploading') {
+    return '<div class="upload-overlay"><div class="upload-spin"></div><span>' + (photo.progress || 0) + '%</span></div>';
+  }
+  if (photo.uploadState === 'failed') return '<div class="upload-overlay failed">Retry</div>';
+  if (photo.uploadState === 'pending') return '<div class="upload-overlay">Queued</div>';
+  return '';
+}
+
+function updateRoutinePhotoCellOverlay(photo) {
+  if (!photo || !photo.photoId) return;
+  var cell = document.getElementById('routinePhotoCell-' + photo.photoId);
+  if (!cell) return;
+  var existing = cell.querySelector('.upload-overlay');
+  if (existing) existing.remove();
+  var html = riUploadOverlayHtml(photo);
+  if (html) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    if (tmp.firstChild) cell.appendChild(tmp.firstChild);
+  }
+}
+
+function startRoutinePhotoUpload(taskIdx, photoId, file) {
+  if (!window.RIQStore) return;
+  RIQStore.ready.then(function() {
+    if (!RIQStore.isAuthed()) return;
+    var photo = findRoutinePhoto(taskIdx, photoId);
+    if (!photo) return;
+    photo.uploadState = 'uploading';
+    photo.progress = 0;
+    updateRoutinePhotoCellOverlay(photo);
+
+    var inspId = getOrCreateRoutineInspectionId();
+    var path = 'routine-inspections/' + inspId + '/task' + taskIdx + '_' + photoId + '.jpg';
+    var task = RIQStore.uploadFileResumable(path, file, {
+      metadata: { contentType: file.type || 'image/jpeg' },
+      onProgress: function(pct) {
+        var p = findRoutinePhoto(taskIdx, photoId);
+        if (!p || p.uploadState !== 'uploading') return;
+        p.progress = pct;
+        updateRoutinePhotoCellOverlay(p);
+      }
+    });
+    task.promise.then(function(res) {
+      var p = findRoutinePhoto(taskIdx, photoId);
+      if (!p) return;
+      p.uploadState = 'done';
+      p.progress = 100;
+      p.cloudUrl = res.url;
+      p.cloudPath = res.path;
+      saveState();
+      updateRoutinePhotoCellOverlay(p);
+    }).catch(function(err) {
+      console.warn('[routine-inspection] photo upload failed:', err);
+      var p = findRoutinePhoto(taskIdx, photoId);
+      if (!p) return;
+      p.uploadState = 'failed';
+      saveState();
+      updateRoutinePhotoCellOverlay(p);
+    });
+  });
+}
+
+function retryRoutinePhotoUpload(taskIdx, photoId) {
+  var photo = findRoutinePhoto(taskIdx, photoId);
+  if (!photo || !photo.url) return;
+  var blob = ri_dataURLToBlob(photo.url);
+  if (!blob) return;
+  startRoutinePhotoUpload(taskIdx, photoId, blob);
+}
+
+function getRoutineUploadStats() {
+  var stats = { uploading: 0, failed: 0, pending: 0, done: 0, total: 0 };
+  Object.keys(taskPhotos || {}).forEach(function(k) {
+    (taskPhotos[k] || []).forEach(function(p) {
+      if (!p || typeof p !== 'object') return;
+      stats.total++;
+      if (p.uploadState === 'uploading') stats.uploading++;
+      else if (p.uploadState === 'failed') stats.failed++;
+      else if (p.uploadState === 'pending') stats.pending++;
+      else if (p.uploadState === 'done' || p.cloudUrl) stats.done++;
+    });
+  });
+  return stats;
+}
+
+function resumeRoutinePendingUploads() {
+  if (!window.RIQStore) return;
+  RIQStore.ready.then(function() {
+    if (!RIQStore.isAuthed()) return;
+    Object.keys(taskPhotos || {}).forEach(function(taskKey) {
+      var list = taskPhotos[taskKey] || [];
+      list.forEach(function(p) {
+        if (!p || typeof p !== 'object') return;
+        if (p.cloudUrl || p.uploadState === 'done') return;
+        if (!p.url || p.url.indexOf('data:') !== 0) return;
+        if (!p.photoId) p.photoId = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        var blob = ri_dataURLToBlob(p.url);
+        if (!blob) return;
+        startRoutinePhotoUpload(parseInt(taskKey, 10), p.photoId, blob);
+      });
+    });
+  });
+}
+
+window.addEventListener('beforeunload', function(e) {
+  var stats = getRoutineUploadStats();
+  if (stats.uploading > 0) {
+    e.preventDefault();
+    e.returnValue = 'Photos are still uploading — leave anyway?';
+    return e.returnValue;
+  }
 });
 
 // ── Build Response (View E) ──
@@ -1302,6 +1454,7 @@ function syncReminderTogglesFromStorage() {
 // ── Complete & Save to Vault (View G) ──
 function completeAndSave() {
   if (!analysisData) { switchView('A'); return; }
+  if (!guardRoutinePendingUploads(function() { completeAndSave(); })) return;
   autoCreateMaintenanceItems();
   saveToFirestore(function() {
     renderSummary();
@@ -1309,6 +1462,27 @@ function completeAndSave() {
     showToast('Saved', 'Inspection saved to Vault', '✅');
     addToPastInspections();
   });
+}
+
+function guardRoutinePendingUploads(retryFn) {
+  var stats = getRoutineUploadStats();
+  if (stats.failed > 0) {
+    showToast(stats.failed + ' photo' + (stats.failed > 1 ? 's' : '') + ' failed to upload', 'Tap any red thumbnail to retry, or continue to re-upload at save', '⚠️');
+    return true;
+  }
+  if (stats.uploading > 0) {
+    showToast(stats.uploading + ' photo' + (stats.uploading > 1 ? 's' : '') + ' still uploading', 'Hang on a sec — we\'ll continue automatically', '☁️');
+    var start = Date.now();
+    var poll = setInterval(function() {
+      var s = getRoutineUploadStats();
+      if (s.uploading === 0 || Date.now() - start > 45000) {
+        clearInterval(poll);
+        if (typeof retryFn === 'function') retryFn();
+      }
+    }, 1000);
+    return false;
+  }
+  return true;
 }
 
 function renderSummary() {
@@ -1445,29 +1619,36 @@ function saveToFirestore(cb) {
     var user = firebase.auth().currentUser;
     if (!user) return;
 
-    var inspId = 'routine_' + Date.now();
+    var inspId = getOrCreateRoutineInspectionId();
     inspectionId = inspId;
 
-    // Upload task photos in parallel — each task can have several photos
+    // Collect already-uploaded photos (from capture-time upload) and fall back
+    // to uploading here only for photos that are still pending/failed.
     var uploadJobs = [];
     var uploadedPhotos = {};
     Object.keys(taskPhotos || {}).forEach(function(taskKey) {
       var photos = taskPhotos[taskKey] || [];
       uploadedPhotos[taskKey] = [];
       photos.forEach(function(photoData, idx) {
-        // Photos can now be plain dataURL strings (legacy) or {url, time, timestamp} objects
-        var dataUrl = typeof photoData === 'string' ? photoData : (photoData && photoData.url) || '';
-        var time = (photoData && photoData.time) || '';
-        var ts = (photoData && photoData.timestamp) || '';
+        var isObj = photoData && typeof photoData === 'object';
+        var dataUrl = typeof photoData === 'string' ? photoData : (isObj && photoData.url) || '';
+        var time = (isObj && photoData.time) || '';
+        var ts = (isObj && photoData.timestamp) || '';
+        var cloudUrl = isObj && (photoData.cloudUrl || (photoData.uploadState === 'done' ? photoData.url : ''));
+        var cloudPath = isObj && photoData.cloudPath;
+        if (cloudUrl) {
+          uploadedPhotos[taskKey].push({ url: cloudUrl, path: cloudPath || '', time: time, timestamp: ts });
+          return;
+        }
         if (!dataUrl) return;
         if (dataUrl.indexOf('data:') !== 0) {
-          // Already a remote URL — keep timestamp metadata if present
           uploadedPhotos[taskKey].push({ url: dataUrl, time: time, timestamp: ts });
           return;
         }
         var blob = ri_dataURLToBlob(dataUrl);
         if (!blob) return;
-        var path = 'routine-inspections/' + inspId + '/task' + taskKey + '_' + idx + '.jpg';
+        var pid = (isObj && photoData.photoId) || idx;
+        var path = 'routine-inspections/' + inspId + '/task' + taskKey + '_' + pid + '.jpg';
         uploadJobs.push(
           RIQStore.uploadFile(path, blob, { contentType: blob.type || 'image/jpeg' })
             .then(function(res) {
@@ -1517,6 +1698,8 @@ function saveToFirestore(cb) {
       } catch(e){}
       RIQStore.write('routine-inspections', inspId, record).then(function() {
         showToast('Saved to cloud ✓', 'Inspection synced across your devices', '☁️');
+        // Clear the stored inspection ID so the next routine inspection gets a fresh one.
+        try { localStorage.removeItem(STORAGE_KEY + '_inspId'); } catch(e) {}
       }).catch(function(err) {
         console.warn('Routine inspection metadata sync failed:', err);
       });
@@ -1646,6 +1829,8 @@ window.addEventListener('load', function() {
   renderRoomList();
   initHelpPanel();
   loadPastInspections();
+  loadState();
+  resumeRoutinePendingUploads();
 });
 </script>
 <script src="/app/js/sidebar.js"></script>

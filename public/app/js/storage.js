@@ -79,6 +79,55 @@
     return d.collection('users').doc(currentUid);
   }
 
+  // ── Image compression ─────────────────────────────────────────
+  // Renter photos average 2–4MB from modern phones. Downscale + re-encode to
+  // JPEG before upload: ~10× smaller files, faster uploads, cheaper storage,
+  // zero perceivable quality loss at the display sizes we use.
+  var MAX_IMAGE_EDGE = 1600;
+  var JPEG_QUALITY = 0.78;
+  var COMPRESS_MIN_BYTES = 200 * 1024; // skip compression for already-small images
+
+  function isCompressibleImage(file) {
+    if (!file || !file.type) return false;
+    if (file.type === 'image/gif') return false;
+    return /^image\//.test(file.type);
+  }
+
+  function compressImage(file) {
+    return new Promise(function(resolve) {
+      try {
+        if (!isCompressibleImage(file) || (file.size && file.size < COMPRESS_MIN_BYTES)) {
+          resolve(file);
+          return;
+        }
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function() {
+          try {
+            var w = img.naturalWidth || img.width;
+            var h = img.naturalHeight || img.height;
+            if (!w || !h) { URL.revokeObjectURL(url); resolve(file); return; }
+            var scale = Math.min(1, MAX_IMAGE_EDGE / Math.max(w, h));
+            var tw = Math.round(w * scale);
+            var th = Math.round(h * scale);
+            var canvas = document.createElement('canvas');
+            canvas.width = tw;
+            canvas.height = th;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, tw, th);
+            canvas.toBlob(function(blob) {
+              URL.revokeObjectURL(url);
+              if (!blob || blob.size >= file.size) { resolve(file); return; }
+              resolve(blob);
+            }, 'image/jpeg', JPEG_QUALITY);
+          } catch (e) { URL.revokeObjectURL(url); resolve(file); }
+        };
+        img.onerror = function() { URL.revokeObjectURL(url); resolve(file); };
+        img.src = url;
+      } catch (e) { resolve(file); }
+    });
+  }
+
   function loadStorageSDK() {
     if (typeof firebase !== 'undefined' && firebase.storage) return Promise.resolve();
     if (storageLoadPromise) return storageLoadPromise;
@@ -216,6 +265,74 @@
           });
         });
       });
+    },
+
+    /**
+     * Resumable upload with per-byte progress. Returns { promise, cancel, pause, resume, path }.
+     * - promise resolves with { url, path, size }
+     * - cancel()/pause()/resume() control the in-flight task
+     * - onProgress(pct, transferred, total) fires as bytes move
+     * Safe to call before loadStorageSDK resolves — controls are wired once the task exists.
+     */
+    uploadFileResumable: function(path, file, options) {
+      options = options || {};
+      var onProgress = typeof options.onProgress === 'function' ? options.onProgress : null;
+      var metadata = options.metadata || {};
+      var skipCompress = options.skipCompress === true;
+
+      if (!currentUid) {
+        return {
+          promise: Promise.reject(new Error('Not signed in')),
+          cancel: function() {}, pause: function() {}, resume: function() {},
+          path: null
+        };
+      }
+
+      var fullPath = 'users/' + currentUid + '/' + path;
+      var task = null;
+      var cancelled = false;
+
+      var prep = skipCompress ? Promise.resolve(file) : compressImage(file);
+
+      var promise = prep.then(function(readyFile) {
+        return loadStorageSDK().then(function() { return readyFile; });
+      }).then(function(readyFile) {
+        if (cancelled) throw new Error('Upload cancelled');
+        var storageRef = firebase.storage().ref(fullPath);
+        var meta = metadata;
+        if (!skipCompress && readyFile && readyFile.type && readyFile !== file) {
+          meta = Object.assign({}, metadata, { contentType: readyFile.type });
+        }
+        task = storageRef.put(readyFile, meta);
+
+        return new Promise(function(resolve, reject) {
+          task.on('state_changed',
+            function(snap) {
+              if (!onProgress) return;
+              var total = snap.totalBytes || readyFile.size || 1;
+              var pct = Math.min(100, Math.round((snap.bytesTransferred / total) * 100));
+              try { onProgress(pct, snap.bytesTransferred, total); } catch (e) {}
+            },
+            function(err) { reject(err); },
+            function() {
+              task.snapshot.ref.getDownloadURL().then(function(url) {
+                resolve({ url: url, path: fullPath, size: readyFile.size });
+              }).catch(reject);
+            }
+          );
+        });
+      });
+
+      return {
+        promise: promise,
+        path: fullPath,
+        cancel: function() {
+          cancelled = true;
+          if (task) { try { task.cancel(); } catch (e) {} }
+        },
+        pause: function() { if (task) { try { task.pause(); } catch (e) {} } },
+        resume: function() { if (task) { try { task.resume(); } catch (e) {} } }
+      };
     },
 
     /** Delete a file from Firebase Storage. */

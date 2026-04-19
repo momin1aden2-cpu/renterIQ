@@ -237,7 +237,7 @@
     FEATURES: FEATURES,
     CLOUD_SYNC_PRICE: CLOUD_SYNC_PRICE,
 
-    isCloudSyncEnabled: function() { return payState ? !!payState.cloudSyncEnabled : false; },
+    isCloudSyncEnabled: function() { return true; },
 
     getState: function() { return payState ? Object.assign({}, payState) : null; },
 
@@ -313,13 +313,10 @@
      * Trigger cloud sync upsell if user hasn't purchased and hasn't dismissed this session.
      * Call after saving a valuable document (lease, condition report, entry report).
      */
+    // Cloud sync is free for every signed-in renter. Call sites keep working;
+    // the prompt simply resolves without showing anything.
     promptCloudSync: function() {
-      if (!payState) return Promise.resolve(false);
-      if (payState.cloudSyncEnabled) return Promise.resolve(false);
-      try {
-        if (sessionStorage.getItem('riq_cloud_prompt_dismissed')) return Promise.resolve(false);
-      } catch(e) {}
-      return showCloudSyncPrompt();
+      return Promise.resolve(false);
     }
   };
 
@@ -338,50 +335,13 @@
     });
   }
 
-  // ── Cloud sync gate — patches RIQStore.write ──
-  function patchCloudSyncGate() {
-    if (!window.RIQStore || !RIQStore.write) return;
-    if (RIQStore._originalWrite) return;
-
-    RIQStore._originalWrite = RIQStore.write;
-    RIQStore.write = function(collection, id, data) {
-      // Always write to localStorage cache
-      var cacheKey = 'riqcache:' + collection;
-      try {
-        var cache = JSON.parse(localStorage.getItem(cacheKey) || '{}');
-        cache[id] = data;
-        localStorage.setItem(cacheKey, JSON.stringify(cache));
-      } catch (e) {}
-
-      // Always allow state, transactions, usage, reviews to sync
-      if (collection === 'state' || collection === 'transactions' || collection === 'usage' || collection === 'reviews') {
-        return RIQStore._originalWrite.call(RIQStore, collection, id, data);
-      }
-
-      // Other collections only sync if cloud sync is purchased
-      if (payState && payState.cloudSyncEnabled) {
-        return RIQStore._originalWrite.call(RIQStore, collection, id, data);
-      }
-
-      return Promise.resolve();
-    };
-  }
+  // Cloud sync is free for every signed-in renter. No write-gating — RIQStore.write
+  // goes straight through to Firestore for all collections.
+  function patchCloudSyncGate() { /* intentionally empty */ }
 
   // ── Boot ──
   function init() {
     loadState();
-    if (window.RIQStore) {
-      patchCloudSyncGate();
-    } else {
-      var attempts = 0;
-      var check = setInterval(function() {
-        if (window.RIQStore || attempts > 40) {
-          clearInterval(check);
-          if (window.RIQStore) patchCloudSyncGate();
-        }
-        attempts++;
-      }, 150);
-    }
   }
 
   // Backwards compat — expose as both RIQPayments and RIQCredits

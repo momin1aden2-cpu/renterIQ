@@ -58,6 +58,10 @@
 .ri-photo img{width:100%;height:100%;object-fit:cover}
 .ri-photo .rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
 .ri-photo .ts{position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-family:'Sora',sans-serif;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;letter-spacing:.3px;pointer-events:none}
+.ri-photo .upload-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;font-family:'Sora',sans-serif;font-size:10px;font-weight:800;letter-spacing:.3px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.ri-photo .upload-overlay.failed{background:rgba(232,64,64,.82);cursor:pointer}
+.ri-photo .upload-spin{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;animation:riqspin .8s linear infinite;margin-bottom:2px}
+@keyframes riqspin{to{transform:rotate(360deg)}}
 .ri-add{aspect-ratio:1;border:2px dashed var(--border);background:var(--blue-xl);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .ri-add-icon{font-size:22px}
 .ri-add-label{font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:var(--muted)}
@@ -364,6 +368,12 @@ function selUrg(v){
   });
 }
 
+var _riIssueId = null;
+function getOrCreateRiIssueId(){
+  if(!_riIssueId) _riIssueId = 'maint_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  return _riIssueId;
+}
+
 function addRiPhoto(){
   if(issue.photos.length>=4){ showToast('Max 4 photos','Keep it short — photos make your point','📷'); return; }
   var input=document.createElement('input');
@@ -374,14 +384,19 @@ function addRiPhoto(){
     reader.onload=function(ev){
       var now=new Date();
       var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-      issue.photos.push({
+      var photo = {
+        photoId: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
         url:ev.target.result,
         file:file,
-        time:time,                      // HH:MM for the visible badge
-        timestamp:now.toISOString()     // full precision for the saved record
-      });
+        time:time,
+        timestamp:now.toISOString(),
+        uploadState: 'pending',
+        progress: 0
+      };
+      issue.photos.push(photo);
       renderPhotos();
       showToast('Photo added · '+time, 'Timestamped to your maintenance report', '📷');
+      startRiPhotoUpload(photo.photoId, file);
     };
     reader.readAsDataURL(file);
   };
@@ -394,10 +409,14 @@ function renderPhotos(){
   var grid=document.getElementById('riPhotoGrid');
   var html='';
   issue.photos.forEach(function(p,i){
-    html+='<div class="ri-photo">'+
+    var pid = p.photoId || '';
+    var overlay = riPhotoUploadOverlayHtml(p);
+    var clickFailed = p.uploadState === 'failed' ? ' onclick="retryRiPhotoUpload(\'' + pid + '\')"' : '';
+    html+='<div class="ri-photo"' + (pid ? ' id="riPhotoCell-' + pid + '"' : '') + clickFailed + '>'+
       '<img src="'+p.url+'" alt="">'+
       (p.time ? '<span class="ts">'+p.time+'</span>' : '')+
-      '<span class="rm" onclick="removeRiPhoto('+i+')">×</span>'+
+      '<span class="rm" onclick="event.stopPropagation();removeRiPhoto('+i+')">×</span>'+
+      overlay +
     '</div>';
   });
   if(issue.photos.length<4){
@@ -405,6 +424,118 @@ function renderPhotos(){
   }
   grid.innerHTML=html;
 }
+
+function riPhotoUploadOverlayHtml(photo){
+  if(!photo || !photo.uploadState || photo.uploadState === 'done') return '';
+  if(photo.uploadState === 'uploading'){
+    return '<div class="upload-overlay"><div class="upload-spin"></div><span>' + (photo.progress||0) + '%</span></div>';
+  }
+  if(photo.uploadState === 'failed') return '<div class="upload-overlay failed">Retry</div>';
+  if(photo.uploadState === 'pending') return '<div class="upload-overlay">Queued</div>';
+  return '';
+}
+
+function updateRiPhotoCellOverlay(photo){
+  if(!photo || !photo.photoId) return;
+  var cell = document.getElementById('riPhotoCell-' + photo.photoId);
+  if(!cell) return;
+  var existing = cell.querySelector('.upload-overlay');
+  if(existing) existing.remove();
+  var html = riPhotoUploadOverlayHtml(photo);
+  if(html){
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    if(tmp.firstChild) cell.appendChild(tmp.firstChild);
+  }
+}
+
+function findRiPhoto(photoId){
+  for(var i=0;i<issue.photos.length;i++){
+    if(issue.photos[i] && issue.photos[i].photoId === photoId) return issue.photos[i];
+  }
+  return null;
+}
+
+function startRiPhotoUpload(photoId, file){
+  if(!window.RIQStore) return;
+  RIQStore.ready.then(function(){
+    if(!RIQStore.isAuthed()) return;
+    var photo = findRiPhoto(photoId);
+    if(!photo) return;
+    photo.uploadState = 'uploading';
+    photo.progress = 0;
+    updateRiPhotoCellOverlay(photo);
+
+    var issueId = getOrCreateRiIssueId();
+    var path = 'maintenance-items/' + issueId + '/' + photoId + '.jpg';
+    var task = RIQStore.uploadFileResumable(path, file, {
+      metadata: {contentType: file.type || 'image/jpeg'},
+      onProgress: function(pct){
+        var p = findRiPhoto(photoId);
+        if(!p || p.uploadState !== 'uploading') return;
+        p.progress = pct;
+        updateRiPhotoCellOverlay(p);
+      }
+    });
+    task.promise.then(function(res){
+      var p = findRiPhoto(photoId);
+      if(!p) return;
+      p.uploadState = 'done';
+      p.progress = 100;
+      p.cloudUrl = res.url;
+      p.cloudPath = res.path;
+      updateRiPhotoCellOverlay(p);
+    }).catch(function(err){
+      console.warn('[report-issue] photo upload failed:', err);
+      var p = findRiPhoto(photoId);
+      if(!p) return;
+      p.uploadState = 'failed';
+      updateRiPhotoCellOverlay(p);
+    });
+  });
+}
+
+function retryRiPhotoUpload(photoId){
+  var photo = findRiPhoto(photoId);
+  if(!photo || !photo.url) return;
+  var blob = riDataURLToBlob(photo.url);
+  if(!blob) return;
+  startRiPhotoUpload(photoId, blob);
+}
+
+function riDataURLToBlob(dataUrl){
+  try{
+    var parts = dataUrl.split(',');
+    var mime = (parts[0].match(/:(.*?);/)||[null,'image/jpeg'])[1];
+    var bstr = atob(parts[1]);
+    var n = bstr.length;
+    var u8 = new Uint8Array(n);
+    while(n--) u8[n] = bstr.charCodeAt(n);
+    return new Blob([u8], {type: mime});
+  } catch(e){ return null; }
+}
+
+function getRiUploadStats(){
+  var stats = {uploading:0, failed:0, pending:0, done:0, total:0};
+  issue.photos.forEach(function(p){
+    if(!p) return;
+    stats.total++;
+    if(p.uploadState === 'uploading') stats.uploading++;
+    else if(p.uploadState === 'failed') stats.failed++;
+    else if(p.uploadState === 'pending') stats.pending++;
+    else if(p.uploadState === 'done' || p.cloudUrl) stats.done++;
+  });
+  return stats;
+}
+
+window.addEventListener('beforeunload', function(e){
+  var stats = getRiUploadStats();
+  if(stats.uploading > 0){
+    e.preventDefault();
+    e.returnValue = 'Photos are still uploading — leave anyway?';
+    return e.returnValue;
+  }
+});
 
 function updateNextBtn(){
   var hasDesc=document.getElementById('riDescription').value.trim().length>=12;
@@ -511,6 +642,7 @@ function copyDraft(){
 }
 
 function saveAndSend(){
+  if(!guardRiPendingUploads(function(){ saveAndSend(); })) return;
   var subject=document.getElementById('emailSubject').value;
   var body=document.getElementById('emailBody').value;
   var to=issue.agentEmail || '';
@@ -526,10 +658,32 @@ function saveAndSend(){
 }
 
 function saveWithoutSending(){
+  if(!guardRiPendingUploads(function(){ saveWithoutSending(); })) return;
   var subject=document.getElementById('emailSubject').value;
   var body=document.getElementById('emailBody').value;
   saveRecords({ subject:subject, body:body, sent:false });
   goDone();
+}
+
+function guardRiPendingUploads(retryFn){
+  var stats = getRiUploadStats();
+  if(stats.failed > 0){
+    showToast(stats.failed+' photo'+(stats.failed>1?'s':'')+' failed to upload','Tap any red thumbnail to retry, or continue anyway','⚠️');
+    return true;
+  }
+  if(stats.uploading > 0){
+    showToast(stats.uploading+' photo'+(stats.uploading>1?'s':'')+' still uploading','Hang on a sec — we\'ll continue automatically','☁️');
+    var start = Date.now();
+    var poll = setInterval(function(){
+      var s = getRiUploadStats();
+      if(s.uploading === 0 || Date.now()-start > 45000){
+        clearInterval(poll);
+        if(typeof retryFn === 'function') retryFn();
+      }
+    }, 1000);
+    return false;
+  }
+  return true;
 }
 
 function saveRecords(opts){
@@ -537,14 +691,31 @@ function saveRecords(opts){
   var followUpDays=(draft && draft.follow_up_days) || (issue.urgency==='emergency'?2:issue.urgency==='urgent'?5:10);
   var expectDays=(draft && draft.expected_response_days) || (issue.urgency==='emergency'?1:issue.urgency==='urgent'?3:7);
 
-  // Photos — keep timestamps + base64 for local. Cloud sync can upload later.
-  var photoData=issue.photos.map(function(p){
-    return { url:p.url, time:p.time||'', timestamp:p.timestamp||'' };
+  // Photos for the local record keep base64 for offline display.
+  var photoDataLocal=issue.photos.map(function(p){
+    return {
+      photoId: p.photoId||'',
+      url:p.url,
+      cloudUrl: p.cloudUrl||'',
+      cloudPath: p.cloudPath||'',
+      time:p.time||'',
+      timestamp:p.timestamp||''
+    };
+  });
+  // Cloud copy: metadata + uploaded URL only. Never base64.
+  var photoDataCloud=issue.photos.map(function(p){
+    return {
+      photoId: p.photoId||'',
+      url: p.cloudUrl||'',
+      path: p.cloudPath||'',
+      time: p.time||'',
+      timestamp: p.timestamp||''
+    };
   });
 
-  // Maintenance item
-  var maintId='maint_'+now+'_'+Math.random().toString(36).slice(2,6);
-  var maint={
+  // Maintenance item — reuse the capture-time id so cloud paths line up.
+  var maintId = getOrCreateRiIssueId();
+  var maintLocal={
     id:maintId,
     threadId:threadId,
     issueType:draft?draft.category:issue.category,
@@ -558,20 +729,22 @@ function saveRecords(opts){
     expectedResponseDays:expectDays,
     followUpDays:followUpDays,
     lastContactAt:opts.sent?now:null,
-    photos:photoData,
+    photos:photoDataLocal,
     date:now
   };
   try {
     var mList=JSON.parse(localStorage.getItem('riq_maintenance_items')||'[]');
-    mList.unshift(maint);
+    mList.unshift(maintLocal);
     localStorage.setItem('riq_maintenance_items', JSON.stringify(mList));
   } catch(e){ console.error(e); }
   if(window.RIQStore){
     RIQStore.ready.then(function(){
       if(!RIQStore.isAuthed())return;
-      RIQStore.write('maintenance-items', maint.id, maint).catch(function(err){ console.warn('Maint sync failed:',err); });
+      var maintCloud = Object.assign({}, maintLocal, {photos: photoDataCloud});
+      RIQStore.write('maintenance-items', maintCloud.id, maintCloud).catch(function(err){ console.warn('Maint sync failed:',err); });
     });
   }
+  var maint = maintLocal;
 
   // Communication record (only if they're sending)
   if(opts.sent){
