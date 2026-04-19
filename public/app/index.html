@@ -1760,14 +1760,14 @@ var RIGHTS_KB = [
 ];
 
 var STATE_DATA = {
-  VIC: { name:'Victoria',     authority:'Consumer Affairs Victoria',     phone:'1300 55 81 81', bondAuth:'RTBA',                     bondMax:'1 month (rent ≤$350/wk)', rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 6 months' },
-  NSW: { name:'New South Wales', authority:'NSW Fair Trading',           phone:'13 32 20',      bondAuth:'Rental Bond Board',         bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'up to 4 per year' },
-  QLD: { name:'Queensland',   authority:'RTA Queensland',               phone:'1300 366 311',  bondAuth:'RTA Queensland',            bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' },
-  WA:  { name:'Western Australia', authority:'Consumer Protection WA',  phone:'1300 304 054',  bondAuth:'Bond Administrator (WA)',    bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24–72 hours', repairDays:'14 days', inspFreq:'every 3 months' },
-  SA:  { name:'South Australia', authority:'CBS South Australia',        phone:'131 882',       bondAuth:'CBS SA',                    bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours (7–14 days for inspection)', repairDays:'14 days', inspFreq:'every 4 weeks (max)' },
-  TAS: { name:'Tasmania',     authority:'CBOS Tasmania',                phone:'1300 654 499',  bondAuth:'Rental Deposit Authority',  bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' },
-  ACT: { name:'ACT',          authority:'ACT Revenue Office',           phone:'(02) 6207 0028',bondAuth:'Office of Rental Bonds',    bondMax:'4 weeks',                 rentNotice:'8 weeks', entryNotice:'1 week (general), 24 hrs (repairs)', repairDays:'14 days', inspFreq:'every 6 months' },
-  NT:  { name:'Northern Territory', authority:'NT Consumer Affairs',    phone:'1800 019 319',  bondAuth:'NT Consumer Affairs',       bondMax:'4 weeks',                 rentNotice:'30 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' }
+  VIC: { name:'Victoria',     authority:'Consumer Affairs Victoria',     phone:'1300 55 81 81', url:'https://www.consumer.vic.gov.au/housing',                                       bondAuth:'RTBA',                     bondMax:'1 month (rent ≤$350/wk)', rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 6 months' },
+  NSW: { name:'New South Wales', authority:'NSW Fair Trading',           phone:'13 32 20',      url:'https://www.fairtrading.nsw.gov.au/housing-and-property/renting',               bondAuth:'Rental Bond Board',         bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'up to 4 per year' },
+  QLD: { name:'Queensland',   authority:'RTA Queensland',               phone:'1300 366 311',  url:'https://www.rta.qld.gov.au/',                                                    bondAuth:'RTA Queensland',            bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' },
+  WA:  { name:'Western Australia', authority:'Consumer Protection WA',  phone:'1300 304 054',  url:'https://www.consumerprotection.wa.gov.au/renting',                              bondAuth:'Bond Administrator (WA)',    bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24–72 hours', repairDays:'14 days', inspFreq:'every 3 months' },
+  SA:  { name:'South Australia', authority:'CBS South Australia',        phone:'131 882',       url:'https://www.cbs.sa.gov.au/services/housing-and-property/renting-your-home',     bondAuth:'CBS SA',                    bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours (7–14 days for inspection)', repairDays:'14 days', inspFreq:'every 4 weeks (max)' },
+  TAS: { name:'Tasmania',     authority:'CBOS Tasmania',                phone:'1300 654 499',  url:'https://www.cbos.tas.gov.au/topics/housing',                                     bondAuth:'Rental Deposit Authority',  bondMax:'4 weeks',                 rentNotice:'60 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' },
+  ACT: { name:'ACT',          authority:'Access Canberra',              phone:'13 22 81',      url:'https://www.accesscanberra.act.gov.au/s/residential-tenancies',                  bondAuth:'Office of Rental Bonds',    bondMax:'4 weeks',                 rentNotice:'8 weeks', entryNotice:'1 week (general), 24 hrs (repairs)', repairDays:'14 days', inspFreq:'every 6 months' },
+  NT:  { name:'Northern Territory', authority:'NT Consumer Affairs',    phone:'1800 019 319',  url:'https://nt.gov.au/property/renting-leasing-your-home',                          bondAuth:'NT Consumer Affairs',       bondMax:'4 weeks',                 rentNotice:'30 days', entryNotice:'24 hours', repairDays:'14 days', inspFreq:'every 3 months' }
 };
 
 function detectStateFromTimezone(){
@@ -1849,7 +1849,29 @@ function homeRightsSearch(val){
   }).filter(function(r){ return r.score > 0; }).sort(function(a,b){ return b.score - a.score; }).map(function(r){ return r.item; });
 
   if(!matches.length){
-    drop.innerHTML = '<div style="padding:16px;text-align:center"><div style="font-weight:600;font-size:13px;color:var(--muted);line-height:1.6">No results for "'+val+'" in '+sd.name+'</div><div style="font-weight:600;font-size:12px;color:var(--blue);margin-top:8px;cursor:pointer" onclick="navigate(\'/app/pages/rights.html\')">Browse all renter rights →</div></div>';
+    var safeQuery = val.slice(0, 60).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+    var telHref = 'tel:' + (sd.phone || '').replace(/\s/g, '');
+    drop.innerHTML =
+      '<div style="padding:16px">' +
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:14px;color:var(--text);margin-bottom:4px">No quick answer for "' + safeQuery + '"</div>' +
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:12px">Your full ' + sd.name + ' rights library covers more topics, and your state authority is always a free call away.</div>' +
+        '<div onclick="navigate(\'/app/pages/rights.html#state-' + stateCode + '\')" style="background:var(--blue-xl);border:1px solid var(--border-lt);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:10px">' +
+          '<div style="width:36px;height:36px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📚</div>' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text)">' + stateCode + ' Rights Library →</div>' +
+            '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px">Every topic we cover for your state</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:12px 14px">' +
+          '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:10.5px;color:var(--teal-dk);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Speak to the authority</div>' +
+          '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px">' + sd.authority + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+            (sd.phone ? '<a href="' + telHref + '" style="text-decoration:none;background:#fff;color:var(--teal-dk);border:1px solid rgba(0,200,150,.3);border-radius:8px;padding:7px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;display:flex;align-items:center;gap:4px;min-height:36px"><span>📞</span>' + sd.phone + '</a>' : '') +
+            (sd.url ? '<a href="' + sd.url + '" target="_blank" rel="noopener" style="text-decoration:none;background:#fff;color:var(--blue);border:1px solid var(--border-lt);border-radius:8px;padding:7px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;display:flex;align-items:center;gap:4px;min-height:36px"><span>🌐</span>Visit website</a>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5;text-align:center">Your state authority is the official source — free to contact.</div>' +
+      '</div>';
     drop.classList.add('open');
     return;
   }
