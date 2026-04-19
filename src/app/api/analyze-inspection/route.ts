@@ -54,7 +54,14 @@ Input format notes:
 - Some agencies include a summary / covering page with a single overall due-back date ("please return within 14 days"). Use that for \`suggested_response_deadline_days\` if found.
 - If the report includes per-item due dates (e.g. "by 30 March"), convert to days-from-today for \`deadline_days\`.
 - Bullet-list or plain-text reports should be parsed the same way: every bullet = one item.
-- Handwritten notes on scanned forms should still be read — include them as items even if legibility is uncertain.`;
+- Handwritten notes on scanned forms should still be read — include them as items even if legibility is uncertain.
+
+Thoroughness — non-negotiable:
+- Read the document end-to-end before composing output. Do not stop at the first page.
+- If a report has 20 action rows and you return 12 items, you have failed. Err toward including more, not fewer.
+- Never invent an item that is not in the document. Quote or closely paraphrase — do not speculate about unstated issues.
+- If an item's text is ambiguous or partially illegible, include it anyway with a short note (e.g. "Partially illegible — confirm with agent").
+- Before returning, sanity-check: roughly how many action items did you see in the report? Your items array should be within ±2 of that count. If the counts differ substantially, reread the report and correct.`;
 
 export async function POST(request: Request) {
   const killed = aiKillSwitch();

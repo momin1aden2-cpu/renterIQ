@@ -80,7 +80,13 @@ Return ONLY valid JSON in this exact format:
 
 Standard emoji mapping: Kitchen 🍳, Living Room 🛋️, Bedroom 🛏️, Bathroom 🚿, Ensuite 🚿, Laundry 🧺, Hallway/Entry 🚪, Garage/Carport 🚗, Outdoor/Garden 🌿, Toilet 🚽, Study/Office 📚
 
-Extract EVERYTHING — do not summarise or skip items. Every row in every table in the report should appear as an item.`;
+Thoroughness — non-negotiable:
+- Read the document end-to-end before composing output. Do not stop at the first page.
+- Every row in every table in the report must appear as an item. Do not summarise, do not merge, do not skip.
+- Never invent an item that is not in the document. If an entry is illegible or ambiguous, include it and put the uncertainty in the comment field (e.g. "Partially illegible").
+- Before returning, sanity-check: how many item-rows did you see across all rooms? Your totalItems should match that count. If your count is materially lower, reread and recover the missing items.
+
+Set totalItems to the exact sum of items you returned across all rooms — this is how the client verifies the extraction was complete.`;
 
 export async function POST(request: Request) {
   const killed = aiKillSwitch();
