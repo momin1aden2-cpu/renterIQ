@@ -912,6 +912,20 @@ function openThreadSheet(threadId){
   var headerAddr = maint && maint.address ? maint.address : '';
   var headerIssue = maint && maint.description ? maint.description : '';
 
+  // Photo gallery — every photo from the maintenance item, tappable to view
+  // full-size. Only shown if the item has photos with a cloud URL.
+  var photoHtml = '';
+  var maintPhotos = (maint && Array.isArray(maint.photos)) ? maint.photos : [];
+  var openablePhotos = maintPhotos.filter(function(p){ return p && (p.cloudUrl || p.url); });
+  if(openablePhotos.length){
+    photoHtml = '<div style="margin-bottom:14px"><div style="font-family:Sora,sans-serif;font-weight:800;font-size:11px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">📷 Photos (' + openablePhotos.length + ')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px">';
+    openablePhotos.forEach(function(p){
+      var src = p.cloudUrl || p.url;
+      photoHtml += '<a href="' + src + '" target="_blank" rel="noopener" style="display:block;aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid var(--border-lt)"><img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></a>';
+    });
+    photoHtml += '</div></div>';
+  }
+
   var threadHtml='';
   if(!thread.length){
     threadHtml='<div style="text-align:center;padding:40px 16px;color:var(--muted);font-family:Nunito,sans-serif;font-weight:600;font-size:13.5px;line-height:1.55">No messages yet for this issue.<br>Start a follow-up to open the thread.</div>';
@@ -926,8 +940,8 @@ function openThreadSheet(threadId){
       }[c.type] || 'Message';
       threadHtml += '<div style="border-left:3px solid var(--blue);padding:10px 12px 10px 14px;margin-bottom:10px;background:var(--blue-xl);border-radius:0 10px 10px 0">' +
         '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px"><span style="font-family:Sora,sans-serif;font-weight:800;font-size:11px;color:var(--blue);letter-spacing:.5px;text-transform:uppercase">' + typeLabel + '</span><span style="font-family:Nunito,sans-serif;font-weight:600;font-size:11px;color:var(--muted)">' + dateStr + '</span></div>' +
-        '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:4px">' + vaultEsc(c.subject || 'No subject') + '</div>' +
-        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55;white-space:pre-wrap">' + vaultEsc((c.body || '').slice(0, 240)) + ((c.body || '').length > 240 ? '…' : '') + '</div>' +
+        '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px">' + vaultEsc(c.subject || 'No subject') + '</div>' +
+        '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.6;white-space:pre-wrap;word-break:break-word">' + vaultEsc(c.body || '') + '</div>' +
         '</div>';
     });
   }
@@ -936,11 +950,11 @@ function openThreadSheet(threadId){
     '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:82vh;display:flex;flex-direction:column;transform:translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)">' +
       '<div style="padding:14px 20px 8px;border-bottom:1px solid var(--border-lt);flex-shrink:0">' +
         '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px"></div>' +
-        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:var(--text);letter-spacing:-.2px">💬 Conversation thread</div>' +
+        '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:var(--text);letter-spacing:-.2px">💬 Issue details</div>' +
         (headerIssue ? '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5">' + vaultEsc(headerIssue.slice(0, 100)) + (headerIssue.length > 100 ? '…' : '') + '</div>' : '') +
         (headerAddr ? '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px">' + vaultEsc(headerAddr) + '</div>' : '') +
       '</div>' +
-      '<div style="flex:1;overflow-y:auto;padding:16px 20px">' + threadHtml + '</div>' +
+      '<div style="flex:1;overflow-y:auto;padding:16px 20px">' + photoHtml + threadHtml + '</div>' +
       '<div style="padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);flex-shrink:0">' +
         '<button id="threadCloseBtn" style="width:100%;background:var(--blue-xl);border:none;color:var(--blue);font-family:Sora,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:12px;cursor:pointer">Close</button>' +
       '</div>' +

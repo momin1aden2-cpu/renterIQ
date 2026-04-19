@@ -626,7 +626,25 @@ function renderDraft(d){
   }
 
   document.getElementById('emailSubject').value=d.subject||'Maintenance request';
-  document.getElementById('emailBody').value=d.body||'';
+  document.getElementById('emailBody').value = appendPhotoLinksToEmail(d.body || '');
+}
+
+// Mailto can't attach files, so surface each photo as a shareable cloud link
+// the agent can click. Only photos that finished uploading are included —
+// anything still pending is quietly skipped (the submit guard waits for
+// uploads before drafting, so this should be empty in practice).
+function appendPhotoLinksToEmail(body){
+  var links = (issue.photos || [])
+    .map(function(p){ return p && (p.cloudUrl || ''); })
+    .filter(function(u){ return !!u; });
+  if(!links.length) return body;
+  var lines = links.map(function(u, i){ return '  ' + (i + 1) + '. ' + u; }).join('\n');
+  var block =
+    '\n\n---\n' +
+    'Photos (' + links.length + '):\n' +
+    lines + '\n' +
+    '(Click each link to view the photo. No login needed.)';
+  return (body || '').replace(/\s+$/, '') + block;
 }
 
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }

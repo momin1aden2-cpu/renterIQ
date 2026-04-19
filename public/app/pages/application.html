@@ -970,9 +970,17 @@ function saveResume(data){
 }
 
 var autosaveTimer;
+var cloudSyncTimer;
 function autosave(){
   clearTimeout(autosaveTimer);
-  autosaveTimer=setTimeout(function(){collectAndSave();updateScore()},600);
+  autosaveTimer=setTimeout(function(){
+    collectAndSave();
+    updateScore();
+    // Also sync the resume snapshot to Firestore (silent, debounced) so the
+    // renter can pick up on another device without re-typing everything.
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer=setTimeout(function(){ saveResumeToVault({silent:true}); },3000);
+  },600);
 }
 
 function collectAndSave(){
@@ -1019,6 +1027,25 @@ function collectAndSave(){
 
 function loadResume(){
   var r=getResume();
+
+  // If the resume is empty locally but a cloud-synced copy exists (e.g. the
+  // renter filled it in on another device, or cleared browser storage), pull
+  // it down from Firestore in the background and re-render. Merge, don't
+  // clobber — any local values the user just typed win.
+  var isEmpty = !r || !Object.keys(r).filter(function(k){ return r[k] !== '' && r[k] != null; }).length;
+  if(isEmpty && window.RIQStore){
+    RIQStore.ready.then(function(){
+      if(!RIQStore.isAuthed()) return;
+      RIQStore.read('state','personal-docs').then(function(remote){
+        if(!remote || !remote.resume) return;
+        var merged = Object.assign({}, remote.resume, getResume());
+        if(remote.coverLetter && !merged.coverLetter) merged.coverLetter = remote.coverLetter;
+        saveResume(merged);
+        loadResume(); // re-hydrate the form now that local is populated
+        showToast('Resume restored','Your saved details are back','✓');
+      }).catch(function(){});
+    });
+  }
 
   // ── Pre-fill core identity from profile / Firebase Auth if resume fields are empty ──
   // This is the dedup bridge: profile.html is the source of truth for name/email/mobile;
@@ -1377,7 +1404,8 @@ async function generateCoverLetter(){
    Writes the resume + doc *metadata* to localStorage and Firestore. ID
    file bytes stay encrypted in IndexedDB (RIQSecureDocs). The cloud payload
    is metadata-only — RenterIQ servers never see ID photos or payslips. */
-function saveResumeToVault(){
+function saveResumeToVault(opts){
+  opts = opts || {};
   try{
     var r=getResume();
     var idScore=Math.min(100,Object.values(uploadedDocs).reduce(function(s,v){return s+(typeof v==='number'?v:0)},0));
@@ -1410,7 +1438,7 @@ function saveResumeToVault(){
     };
     localStorage.setItem('riq_personal_docs',JSON.stringify(record));
     localStorage.setItem('riq_renter_resume_vault',JSON.stringify(Object.assign({},resumeSnapshot,{_savedToVault:Date.now(),_coverLetter:record.coverLetter,_idScore:idScore,_docCount:Object.keys(metaOnly).length,docs:metaOnly})));
-    showToast('Resume saved 🔒','Your IDs stay encrypted on this device','🗂️');
+    if(!opts.silent) showToast('Resume saved 🔒','Your IDs stay encrypted on this device','🗂️');
     syncPersonalDocsToCloud(record);
   }catch(e){console.warn('saveResumeToVault:',e);}
 }
