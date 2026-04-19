@@ -6,17 +6,14 @@
  *
  * FREE FOREVER:
  *   Property Search & Tracker, Property Inspection, Rental Application,
- *   Renter Rights Hub, Maintenance Log, 1st Lease Review, Document Vault
- *   (local), Push Notifications, Routine Inspection Assist, Rent Tracker,
- *   Bond Tracker, Move-Out Checklist
+ *   Renter Rights Hub, Maintenance Log, 1st Lease Review, Document Vault,
+ *   Cross-device Cloud Sync, Push Notifications, Routine Inspection Assist,
+ *   Rent Tracker, Bond Tracker, Move-Out Checklist
  *
  * PAID (direct pay):
  *   Lease Review (2nd+)       → $4.99
  *   Bond-Shield Move-In       → $24.99
  *   Exit-Guard Bond Shield    → $29.99
- *
- * CLOUD SYNC:
- *   One-time $14.99 unlock. Prompted on first valuable save.
  *
  * Usage:
  *   await RIQPayments.ready;
@@ -34,8 +31,6 @@
     exit_bond_shield:  { name: 'Exit-Guard Bond Shield',  price: '$29.99', priceCents: 2999, freeFirst: false, heroIcon: '🚪', heroLine: 'Compare your exit vs entry photos, flag discrepancies, and get bond recovery suggestions.' }
   };
 
-  var CLOUD_SYNC_PRICE = '$14.99';
-  var CLOUD_SYNC_CENTS = 1499;
   var LOCAL_KEY = 'riq_payment_state';
   var readyResolve;
   var readyPromise = new Promise(function(res) { readyResolve = res; });
@@ -173,7 +168,6 @@
   var RIQPayments = {
     ready: readyPromise,
     FEATURES: FEATURES,
-    CLOUD_SYNC_PRICE: CLOUD_SYNC_PRICE,
 
     isCloudSyncEnabled: function() { return true; },
 
@@ -237,20 +231,11 @@
     },
 
     /**
-     * Enable cloud sync (one-time $14.99).
-     * In production, called via Stripe webhook Cloud Function.
+     * Legacy — cloud sync is now included with every signed-in account.
+     * Kept as a no-op so old Stripe webhooks don't break.
      */
-    enableCloudSync: function() {
-      if (!payState) return;
-      payState.cloudSyncEnabled = true;
-      saveLocal();
-      saveRemote();
-    },
+    enableCloudSync: function() {},
 
-    /**
-     * Trigger cloud sync upsell if user hasn't purchased and hasn't dismissed this session.
-     * Call after saving a valuable document (lease, condition report, entry report).
-     */
     // Cloud sync is free for every signed-in renter. Call sites keep working;
     // the prompt simply resolves without showing anything.
     promptCloudSync: function() {
