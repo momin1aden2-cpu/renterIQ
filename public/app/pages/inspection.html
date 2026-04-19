@@ -291,7 +291,10 @@
 <!-- VIEW E: SUMMARY -->
 <div class="view" id="viewE" style="display:none">
   <header class="sh">
-    <div class="sh-row"><button class="sh-back" id="sumBackBtn" onclick="sumBack()"><span class="sh-back-arrow">‹</span><span class="sh-label" id="sumBackLabel">Walkthrough</span></button></div>
+    <div class="sh-row" style="display:flex;justify-content:space-between;align-items:center">
+      <button class="sh-back" id="sumBackBtn" onclick="sumBack()"><span class="sh-back-arrow">‹</span><span class="sh-label" id="sumBackLabel">Walkthrough</span></button>
+      <button id="sumDeleteBtn" onclick="deleteSavedInspection()" style="display:none;background:rgba(232,64,64,.15);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:Sora,sans-serif;font-weight:700;font-size:12px;padding:7px 12px;border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent">🗑 Delete</button>
+    </div>
     <div class="sh-title" id="sumHeadTitle">Inspection Summary</div>
     <div class="sh-sub" id="sumAddr">Your notes from today</div>
   </header>
@@ -1120,6 +1123,7 @@ function startWalkthrough(){
   // Reset summary header in case user just came from a saved-view
   var t=document.getElementById('sumHeadTitle'); if(t)t.textContent='Inspection Summary';
   var backLbl=document.getElementById('sumBackLabel'); if(backLbl)backLbl.textContent='Walkthrough';
+  var delBtn=document.getElementById('sumDeleteBtn'); if(delBtn)delBtn.style.display='none';
   var sub=document.getElementById('wcAddr');
   if(sub && inspectionData.address)sub.textContent=inspectionData.address;
   renderQuickScan();
@@ -1170,8 +1174,8 @@ function updateScanFinishState(){
 }
 
 function addScanPhoto(){
-  if((inspectionData.scan.photos||[]).length>=3){
-    showToast('Max 3 photos','Keep it quick — photos are optional at open homes','📷');
+  if((inspectionData.scan.photos||[]).length>=5){
+    showToast('Max 5 photos','Open homes are quick — keep it to the highlights','📷');
     return;
   }
   var input=document.createElement('input');
@@ -1202,17 +1206,85 @@ function renderScanPhotos(){
   var grid=document.getElementById('scanPhotos'); if(!grid)return;
   var photos=inspectionData.scan.photos||[];
   var html='';
-  photos.forEach(function(p){
+  photos.forEach(function(p,i){
     var src = (p && p.url) || '';
-    html += '<div class="ph-thumb" onclick="window.open(\''+src+'\',\'_blank\')">'+
+    html += '<div class="ph-thumb" onclick="openScanPhotoLightbox('+i+')">'+
       '<img src="'+src+'" alt="">'+
       '<span class="ph-ts">'+((p && p.ts)||'')+'</span>'+
     '</div>';
   });
-  if(photos.length<3){
-    html+='<div class="ph-add" onclick="addScanPhoto()"><span style="font-size:20px">📷</span><span style="font-size:9px;font-family:\'Sora\',sans-serif;font-weight:700;color:var(--muted)">Add</span></div>';
+  if(photos.length<5){
+    html+='<div class="ph-add" onclick="addScanPhoto()"><span style="font-size:20px">📷</span><span style="font-size:9px;font-family:\'Sora\',sans-serif;font-weight:700;color:var(--muted)">Add ('+photos.length+'/5)</span></div>';
   }
   grid.innerHTML=html;
+}
+
+// ── Lightbox for Quick-Scan photos ─────────────────────────────
+// Tap any thumbnail, full-screen overlay with close + swipe-to-next.
+// Used on the walkthrough photo grid, the summary card thumbnails, and
+// the comparison sheet thumbnails.
+function openScanPhotoLightbox(urlOrIndex, gallery){
+  var photos;
+  var startIndex = 0;
+  if(Array.isArray(gallery)){
+    photos = gallery;
+    startIndex = typeof urlOrIndex === 'number' ? urlOrIndex : 0;
+  } else if (typeof urlOrIndex === 'number'){
+    photos = (inspectionData && inspectionData.scan && inspectionData.scan.photos) || [];
+    startIndex = urlOrIndex;
+  } else {
+    photos = [{ url: urlOrIndex, ts: '' }];
+  }
+  if(!photos.length) return;
+
+  var overlay = document.getElementById('riqLightbox');
+  if(overlay) overlay.remove();
+  overlay = document.createElement('div');
+  overlay.id = 'riqLightbox';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:100050;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;transition:opacity .2s ease;-webkit-tap-highlight-color:transparent';
+
+  var idx = Math.max(0, Math.min(startIndex, photos.length - 1));
+  function render(){
+    var p = photos[idx];
+    var src = (p && p.url) || (typeof p === 'string' ? p : '');
+    var caption = (p && p.ts) || '';
+    var counter = photos.length > 1 ? (idx + 1) + ' / ' + photos.length : '';
+    overlay.innerHTML =
+      '<button id="riqLbClose" aria-label="Close" style="position:absolute;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;border:none;font-size:22px;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">✕</button>' +
+      (counter ? '<div style="position:absolute;top:24px;left:0;right:0;text-align:center;color:#fff;font-family:Sora,sans-serif;font-weight:700;font-size:13px;opacity:.75">' + counter + '</div>' : '') +
+      '<div style="max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;gap:10px">' +
+        '<img src="' + src + '" style="max-width:100%;max-height:82vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
+        (caption ? '<div style="color:rgba(255,255,255,.75);font-family:Sora,sans-serif;font-weight:700;font-size:12px">📷 ' + caption + '</div>' : '') +
+      '</div>' +
+      (photos.length > 1
+        ? '<button id="riqLbPrev" aria-label="Previous" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;border:none;font-size:24px;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">‹</button>' +
+          '<button id="riqLbNext" aria-label="Next" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;border:none;font-size:24px;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">›</button>'
+        : '');
+    document.getElementById('riqLbClose').onclick = close;
+    if(photos.length > 1){
+      document.getElementById('riqLbPrev').onclick = function(e){ e.stopPropagation(); idx = (idx - 1 + photos.length) % photos.length; render(); };
+      document.getElementById('riqLbNext').onclick = function(e){ e.stopPropagation(); idx = (idx + 1) % photos.length; render(); };
+    }
+  }
+  function close(){
+    overlay.style.opacity = '0';
+    setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); document.removeEventListener('keydown', onKey); }, 200);
+  }
+  function onKey(e){
+    if(e.key === 'Escape') close();
+    else if(e.key === 'ArrowLeft' && photos.length > 1){ idx = (idx - 1 + photos.length) % photos.length; render(); }
+    else if(e.key === 'ArrowRight' && photos.length > 1){ idx = (idx + 1) % photos.length; render(); }
+  }
+  overlay.onclick = function(e){ if(e.target === overlay) close(); };
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(overlay);
+  render();
+  requestAnimationFrame(function(){ overlay.style.opacity = '1'; });
+}
+
+function openComparePhoto(savedKey, index){
+  var gallery = (window.__riqComparePhotos && window.__riqComparePhotos[savedKey]) || [];
+  openScanPhotoLightbox(index || 0, gallery);
 }
 
 function finishWalkthrough(){ renderSummary(); switchView('E'); }
@@ -1232,8 +1304,8 @@ function renderSummary(){
   var pc=(inspectionData.scan.photos||[]).length;
   if(pc){
     hlHtml+='<div><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:6px">📷 Photos</div><div style="display:flex;gap:6px;flex-wrap:wrap">';
-    inspectionData.scan.photos.forEach(function(p){
-      hlHtml+='<img src="'+p.url+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;cursor:pointer" onclick="window.open(\''+p.url+'\',\'_blank\')">';
+    inspectionData.scan.photos.forEach(function(p,i){
+      hlHtml+='<img src="'+p.url+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;cursor:pointer" onclick="openScanPhotoLightbox('+i+')">';
     });
     hlHtml+='</div></div>';
   }
@@ -1609,16 +1681,22 @@ function renderCompareMatrix(){
   var hasAnyPhotos = selectedObjs.some(function(s){ return s.data && s.data.scan && s.data.scan.photos && s.data.scan.photos.length; });
   var photoRowHtml = '';
   if(hasAnyPhotos){
+    // Cache each property's photo array so the onclick handlers can pull the
+    // right gallery by key without JSON-escaping it into inline attributes.
+    window.__riqComparePhotos = window.__riqComparePhotos || {};
     var photoCells = selectedObjs.map(function(s){
       var photos = (s.data && s.data.scan && s.data.scan.photos) || [];
       if(!photos.length) return '<div style="text-align:center;padding:10px 4px;color:var(--muted);font-size:11px;font-weight:600">No photos</div>';
-      var thumbs = photos.slice(0, 3).map(function(p){
-        var url = p.url || p.data || p;
-        if(!url || typeof url !== 'string') return '';
-        return '<div style="width:32px;height:32px;border-radius:6px;background:#E8EEF8 url(\''+url+'\') center/cover;border:1px solid rgba(255,255,255,.6);box-shadow:0 1px 3px rgba(0,0,0,.1);flex-shrink:0"></div>';
+      window.__riqComparePhotos[s.key] = photos;
+      var thumbs = photos.slice(0, 3).map(function(p, i){
+        var url = (p && p.url) || (typeof p === 'string' ? p : '');
+        if(!url) return '';
+        return '<img src="' + url + '" onclick="event.stopPropagation();openComparePhoto(\'' + s.key + '\',' + i + ')" style="width:32px;height:32px;border-radius:6px;object-fit:cover;border:1px solid rgba(255,255,255,.6);box-shadow:0 1px 3px rgba(0,0,0,.1);flex-shrink:0;cursor:pointer">';
       }).join('');
-      var extra = photos.length > 3 ? '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--muted)">+'+( photos.length - 3)+'</span>' : '';
-      return '<div style="display:flex;gap:3px;align-items:center;justify-content:center;padding:8px 2px;flex-wrap:wrap">'+thumbs+extra+'</div>';
+      var extraBtn = photos.length > 3
+        ? '<span onclick="event.stopPropagation();openComparePhoto(\'' + s.key + '\',3)" style="font-family:Sora,sans-serif;font-weight:700;font-size:9px;color:var(--blue);cursor:pointer">+' + (photos.length - 3) + '</span>'
+        : '';
+      return '<div style="display:flex;gap:3px;align-items:center;justify-content:center;padding:8px 2px;flex-wrap:wrap">'+thumbs+extraBtn+'</div>';
     }).join('');
     photoRowHtml = '<div style="display:grid;'+colTpl+';align-items:center;border-top:1px solid var(--border-lt);background:var(--blue-xl)">'+
       '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:'+(isMobile?'10.5px':'11.5px')+';color:var(--text);padding:10px '+(isMobile?'8px':'12px')+'">📷 Photos</div>'+
@@ -2170,9 +2248,11 @@ function loadSavedInspection(key){
     var t=document.getElementById('sumHeadTitle');
     var sub=document.getElementById('sumAddr');
     var backLbl=document.getElementById('sumBackLabel');
+    var delBtn=document.getElementById('sumDeleteBtn');
     if(t)t.textContent='Your Inspection';
     if(sub)sub.textContent=inspectionData.address||'Saved inspection';
     if(backLbl)backLbl.textContent='Inspections';
+    if(delBtn)delBtn.style.display='inline-flex';
 
     // If a verdict was saved, reselect it so the action block shows
     if(inspectionData.verdict)setVerdict(inspectionData.verdict);
@@ -2182,6 +2262,35 @@ function loadSavedInspection(key){
     console.error('loadSavedInspection:',e);
     showToast('Error','Could not load inspection','❌');
   }
+}
+
+function deleteSavedInspection(){
+  if(!viewingSavedKey) return;
+  var addr = (inspectionData && inspectionData.address) || 'this inspection';
+  var confirmed = confirm('Delete your inspection for ' + addr + '?\n\nThis removes all your notes and photos. You can always re-inspect later.');
+  if(!confirmed) return;
+  try {
+    localStorage.removeItem(viewingSavedKey);
+    // Also clean from the tracked-property list if linked
+    try {
+      var tracked = JSON.parse(localStorage.getItem('renteriq_tracked_properties')||'[]');
+      var next = tracked.map(function(p){
+        if(p && p.inspectionKey === viewingSavedKey){
+          delete p.inspectionKey;
+          delete p.verdict;
+          p.status = 'tracking';
+        }
+        return p;
+      });
+      localStorage.setItem('renteriq_tracked_properties', JSON.stringify(next));
+    } catch(e){}
+    showToast('Deleted','Inspection removed from your list','🗑');
+  } catch(e){ console.error('deleteSavedInspection:', e); }
+  viewingSavedKey = null;
+  var delBtn=document.getElementById('sumDeleteBtn');
+  if(delBtn)delBtn.style.display='none';
+  switchView('A');
+  renderInspectionList();
 }
 
 function sumBack(){
