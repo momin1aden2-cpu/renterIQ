@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
+import { requireFeature } from '@/lib/feature-gate';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface RoomSummary {
@@ -156,6 +157,8 @@ export async function POST(request: Request) {
   if (killed) return killed;
   const auth = await requireAuth(request, { limit: 10 });
   if (!auth.ok) return auth.response;
+  const gate = await requireFeature(auth.uid, 'exit_bond_shield');
+  if (!gate.ok) return gate.response;
 
   try {
     const body = await request.json();

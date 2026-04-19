@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
+import { requireFeature } from '@/lib/feature-gate';
 
 const STATE_CONTEXT: Record<string, { name: string; act: string; authority: string; bondWeeks: number; bondAuthority: string }> = {
   NSW: { name: 'New South Wales', act: 'Residential Tenancies Act 2010 (NSW)', authority: 'NSW Fair Trading', bondWeeks: 4, bondAuthority: 'Rental Bond Board' },
@@ -155,6 +156,8 @@ export async function POST(request: Request) {
   if (killed) return killed;
   const auth = await requireAuth(request, { limit: 10 });
   if (!auth.ok) return auth.response;
+  const gate = await requireFeature(auth.uid, 'lease_review');
+  if (!gate.ok) return gate.response;
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
