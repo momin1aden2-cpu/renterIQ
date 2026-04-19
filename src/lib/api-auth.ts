@@ -58,7 +58,7 @@ export async function requireAuth(
     } else {
       try {
         const decoded = await adminAuth()!.verifyIdToken(token);
-        const rl = checkRateLimit('uid:' + decoded.uid, limit, windowMs);
+        const rl = await checkRateLimit('uid:' + decoded.uid, limit, windowMs);
         if (!rl.ok) {
           return { ok: false, response: NextResponse.json({ error: 'Rate limit exceeded. Please try again later.' }, { status: 429 }) };
         }
@@ -70,7 +70,7 @@ export async function requireAuth(
   }
 
   const ip = getClientIp(req);
-  const rl = checkRateLimit('ip:' + ip, Math.min(limit, 15), windowMs);
+  const rl = await checkRateLimit('ip:' + ip, Math.min(limit, 15), windowMs);
   if (!rl.ok) {
     return { ok: false, response: NextResponse.json({ error: 'Rate limit exceeded. Please try again later.' }, { status: 429 }) };
   }
