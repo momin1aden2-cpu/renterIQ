@@ -155,10 +155,6 @@
 
       if (payBtn) {
         payBtn.onclick = function() {
-          // Stripe checkout placeholder — allow through during beta
-          if (typeof showToast === 'function') {
-            showToast('Beta access', 'Free during beta — generating your report', '🛡️');
-          }
           close(true);
         };
       }
@@ -170,66 +166,8 @@
     });
   }
 
-  // ── Cloud sync upsell prompt ──
-  function showCloudSyncPrompt() {
-    return new Promise(function(resolve) {
-      if (payState && payState.cloudSyncEnabled) { resolve(false); return; }
-
-      var existing = document.getElementById('riq-cloud-sync-prompt');
-      if (existing) existing.remove();
-
-      var overlay = document.createElement('div');
-      overlay.id = 'riq-cloud-sync-prompt';
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:100002;background:rgba(10,36,96,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .25s ease';
-
-      var card = document.createElement('div');
-      card.style.cssText = 'width:100%;max-width:380px;background:#fff;border-radius:22px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.25);transform:scale(.9);transition:transform .3s cubic-bezier(.34,1.56,.64,1)';
-
-      card.innerHTML =
-        '<div style="text-align:center">' +
-          '<div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--teal),var(--teal-dk));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px">☁️</div>' +
-          '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;color:var(--text)">Protect this document</div>' +
-          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-top:8px;line-height:1.65">This is saved on your device only. If you lose or change your phone, this document is gone.</div>' +
-          '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:var(--teal-dk);margin-top:8px;line-height:1.65">Secure it in the cloud for <strong>$14.99 one-time</strong> — access your documents from any device, forever.</div>' +
-        '</div>' +
-        '<div style="display:flex;flex-direction:column;gap:10px;margin-top:20px">' +
-          '<button id="cloudPromptBuy" style="background:var(--teal);color:#fff;border:none;border-radius:14px;padding:14px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,200,150,.25)">Unlock Cloud Sync — $14.99 →</button>' +
-          '<button id="cloudPromptSkip" style="background:none;color:var(--muted);border:none;padding:10px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;cursor:pointer">Keep it local for now</button>' +
-        '</div>';
-
-      overlay.appendChild(card);
-      document.body.appendChild(overlay);
-
-      requestAnimationFrame(function() {
-        overlay.style.opacity = '1';
-        requestAnimationFrame(function() { card.style.transform = 'scale(1)'; });
-      });
-
-      function close() {
-        overlay.style.opacity = '0';
-        card.style.transform = 'scale(.9)';
-        setTimeout(function() { overlay.remove(); }, 300);
-      }
-
-      document.getElementById('cloudPromptBuy').onclick = function() {
-        // Stripe placeholder — show toast during beta
-        if (typeof showToast === 'function') {
-          showToast('Coming soon', 'Cloud sync purchase is being set up', '☁️');
-        }
-        close();
-        resolve(true);
-      };
-
-      document.getElementById('cloudPromptSkip').onclick = function() {
-        // Remember they dismissed it — don't show again this session
-        try { sessionStorage.setItem('riq_cloud_prompt_dismissed', '1'); } catch(e) {}
-        close();
-        resolve(false);
-      };
-
-      overlay.onclick = function(e) { if (e.target === overlay) { close(); resolve(false); } };
-    });
-  }
+  // Cloud sync is free for every signed-in renter. The legacy upsell prompt
+  // has been retired along with the paywall.
 
   // ── Public API ──
   var RIQPayments = {

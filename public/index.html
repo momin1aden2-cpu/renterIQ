@@ -116,7 +116,7 @@
         {
           "@type": "Question",
           "name": "Does RenterIQ replace a lawyer for lease review?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No — RenterIQ is not a legal service. It produces a plain-English summary of your lease and flags clauses that may need attention. For binding legal advice, contact your state tenancy authority or a tenancy legal service." }
+          "acceptedAnswer": { "@type": "Answer", "text": "No — RenterIQ produces a plain-English summary of your lease and flags clauses that may need attention. It's a tool to help you understand what you're signing, not a replacement for a lawyer. For binding advice on your specific situation, contact your state tenancy authority." }
         },
         {
           "@type": "Question",
@@ -1062,7 +1062,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
           <p>Bathroom grout staining — the agent's own entry report noted the same condition at move-in. This is pre-existing and in your favour.</p>
         </div>
       </div>
-      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px;font-style:italic;line-height:1.6">Nothing enters your report without your review. RenterIQ is a documentation tool — not a legal service.</p>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px;font-style:italic;line-height:1.6">Nothing enters your report without your review. RenterIQ documents your tenancy — the decisions stay yours.</p>
     </div>
   </div>
 </section>
@@ -1230,11 +1230,11 @@ input,textarea,select{font-family:'Nunito',sans-serif;border:none;outline:none}
   </div>
 </section>
 
-<!-- ========== LEGAL DISCLAIMER ========== -->
+<!-- ========== DISCLAIMER ========== -->
 <div class="legal-bar">
   <div class="container">
     <span class="lb-icon">⚠️</span>
-    <p><strong>Disclaimer:</strong> RenterIQ is a personal organisation tool — not a legal service. All summaries and reports are for informational purposes only and should not be relied upon as legal advice. Always verify information with a qualified professional or your state tenancy authority.</p>
+    <p><strong>Disclaimer:</strong> RenterIQ helps you organise your tenancy records. All summaries and reports are for your personal reference only. Always verify details with your state tenancy authority or a qualified professional before acting on them.</p>
   </div>
 </div>
 
@@ -1551,7 +1551,7 @@ function heroRightsSearch(val){
       '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.6">'+heroEscHtml(a.text)+'</div>'+
       numsHtml+
       '<div style="margin-top:8px;display:flex;align-items:center;gap:8px"><a href="tel:'+a.phone.replace(/\s/g,'')+'" style="text-decoration:none;background:var(--blue-xl);color:var(--blue);border:1px solid var(--border-lt);border-radius:8px;padding:5px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px"><span>📞</span>'+heroEscHtml(a.phone)+'</a></div>'+
-      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px solid var(--border-lt);padding-top:8px">General information for '+heroEscHtml(sd.name)+' renters. For your specific situation, contact '+heroEscHtml(a.contact)+' on '+heroEscHtml(a.phone)+'. RenterIQ is an information tool, not a legal service.</div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px solid var(--border-lt);padding-top:8px">General information for '+heroEscHtml(sd.name)+' renters. For your specific situation, contact '+heroEscHtml(a.contact)+' on '+heroEscHtml(a.phone)+'.</div>'+
     '</div>';
   }).join('');
 
@@ -1593,7 +1593,7 @@ function heroRightsSearchTop(val){
       '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.6">'+heroEscHtml(a.text)+'</div>'+
       numsHtml+
       '<div style="margin-top:10px;display:flex;align-items:center;gap:8px"><a href="tel:'+a.phone.replace(/\s/g,'')+'" style="text-decoration:none;background:var(--blue-xl);color:var(--blue);border:1px solid var(--border-lt);border-radius:8px;padding:6px 12px;font-family:Sora,sans-serif;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px;min-height:36px"><span>📞</span>'+heroEscHtml(a.phone)+'</a><a href="/app/index.html" style="font-family:Sora,sans-serif;font-weight:700;font-size:11px;color:var(--blue);text-decoration:none">More in the app →</a></div>'+
-      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px solid var(--border-lt);padding-top:8px">General information for '+heroEscHtml(sd.name)+' renters. For your specific situation, contact '+heroEscHtml(a.contact)+' on '+heroEscHtml(a.phone)+'. This is an information tool, not a legal service.</div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px solid var(--border-lt);padding-top:8px">General information for '+heroEscHtml(sd.name)+' renters. For your specific situation, contact '+heroEscHtml(a.contact)+' on '+heroEscHtml(a.phone)+'.</div>'+
     '</div>';
   results.style.display='block';
 }

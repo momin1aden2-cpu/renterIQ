@@ -33,7 +33,7 @@
 .pr-back{background:none;border:none;color:#fff;display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;margin:-8px 0;-webkit-tap-highlight-color:transparent;border-radius:8px;transition:background-color 0.2s var(--ease-smooth)}
 .pr-back:active{background-color:rgba(255,255,255,0.1)}
 .pr-back-arrow{font-size:22px;font-weight:700;line-height:1}
-.pr-back-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;opacity:.7}
+.pr-back-label{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;letter-spacing:-.1px;opacity:.75}
 .pr-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#fff;margin-top:8px}
 .pr-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
 .sec-label{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:18px 0 8px}
@@ -179,7 +179,7 @@
 
 <header class="pr-header">
   <div class="pr-row">
-    <button class="pr-back" onclick="navigate('/app/index.html')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">RENTERIQ</span></button>
+    <button class="pr-back" onclick="navigate('/app/index.html')"><span class="pr-back-arrow">‹</span><span class="pr-back-label">RenterIQ</span></button>
     <button onclick="switchView('B')" aria-label="Edit profile" style="background:rgba(255,255,255,.12);border:none;width:36px;height:36px;border-radius:10px;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent">✏️</button>
   </div>
   <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
@@ -246,7 +246,7 @@
 <div class="sec-label">Purchases</div>
 <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt)">
   <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">💳</span><div style="flex:1"><div class="settings-title">Pricing &amp; Purchases</div><div class="settings-sub">See what's free, what's paid, and your history</div></div><span class="settings-chevron">›</span></div>
-  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">☁️</span><div style="flex:1"><div class="settings-title">Cloud Sync</div><div class="settings-sub" id="cloudSyncSub">Local storage only — your data stays on this device</div></div><span class="settings-chevron">›</span></div>
+  <div class="settings-row" onclick="switchView('E')"><span class="settings-icon">☁️</span><div style="flex:1"><div class="settings-title">Cloud Sync</div><div class="settings-sub" id="cloudSyncSub">Active — your Vault syncs across every device</div></div><span class="settings-chevron">›</span></div>
 </div>
 
 
@@ -284,9 +284,9 @@
 
 <!-- FOOTER -->
 <div style="text-align:center;padding:24px 16px 8px">
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">RenterIQ · Version 1.0.0 Beta</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted)">RenterIQ · Version 1.0</div>
   <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Built in Australia 🇦🇺</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">Not a legal service · Organisation tool only</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:4px">A personal tenancy records tool</div>
 </div>
 
 </div><!-- /scrollable -->
@@ -574,12 +574,11 @@
     <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--teal-dk));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">☁️</div>
     <div style="flex:1">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text)">Cloud Sync</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55">Sync your Vault, reports and photos across every device. One-time purchase — no recurring fees.</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55">Your Vault, reports and photos sync across every device the moment you sign in.</div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-        <span id="cloudSyncStatus" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Local only</span>
-        <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--teal-dk)">$14.99 one-time</span>
+        <span id="cloudSyncStatus" style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--teal-dk)">Active ✓</span>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--muted)">Included</span>
       </div>
-      <button style="margin-top:10px;width:100%;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="showToast('Coming soon','Cloud sync purchase is being set up','☁️')">Unlock Cloud Sync →</button>
     </div>
   </div>
 </div>
@@ -670,7 +669,7 @@
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:12px">Purchase Terms</div>
   <div style="display:flex;flex-direction:column;gap:10px">
     <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Reports</strong> — Paid per report via secure Stripe checkout. Each tool shows the price before you confirm.</div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Cloud Sync</strong> — A one-time $14.99 purchase that syncs your Vault across devices. Non-refundable once activated.</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">Cloud Sync</strong> — Included with every signed-in account. Your Vault syncs across every device you use.</div>
     <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);line-height:1.75"><strong style="color:var(--text)">No subscriptions</strong> — RenterIQ does not charge recurring fees. You will never be auto-billed.</div>
   </div>
 </div>
@@ -678,8 +677,8 @@
 <!-- DISCLAIMER -->
 <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:16px;margin-bottom:14px">
   <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#7A5500;margin-bottom:10px">Disclaimer</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65;margin-bottom:8px">RenterIQ is an organisation and documentation tool — not a legal service. Nothing in this app constitutes legal advice. All summaries, comparisons, and suggestions are for personal reference only.</div>
-  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">Tenancy laws differ by state and territory. Always contact your state tenancy authority for legal questions.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65;margin-bottom:8px">RenterIQ helps you organise your tenancy records. All summaries, comparisons, and suggestions are for personal reference only.</div>
+  <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">Tenancy laws differ by state and territory. Your state tenancy authority is the official source for tenancy questions.</div>
 </div>
 
 <!-- ABOUT -->
@@ -845,39 +844,8 @@ function toggleQuiet(){
 function loadPurchaseState(){
   var cloudSubEl=document.getElementById('cloudSyncSub');
   var cloudStatusEl=document.getElementById('cloudSyncStatus');
-  var cloudEnabled=false;
-
-  // Check payments state
-  if(window.RIQPayments){
-    var state=RIQPayments.getState();
-    if(state) cloudEnabled=!!state.cloudSyncEnabled;
-  }
-
-  // Also check localStorage fallback
-  if(!cloudEnabled){
-    try{
-      var cached=localStorage.getItem('riq_payment_state');
-      if(cached){
-        var c=JSON.parse(cached);
-        cloudEnabled=!!c.cloudSyncEnabled;
-      }
-    }catch(e){}
-    // Legacy fallback
-    if(!cloudEnabled){
-      try{
-        var old=localStorage.getItem('riq_credit_state');
-        if(old) cloudEnabled=!!JSON.parse(old).cloudSyncEnabled;
-      }catch(e){}
-    }
-  }
-
-  if(cloudEnabled){
-    if(cloudSubEl)cloudSubEl.textContent='☁️ Active — your data syncs across devices';
-    if(cloudStatusEl){cloudStatusEl.textContent='Active ✓';cloudStatusEl.style.color='var(--teal-dk)';}
-  } else {
-    if(cloudSubEl)cloudSubEl.textContent='Local storage only — your data stays on this device';
-    if(cloudStatusEl){cloudStatusEl.textContent='Local only';cloudStatusEl.style.color='var(--muted)';}
-  }
+  if(cloudSubEl)cloudSubEl.textContent='Active — your Vault syncs across every device';
+  if(cloudStatusEl){cloudStatusEl.textContent='Active ✓';cloudStatusEl.style.color='var(--teal-dk)';}
 }
 
 /* --- PASSWORD RESET --- */

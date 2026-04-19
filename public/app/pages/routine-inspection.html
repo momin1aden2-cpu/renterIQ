@@ -209,7 +209,7 @@
 <div class="view" id="viewA">
   <header class="sh">
     <div class="sh-row">
-      <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RENTERIQ</span></button>
+      <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RenterIQ</span></button>
       <button class="sh-right" onclick="showToast('Info','Routine inspections happen every 3–6 months. Upload the report when you receive it and RenterIQ will help you respond.','📋')">ℹ️</button>
     </div>
     <div class="sh-title">Routine Inspection Response</div>
@@ -278,7 +278,7 @@
     <div style="padding:0 16px;margin-top:8px">
       <div class="disclaimer-note">
         <span class="dn-icon">⚠️</span>
-        <p>Smart analysis · Always verify items against the original report. RenterIQ does not provide legal advice.</p>
+        <p>Smart analysis · Always verify items against the original report before responding.</p>
       </div>
     </div>
   </div>
@@ -477,7 +477,7 @@
     <div style="padding:0 16px">
       <div class="disclaimer-note">
         <span class="dn-icon">⚠️</span>
-        <p>Auto-drafted response · Please review and edit before sending. This is not legal correspondence.</p>
+        <p>Auto-drafted response · Please review and edit before sending — your words, your call.</p>
       </div>
     </div>
   </div>
@@ -924,7 +924,7 @@ function renderAnalysisResults(data) {
     '<button onclick="buildResponse()" style="width:100%;background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:14px;padding:14px;font-family:Sora,sans-serif;font-weight:800;font-size:14px;cursor:pointer;min-height:48px">✉️ Skip — just draft the agent reply</button>'+
   '</div>';
 
-  html += '<div style="padding:16px"><div class="disclaimer-note"><span class="dn-icon">⚠️</span><p>Smart classification · Always check before acting. Helper, not legal advice.</p></div></div>';
+  html += '<div style="padding:16px"><div class="disclaimer-note"><span class="dn-icon">⚠️</span><p>Smart classification · Always check the original report before acting — your call.</p></div></div>';
 
   document.getElementById('analysisResults').innerHTML = html;
 }

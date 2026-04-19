@@ -143,7 +143,7 @@
 <div class="view" id="viewA" style="display:flex;flex-direction:column;min-height:100vh">
   <header class="sh">
     <div class="sh-row">
-      <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RENTERIQ</span></button>
+      <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RenterIQ</span></button>
       <span style="font-size:20px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Exit Condition Report','Complete this after cleaning — before handing back the keys. Your bond depends on it.','🚪')">?</span>
     </div>
     <div class="sh-title">Exit Condition Report</div>
@@ -361,8 +361,8 @@
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
     <div id="bondStatsRow" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border-lt);margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr)"></div>
     <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px;margin-bottom:16px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:5px">⚠️ These are suggestions only — not legal advice.</div>
-      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">RenterIQ suggests practical fixes based on what was detected. The decision to act on any suggestion is entirely yours. Bond outcomes depend on your specific situation and the agency's assessment. For disputes, contact your state tenancy authority.</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:5px">⚠️ Suggestions only — your call.</div>
+      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">RenterIQ suggests practical fixes based on what was detected. The decision to act on any suggestion is entirely yours. Bond outcomes depend on your specific situation and the agency's assessment. For disputes, your state tenancy authority is the official source.</div>
     </div>
     <div id="bondRecoveryCards"></div>
   </div>
@@ -1727,7 +1727,7 @@ function renderBondRecovery(data){
       +'</div>'
       +'<div style="padding:14px 16px"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:5px">The Issue:</div><div style="font-weight:600;font-size:13px;color:var(--text);line-height:1.65">'+item.issue+'</div></div>'
       +'<div style="padding:0 16px 14px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Not legal advice</span></div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px">✦</span><span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px">Smart Fix Suggestion</span></div><span style="font-weight:600;font-size:9px;color:var(--muted)">Suggestion — your call</span></div>'
         +'<div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:12px;padding:13px 14px"><div style="font-weight:600;font-size:13px;color:#005040;line-height:1.75">'+item.suggestion+'</div></div>'
       +'</div>'
       +'<div style="padding:14px 16px;border-top:1px solid var(--border-lt);background:var(--blue-xl);display:flex;gap:16px">'
