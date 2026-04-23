@@ -64,12 +64,16 @@ function init(): { app: App | null; auth: Auth | null } {
 // Hosting consoles differ in how they store multi-line secrets. This tolerates
 // the common paste accidents:
 //   - surrounding whitespace
-//   - surrounding single or double quotes the console added literally
+//   - a trailing JSON comma or semicolon from a half-copied JSON line
+//   - surrounding single or double quotes the console kept literally
 //   - literal "\n" escape sequences (two chars) that never got unescaped
 //   - Windows CRLF line endings
 // If the key is already a well-formed PEM with real newlines, this is a no-op.
 function normalisePrivateKey(raw: string): string {
   let key = raw.trim();
+  while (key.endsWith(',') || key.endsWith(';')) {
+    key = key.slice(0, -1).trimEnd();
+  }
   if (
     (key.startsWith('"') && key.endsWith('"')) ||
     (key.startsWith("'") && key.endsWith("'"))
