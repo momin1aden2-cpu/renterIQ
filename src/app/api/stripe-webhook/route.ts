@@ -66,6 +66,7 @@ export async function POST(req: Request) {
   const txRef = userRef.collection('transactions').doc(session.id);
   const payRef = userRef.collection('state').doc('payments');
 
+  let stage: 'tx_read' | 'batch_commit' = 'tx_read';
   try {
     // Idempotency — Stripe retries webhooks. If we've already written the
     // transaction for this session, skip.
@@ -106,10 +107,16 @@ export async function POST(req: Request) {
       { merge: true }
     );
 
+    stage = 'batch_commit';
     await batch.commit();
   } catch (err) {
-    console.error('[stripe-webhook] Firestore write failed', err);
-    return NextResponse.json({ error: 'Database write failed' }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    const code = err && typeof err === 'object' && 'code' in err ? String((err as { code: unknown }).code) : null;
+    console.error('[stripe-webhook] Firestore write failed', { stage, code, message, uid, feature, sessionId: session.id });
+    return NextResponse.json(
+      { error: 'Database write failed', stage, code, detail: message },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ received: true, uid, feature });
