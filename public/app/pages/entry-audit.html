@@ -26,9 +26,13 @@
 <title>Entry Condition Report — RenterIQ</title>
 <script src="/app/js/pwa-init.js" defer></script>
 <style>
-.property-card{background:linear-gradient(135deg,var(--blue),var(--blue-md));border-radius:18px;padding:20px;margin:16px;color:#fff}
-.property-address{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px}
-.property-sub{font-weight:600;font-size:13px;opacity:.8}
+.property-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;margin:12px 16px 4px;background:#fff;border:1px solid var(--border-lt);border-radius:14px;box-shadow:0 2px 10px rgba(10,36,96,.05)}
+.property-bar .pb-icon{width:34px;height:34px;border-radius:10px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.property-bar .pb-body{flex:1;min-width:0}
+.property-address{font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--text);letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.property-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.property-bar .pb-change{background:transparent;color:var(--blue);border:none;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:8px 4px;flex-shrink:0;letter-spacing:.2px}
+.property-bar .pb-change:active{opacity:.55}
 .room-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px}
 .room-card{background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s var(--ease-smooth)}
 .room-card:active{transform:scale(.97)}
@@ -58,7 +62,8 @@
 .cond-fair-active{border-color:var(--amber)!important;background:rgba(245,166,35,.06)!important}
 .cond-poor-active{border-color:var(--red)!important;background:rgba(232,64,64,.06)!important}
 
-.complete-area{position:sticky;bottom:72px;background:linear-gradient(transparent,var(--blue-xl) 30%);padding:24px 16px 12px;z-index:5}
+.complete-area{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(56px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px;background:linear-gradient(transparent,var(--blue-xl) 35%);padding:28px 16px 14px;z-index:8;pointer-events:none}
+.complete-area > *{pointer-events:auto}
 .complete-hint{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-top:6px}
 
 .room-header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 0;box-shadow:0 2px 16px rgba(10,36,96,.18)}
@@ -139,13 +144,16 @@
     <div class="sh-sub">Document the property at move-in</div>
   </header>
 
-  <div class="property-card">
-    <div class="property-address" id="propertyAddress">Property Address</div>
-    <div class="property-sub" id="propertyDetails">Loading property details...</div>
-    <button onclick="showPropertyPicker()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:8px">Change Property</button>
+  <div class="property-bar" id="propertyCard" style="display:none">
+    <div class="pb-icon">📍</div>
+    <div class="pb-body">
+      <div class="property-address" id="propertyAddress">—</div>
+      <div class="property-sub" id="propertyDetails">—</div>
+    </div>
+    <button class="pb-change" onclick="showPropertyPicker()">Change</button>
   </div>
 
-  <div style="flex:1;overflow-y:auto;padding-bottom:100px">
+  <div id="entryBody" style="flex:1;overflow-y:auto;padding-bottom:180px;display:none">
     <div style="padding:0 16px 8px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase;margin-bottom:10px">Agent's Copy</div>
       <div id="agencyEntryCard" style="background:#fff;border:1.5px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:18px;cursor:pointer;display:flex;gap:12px;align-items:center" onclick="uploadAgencyEntry()">
@@ -169,7 +177,7 @@
     </div>
   </div>
 
-  <div class="complete-area">
+  <div class="complete-area" id="entryCompleteArea" style="display:none">
     <button class="btn-blue-c btn-full" id="generateReportBtn" style="border-radius:14px;padding:14px;font-size:15px;opacity:.4;pointer-events:none" onclick="generateEntryReport()">Generate Entry Report →</button>
     <div class="complete-hint" id="completeHint">Complete all areas to generate report</div>
   </div>
@@ -817,15 +825,17 @@ function generateRoomsForProperty(setup){
 // Update property display
 function updatePropertyDisplay(setup){
   document.getElementById('propertyAddress').textContent=setup.address;
-  
+
   var details=[];
   if(setup.bedrooms) details.push(setup.bedrooms+' bed');
   if(setup.bathrooms) details.push(setup.bathrooms+' bath');
   if(setup.living>1) details.push(setup.living+' living');
   if(setup.garage) details.push('garage');
   if(setup.carport) details.push('carport');
-  
+
   document.getElementById('propertyDetails').textContent=details.join(' · ')||'Property details';
+  var card=document.getElementById('propertyCard');
+  if(card) card.style.display='flex';
 }
 
 // Load existing property setup
@@ -849,25 +859,31 @@ function loadPropertySetup(){
 
 // Fallback property info loading
 function loadPropertyInfo(){
+  var addrEl=document.getElementById('propertyAddress');
+  var subEl=document.getElementById('propertyDetails');
+  var card=document.getElementById('propertyCard');
   var activeProp=localStorage.getItem('riq-active-property');
+  var shown=false;
   if(activeProp){
     try{
       var prop=JSON.parse(activeProp);
-      document.getElementById('propertyAddress').textContent=prop.label||'Property Address';
-      document.getElementById('propertyDetails').textContent=prop.details||'Move-in condition report';
-    }catch(e){
-      document.getElementById('propertyAddress').textContent='Property Address';
-      document.getElementById('propertyDetails').textContent='Move-in condition report';
-    }
-  }else{
-    document.getElementById('propertyAddress').textContent='Property Address';
-    document.getElementById('propertyDetails').textContent='Move-in condition report';
+      if(prop && prop.label){
+        addrEl.textContent=prop.label;
+        subEl.textContent=prop.details||'Move-in condition report';
+        shown=true;
+      }
+    }catch(e){}
   }
+  if(card) card.style.display = shown ? 'flex' : 'none';
 }
 
 function buildRoomGrid(){
   var grid=document.getElementById('roomGrid');
   if(!grid)return;
+  var body=document.getElementById('entryBody');
+  var cta=document.getElementById('entryCompleteArea');
+  if(body) body.style.display='block';
+  if(cta) cta.style.display='block';
   grid.innerHTML='';
   
   // Add standard rooms
@@ -2178,8 +2194,16 @@ function backToOverview(){
 }
 
 function switchView(viewId){
+  var id = String(viewId||'');
+  if(id && id.indexOf('view') !== 0) id = 'view' + id;
   document.querySelectorAll('.view').forEach(function(v){v.style.display='none'});
-  document.getElementById(viewId).style.display='flex';
+  var el = document.getElementById(id);
+  if(el){
+    el.style.display = 'flex';
+    try { window.scrollTo(0,0); } catch(e){}
+    var shell = document.querySelector('.app-shell');
+    if(shell) shell.scrollTop = 0;
+  }
 }
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/app/sw.js')})}
