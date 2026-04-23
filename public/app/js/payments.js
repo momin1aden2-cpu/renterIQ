@@ -118,6 +118,10 @@
     for (var i = 0; i < payState.purchases.length; i++) {
       var p = payState.purchases[i];
       if (!p || p.feature !== featureKey) continue;
+      // Only Stripe-confirmed purchases grant access. Historical entries
+      // written by the legacy client-side paywall have no source field and
+      // must not unlock paid features.
+      if (p.source !== 'stripe') continue;
       var ts = typeof p.createdAt === 'number' ? p.createdAt : 0;
       if (now - ts <= ENTITLEMENT_GRACE_MS) return true;
     }

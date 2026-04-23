@@ -30,7 +30,7 @@ export async function requireFeature(uid: string, feature: FeatureKey): Promise<
     return { ok: true, reason: 'admin_not_configured' };
   }
 
-  let state: { leaseReviewCount?: number; purchases?: Array<{ feature?: string; createdAt?: number }> } = {};
+  let state: { leaseReviewCount?: number; purchases?: Array<{ feature?: string; createdAt?: number; source?: string }> } = {};
   try {
     const db = getFirestore();
     const snap = await db.collection('users').doc(uid).collection('state').doc('payments').get();
@@ -48,11 +48,18 @@ export async function requireFeature(uid: string, feature: FeatureKey): Promise<
     return { ok: true, reason: 'first_free' };
   }
 
-  // Any feature — accept a matching purchase within the grace window.
+  // Any feature — accept only Stripe-confirmed purchases within the grace
+  // window. Historical records written by the pre-Stripe client paywall have
+  // no source field and must not unlock paid routes.
   const now = Date.now();
   const purchases = Array.isArray(state.purchases) ? state.purchases : [];
   const hasRecent = purchases.some(
-    (p) => p && p.feature === feature && typeof p.createdAt === 'number' && now - p.createdAt <= PURCHASE_GRACE_MS
+    (p) =>
+      p &&
+      p.feature === feature &&
+      p.source === 'stripe' &&
+      typeof p.createdAt === 'number' &&
+      now - p.createdAt <= PURCHASE_GRACE_MS
   );
   if (hasRecent) return { ok: true, reason: 'paid' };
 
