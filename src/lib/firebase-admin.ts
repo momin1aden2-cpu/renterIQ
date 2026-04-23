@@ -6,6 +6,37 @@ let cached: { app: App | null; auth: Auth | null } | null = null;
 function init(): { app: App | null; auth: Auth | null } {
   if (cached) return cached;
 
+  // Preferred path — a single base64-encoded service account JSON. Immune
+  // to newline/quote mangling in hosting consoles.
+  const b64 = process.env.FIREBASE_ADMIN_SA_B64;
+  if (b64) {
+    try {
+      const decoded = Buffer.from(b64.trim(), 'base64').toString('utf-8');
+      const json = JSON.parse(decoded) as {
+        project_id?: string;
+        client_email?: string;
+        private_key?: string;
+      };
+      if (json.project_id && json.client_email && json.private_key) {
+        const app = getApps().length
+          ? getApps()[0]
+          : initializeApp({
+              credential: cert({
+                projectId: json.project_id,
+                clientEmail: json.client_email,
+                privateKey: json.private_key
+              })
+            });
+        cached = { app, auth: getAuth(app) };
+        return cached;
+      }
+      console.error('[firebase-admin] FIREBASE_ADMIN_SA_B64 decoded but missing expected fields');
+    } catch (err) {
+      console.error('[firebase-admin] FIREBASE_ADMIN_SA_B64 failed to decode/parse', err);
+    }
+  }
+
+  // Legacy path — three separate env vars.
   const projectId =
     process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
