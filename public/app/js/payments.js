@@ -160,18 +160,60 @@
   function startCheckout(featureKey) {
     var returnTo = window.location.pathname + (window.location.search || '');
     var email = getCurrentUserEmail();
-    return fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ feature: featureKey, returnTo: returnTo, email: email })
-    }).then(function(r) {
-      return r.json().then(function(body) {
-        if (!r.ok || !body || !body.url) {
-          var msg = (body && body.error) || 'We could not start the payment. Please try again.';
-          throw new Error(msg);
-        }
-        window.location.href = body.url;
+    return waitForIdToken(6000).then(function(token) {
+      if (!token) {
+        throw new Error('Your session timed out. Sign in again and retry.');
+      }
+      return fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ feature: featureKey, returnTo: returnTo, email: email })
+      }).then(function(r) {
+        return r.json().then(function(body) {
+          if (!r.ok || !body || !body.url) {
+            var msg = (body && body.error) || 'We could not start the payment. Please try again.';
+            throw new Error(msg);
+          }
+          window.location.href = body.url;
+        });
       });
+    });
+  }
+
+  // Wait for firebase.auth() to hydrate its session from IndexedDB and then
+  // return a fresh ID token. The global fetch patch in firebase-init.js
+  // silently skips token attachment if currentUser is null at request time,
+  // which can happen right after page load — this explicit wait guarantees
+  // the server sees the Bearer header before we try to pay.
+  function waitForIdToken(timeoutMs) {
+    return new Promise(function(resolve) {
+      if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length || !firebase.auth) {
+        resolve(null);
+        return;
+      }
+      var auth = firebase.auth();
+      var settled = false;
+      function done(token) {
+        if (settled) return;
+        settled = true;
+        resolve(token || null);
+      }
+      function fetchToken(user) {
+        if (!user) { done(null); return; }
+        user.getIdToken(true).then(done).catch(function() { done(null); });
+      }
+      if (auth.currentUser) { fetchToken(auth.currentUser); return; }
+      var unsub = auth.onAuthStateChanged(function(user) {
+        try { unsub && unsub(); } catch (e) {}
+        fetchToken(user);
+      });
+      setTimeout(function() {
+        try { unsub && unsub(); } catch (e) {}
+        done(null);
+      }, timeoutMs || 5000);
     });
   }
 
