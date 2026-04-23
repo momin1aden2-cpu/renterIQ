@@ -9,21 +9,47 @@ function init(): { app: App | null; auth: Auth | null } {
   const projectId =
     process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
-  let privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+  const rawKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
 
-  if (!projectId || !clientEmail || !privateKey) {
+  if (!projectId || !clientEmail || !rawKey) {
     cached = { app: null, auth: null };
     return cached;
   }
 
-  privateKey = privateKey.replace(/\\n/g, '\n');
+  const privateKey = normalisePrivateKey(rawKey);
 
-  const app = getApps().length
-    ? getApps()[0]
-    : initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
-
-  cached = { app, auth: getAuth(app) };
+  try {
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
+    cached = { app, auth: getAuth(app) };
+  } catch (err) {
+    console.error('[firebase-admin] initializeApp threw', err);
+    cached = { app: null, auth: null };
+  }
   return cached;
+}
+
+// Hosting consoles differ in how they store multi-line secrets. This tolerates
+// the common paste accidents:
+//   - surrounding whitespace
+//   - surrounding single or double quotes the console added literally
+//   - literal "\n" escape sequences (two chars) that never got unescaped
+//   - Windows CRLF line endings
+// If the key is already a well-formed PEM with real newlines, this is a no-op.
+function normalisePrivateKey(raw: string): string {
+  let key = raw.trim();
+  if (
+    (key.startsWith('"') && key.endsWith('"')) ||
+    (key.startsWith("'") && key.endsWith("'"))
+  ) {
+    key = key.slice(1, -1);
+  }
+  if (key.indexOf('\\n') !== -1 && key.indexOf('\n') === -1) {
+    key = key.replace(/\\n/g, '\n');
+  }
+  key = key.replace(/\r\n/g, '\n');
+  return key;
 }
 
 export function adminAuth(): Auth | null {
