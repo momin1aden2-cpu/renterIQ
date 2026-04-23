@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="/app/manifest.json">
+<meta name="theme-color" content="#0A2460">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RenterIQ">
+<link rel="stylesheet" href="/app/css/app.css?v=5">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+<script src="/api/firebase-config" defer></script>
+<script src="/app/js/firebase-init.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
+<title>Confirming payment — RenterIQ</title>
+<style>
+body{background:linear-gradient(180deg,#0A2460 0%,#1B50C8 50%,#2E63E0 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;margin:0}
+.pay-card{width:100%;max-width:420px;background:#fff;border-radius:24px;padding:34px 26px calc(env(safe-area-inset-bottom,0px) + 28px);box-shadow:0 24px 80px rgba(0,0,0,.25);text-align:center}
+.pay-icon{width:72px;height:72px;border-radius:20px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
+.pay-icon.progress{background:linear-gradient(135deg,var(--blue),var(--blue-md))}
+.pay-icon.success{background:linear-gradient(135deg,#16a37c,#0ea573)}
+.pay-icon.error{background:linear-gradient(135deg,#c23a3a,#e04848)}
+.pay-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:paySpin .9s linear infinite}
+@keyframes paySpin{to{transform:rotate(360deg)}}
+.pay-check{width:36px;height:36px}
+.pay-title{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--text);letter-spacing:-.3px;line-height:1.3}
+.pay-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--muted);margin-top:10px;line-height:1.6}
+.pay-step{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:22px}
+.pay-btn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border:none;border-radius:14px;padding:16px;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;cursor:pointer;min-height:52px;box-shadow:0 4px 16px rgba(27,80,200,.25);margin-top:20px}
+.pay-btn.secondary{background:#fff;color:var(--muted);border:2px solid var(--border);box-shadow:none}
+.pay-details{background:var(--blue-xl);border-radius:14px;padding:14px 16px;margin-top:18px;text-align:left}
+.pay-details-row{display:flex;justify-content:space-between;align-items:center;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);padding:4px 0}
+.pay-details-label{color:var(--muted);text-transform:uppercase;font-family:'Sora',sans-serif;font-weight:700;font-size:10.5px;letter-spacing:.6px}
+</style>
+</head>
+<body>
+
+<div class="pay-card" id="payCard">
+  <div class="pay-icon progress" id="payIcon"><div class="pay-spinner"></div></div>
+  <div class="pay-title" id="payTitle">Confirming your payment…</div>
+  <div class="pay-sub" id="paySub">This normally takes a few seconds. Please keep this tab open.</div>
+  <div class="pay-step" id="payStep">Step 2 of 2 · Unlocking your tool</div>
+</div>
+
+<script>
+(function(){
+  var POLL_EVERY_MS = 1500;
+  var MAX_WAIT_MS = 40000;
+
+  var params = new URLSearchParams(window.location.search);
+  var sessionId = params.get('session_id') || '';
+  var returnTo = params.get('return') || '/app/pages/profile.html';
+
+  // Guard against open redirects — only allow same-origin /app/ paths.
+  if (returnTo.indexOf('/app/') !== 0 || returnTo.indexOf('..') >= 0 || returnTo.indexOf('//') >= 0) {
+    returnTo = '/app/pages/profile.html';
+  }
+
+  var iconEl = document.getElementById('payIcon');
+  var titleEl = document.getElementById('payTitle');
+  var subEl = document.getElementById('paySub');
+  var stepEl = document.getElementById('payStep');
+  var cardEl = document.getElementById('payCard');
+
+  function render(state, opts) {
+    opts = opts || {};
+    if (state === 'success') {
+      iconEl.className = 'pay-icon success';
+      iconEl.innerHTML = '<svg class="pay-check" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      titleEl.textContent = 'Payment confirmed';
+      subEl.textContent = 'Thanks — your tool is unlocked. Taking you back now…';
+      stepEl.textContent = 'Redirecting…';
+      if (opts.purchase) {
+        var det = document.createElement('div');
+        det.className = 'pay-details';
+        det.innerHTML =
+          '<div class="pay-details-row"><span class="pay-details-label">Product</span><span>' + escapeHtml(opts.purchase.name || 'RenterIQ report') + '</span></div>' +
+          '<div class="pay-details-row"><span class="pay-details-label">Paid</span><span>A$' + (opts.purchase.priceCents / 100).toFixed(2) + '</span></div>' +
+          '<div class="pay-details-row"><span class="pay-details-label">Reference</span><span style="font-size:11px">' + escapeHtml((opts.purchase.id || '').slice(-12)) + '</span></div>';
+        cardEl.appendChild(det);
+      }
+      var goBtn = document.createElement('button');
+      goBtn.className = 'pay-btn';
+      goBtn.textContent = 'Continue →';
+      goBtn.onclick = function(){ window.location.replace(returnTo); };
+      cardEl.appendChild(goBtn);
+    } else if (state === 'slow') {
+      iconEl.className = 'pay-icon progress';
+      iconEl.innerHTML = '<div class="pay-spinner"></div>';
+      titleEl.textContent = 'Still confirming…';
+      subEl.textContent = 'Payment is done on Stripe\'s side — we\'re just waiting for the final sync. This is safe to close; the tool will unlock the moment it clears.';
+      stepEl.textContent = 'Taking longer than usual';
+      var retryBtn = document.createElement('button');
+      retryBtn.className = 'pay-btn';
+      retryBtn.textContent = 'Go back and try again';
+      retryBtn.onclick = function(){ window.location.replace(returnTo); };
+      cardEl.appendChild(retryBtn);
+    } else if (state === 'error') {
+      iconEl.className = 'pay-icon error';
+      iconEl.innerHTML = '<div style="color:#fff;font-family:Sora,sans-serif;font-weight:800;font-size:28px">!</div>';
+      titleEl.textContent = opts.title || 'Something\'s off';
+      subEl.textContent = opts.message || 'We couldn\'t confirm the payment on our side. If you were charged, we\'ll sort it automatically — you can safely head back.';
+      stepEl.textContent = '';
+      var backBtn = document.createElement('button');
+      backBtn.className = 'pay-btn';
+      backBtn.textContent = 'Back to RenterIQ';
+      backBtn.onclick = function(){ window.location.replace(returnTo); };
+      cardEl.appendChild(backBtn);
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+
+  function whenFirebaseReady() {
+    return new Promise(function(resolve) {
+      var tries = 0;
+      (function check() {
+        tries++;
+        if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length && firebase.auth && firebase.firestore) {
+          resolve(true);
+        } else if (tries > 50) {
+          resolve(false);
+        } else {
+          setTimeout(check, 120);
+        }
+      })();
+    });
+  }
+
+  function waitForUser() {
+    return new Promise(function(resolve) {
+      var unsub = firebase.auth().onAuthStateChanged(function(user) {
+        unsub && unsub();
+        resolve(user || null);
+      });
+    });
+  }
+
+  function findPurchase(purchases, sid) {
+    if (!Array.isArray(purchases)) return null;
+    for (var i = 0; i < purchases.length; i++) {
+      var p = purchases[i];
+      if (p && p.id === sid) return p;
+    }
+    // No match on id — fall back to the most recent purchase if we have no
+    // session id at all (e.g. Stripe stripped the placeholder).
+    if (!sid && purchases.length) return purchases[purchases.length - 1];
+    return null;
+  }
+
+  function pollForEntitlement() {
+    var startedAt = Date.now();
+    whenFirebaseReady().then(function(ok) {
+      if (!ok) {
+        render('error', { title: 'Connection issue', message: 'Could not reach our servers to confirm the payment. Please head back and re-open the tool — if you\'ve been charged, it will be unlocked automatically.' });
+        return;
+      }
+      waitForUser().then(function(user) {
+        if (!user) {
+          render('error', { title: 'Sign-in expired', message: 'You\'ve been signed out. Sign back in and we\'ll reconcile your purchase automatically.' });
+          return;
+        }
+        var db = firebase.firestore();
+        var ref = db.collection('users').doc(user.uid).collection('state').doc('payments');
+
+        function attempt() {
+          ref.get({ source: 'server' }).then(function(snap) {
+            var data = snap.exists ? snap.data() : null;
+            var purchase = data ? findPurchase(data.purchases, sessionId) : null;
+            if (purchase) {
+              render('success', { purchase: purchase });
+              setTimeout(function(){ window.location.replace(returnTo); }, 1600);
+              return;
+            }
+            if (Date.now() - startedAt >= MAX_WAIT_MS) {
+              render('slow');
+              return;
+            }
+            setTimeout(attempt, POLL_EVERY_MS);
+          }).catch(function() {
+            if (Date.now() - startedAt >= MAX_WAIT_MS) {
+              render('slow');
+              return;
+            }
+            setTimeout(attempt, POLL_EVERY_MS);
+          });
+        }
+        attempt();
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', pollForEntitlement);
+})();
+</script>
+
+</body>
+</html>
