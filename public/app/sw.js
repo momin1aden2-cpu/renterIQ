@@ -1,6 +1,6 @@
 // Service worker: network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v146';
+var CACHE_NAME = 'renteriq-shell-v147';
 
 var APP_SHELL = [
   '/app/index.html',
@@ -66,6 +66,14 @@ self.addEventListener('activate', function (event) {
       return self.clients.claim();
     })
   );
+});
+
+// ── Message bridge: the in-app update banner posts { type: 'SKIP_WAITING' }
+// so users can opt into the new version without waiting for a full tab close.
+self.addEventListener('message', function (event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // ── Fetch: cache-first for local assets, network-only for API calls ──────────

@@ -12,6 +12,23 @@
         document.addEventListener('visibilitychange', function () {
           if (document.visibilityState === 'visible') { reg.update(); }
         });
+
+        // A new worker was already waiting from a previous session — prompt
+        // the user right away.
+        if (reg.waiting && navigator.serviceWorker.controller) {
+          showUpdateBanner(reg.waiting);
+        }
+
+        // Watch for a new worker installing in the background.
+        reg.addEventListener('updatefound', function () {
+          var incoming = reg.installing;
+          if (!incoming) return;
+          incoming.addEventListener('statechange', function () {
+            if (incoming.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateBanner(incoming);
+            }
+          });
+        });
       })
       .catch(function () {});
 
@@ -20,6 +37,42 @@
       if (refreshing) return;
       refreshing = true;
       window.location.reload();
+    });
+  }
+
+  function showUpdateBanner(worker) {
+    if (document.getElementById('riqUpdateBanner')) return;
+    var bar = document.createElement('div');
+    bar.id = 'riqUpdateBanner';
+    bar.setAttribute('role', 'status');
+    bar.style.cssText =
+      'position:fixed;left:14px;right:14px;bottom:calc(72px + env(safe-area-inset-bottom,0px));' +
+      'max-width:420px;margin:0 auto;background:#0A2460;color:#fff;border-radius:14px;' +
+      'padding:12px 14px;display:flex;align-items:center;gap:12px;z-index:10001;' +
+      'box-shadow:0 12px 40px rgba(10,36,96,.35);font-family:Sora,Nunito,sans-serif;' +
+      'transform:translateY(120px);opacity:0;transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .3s ease';
+    bar.innerHTML =
+      '<div style="font-size:22px;line-height:1">✨</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:700;font-size:13.5px;line-height:1.3">New version ready</div>' +
+        '<div style="font-weight:600;font-size:11.5px;color:rgba(255,255,255,.75);margin-top:2px">Tap refresh to get the latest.</div>' +
+      '</div>' +
+      '<button type="button" id="riqUpdateRefresh" style="background:#fff;color:#0A2460;border:none;border-radius:10px;font-family:Sora,sans-serif;font-weight:800;font-size:12px;padding:9px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent">Refresh</button>' +
+      '<button type="button" id="riqUpdateDismiss" aria-label="Dismiss" style="background:transparent;color:rgba(255,255,255,.7);border:none;font-size:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 6px">×</button>';
+
+    document.body.appendChild(bar);
+    requestAnimationFrame(function () {
+      bar.style.transform = 'translateY(0)';
+      bar.style.opacity = '1';
+    });
+
+    document.getElementById('riqUpdateRefresh').addEventListener('click', function () {
+      try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (_e) {}
+    });
+    document.getElementById('riqUpdateDismiss').addEventListener('click', function () {
+      bar.style.transform = 'translateY(120px)';
+      bar.style.opacity = '0';
+      setTimeout(function () { if (bar.parentNode) bar.parentNode.removeChild(bar); }, 300);
     });
   }
 

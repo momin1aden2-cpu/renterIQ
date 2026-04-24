@@ -24,6 +24,31 @@ const nextConfig = {
           { key: 'Content-Type', value: 'application/manifest+json' },
           { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }
         ]
+      },
+      {
+        // The service worker file must never be HTTP-cached by the browser,
+        // otherwise updates can't be discovered for hours (or days, on iOS).
+        // Forcing no-store means every PWA open checks for a new sw.js.
+        source: '/app/sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' },
+          { key: 'Service-Worker-Allowed', value: '/app/' }
+        ]
+      },
+      {
+        // HTML shells also shouldn't be HTTP-cached — the service worker
+        // already handles offline fallback. Without this, the browser can
+        // return a stale HTML referencing old JS filenames for up to 24h.
+        source: '/app/:path*.html',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }
+        ]
+      },
+      {
+        source: '/app',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }
+        ]
       }
     ];
   },
