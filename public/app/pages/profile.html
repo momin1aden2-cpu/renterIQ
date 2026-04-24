@@ -891,7 +891,7 @@ function signOut(){
     console.warn('[RenterIQ] Firebase auth not available, using fallback');
     localStorage.clear();
     sessionStorage.clear();
-    window.location.href = 'index.html';
+    window.location.href = '/';
     return;
   }
 
@@ -900,7 +900,7 @@ function signOut(){
     console.warn('[RenterIQ] No Firebase app initialized, using fallback');
     localStorage.clear();
     sessionStorage.clear();
-    window.location.href = 'index.html';
+    window.location.href = '/';
     return;
   }
 
@@ -910,20 +910,20 @@ function signOut(){
       localStorage.clear();
       sessionStorage.clear();
       // Redirect to landing/login page
-      window.location.href = 'index.html';
+      window.location.href = '/';
     }).catch((error) => {
       console.error('[RenterIQ] Sign out error:', error);
       showToast('Sign out failed', 'Please try again', '❌');
       // Fallback on error
       localStorage.clear();
       sessionStorage.clear();
-      window.location.href = 'index.html';
+      window.location.href = '/';
     });
   } catch (error) {
     console.error('[RenterIQ] Sign out exception:', error);
     localStorage.clear();
     sessionStorage.clear();
-    window.location.href = 'index.html';
+    window.location.href = '/';
   }
 }
 
@@ -1015,7 +1015,7 @@ function deleteAccount() {
       // Redirect to login page
       showToast('Account deleted', 'All data removed successfully', '✅');
       setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = '/';
       }, 1500);
     })
     .catch((error) => {

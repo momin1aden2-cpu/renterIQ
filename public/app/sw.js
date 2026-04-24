@@ -1,6 +1,6 @@
 // Service worker: network-first HTML, cache-first assets, network-only APIs.
 
-var CACHE_NAME = 'renteriq-shell-v145';
+var CACHE_NAME = 'renteriq-shell-v146';
 
 var APP_SHELL = [
   '/app/index.html',
@@ -120,7 +120,12 @@ self.addEventListener('fetch', function (event) {
         safeCachePut(event.request, response);
         return response;
       }).catch(function () {
-        return caches.match(event.request, matchOpts);
+        return caches.match(event.request, matchOpts).then(function (hit) {
+          // If nothing matches (e.g. a stale link to a page that was removed)
+          // fall back to the cached app shell rather than letting the browser
+          // surface a network error page.
+          return hit || caches.match('/app/index.html') || buildOfflineResponse();
+        });
       })
     );
     return;
@@ -138,10 +143,24 @@ self.addEventListener('fetch', function (event) {
       return fetch(event.request).then(function (response) {
         safeCachePut(event.request, response);
         return response;
+      }).catch(function () {
+        // Swallow the network error so it never bubbles as an uncaught
+        // rejection. The browser will treat this like a 504 gateway.
+        return new Response('', { status: 504, statusText: 'Offline' });
       });
     })
   );
 });
+
+// Minimal offline placeholder for navigations when nothing is cached.
+function buildOfflineResponse() {
+  var html = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>Offline — RenterIQ</title>' +
+    '<style>body{font-family:system-ui,sans-serif;background:#0A2460;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;padding:24px}a{color:#fff;text-decoration:underline}</style>' +
+    '<div><h1 style="font-weight:700;margin:0 0 8px">You\'re offline</h1>' +
+    '<p style="opacity:.75;margin:0 0 18px">Reconnect and try again, or <a href="/">return home</a>.</p></div>';
+  return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+}
 
 // ── Push notifications ──────────────────────────────────────────────────────
 // FCM sends a push message → SW wakes up → shows a native notification.
