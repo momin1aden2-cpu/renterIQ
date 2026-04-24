@@ -1007,10 +1007,19 @@ function startAnalysisCore(){
       totalClauses = data.clauses.length;
       renderClauses(data);
       renderSummary(data);
-
-      if (window.RIQPayments) RIQPayments.recordPurchase('lease_review');
-      finishAnimation();
       extractLeaseKeyTerms(data);
+
+      // Persist the result immediately so the renter never loses it if they
+      // close the tab, lose signal, or the page errors before they've had a
+      // chance to tap "Save to Vault" themselves. recordPurchase only runs
+      // after a successful local save, so a write failure doesn't consume
+      // the free first review.
+      var saved = false;
+      try { saveToVault({ silent: true }); saved = true; }
+      catch (e) { console.warn('Auto-save after analysis failed:', e); }
+
+      if (saved && window.RIQPayments) RIQPayments.recordPurchase('lease_review');
+      finishAnimation();
       if (window.RIQPayments && typeof RIQPayments.promptCloudSync === 'function') RIQPayments.promptCloudSync();
     })
     .catch(function(err){
@@ -1271,7 +1280,13 @@ function toggleOriginal(n){
 
 // Save to Vault — single source of truth. Carries property metadata,
 // the AI clauses/summary, extracted key terms, and the original file ref.
-function saveToVault(){
+// opts.silent: auto-save path triggered right after the analysis completes.
+// Suppresses the "Saved to cloud ✓" toast so the renter isn't confused
+// before they've had a chance to review the result themselves.
+function saveToVault(opts){
+  opts = opts || {};
+  var silent = opts.silent === true;
+
   // Updating an existing record (re-save after edits)? Preserve its id.
   var existingId = (window.__riqEditingLeaseId || '');
   var now = new Date();
@@ -1284,8 +1299,13 @@ function saveToVault(){
   var clauses = (leaseData && leaseData.clauses) ? leaseData.clauses : [];
   var flaggedCount = clauses.filter(function(c){ return c && c.rating !== 'standard'; }).length;
 
+  var recordId = existingId || ('lease_'+Date.now());
+  // Anchor this record id for the rest of the session so a later manual
+  // save after the user edits form fields updates the same record instead
+  // of creating a duplicate in the vault.
+  window.__riqEditingLeaseId = recordId;
   var record = {
-    id: existingId || ('lease_'+Date.now()),
+    id: recordId,
     type: 'lease_review',
     savedAt: now.toISOString(),
     fileName: (document.getElementById('fileName') && document.getElementById('fileName').textContent) || '',
@@ -1442,7 +1462,7 @@ function syncLeaseToCloud(record){
     function writeMetadata(rec){
       persistLocal(rec);
       RIQStore.write('leases', rec.id, rec).then(function(){
-        showToast('Saved to cloud ✓','Lease synced across your devices','☁️');
+        if (!silent) showToast('Saved to cloud ✓','Lease synced across your devices','☁️');
       }).catch(function(err){
         console.warn('Lease metadata sync failed:',err);
       });
