@@ -1,15 +1,30 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async headers() {
+    const securityHeaders = [
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'X-Frame-Options', value: 'DENY' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+      {
+        key: 'Permissions-Policy',
+        value: 'geolocation=(self), camera=(self), microphone=(), payment=(self), usb=(), interest-cohort=()'
+      }
+    ];
     return [
       {
-        // Ensure manifest.json is served with correct PWA MIME type
+        // Security headers applied to every response.
+        source: '/:path*',
+        headers: securityHeaders
+      },
+      {
+        // Ensure manifest.json is served with correct PWA MIME type.
         source: '/:path*manifest.json',
         headers: [
           { key: 'Content-Type', value: 'application/manifest+json' },
-          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
-        ],
-      },
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }
+        ]
+      }
     ];
   },
   async rewrites() {

@@ -68,6 +68,15 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Stripe entitlements — source of truth for paid feature access. Only
+    // the Stripe webhook (via Admin SDK, which bypasses rules) may write
+    // here. Owners can read their own entitlements so clients can show
+    // paid state; nobody else can read or modify.
+    match /stripe-entitlements/{userId}/items/{sessionId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

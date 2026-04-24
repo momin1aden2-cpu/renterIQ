@@ -65,6 +65,14 @@ export async function POST(req: Request) {
   const userRef = db.collection('users').doc(uid);
   const txRef = userRef.collection('transactions').doc(session.id);
   const payRef = userRef.collection('state').doc('payments');
+  // The authoritative entitlement record lives under a server-only path so
+  // Firestore rules can block client writes — a user cannot fabricate a paid
+  // purchase to bypass the server feature gate.
+  const entitlementRef = db
+    .collection('stripe-entitlements')
+    .doc(uid)
+    .collection('items')
+    .doc(session.id);
 
   let stage: 'tx_read' | 'batch_commit' = 'tx_read';
   try {
@@ -98,6 +106,19 @@ export async function POST(req: Request) {
       customerEmail: session.customer_details?.email || null,
       liveMode: event.livemode === true
     });
+    batch.set(entitlementRef, {
+      sessionId: session.id,
+      feature,
+      featureName: catalog.name,
+      priceCents: amountCents,
+      createdAt,
+      source: 'stripe',
+      liveMode: event.livemode === true
+    });
+    // Mirrored into the user's own state doc purely so the client can show
+    // the purchase in its UI without a subcollection query. The server
+    // feature gate ignores this copy — it only trusts the server-only
+    // stripe-entitlements path above.
     batch.set(
       payRef,
       {

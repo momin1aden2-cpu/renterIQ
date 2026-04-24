@@ -30,38 +30,54 @@ export async function requireFeature(uid: string, feature: FeatureKey): Promise<
     return { ok: true, reason: 'admin_not_configured' };
   }
 
-  let state: { leaseReviewCount?: number; purchases?: Array<{ feature?: string; createdAt?: number; source?: string }> } = {};
+  let leaseReviewCount = 0;
+  const db = getFirestore();
+
+  // Freebie counter lives under the user's own state doc. Users can write
+  // this, so an attacker could only get *one additional* free review per
+  // tampered reset — capped hard by the rate limiter on the AI route.
   try {
-    const db = getFirestore();
     const snap = await db.collection('users').doc(uid).collection('state').doc('payments').get();
-    if (snap.exists) state = snap.data() as typeof state;
+    if (snap.exists) {
+      const data = snap.data() as { leaseReviewCount?: number } | undefined;
+      leaseReviewCount = (data && data.leaseReviewCount) || 0;
+    }
   } catch (err) {
-    console.warn('[feature-gate] Firestore read failed, denying to be safe:', err);
+    console.warn('[feature-gate] freebie read failed:', err);
+  }
+
+  if (feature === 'lease_review' && leaseReviewCount === 0) {
+    return { ok: true, reason: 'first_free' };
+  }
+
+  // Paid access lives at stripe-entitlements/{uid}/items/{sessionId}. This
+  // path is server-only-write in firestore.rules so it cannot be forged
+  // from the browser. Each document is created by the Stripe webhook after
+  // a verified checkout.session.completed event.
+  try {
+    const entSnap = await db
+      .collection('stripe-entitlements')
+      .doc(uid)
+      .collection('items')
+      .get();
+    const now = Date.now();
+    const hasRecent = entSnap.docs.some((doc) => {
+      const d = doc.data() as { feature?: string; source?: string; createdAt?: number };
+      return (
+        d.feature === feature &&
+        d.source === 'stripe' &&
+        typeof d.createdAt === 'number' &&
+        now - d.createdAt <= PURCHASE_GRACE_MS
+      );
+    });
+    if (hasRecent) return { ok: true, reason: 'paid' };
+  } catch (err) {
+    console.warn('[feature-gate] entitlement read failed, denying to be safe:', err);
     return {
       ok: false,
       response: NextResponse.json({ error: 'Could not verify purchase', feature }, { status: 500 })
     };
   }
-
-  // Lease review — first use is free.
-  if (feature === 'lease_review' && (state.leaseReviewCount || 0) === 0) {
-    return { ok: true, reason: 'first_free' };
-  }
-
-  // Any feature — accept only Stripe-confirmed purchases within the grace
-  // window. Historical records written by the pre-Stripe client paywall have
-  // no source field and must not unlock paid routes.
-  const now = Date.now();
-  const purchases = Array.isArray(state.purchases) ? state.purchases : [];
-  const hasRecent = purchases.some(
-    (p) =>
-      p &&
-      p.feature === feature &&
-      p.source === 'stripe' &&
-      typeof p.createdAt === 'number' &&
-      now - p.createdAt <= PURCHASE_GRACE_MS
-  );
-  if (hasRecent) return { ok: true, reason: 'paid' };
 
   return {
     ok: false,
