@@ -87,24 +87,47 @@
 /* Itemised condition checklist */
 .item-row{background:#fff;border:1px solid var(--border-lt);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:all .2s var(--ease-smooth)}
 .item-row.has-issue{border-color:var(--amber);background:rgba(245,166,35,.04)}
+.item-row.confirmed-good{border-color:rgba(0,200,150,.45);background:rgba(0,200,150,.03)}
 .item-head{display:flex;align-items:center;gap:12px;padding:14px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px}
-.item-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .15s}
-.item-check.checked{background:var(--teal);border-color:var(--teal);color:#fff}
-.item-check.issue{background:var(--amber);border-color:var(--amber);color:#fff}
+.item-check{width:26px;height:26px;border-radius:50%;border:2px dashed var(--border);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .15s}
+.item-check.checked{background:var(--teal);border:2px solid var(--teal);color:#fff}
+.item-check.issue{background:var(--amber);border:2px solid var(--amber);color:#fff}
 .item-label{flex:1;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
 .item-status{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .item-status.ok{color:var(--teal)}
 .item-status.issue{color:var(--amber)}
+.item-status.pending{color:var(--muted)}
+.mark-good-btn{width:100%;background:linear-gradient(135deg,var(--teal),var(--teal-dk,#00a878));color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Sora',sans-serif;font-weight:800;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:10px;letter-spacing:.3px;box-shadow:0 3px 10px rgba(0,200,150,.22)}
+.mark-good-btn:active{transform:scale(.98)}
 .item-chev{font-size:18px;color:var(--muted);transition:transform .2s}
 .item-row.expanded .item-chev{transform:rotate(90deg)}
 .item-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border-lt);background:var(--blue-xl)}
 .item-row.expanded .item-body{display:block}
-.tri-row{display:flex;gap:8px;margin:14px 0 10px}
-.tri-btn{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
-.tri-btn .tri-icon{font-size:18px;line-height:1}
-.tri-btn.yes{background:rgba(0,200,150,.1);border-color:var(--teal);color:var(--teal-dk)}
-.tri-btn.no{background:rgba(232,64,64,.08);border-color:var(--red);color:var(--red)}
-.tri-btn.na{background:var(--glass-surface-1);border-color:var(--border);color:var(--muted)}
+.issue-panel{margin:14px 0 10px}
+.issue-heading{font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.issue-boxes{display:flex;gap:8px}
+.issue-box{flex:1;min-width:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 6px;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s}
+.issue-box:active{transform:scale(.97)}
+.issue-box.on{background:rgba(245,166,35,.08);border-color:var(--amber);color:var(--amber)}
+.issue-box .issue-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;background:#fff;transition:all .15s}
+.issue-box.on .issue-check{background:var(--amber);border-color:var(--amber);color:#fff}
+.issue-box .issue-icon{font-size:18px;line-height:1}
+.issue-box .issue-text{font-size:11px;text-align:center;line-height:1.25}
+.item-issue-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.item-issue-chip{background:rgba(245,166,35,.1);color:var(--amber);padding:2px 8px;border-radius:100px;font-family:'Sora',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.3px}
+.clear-issues-btn{width:100%;background:transparent;color:var(--muted);border:1px dashed var(--border);border-radius:10px;padding:9px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:8px;letter-spacing:.3px}
+.clear-issues-btn:active{opacity:.6}
+.add-item-btn{width:100%;background:var(--blue-xl);border:2px dashed var(--border);border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.add-item-btn:active{border-color:var(--blue);background:var(--blue-lt)}
+.add-item-btn .plus{font-size:16px;color:var(--blue);font-weight:800}
+.item-label-badge{display:inline-block;background:rgba(27,80,200,.08);color:var(--blue);font-family:'Sora',sans-serif;font-weight:700;font-size:9px;padding:2px 6px;border-radius:6px;margin-left:6px;letter-spacing:.3px;text-transform:uppercase;vertical-align:middle}
+.item-delete-btn{background:transparent;border:none;color:var(--muted);font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:6px;border-radius:6px;line-height:1}
+.item-delete-btn:active{background:rgba(232,64,64,.08);color:var(--red)}
+.modal-toggle-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--blue-xl);border-radius:12px;margin-bottom:16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.modal-toggle-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:transparent;transition:all .15s}
+.modal-toggle-box.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.modal-toggle-label{flex:1;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);line-height:1.35}
+.modal-toggle-sub{font-family:'Nunito',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:2px}
 .item-photo-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .item-photo{width:58px;height:58px;border-radius:8px;overflow:hidden;position:relative;background:var(--border-lt)}
 .item-photo img{width:100%;height:100%;object-fit:cover}
@@ -169,7 +192,7 @@
 
     <div style="padding:0 16px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:12px">Your Move-in Record</div>
-      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Walk through each room and mark what's clean, undamaged and working. Your own photos protect you at bond time.</div>
+      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Every item starts marked as good. Walk through each room and flag anything that's not. Photos and notes protect your bond at move-out.</div>
     </div>
 
     <div class="room-grid" id="roomGrid">
@@ -199,19 +222,19 @@
 
   <div style="flex:1;overflow-y:auto;background:var(--blue-xl)">
     <div style="padding:16px">
-      <button class="all-good-btn" id="allGoodBtn" onclick="markRoomAllGood()">✓ Mark all items Clean, Undamaged & Working</button>
+      <button class="all-good-btn" id="allGoodBtn" onclick="completeRoomFromHeader()">✓ Complete this room</button>
 
       <div id="itemsList"></div>
 
       <div class="legal-note">
-        Columns: <strong style="color:var(--teal-dk)">Clean</strong> · <strong style="color:var(--teal-dk)">Undamaged</strong> · <strong style="color:var(--teal-dk)">Working</strong>. Same format used by leasing agents. Tap any item to add photos or notes.
+        Tap any item to flag an issue, add photos, or leave a note. Items left unflagged will be reported as clean, undamaged and working.
       </div>
     </div>
   </div>
 
   <div class="room-footer">
     <button class="btn-blue-c" style="border-radius:12px;padding:12px 16px;font-size:13px" onclick="backToOverview()">← Back</button>
-    <button class="btn-blue-c flex-1" onclick="saveRoomData()">Save Room ✓</button>
+    <button class="btn-blue-c flex-1" onclick="completeRoomFromHeader()">✓ Complete Room</button>
   </div>
 </div>
 
@@ -349,6 +372,26 @@
   </div>
 </div>
 
+<!-- ADD ITEM MODAL -->
+<div class="modal-overlay" id="addItemModal">
+  <div class="modal-content">
+    <div class="modal-title" id="addItemModalTitle">Add Item</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Something on the checklist missing? Add it here.</div>
+    <input type="text" class="modal-input" id="newItemName" placeholder="e.g. Walk-in robe, Dishwasher, Wall heater" maxlength="40">
+    <div class="modal-toggle-row" id="newItemWorkingToggle" onclick="toggleNewItemWorking()">
+      <div class="modal-toggle-box" id="newItemWorkingBox"></div>
+      <div style="flex:1">
+        <div class="modal-toggle-label">Can this item stop working?</div>
+        <div class="modal-toggle-sub">Tick if it's an appliance, light, tap, fan, power point etc.</div>
+      </div>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-secondary" onclick="closeAddItem()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="confirmAddItem()">Add Item</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /app-shell -->
 
 <script>
@@ -394,6 +437,7 @@ function getItemsForRoom(room){
   var id=(room.id||'').toLowerCase();
   var name=(room.name||'').toLowerCase();
   var extras=[];
+  var base=null;
   if(id==='kitchen'||name.indexOf('kitchen')!==-1){
     extras=[
       {id:'sink',label:'Sink & Taps',working:true},
@@ -440,7 +484,7 @@ function getItemsForRoom(room){
       {id:'intercom',label:'Intercom / Doorbell',working:true}
     ];
   } else if(id==='garage'||id==='carport'){
-    return [
+    base=[
       {id:'walls',label:'Walls',working:false},
       {id:'ceiling',label:'Ceiling',working:false},
       {id:'floor',label:'Floor',working:false},
@@ -449,7 +493,7 @@ function getItemsForRoom(room){
       {id:'power',label:'Power Points',working:true}
     ];
   } else if(id==='garden'||id==='balcony'||id==='outdoor'||name.indexOf('garden')!==-1||name.indexOf('balcony')!==-1){
-    return [
+    base=[
       {id:'paving',label:'Paving / Decking',working:false},
       {id:'lawn',label:'Lawn / Plants',working:false},
       {id:'fencing',label:'Fencing / Railing',working:false},
@@ -458,10 +502,23 @@ function getItemsForRoom(room){
       {id:'general',label:'General Tidiness',working:false}
     ];
   }
-  return STANDARD_ITEMS.concat(extras);
+  if(!base)base=STANDARD_ITEMS.concat(extras);
+  // Special rooms (garage/outdoor) return early above — we don't reach here.
+  return base.concat(getCustomItemsForRoom(room));
+}
+
+function getCustomItemsForRoom(room){
+  if(!room||!roomData||!roomData[room.id])return [];
+  var list=roomData[room.id].customItems;
+  if(!Array.isArray(list))return [];
+  return list.map(function(it){
+    return { id: it.id, label: it.label, working: !!it.working, custom: true };
+  });
 }
 
 function defaultItemState(item){
+  // Items start unreviewed. The renter has to actively confirm each one is
+  // fine (or flag what's wrong) so nothing slips through unchecked.
   return {clean:null,undamaged:null,working:item.working?null:'na',comment:'',photos:[]};
 }
 
@@ -918,15 +975,35 @@ function createRoomCard(room){
   var rd=roomData[room.id];
   if(rd){
     if(rd.completed){
-      status=rd.condition==='issues'?'Issues noted':'✓ Completed';
-    }else if(rd.items){
-      var keys=Object.keys(rd.items);
-      var set=keys.filter(function(k){var it=rd.items[k];return it && it.clean!==null;}).length;
-      if(set)status=set+' item'+(set>1?'s':'')+' checked';
+      var issueCount=countRoomIssues(room.id);
+      if(issueCount>0){
+        status='⚠ '+issueCount+' issue'+(issueCount>1?'s':'')+' noted';
+      } else {
+        status='✓ All good';
+      }
+    } else if(rd.items){
+      var items=rd.items;
+      var itemsForRoom=getItemsForRoom(room);
+      var pendingCount=itemsForRoom.filter(function(it){
+        var s=items[it.id];
+        if(!s)return true;
+        var workingPending=it.working ? s.working===null : false;
+        return s.clean===null || s.undamaged===null || workingPending;
+      }).length;
+      if(pendingCount===itemsForRoom.length){
+        status='Not started';
+      } else if(pendingCount===0){
+        // Everything touched but room not marked complete — prompt the user.
+        status='Ready to complete';
+      } else {
+        status=pendingCount+' item'+(pendingCount>1?'s':'')+' to review';
+      }
     }
   }
   
-  card.innerHTML='<span class="room-emoji">'+room.emoji+'</span><div class="room-name">'+room.name+'</div><div class="room-status">'+status+'</div>';
+  card.innerHTML='<span class="room-emoji">'+escapeForHtml(room.emoji)+'</span>'+
+    '<div class="room-name">'+escapeForHtml(room.name)+'</div>'+
+    '<div class="room-status">'+escapeForHtml(status)+'</div>';
   return card;
 }
 
@@ -957,6 +1034,7 @@ function renderItems(){
 
   currentItems.forEach(function(item){
     var state=data[item.id]||defaultItemState(item);
+
     var row=document.createElement('div');
     row.className='item-row';
     row.id='itemRow-'+item.id;
@@ -966,27 +1044,61 @@ function renderItems(){
     if(state.undamaged===false)issues.push('Damaged');
     if(item.working && state.working===false)issues.push('Not working');
     var hasIssue=issues.length>0;
-    var allGood=state.clean===true && state.undamaged===true && (!item.working || state.working===true);
+
+    // "Reviewed good" = the renter actively confirmed every field is fine.
+    var confirmedGood=state.clean===true
+      && state.undamaged===true
+      && (!item.working || state.working===true);
+    var reviewed=hasIssue || confirmedGood;
 
     if(hasIssue)row.className+=' has-issue';
+    else if(confirmedGood)row.className+=' confirmed-good';
 
-    var statusLabel=hasIssue ? issues.join(' · ') : (allGood ? 'All good' : 'Tap to check');
-    var statusCls=hasIssue ? 'issue' : (allGood ? 'ok' : '');
-    var checkCls=hasIssue ? 'item-check issue' : (allGood ? 'item-check checked' : 'item-check');
-    var checkMark=hasIssue ? '!' : (allGood ? '✓' : '');
+    var checkCls='item-check';
+    var checkMark='';
+    if(hasIssue){ checkCls+=' issue'; checkMark='!'; }
+    else if(confirmedGood){ checkCls+=' checked'; checkMark='✓'; }
 
     var head=document.createElement('div');
     head.className='item-head';
     head.onclick=function(){ toggleItem(item.id) };
+
+    var statusHtml;
+    if(hasIssue){
+      var chips=issues.map(function(t){return '<span class="item-issue-chip">'+t+'</span>'}).join('');
+      statusHtml='<div class="item-issue-chips">'+chips+'</div>';
+    } else if(confirmedGood){
+      statusHtml='<div class="item-status ok">All good</div>';
+    } else {
+      statusHtml='<div class="item-status pending">Not reviewed yet</div>';
+    }
+
+    var labelHtml=escapeForHtml(item.label);
+    if(item.custom)labelHtml+='<span class="item-label-badge">Custom</span>';
+
     head.innerHTML='<div class="'+checkCls+'">'+checkMark+'</div>'+
-      '<div style="flex:1;min-width:0"><div class="item-label">'+item.label+'</div>'+
-      '<div class="item-status '+statusCls+'">'+statusLabel+'</div></div>'+
-      '<span class="item-chev">›</span>';
+      '<div style="flex:1;min-width:0"><div class="item-label">'+labelHtml+'</div>'+
+      statusHtml+'</div>';
+
+    if(item.custom){
+      var delBtn=document.createElement('button');
+      delBtn.className='item-delete-btn';
+      delBtn.title='Remove this custom item';
+      delBtn.innerHTML='🗑️';
+      delBtn.onclick=function(e){ e.stopPropagation(); removeCustomItem(item.id); };
+      head.appendChild(delBtn);
+    }
+
+    var chev=document.createElement('span');
+    chev.className='item-chev';
+    chev.textContent='›';
+    head.appendChild(chev);
+
     row.appendChild(head);
 
     var body=document.createElement('div');
     body.className='item-body';
-    body.appendChild(buildTriRow(item,state));
+    body.appendChild(buildIssuePanel(item,state));
     body.appendChild(buildPhotoStrip(item,state));
     var ta=document.createElement('textarea');
     ta.className='item-comment';
@@ -1001,39 +1113,103 @@ function renderItems(){
 
     list.appendChild(row);
   });
+
+  var addBtn=document.createElement('button');
+  addBtn.className='add-item-btn';
+  addBtn.innerHTML='<span class="plus">+</span><span>Add item to this room</span>';
+  addBtn.onclick=function(){ openAddItem(); };
+  list.appendChild(addBtn);
+
   updateAllGoodBtn();
 }
 
-function buildTriRow(item,state){
-  var row=document.createElement('div');
-  row.className='tri-row';
-  var specs=[
-    {key:'clean',label:'Clean',icon:'🧼'},
-    {key:'undamaged',label:'Undamaged',icon:'🛡️'}
-  ];
-  if(item.working)specs.push({key:'working',label:'Working',icon:'⚡'});
-  specs.forEach(function(spec){
-    var val=state[spec.key];
-    var btn=document.createElement('button');
-    var cls='tri-btn';
-    var mark='—';
-    if(val===true){cls+=' yes';mark='✓ Yes';}
-    else if(val===false){cls+=' no';mark='✗ No';}
-    btn.className=cls;
-    btn.innerHTML='<span class="tri-icon">'+spec.icon+'</span><span>'+spec.label+'</span><span style="margin-top:2px">'+mark+'</span>';
-    btn.onclick=function(e){ e.stopPropagation(); cycleTri(item.id,spec.key); };
-    row.appendChild(btn);
+function escapeForHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
   });
-  return row;
 }
 
-function cycleTri(itemId,key){
+function buildIssuePanel(item,state){
+  var wrap=document.createElement('div');
+  wrap.className='issue-panel';
+
+  var heading=document.createElement('div');
+  heading.className='issue-heading';
+  heading.textContent="Anything wrong here? Tap what applies.";
+  wrap.appendChild(heading);
+
+  var opts=[
+    {key:'clean',label:'Not clean',icon:'🧽'},
+    {key:'undamaged',label:'Damaged',icon:'⚠️'}
+  ];
+  if(item.working)opts.push({key:'working',label:'Not working',icon:'⚡'});
+
+  var boxes=document.createElement('div');
+  boxes.className='issue-boxes';
+  opts.forEach(function(opt){
+    var flagged=state[opt.key]===false;
+    var btn=document.createElement('button');
+    btn.className='issue-box'+(flagged?' on':'');
+    btn.innerHTML='<span class="issue-check">'+(flagged?'✓':'')+'</span>'+
+      '<span class="issue-icon">'+opt.icon+'</span>'+
+      '<span class="issue-text">'+opt.label+'</span>';
+    btn.onclick=function(e){ e.stopPropagation(); toggleIssue(item.id,opt.key); };
+    boxes.appendChild(btn);
+  });
+  wrap.appendChild(boxes);
+
+  var anyFlagged=opts.some(function(o){return state[o.key]===false});
+  var confirmedGood=state.clean===true
+    && state.undamaged===true
+    && (!item.working || state.working===true);
+
+  // Either a big green "Looks fine" confirmation (when unreviewed or currently
+  // flagged) or a reset button (when already marked good, so the user can
+  // change their mind).
+  if(!confirmedGood){
+    var confirm=document.createElement('button');
+    confirm.className='mark-good-btn';
+    confirm.textContent=anyFlagged
+      ? '↺ Actually, this one is fine'
+      : '✓ Looks fine — mark as good';
+    confirm.onclick=function(e){ e.stopPropagation(); clearItemIssues(item.id); };
+    wrap.appendChild(confirm);
+  } else {
+    var reset=document.createElement('button');
+    reset.className='clear-issues-btn';
+    reset.textContent='↺ Reset — not yet reviewed';
+    reset.onclick=function(e){ e.stopPropagation(); resetItemReview(item.id); };
+    wrap.appendChild(reset);
+  }
+
+  return wrap;
+}
+
+function toggleIssue(itemId,key){
   var state=roomData[currentRoom.id].items[itemId];
-  var cur=state[key];
-  // null/na → true → false → true (two real states, start positive)
-  if(cur===null||cur==='na')state[key]=true;
-  else if(cur===true)state[key]=false;
-  else state[key]=true;
+  // Flagging sets the field to false. Unflagging clears back to null so the
+  // item is considered "not reviewed" until the user confirms it's fine.
+  state[key]=state[key]===false ? null : false;
+  persistRoomData();
+  renderItems();
+}
+
+function clearItemIssues(itemId){
+  var item=currentItems.find(function(it){return it.id===itemId});
+  var state=roomData[currentRoom.id].items[itemId];
+  state.clean=true;
+  state.undamaged=true;
+  state.working=(item && item.working) ? true : 'na';
+  persistRoomData();
+  renderItems();
+}
+
+function resetItemReview(itemId){
+  var item=currentItems.find(function(it){return it.id===itemId});
+  var state=roomData[currentRoom.id].items[itemId];
+  state.clean=null;
+  state.undamaged=null;
+  state.working=(item && item.working) ? null : 'na';
   persistRoomData();
   renderItems();
 }
@@ -1236,24 +1412,42 @@ function markRoomAllGood(){
   });
   persistRoomData();
   renderItems();
-  showToast(currentRoom.name+' marked good','You can still flag individual items','✓');
+  showToast(currentRoom.name+' reset','All issues cleared','✓');
+}
+
+// Header-level complete button. If there are pending photo uploads we wait
+// for them first; otherwise the room is saved straight away.
+function completeRoomFromHeader(){
+  if(!guardPendingUploads(completeRoomFromHeader))return;
+  saveRoomData();
 }
 
 function updateAllGoodBtn(){
   var btn=document.getElementById('allGoodBtn');
   if(!btn)return;
-  var items=roomData[currentRoom.id].items;
-  var allMarked=currentItems.every(function(it){
-    var s=items[it.id];
-    return s && s.clean===true && s.undamaged===true && (!it.working || s.working===true);
-  });
-  if(allMarked){
-    btn.classList.add('done');
-    btn.textContent='✓ All items marked good — tap any to edit';
+  var count=countRoomIssues(currentRoom.id);
+  var pending=countUnreviewedItems(currentRoom.id);
+  if(pending>0){
+    btn.classList.remove('done');
+    btn.textContent=pending+' item'+(pending>1?'s':'')+' still to review';
+  } else if(count>0){
+    btn.classList.remove('done');
+    btn.textContent='✓ Complete this room ('+count+' issue'+(count>1?'s':'')+' noted)';
   } else {
     btn.classList.remove('done');
-    btn.textContent='✓ Mark all items Clean, Undamaged & Working';
+    btn.textContent='✓ Complete this room — all items reviewed';
   }
+}
+
+function countUnreviewedItems(roomId){
+  var data=roomData[roomId];
+  if(!data||!data.items)return currentItems ? currentItems.length : 0;
+  return currentItems.filter(function(item){
+    var s=data.items[item.id];
+    if(!s)return true;
+    var workingPending=item.working ? s.working===null : false;
+    return s.clean===null || s.undamaged===null || workingPending;
+  }).length;
 }
 
 function persistRoomData(){
@@ -1261,48 +1455,54 @@ function persistRoomData(){
 }
 
 function isRoomComplete(roomId){
+  return !!(roomData[roomId] && roomData[roomId].completed);
+}
+
+function countRoomIssues(roomId){
   var data=roomData[roomId];
-  if(!data||!data.items)return false;
-  var keys=Object.keys(data.items);
-  if(!keys.length)return false;
-  return keys.every(function(k){
-    var it=data.items[k];
-    return it && it.clean!==null && it.undamaged!==null && (it.working!==null);
+  if(!data||!data.items)return 0;
+  var n=0;
+  Object.keys(data.items).forEach(function(k){
+    var s=data.items[k];
+    if(!s)return;
+    if(s.clean===false || s.undamaged===false || s.working===false)n++;
   });
+  return n;
 }
 
 function saveRoomData(){
   if(!currentRoom)return;
 
   var items=roomData[currentRoom.id].items||{};
-  var missing=currentItems.filter(function(it){
-    var s=items[it.id];
-    return !s||s.clean===null||s.undamaged===null||s.working===null;
-  });
-  if(missing.length){
-    showToast('Check '+missing.length+' item'+(missing.length>1?'s':''),'Tap "Mark all good" or set each one','⚠️');
+
+  var pending=countUnreviewedItems(currentRoom.id);
+  if(pending>0){
+    showToast(
+      pending+' item'+(pending>1?'s':'')+' still to review',
+      'Mark each as good or flag what\'s wrong',
+      '⚠️'
+    );
     return;
   }
 
-  // Derive an overall condition band from the item ticks
-  var allGood=currentItems.every(function(it){
-    var s=items[it.id];
-    return s.clean===true && s.undamaged===true && (!it.working || s.working===true);
-  });
   var anyIssue=currentItems.some(function(it){
     var s=items[it.id];
-    return s.clean===false || s.undamaged===false || (it.working && s.working===false);
+    return s && (s.clean===false || s.undamaged===false || (it.working && s.working===false));
   });
 
   roomData[currentRoom.id].completed=true;
-  roomData[currentRoom.id].condition=allGood?'good':(anyIssue?'issues':'fair');
+  roomData[currentRoom.id].condition=anyIssue?'issues':'good';
   roomData[currentRoom.id].savedAt=new Date().toISOString();
 
   persistRoomData();
   buildRoomGrid();
   updateGenerateButton();
 
-  showToast(currentRoom.name+' saved','Condition recorded · '+currentItems.length+' items','✓');
+  var issueCount=countRoomIssues(currentRoom.id);
+  var subtitle=issueCount
+    ? issueCount+' issue'+(issueCount>1?'s':'')+' noted'
+    : 'Everything marked good';
+  showToast(currentRoom.name+' saved',subtitle,'✓');
   backToOverview();
 
   // If all rooms are now complete and an extracted agency report exists
@@ -2173,20 +2373,98 @@ function addCustomRoom(){
     showToast('Room name required','Please enter a room name','⚠️');
     return;
   }
-  
+
   var room={
     id:name.toLowerCase().replace(/\s+/g,'-'),
     name:name,
     emoji:selectedEmoji
   };
-  
+
   customRooms.push(room);
   roomData._customRooms=customRooms;
   localStorage.setItem('renteriq_entry_audit',JSON.stringify(roomData));
-  
+
   buildRoomGrid();
   closeAddRoom();
   showToast('Room added',name+' added to your audit','➕');
+}
+
+// ── Custom items per room ────────────────────────────────────────────────
+var _newItemWorking=false;
+
+function openAddItem(){
+  if(!currentRoom)return;
+  _newItemWorking=false;
+  var input=document.getElementById('newItemName');
+  var box=document.getElementById('newItemWorkingBox');
+  var title=document.getElementById('addItemModalTitle');
+  if(title)title.textContent='Add item to '+currentRoom.name;
+  if(input){ input.value=''; }
+  if(box){ box.classList.remove('on'); box.textContent=''; }
+  document.getElementById('addItemModal').style.display='flex';
+  if(input)setTimeout(function(){ input.focus(); },100);
+}
+
+function closeAddItem(){
+  document.getElementById('addItemModal').style.display='none';
+}
+
+function toggleNewItemWorking(){
+  _newItemWorking=!_newItemWorking;
+  var box=document.getElementById('newItemWorkingBox');
+  if(!box)return;
+  if(_newItemWorking){ box.classList.add('on'); box.textContent='✓'; }
+  else{ box.classList.remove('on'); box.textContent=''; }
+}
+
+function confirmAddItem(){
+  if(!currentRoom)return;
+  var label=(document.getElementById('newItemName').value||'').trim();
+  if(!label){
+    showToast('Item name required','Tell us what to add to the list','⚠️');
+    return;
+  }
+
+  if(!roomData[currentRoom.id])roomData[currentRoom.id]={};
+  if(!roomData[currentRoom.id].customItems)roomData[currentRoom.id].customItems=[];
+  if(!roomData[currentRoom.id].items)roomData[currentRoom.id].items={};
+
+  var list=roomData[currentRoom.id].customItems;
+  var dupe=list.some(function(it){ return (it.label||'').toLowerCase()===label.toLowerCase(); });
+  if(dupe){
+    showToast('Already on the list','That item already exists here','ℹ️');
+    return;
+  }
+
+  var newItem={
+    id:'custom_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    label:label,
+    working:!!_newItemWorking
+  };
+  list.push(newItem);
+
+  // Seed its state so the renderer has something to show
+  roomData[currentRoom.id].items[newItem.id]=defaultItemState(newItem);
+
+  // Refresh cached item list for the currently-open room.
+  currentItems=getItemsForRoom(currentRoom);
+
+  persistRoomData();
+  renderItems();
+  closeAddItem();
+  showToast('Added '+label,'Scroll down to flag it if there\'s an issue','➕');
+}
+
+function removeCustomItem(itemId){
+  if(!currentRoom)return;
+  var rd=roomData[currentRoom.id];
+  if(!rd||!Array.isArray(rd.customItems))return;
+  rd.customItems=rd.customItems.filter(function(it){ return it.id!==itemId; });
+  if(rd.items)delete rd.items[itemId];
+  currentItems=getItemsForRoom(currentRoom);
+  persistRoomData();
+  renderItems();
+  showToast('Item removed','Removed from this room','🗑️');
 }
 
 function backToOverview(){
