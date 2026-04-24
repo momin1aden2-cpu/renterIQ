@@ -2130,6 +2130,25 @@ function riqOpenLocalLease(id){
   });
 }
 
+// Prefer the local copy; fall back to the cloud download URL if the device
+// doesn't have a local blob (e.g. the lease was uploaded on another phone).
+function riqOpenLease(id, fileUrl){
+  if (window.RIQLocalFiles) {
+    RIQLocalFiles.openInNewTab(id).then(function(rec){
+      if (rec) return;
+      if (fileUrl) { window.open(fileUrl, '_blank'); return; }
+      showToast('File not found','Re-upload via the Lease Reviewer','⚠️');
+    }).catch(function(){
+      if (fileUrl) { window.open(fileUrl, '_blank'); return; }
+      showToast('Could not open file','Re-upload via the Lease Reviewer','⚠️');
+    });
+  } else if (fileUrl) {
+    window.open(fileUrl, '_blank');
+  } else {
+    showToast('File unavailable','Local storage helper is still loading','⚠️');
+  }
+}
+
 // Toggle a clause's "discussed" flag on a saved lease record + re-render
 function riqToggleClauseDiscussed(leaseId, clauseIdx, discussed){
   try {
@@ -2321,12 +2340,14 @@ function renderLeaseDetail(l){
     html += '<div style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px"><span style="font-size:18px;flex-shrink:0">✓</span><div><div style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;color:var(--teal-dk);margin-bottom:3px">This lease looks standard</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--teal-dk);line-height:1.55">All '+totalClauses+' clauses match typical Australian residential tenancy practice. No flags raised.</div></div></div>';
   }
 
-  // Original file — prefer cloud URL, fall back to locally stored blob
-  if (l.fileUrl) {
+  // Original file — prefer the on-device copy (always available, always
+  // faster, immune to stale Firebase Storage download tokens). Fall back
+  // to the cloud URL only when there's no local copy — typically on a
+  // second device that didn't upload the file originally.
+  if (l.hasLocalFile) {
+    html += '<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="riqOpenLease(\''+vaultEsc(l.id)+'\',\''+vaultEsc(l.fileUrl||'')+'\')"><span>📄</span> Open original lease</button>';
+  } else if (l.fileUrl) {
     html += '<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="window.open(\''+vaultEsc(l.fileUrl)+'\',\'_blank\')"><span>📄</span> Open original lease</button>';
-  } else if (l.hasLocalFile) {
-    html += '<button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="riqOpenLocalLease(\''+vaultEsc(l.id)+'\')"><span>📄</span> Open original lease</button>';
-    html += '<div style="display:flex;align-items:center;gap:6px;padding:8px 14px;margin-bottom:14px;font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);line-height:1.5"><span>📱</span><span>Stored on this device only — not synced to the cloud.</span></div>';
   } else if (!clauses.length) {
     html += '<div style="background:rgba(27,80,200,.05);border:1px solid var(--blue-lt);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">💡 Re-upload your lease in the Lease Reviewer to restore the original file and the full clause-by-clause breakdown.</div>';
   }
