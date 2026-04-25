@@ -138,7 +138,8 @@ a{text-decoration:none;color:inherit}
     <h2>Privacy by design — identity documents</h2>
     <p><strong>RenterIQ has no capability to store identity documents.</strong> The product does not include an upload path for driver licences, passports, Medicare cards, payslips, bank statements, or other "100-point" identification material. We do not collect them, encrypt them, or pass them through our servers.</p>
     <p>When an agency or landlord asks for these documents at application time, you attach them directly from your own device storage (iCloud, OneDrive, Google Drive, Files app, photos) to their portal, email, or in person. RenterIQ is never in the submission chain for identity material.</p>
-    <p>This is a structural commitment, not a policy promise — it's enforced by the absence of any feature that accepts those files. The decision was informed by the Office of the Australian Information Commissioner's 2024 determination on rental application platforms, which found over-collection of personal information by other operators in this market.</p>
+    <p>This is a structural commitment, not a policy promise — it's enforced by the absence of any feature that accepts those files. The decision was informed by the Office of the Australian Information Commissioner's determination on a rental application platform, which found over-collection of personal information by another operator in this market.</p>
+    <p>For the plain-English explanation of how this works in practice, see <a href="/privacy-by-design.html">Privacy by design</a>.</p>
   </div>
 
   <div class="doc-card">
@@ -212,8 +213,11 @@ a{text-decoration:none;color:inherit}
   </div>
 
   <div class="doc-card">
-    <h2>7. Data Retention</h2>
-    <p>Vault items and tenancy records you save in RenterIQ are kept for as long as your account is active. Support correspondence is retained for up to 12 months unless you request earlier deletion. When you delete your account, personal data is removed from our active systems within 30 days; backups are purged within 90 days.</p>
+    <h2>7. Data Retention &amp; Inactive Account Deletion</h2>
+    <p>Vault items and tenancy records you save in RenterIQ are kept for as long as your account is active. We track a <em>last active</em> timestamp on each account — refreshed every time you sign in or sync data — solely so we can identify and remove accounts that are no longer being used.</p>
+    <p><strong>Inactive accounts.</strong> Accounts that have not been signed in to for 18 consecutive months will be deleted under our retention policy. We will email the account holder at least once before the deletion proceeds. When deletion runs, the user document, all subcollections (leases, audits, reports, communications, reminders, etc.) and associated files in cloud storage are removed.</p>
+    <p><strong>Right to delete on demand.</strong> You can wipe every record on your account at any time from <em>Profile → Data &amp; Privacy → Delete All Data</em>. The wipe runs immediately against the user's Firestore documents and clears the local browser cache. Your authenticated account itself stays so you can sign back in and start fresh; use <em>Delete Account</em> instead if you want to remove the account as well.</p>
+    <p>Support correspondence is retained for up to 12 months unless you request earlier deletion. When you delete your account, personal data is removed from our active systems within 30 days; backups are purged within 90 days.</p>
   </div>
 
   <div class="doc-card">

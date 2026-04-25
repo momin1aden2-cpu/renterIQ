@@ -625,6 +625,15 @@
   </div>
 </div>
 
+<!-- RETENTION -->
+<div style="background:linear-gradient(135deg,rgba(27,80,200,.04),rgba(0,200,150,.04));border:1px solid rgba(27,80,200,.15);border-radius:16px;padding:16px 18px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start">
+  <span style="font-size:20px;flex-shrink:0;margin-top:1px">⏳</span>
+  <div>
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--text)">Retention</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.6">Accounts that haven't been signed in to for 18 months are scheduled for automatic deletion — your data, your account. You can wipe everything sooner from this screen at any time.</div>
+  </div>
+</div>
+
 <!-- DATA STORED -->
 <div class="sec-label">Data Stored in Your Vault</div>
 <div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border-lt)">
@@ -1029,7 +1038,23 @@ function deleteAccount() {
 }
 
 function confirmDataDelete(){
-  showToast('Data deletion','Contact support@renteriq.com.au to request full data deletion','❌');
+  var confirmed = confirm('Delete all your RenterIQ data?\n\nThis wipes every saved lease, audit, photo, report and resume from your account and this device. Your account itself stays — you can sign back in with the same email and start fresh.\n\nThis cannot be undone.');
+  if (!confirmed) return;
+  if (!window.RIQStore || typeof RIQStore.wipeAllData !== 'function') {
+    showToast('Not ready', 'Storage helper still loading — try again in a moment', '⚠️');
+    return;
+  }
+  showToast('Deleting your data…', 'This may take a few seconds', '🗑️');
+  RIQStore.wipeAllData().then(function(summary) {
+    var subtitle = summary && summary.docsDeleted
+      ? summary.docsDeleted + ' record' + (summary.docsDeleted !== 1 ? 's' : '') + ' removed'
+      : 'Local data cleared';
+    showToast('Your data has been deleted', subtitle, '✓');
+    setTimeout(function(){ window.location.href = '/app/index.html'; }, 1400);
+  }).catch(function(err) {
+    console.error('[RenterIQ] wipeAllData failed:', err);
+    showToast('Couldn\'t finish', 'Some data may remain — please try again or contact support', '⚠️');
+  });
 }
 
 /* --- STATE SELECTOR --- */

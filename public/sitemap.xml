@@ -26,6 +26,12 @@
   </url>
 
   <url>
+    <loc>https://renteriq.com.au/privacy-by-design.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
     <loc>https://renteriq.com.au/terms.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>

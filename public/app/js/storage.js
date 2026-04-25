@@ -44,6 +44,7 @@
           currentUid = user ? user.uid : null;
           firestoreReady = true;
           readyResolve();
+          if (currentUid) bumpLastActive();
         });
       } catch (e) {
         console.warn('[RIQStore] auth listener failed:', e);
@@ -59,6 +60,31 @@
     setTimeout(function() { waitForFirebase(retries + 1); }, 200);
   }
   waitForFirebase();
+
+  // Stamp lastActiveAt on the user doc, at most once per 24 hours. Drives the
+  // retention policy — accounts that haven't been touched for 18 months are
+  // candidates for automatic deletion (per the privacy policy).
+  function bumpLastActive() {
+    var localKey = 'riq_last_active_bump';
+    var DAY = 24 * 60 * 60 * 1000;
+    try {
+      var lastBump = parseInt(localStorage.getItem(localKey) || '0', 10);
+      if (Date.now() - lastBump < DAY) return;
+    } catch (e) {}
+    var doc = userDoc();
+    if (!doc) return;
+    try {
+      doc.set({ lastActiveAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+        .then(function() {
+          try { localStorage.setItem(localKey, String(Date.now())); } catch (e) {}
+        })
+        .catch(function(err) {
+          console.warn('[RIQStore] lastActiveAt bump failed:', err);
+        });
+    } catch (e) {
+      console.warn('[RIQStore] lastActiveAt setup failed:', e);
+    }
+  }
 
   // ── Internal helpers ──────────────────────────────────────────
   function safeJSON(key, fallback) {
@@ -388,6 +414,76 @@
     isMigrated: function(localKey) {
       try { return !!localStorage.getItem('riqmigrated:' + localKey); }
       catch (e) { return false; }
+    },
+
+    /**
+     * Wipe every record under the signed-in user's account — supports the
+     * "delete my data" right disclosed in the privacy policy. Account
+     * itself is NOT removed; the renter can sign back in and start fresh.
+     *
+     * Iterates the known user-scoped Firestore collections, deletes each
+     * document, then clears every localStorage key the app uses. Returns
+     * a summary of what was removed.
+     */
+    wipeAllData: function() {
+      var collections = [
+        'tracked-properties', 'leases', 'entry-audits', 'exit-audits',
+        'agency-reports', 'maintenance-items', 'routine-inspections',
+        'communications', 'reminders', 'fcm-tokens', 'state'
+      ];
+
+      var doc = userDoc();
+      if (!doc) {
+        // Not signed in — just clear local state.
+        try { localStorage.clear(); } catch (e) {}
+        return Promise.resolve({ docsDeleted: 0, collectionsCleared: 0, localOnly: true });
+      }
+
+      var docsDeleted = 0;
+      var collectionsCleared = 0;
+
+      var deletes = collections.map(function(coll) {
+        return doc.collection(coll).get().then(function(snap) {
+          if (snap.empty) return null;
+          collectionsCleared++;
+          var batch = firebase.firestore().batch();
+          snap.forEach(function(d) {
+            batch.delete(d.ref);
+            docsDeleted++;
+          });
+          return batch.commit().catch(function(err) {
+            console.warn('[RIQStore] wipe failed for ' + coll + ':', err);
+          });
+        }).catch(function(err) {
+          console.warn('[RIQStore] wipe list failed for ' + coll + ':', err);
+        });
+      });
+
+      // Clear the user-doc fields too (without removing the doc — auth
+      // mapping stays intact). Only fields not handled by the collection
+      // wipe live here; merge with empty values.
+      deletes.push(doc.set({
+        resume: firebase.firestore.FieldValue.delete(),
+        coverLetter: firebase.firestore.FieldValue.delete()
+      }, { merge: true }).catch(function(err) {
+        console.warn('[RIQStore] wipe user doc fields failed:', err);
+      }));
+
+      return Promise.all(deletes).then(function() {
+        // Clear every RenterIQ localStorage key. Preserves any keys other
+        // domains may have set; we only target our own prefixes + known
+        // direct keys.
+        try {
+          var toRemove = [];
+          for (var i = 0; i < localStorage.length; i++) {
+            var k = localStorage.key(i);
+            if (!k) continue;
+            if (k.indexOf('riq') === 0 || k.indexOf('renteriq') === 0) toRemove.push(k);
+          }
+          toRemove.forEach(function(k) { localStorage.removeItem(k); });
+        } catch (e) {}
+        return { docsDeleted: docsDeleted, collectionsCleared: collectionsCleared, localOnly: false };
+      });
     }
   };
 
