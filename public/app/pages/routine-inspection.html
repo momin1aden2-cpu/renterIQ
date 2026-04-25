@@ -29,6 +29,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
 <title>Routine Inspection Response — RenterIQ</title>
 <script src="/app/js/pwa-init.js" defer></script>
+<script src="/app/js/ai-disclaimer.js" defer></script>
 <style>
 /* Page-specific header icon button */
 .sh-right{font-size:20px;color:rgba(255,255,255,.8);cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center}
@@ -373,6 +374,7 @@
 
     <!-- Action -->
     <div style="padding:0 16px">
+      <div data-ai-disclaimer style="margin-bottom:12px"></div>
       <button class="btn-blue-c btn-full" id="analyzeBtn" onclick="startAnalysis()">
         ✦ Analyse Report
       </button>
@@ -700,7 +702,8 @@ function renumberItems() {
 
 // ── Inspection Analysis ──
 function startAnalysis() {
-  startAnalysisCore();
+  var disclaim=(window.RIQDisclaimer&&window.RIQDisclaimer.gate)?window.RIQDisclaimer.gate():Promise.resolve(true);
+  disclaim.then(function(ok){ if(!ok) return; startAnalysisCore(); });
 }
 function startAnalysisCore() {
   var btn = document.getElementById('analyzeBtn');

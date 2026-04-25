@@ -1113,6 +1113,7 @@
 .ob-btn-skip:active { color: var(--blue); }
 </style>
 <script src="/app/js/pwa-init.js" defer></script>
+<script src="/app/js/ai-disclaimer.js" defer></script>
 </head>
 <body>
 
@@ -2197,6 +2198,10 @@ async function homeTrackProperty() {
   if (existing.some(function(p){ return (p.url||p.originalLink) === url; })) {
     homeTrackMsg('This property is already saved', true); return;
   }
+  if (window.RIQDisclaimer && window.RIQDisclaimer.gate) {
+    var acked = await window.RIQDisclaimer.gate();
+    if (!acked) { homeTrackMsg('', false); return; }
+  }
   var src = homeDetectSource(url);
   if (btn) { btn.textContent = 'Saving…'; btn.style.opacity = '.65'; btn.disabled = true; }
   homeTrackMsg('Fetching property details…', false);
@@ -2319,6 +2324,16 @@ function homeUploadBookingConfirmation(id) {
 }
 
 function homeProcessBookingConfirmation(file, propId) {
+  var disclaim = (window.RIQDisclaimer && window.RIQDisclaimer.gate)
+    ? window.RIQDisclaimer.gate()
+    : Promise.resolve(true);
+  disclaim.then(function(ok){
+    if (!ok) return;
+    runHomeProcessBookingConfirmation(file, propId);
+  });
+}
+
+function runHomeProcessBookingConfirmation(file, propId) {
   showToast('Reading confirmation…', 'Extracting inspection date and time', '📎');
   var reader = new FileReader();
   reader.onload = function(ev) {

@@ -26,6 +26,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
 <title>Report an Issue — RenterIQ</title>
 <script src="/app/js/pwa-init.js" defer></script>
+<script src="/app/js/ai-disclaimer.js" defer></script>
 <style>
 /* Page-local form primitives (matched to inspection.html conventions) */
 .input-f{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:11px;padding:11px 13px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);outline:none;box-sizing:border-box;-webkit-appearance:none;appearance:none}
@@ -174,6 +175,7 @@
   </div>
 
   <div class="ri-action-bar" id="riActionBarA">
+    <div data-ai-disclaimer style="margin-bottom:10px"></div>
     <button class="ri-primary-btn is-disabled" id="riNextBtn" onclick="goDraft()" disabled>
       <span>✦</span><span>Draft my email</span><span class="chev">→</span>
     </button>
@@ -559,12 +561,16 @@ function updateNextBtn(){
 }
 
 function goDraft(){
-  issue.description=document.getElementById('riDescription').value.trim();
-  issue.address=document.getElementById('riAddress').value.trim();
-  issue.agentName=document.getElementById('riAgentName').value.trim();
-  issue.agentEmail=document.getElementById('riAgentEmail').value.trim();
-  switchView('B');
-  runDraft();
+  var disclaim=(window.RIQDisclaimer&&window.RIQDisclaimer.gate)?window.RIQDisclaimer.gate():Promise.resolve(true);
+  disclaim.then(function(ok){
+    if(!ok) return;
+    issue.description=document.getElementById('riDescription').value.trim();
+    issue.address=document.getElementById('riAddress').value.trim();
+    issue.agentName=document.getElementById('riAgentName').value.trim();
+    issue.agentEmail=document.getElementById('riAgentEmail').value.trim();
+    switchView('B');
+    runDraft();
+  });
 }
 
 function runDraft(){

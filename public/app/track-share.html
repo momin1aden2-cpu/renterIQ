@@ -18,6 +18,7 @@
 <script src="/app/js/firebase-init.js" defer></script>
 <script src="/app/js/storage.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
+<script src="/app/js/ai-disclaimer.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -198,6 +199,10 @@ async function fetchAndPreview(url) {
   if (!src) {
     showError('Unsupported source', 'RenterIQ tracks listings from realestate.com.au, Domain, REIWA and Rent.com.au.');
     return;
+  }
+  if (window.RIQDisclaimer && window.RIQDisclaimer.gate) {
+    var acked = await window.RIQDisclaimer.gate();
+    if (!acked) { showError('Cancelled', 'Tracking stopped — open the listing again when you\'re ready.'); return; }
   }
   document.getElementById('loadingTitle').textContent = 'Reading ' + src.name + '…';
 

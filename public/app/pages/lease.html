@@ -23,6 +23,7 @@
 <script src="/app/js/local-files.js" defer></script>
 <script src="/app/js/payments.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
+<script src="/app/js/ai-disclaimer.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -219,7 +220,8 @@
 
     <!-- Analyse Button -->
     <div style="padding:0 16px 24px">
-      <button class="btn-blue-c btn-full" id="analyseBtn" style="border-radius:14px;opacity:.5;pointer-events:none" onclick="var b=this;b.style.opacity='.7';b.style.pointerEvents='none';b.textContent='Processing…';startAnalysis()">Analyse My Lease →</button>
+      <div data-ai-disclaimer style="margin-bottom:12px"></div>
+      <button class="btn-blue-c btn-full" id="analyseBtn" style="border-radius:14px;opacity:.5;pointer-events:none" onclick="handleAnalyseClick(this)">Analyse My Lease →</button>
     </div>
   </div>
 
@@ -758,6 +760,19 @@ function collectLeaseDetails(){
 var leaseData=null;
 var totalClauses=12;
 var understood={};
+
+function handleAnalyseClick(btn){
+  var disclaim = (window.RIQDisclaimer && window.RIQDisclaimer.gate)
+    ? window.RIQDisclaimer.gate()
+    : Promise.resolve(true);
+  disclaim.then(function(ok){
+    if (!ok) return;
+    btn.style.opacity='.7';
+    btn.style.pointerEvents='none';
+    btn.textContent='Processing…';
+    startAnalysis();
+  });
+}
 
 function startAnalysis(){
   ensureStateBeforeAnalysis().then(function(ok){
