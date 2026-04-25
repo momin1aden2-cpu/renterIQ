@@ -173,7 +173,7 @@
   <header class="sh">
     <div class="sh-row">
       <button class="sh-back" onclick="navigate('/app/index.html')"><span class="sh-back-arrow">‹</span><span class="sh-label">RenterIQ</span></button>
-      <span style="font-size:20px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="showToast('Entry Condition Report','Document the property at move-in with timestamped photos','📸')">?</span>
+      <span style="font-size:20px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center" onclick="openStateFormSheet()">?</span>
     </div>
     <div class="sh-title">Entry Condition Report</div>
     <div class="sh-sub">Document the property at move-in</div>
@@ -188,18 +188,11 @@
     <button class="pb-change" onclick="showPropertyPicker()">Change</button>
   </div>
 
-  <div id="stateFormRef" style="display:none;margin:0 16px 12px;background:rgba(27,80,200,.04);border:1px solid rgba(27,80,200,.15);border-radius:12px;padding:11px 14px;gap:10px;align-items:flex-start"></div>
-
-  <div id="howThisWorksCard" style="display:none;margin:0 16px 14px;background:#fff;border:1px solid var(--border-lt);border-radius:14px;overflow:hidden">
-    <button id="howThisWorksToggle" type="button" style="width:100%;background:transparent;border:none;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:left">
-      <span style="font-size:20px;flex-shrink:0">💡</span>
-      <span style="flex:1;font-family:'Sora',sans-serif;font-weight:800;font-size:13.5px;color:var(--text);letter-spacing:-.1px">How this works alongside your agent's form</span>
-      <span id="howThisWorksChev" style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--muted);transition:transform .2s">⌄</span>
-    </button>
-    <div id="howThisWorksBody" style="display:none;padding:0 16px 16px">
-      <div id="howThisWorksCopy" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.7"></div>
-    </div>
-  </div>
+  <button id="stateFormPill" type="button" style="display:none;width:calc(100% - 32px);margin:0 16px 10px;background:rgba(27,80,200,.06);border:1px solid rgba(27,80,200,.18);border-radius:10px;padding:9px 12px;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:left;font-family:inherit" onclick="openStateFormSheet()">
+    <span style="font-size:14px;flex-shrink:0">📋</span>
+    <span id="stateFormPillText" style="flex:1;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;color:var(--text);letter-spacing:-.05px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Equivalent to your state's condition report</span>
+    <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--blue);flex-shrink:0">How this works ›</span>
+  </button>
 
   <div id="entryBody" style="flex:1;overflow-y:auto;padding-bottom:180px;display:none">
     <div style="padding:0 16px 8px">
@@ -416,6 +409,39 @@
     </div>
   </div>
 </div>
+
+<!-- STATE FORM REFERENCE + HOW THIS WORKS — fullscreen modal. Designed to
+     fit all 4 steps on a typical phone viewport (~670px tall) without
+     scrolling. Centered with max-width on desktop. Triggered from the pill
+     above the room grid or the ? icon in the header. -->
+<div id="stateFormSheet" style="display:none;position:fixed;inset:0;z-index:10010;background:rgba(10,36,96,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;opacity:0;transition:opacity .22s ease;padding:0" onclick="if(event.target===this)closeStateFormSheet()">
+  <div id="stateFormSheetCard" style="background:#fff;width:100%;max-width:560px;height:100vh;max-height:100vh;display:flex;flex-direction:column;transform:translateY(20px);transition:transform .28s cubic-bezier(.34,1.56,.64,1);overflow:hidden;box-sizing:border-box">
+    <div style="padding:max(14px,env(safe-area-inset-top,14px)) 18px 12px;flex-shrink:0;border-bottom:1px solid var(--border-lt);background:#fff">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px;line-height:1;flex-shrink:0">📋</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--text);letter-spacing:-.2px;line-height:1.25">How this works alongside your agent's form</div>
+          <div id="stateFormSheetSubtitle" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        </div>
+        <button onclick="closeStateFormSheet()" aria-label="Close" style="background:rgba(15,23,42,.06);color:var(--muted);border:none;width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;line-height:1;font-weight:700">✕</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch">
+      <div id="stateFormSheetRefBlock" style="background:rgba(27,80,200,.05);border:1px solid rgba(27,80,200,.15);border-radius:10px;padding:10px 12px;margin-bottom:14px;display:none"></div>
+      <div id="stateFormSheetSteps"></div>
+    </div>
+  </div>
+</div>
+<style>
+@media(min-width:600px){
+  #stateFormSheetCard{height:auto;max-height:88vh;border-radius:18px;box-shadow:0 24px 72px rgba(10,36,96,.45)}
+}
+.riq-step-row{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border-lt)}
+.riq-step-row:last-child{border-bottom:none}
+.riq-step-num{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#2E63E0);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.riq-step-head{font-family:'Sora',sans-serif;font-weight:700;font-size:12.5px;color:var(--text);letter-spacing:-.05px;line-height:1.4}
+.riq-step-body{font-family:'Nunito',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.55}
+</style>
 
 </div><!-- /app-shell -->
 
@@ -1041,63 +1067,97 @@ function getStateConditionReportRef(){
   return { state: state, ref: refs[state] || null };
 }
 
+// Compact one-line pill on the audit overview. Real estate matters here —
+// the room grid is the working area, the educational content lives in a
+// bottom sheet behind a single tap.
 function renderStateFormRef(){
-  var box = document.getElementById('stateFormRef');
-  if(!box) return;
+  var pill = document.getElementById('stateFormPill');
+  var pillText = document.getElementById('stateFormPillText');
+  if(!pill) return;
   var info = getStateConditionReportRef();
-  var ref = info.ref;
-  if(!ref){ box.style.display = 'none'; return; }
-  box.innerHTML = '<span style="font-size:18px;flex-shrink:0;margin-top:1px">📋</span>' +
-    '<div>' +
-      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12.5px;color:var(--text);letter-spacing:-.1px">Equivalent to the ' + ref.formName + ' (' + ref.authority + ')</div>' +
-      '<a href="' + ref.href + '" target="_blank" rel="noopener" style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11.5px;color:var(--blue);display:inline-block;margin-top:4px;text-decoration:none">' + ref.linkText + '</a>' +
-    '</div>';
-  box.style.display = 'flex';
-  renderHowThisWorks(info);
+  var ref = info && info.ref;
+  if(!ref){ pill.style.display = 'none'; return; }
+  if(pillText) pillText.textContent = 'Equivalent to ' + ref.formName;
+  pill.style.display = 'flex';
 }
 
-// Renders the collapsible "How this works alongside your agent's form" copy.
-// State-aware deadline + form name; identical agent/landlord wording for all
-// states because the legal duty is the same regardless.
-function renderHowThisWorks(info){
-  var card = document.getElementById('howThisWorksCard');
-  var copy = document.getElementById('howThisWorksCopy');
-  var toggle = document.getElementById('howThisWorksToggle');
-  var body = document.getElementById('howThisWorksBody');
-  var chev = document.getElementById('howThisWorksChev');
-  if(!card || !copy) return;
+// Populates and shows the full-screen bottom sheet. Always renders fresh
+// content from getStateConditionReportRef() so the copy reflects the
+// renter's latest profile state.
+function openStateFormSheet(){
+  var sheet = document.getElementById('stateFormSheet');
+  var refBlock = document.getElementById('stateFormSheetRefBlock');
+  var stepsBlock = document.getElementById('stateFormSheetSteps');
+  var subtitle = document.getElementById('stateFormSheetSubtitle');
+  if(!sheet) return;
+
+  var info = getStateConditionReportRef();
   var ref = info && info.ref;
-  if(!ref){ card.style.display = 'none'; return; }
 
-  var step3Deadline = ref.deadline
-    ? ('return it within ' + ref.deadline)
-    : 'return it as soon as practical after move-in';
-  copy.innerHTML =
-    '<div style="margin-bottom:10px"><strong style="color:var(--text)">1. Your agent or landlord gives you the official ' + ref.formName + '.</strong> They\'re legally required to complete and sign it before you move in.</div>' +
-    '<div style="margin-bottom:10px"><strong style="color:var(--text)">2. Walk through every room in this RenterIQ audit — the room grid below.</strong> Mark each item, snap photos, add notes. You build a far more detailed record than the agent\'s tickbox form, all timestamped on this device.</div>' +
-    '<div style="margin-bottom:10px"><strong style="color:var(--text)">3. Transfer any disagreements to the agent\'s ' + ref.formName + ' and ' + step3Deadline + '.</strong> Sign their copy with your additions. That\'s the version they keep on file.</div>' +
-    '<div><strong style="color:var(--text)">4. Keep both copies for exit.</strong> Your RenterIQ record and the signed official form are what you reach for at bond return time if anything is disputed.</div>';
+  if(ref){
+    if(refBlock){
+      refBlock.innerHTML =
+        '<div style="display:flex;align-items:flex-start;gap:10px">' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:10px;color:var(--blue);letter-spacing:1.3px;text-transform:uppercase">Your state\'s form</div>' +
+            '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--text);letter-spacing:-.05px;line-height:1.35;margin-top:3px">' + ref.formName + '</div>' +
+            '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.45">' + ref.authority + '</div>' +
+          '</div>' +
+          '<a href="' + ref.href + '" target="_blank" rel="noopener" style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:var(--blue);text-decoration:none;flex-shrink:0;white-space:nowrap;padding-top:2px">View →</a>' +
+        '</div>';
+      refBlock.style.display = 'block';
+    }
+    if(subtitle) subtitle.textContent = 'Pulled from your state in your profile · ' + (info.state || '');
 
-  card.style.display = 'block';
-
-  if(toggle && !toggle.dataset.bound){
-    toggle.dataset.bound = '1';
-    toggle.addEventListener('click', function(){
-      var open = body.style.display === 'block';
-      body.style.display = open ? 'none' : 'block';
-      if(chev) chev.style.transform = open ? '' : 'rotate(180deg)';
-      // On expand, align the card's top with the top of the visible area
-      // so the renter reads steps 1 → 4 naturally. Aligning the bottom
-      // (the previous attempt) pushed steps 1 and 2 above the fold on
-      // shorter screens.
-      if(!open){
-        setTimeout(function(){
-          try { card.scrollIntoView({ behavior:'smooth', block:'start' }); }
-          catch(e){ card.scrollIntoView(true); }
-        }, 60);
-      }
-    });
+    var step3Deadline = ref.deadline
+      ? ('return it within ' + ref.deadline)
+      : 'return it as soon as practical after move-in';
+    if(stepsBlock){
+      stepsBlock.innerHTML =
+        buildSheetStep(1, 'Your agent or landlord gives you the official ' + ref.formName + '.', 'They\'re legally required to complete and sign it before you move in.') +
+        buildSheetStep(2, 'Walk through every room in this RenterIQ audit.', 'Mark each item, snap photos, add notes. You build a far more detailed record than the agent\'s tickbox form, all timestamped on this device.') +
+        buildSheetStep(3, 'Transfer disagreements to the agent\'s ' + ref.formName + ' and ' + step3Deadline + '.', 'Sign their copy with your additions. That\'s the version they keep on file.') +
+        buildSheetStep(4, 'Keep both copies for exit.', 'Your RenterIQ record and the signed official form are what you reach for at bond return time if anything is disputed.');
+    }
+  } else {
+    if(refBlock){ refBlock.style.display = 'none'; }
+    if(subtitle) subtitle.textContent = 'Set your state in Profile to see the local form reference.';
+    if(stepsBlock){
+      stepsBlock.innerHTML =
+        buildSheetStep(1, 'Your agent or landlord gives you the official condition report.', 'Most Australian states legally require this before move-in.') +
+        buildSheetStep(2, 'Walk through every room in this RenterIQ audit.', 'Photos, timestamps and notes — far more detail than the agent\'s tickbox form.') +
+        buildSheetStep(3, 'Transfer disagreements to the agent\'s form and return it within your state\'s deadline.', 'Typically 5–7 days. Sign their copy with your additions.') +
+        buildSheetStep(4, 'Keep both copies for exit.', 'They\'re your evidence at bond return time.');
+    }
   }
+
+  sheet.style.display = 'flex';
+  requestAnimationFrame(function(){
+    sheet.style.opacity = '1';
+    var card = document.getElementById('stateFormSheetCard');
+    if(card) card.style.transform = 'translateY(0)';
+  });
+}
+
+function closeStateFormSheet(){
+  var sheet = document.getElementById('stateFormSheet');
+  if(!sheet) return;
+  sheet.style.opacity = '0';
+  var card = document.getElementById('stateFormSheetCard');
+  if(card) card.style.transform = 'translateY(20px)';
+  setTimeout(function(){ sheet.style.display = 'none'; }, 240);
+}
+
+function buildSheetStep(num, headline, body){
+  var safeHead = String(headline).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var safeBody = String(body).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return '<div class="riq-step-row">' +
+    '<div class="riq-step-num">' + num + '</div>' +
+    '<div style="flex:1;min-width:0">' +
+      '<div class="riq-step-head">' + safeHead + '</div>' +
+      '<div class="riq-step-body">' + safeBody + '</div>' +
+    '</div>' +
+  '</div>';
 }
 
 // Fallback property info loading
