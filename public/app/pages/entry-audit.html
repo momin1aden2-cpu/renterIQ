@@ -22,6 +22,7 @@
 <script src="/app/js/storage.js" defer></script>
 <script src="/app/js/payments.js" defer></script>
 <script src="/app/js/auth-guard.js" defer></script>
+<script src="/app/js/ai-disclaimer.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -91,15 +92,19 @@
 .item-row{background:#fff;border:1px solid var(--border-lt);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:all .2s var(--ease-smooth)}
 .item-row.has-issue{border-color:var(--amber);background:rgba(245,166,35,.04)}
 .item-row.confirmed-good{border-color:rgba(0,200,150,.45);background:rgba(0,200,150,.03)}
+.item-row.not-applicable{border-color:var(--border-lt);background:rgba(15,23,42,.025)}
+.item-row.not-applicable .item-label{color:var(--muted)}
 .item-head{display:flex;align-items:center;gap:12px;padding:14px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px}
 .item-check{width:26px;height:26px;border-radius:50%;border:2px dashed var(--border);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .15s}
 .item-check.checked{background:var(--teal);border:2px solid var(--teal);color:#fff}
 .item-check.issue{background:var(--amber);border:2px solid var(--amber);color:#fff}
+.item-check.na{background:#fff;border:2px solid var(--border);color:var(--muted);font-weight:700}
 .item-label{flex:1;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
 .item-status{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .item-status.ok{color:var(--teal)}
 .item-status.issue{color:var(--amber)}
 .item-status.pending{color:var(--muted)}
+.item-status.na{color:var(--muted);opacity:.85}
 .mark-good-btn{width:100%;background:linear-gradient(135deg,var(--teal),var(--teal-dk,#00a878));color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Sora',sans-serif;font-weight:800;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:10px;letter-spacing:.3px;box-shadow:0 3px 10px rgba(0,200,150,.22)}
 .mark-good-btn:active{transform:scale(.98)}
 .item-chev{font-size:18px;color:var(--muted);transition:transform .2s}
@@ -120,6 +125,10 @@
 .item-issue-chip{background:rgba(245,166,35,.1);color:var(--amber);padding:2px 8px;border-radius:100px;font-family:'Sora',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.3px}
 .clear-issues-btn{width:100%;background:transparent;color:var(--muted);border:1px dashed var(--border);border-radius:10px;padding:9px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:8px;letter-spacing:.3px}
 .clear-issues-btn:active{opacity:.6}
+.not-applicable-btn{width:100%;background:transparent;color:var(--muted);border:none;padding:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:11.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:6px;letter-spacing:.3px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border)}
+.not-applicable-btn:active{opacity:.6}
+.na-panel{margin:10px 0 4px}
+.na-msg{font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.55;background:#fff;border:1px solid var(--border-lt);border-radius:10px;padding:10px 12px;margin-bottom:8px}
 .add-item-btn{width:100%;background:var(--blue-xl);border:2px dashed var(--border);border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
 .add-item-btn:active{border-color:var(--blue);background:var(--blue-lt)}
 .add-item-btn .plus{font-size:16px;color:var(--blue);font-weight:800}
@@ -195,7 +204,7 @@
 
     <div style="padding:0 16px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:12px">Your Move-in Record</div>
-      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Every item starts marked as good. Walk through each room and flag anything that's not. Photos and notes protect your bond at move-out.</div>
+      <div style="font-weight:600;font-size:13px;color:var(--muted);margin-bottom:16px">Walk through each room. Mark each item as fine, flag what isn't, or skip what isn't here. Photos and notes protect your bond at move-out.</div>
     </div>
 
     <div class="room-grid" id="roomGrid">
@@ -521,8 +530,28 @@ function getCustomItemsForRoom(room){
 
 function defaultItemState(item){
   // Items start unreviewed. The renter has to actively confirm each one is
-  // fine (or flag what's wrong) so nothing slips through unchecked.
-  return {clean:null,undamaged:null,working:item.working?null:'na',comment:'',photos:[]};
+  // fine, flag what's wrong, or mark it not in this room.
+  return {clean:null,undamaged:null,working:item.working?null:'na',comment:'',photos:[],notApplicable:false};
+}
+
+// An item is reviewed when the renter has actively done one of three things:
+// flagged at least one issue, confirmed every aspect is fine, or marked it
+// as not in this room. Untouched fields don't count as review on their own.
+function isItemFlagged(state){
+  if(!state) return false;
+  return state.clean===false || state.undamaged===false || state.working===false;
+}
+function isItemConfirmedGood(item,state){
+  if(!state) return false;
+  return state.clean===true
+    && state.undamaged===true
+    && (!item.working || state.working===true);
+}
+function isItemReviewed(item,state){
+  if(!state) return false;
+  if(state.notApplicable===true) return true;
+  if(isItemFlagged(state)) return true;
+  return isItemConfirmedGood(item,state);
 }
 
 // Initialize
@@ -988,15 +1017,12 @@ function createRoomCard(room){
       var items=rd.items;
       var itemsForRoom=getItemsForRoom(room);
       var pendingCount=itemsForRoom.filter(function(it){
-        var s=items[it.id];
-        if(!s)return true;
-        var workingPending=it.working ? s.working===null : false;
-        return s.clean===null || s.undamaged===null || workingPending;
+        return !isItemReviewed(it, items[it.id]);
       }).length;
       if(pendingCount===itemsForRoom.length){
         status='Not started';
       } else if(pendingCount===0){
-        // Everything touched but room not marked complete — prompt the user.
+        // Everything reviewed but room not marked complete — prompt the user.
         status='Ready to complete';
       } else {
         status=pendingCount+' item'+(pendingCount>1?'s':'')+' to review';
@@ -1042,24 +1068,24 @@ function renderItems(){
     row.className='item-row';
     row.id='itemRow-'+item.id;
 
+    var notApplicable=state.notApplicable===true;
     var issues=[];
-    if(state.clean===false)issues.push('Not clean');
-    if(state.undamaged===false)issues.push('Damaged');
-    if(item.working && state.working===false)issues.push('Not working');
+    if(!notApplicable){
+      if(state.clean===false)issues.push('Not clean');
+      if(state.undamaged===false)issues.push('Damaged');
+      if(item.working && state.working===false)issues.push('Not working');
+    }
     var hasIssue=issues.length>0;
+    var confirmedGood=!notApplicable && isItemConfirmedGood(item,state);
 
-    // "Reviewed good" = the renter actively confirmed every field is fine.
-    var confirmedGood=state.clean===true
-      && state.undamaged===true
-      && (!item.working || state.working===true);
-    var reviewed=hasIssue || confirmedGood;
-
-    if(hasIssue)row.className+=' has-issue';
+    if(notApplicable)row.className+=' not-applicable';
+    else if(hasIssue)row.className+=' has-issue';
     else if(confirmedGood)row.className+=' confirmed-good';
 
     var checkCls='item-check';
     var checkMark='';
-    if(hasIssue){ checkCls+=' issue'; checkMark='!'; }
+    if(notApplicable){ checkCls+=' na'; checkMark='—'; }
+    else if(hasIssue){ checkCls+=' issue'; checkMark='!'; }
     else if(confirmedGood){ checkCls+=' checked'; checkMark='✓'; }
 
     var head=document.createElement('div');
@@ -1067,7 +1093,9 @@ function renderItems(){
     head.onclick=function(){ toggleItem(item.id) };
 
     var statusHtml;
-    if(hasIssue){
+    if(notApplicable){
+      statusHtml='<div class="item-status na">Not in this room</div>';
+    } else if(hasIssue){
       var chips=issues.map(function(t){return '<span class="item-issue-chip">'+t+'</span>'}).join('');
       statusHtml='<div class="item-issue-chips">'+chips+'</div>';
     } else if(confirmedGood){
@@ -1101,17 +1129,21 @@ function renderItems(){
 
     var body=document.createElement('div');
     body.className='item-body';
-    body.appendChild(buildIssuePanel(item,state));
-    body.appendChild(buildPhotoStrip(item,state));
-    var ta=document.createElement('textarea');
-    ta.className='item-comment';
-    ta.placeholder='Note anything specific — scuff on west wall, small stain near window…';
-    ta.value=state.comment||'';
-    ta.oninput=function(){
-      roomData[currentRoom.id].items[item.id].comment=ta.value;
-      persistRoomData();
-    };
-    body.appendChild(ta);
+    if(notApplicable){
+      body.appendChild(buildNotApplicablePanel(item));
+    } else {
+      body.appendChild(buildIssuePanel(item,state));
+      body.appendChild(buildPhotoStrip(item,state));
+      var ta=document.createElement('textarea');
+      ta.className='item-comment';
+      ta.placeholder='Note anything specific — scuff on west wall, small stain near window…';
+      ta.value=state.comment||'';
+      ta.oninput=function(){
+        roomData[currentRoom.id].items[item.id].comment=ta.value;
+        persistRoomData();
+      };
+      body.appendChild(ta);
+    }
     row.appendChild(body);
 
     list.appendChild(row);
@@ -1162,36 +1194,63 @@ function buildIssuePanel(item,state){
   wrap.appendChild(boxes);
 
   var anyFlagged=opts.some(function(o){return state[o.key]===false});
-  var confirmedGood=state.clean===true
-    && state.undamaged===true
-    && (!item.working || state.working===true);
+  var confirmedGood=isItemConfirmedGood(item,state);
 
-  // Either a big green "Looks fine" confirmation (when unreviewed or currently
-  // flagged) or a reset button (when already marked good, so the user can
-  // change their mind).
-  if(!confirmedGood){
-    var confirm=document.createElement('button');
-    confirm.className='mark-good-btn';
-    confirm.textContent=anyFlagged
-      ? '↺ Actually, this one is fine'
-      : '✓ Looks fine — mark as good';
-    confirm.onclick=function(e){ e.stopPropagation(); clearItemIssues(item.id); };
-    wrap.appendChild(confirm);
-  } else {
+  // Three button states. Flagging an issue is itself a review — we don't
+  // require the renter to also mark "actually fine", that would erase their
+  // work. So once flagged, the only follow-up is a discreet reset link.
+  if(anyFlagged){
+    var resetIssue=document.createElement('button');
+    resetIssue.className='clear-issues-btn';
+    resetIssue.textContent='↺ Clear flags — start over';
+    resetIssue.onclick=function(e){ e.stopPropagation(); resetItemReview(item.id); };
+    wrap.appendChild(resetIssue);
+  } else if(confirmedGood){
     var reset=document.createElement('button');
     reset.className='clear-issues-btn';
     reset.textContent='↺ Reset — not yet reviewed';
     reset.onclick=function(e){ e.stopPropagation(); resetItemReview(item.id); };
     wrap.appendChild(reset);
+  } else {
+    var confirmBtn=document.createElement('button');
+    confirmBtn.className='mark-good-btn';
+    confirmBtn.textContent='✓ Looks fine — mark as good';
+    confirmBtn.onclick=function(e){ e.stopPropagation(); clearItemIssues(item.id); };
+    wrap.appendChild(confirmBtn);
+
+    var naBtn=document.createElement('button');
+    naBtn.className='not-applicable-btn';
+    naBtn.textContent='Not in this room';
+    naBtn.onclick=function(e){ e.stopPropagation(); markNotApplicable(item.id); };
+    wrap.appendChild(naBtn);
   }
+
+  return wrap;
+}
+
+function buildNotApplicablePanel(item){
+  var wrap=document.createElement('div');
+  wrap.className='na-panel';
+
+  var msg=document.createElement('div');
+  msg.className='na-msg';
+  msg.textContent='Marked not in this room. Photos and notes are paused for this item.';
+  wrap.appendChild(msg);
+
+  var revert=document.createElement('button');
+  revert.className='clear-issues-btn';
+  revert.textContent='↺ Actually, it is in this room';
+  revert.onclick=function(e){ e.stopPropagation(); clearNotApplicable(item.id); };
+  wrap.appendChild(revert);
 
   return wrap;
 }
 
 function toggleIssue(itemId,key){
   var state=roomData[currentRoom.id].items[itemId];
-  // Flagging sets the field to false. Unflagging clears back to null so the
-  // item is considered "not reviewed" until the user confirms it's fine.
+  // Tapping an issue toggles it. Once any issue is flagged the item counts
+  // as reviewed — untouched fields stay null and aren't treated as issues.
+  state.notApplicable=false;
   state[key]=state[key]===false ? null : false;
   persistRoomData();
   renderItems();
@@ -1200,6 +1259,7 @@ function toggleIssue(itemId,key){
 function clearItemIssues(itemId){
   var item=currentItems.find(function(it){return it.id===itemId});
   var state=roomData[currentRoom.id].items[itemId];
+  state.notApplicable=false;
   state.clean=true;
   state.undamaged=true;
   state.working=(item && item.working) ? true : 'na';
@@ -1210,6 +1270,31 @@ function clearItemIssues(itemId){
 function resetItemReview(itemId){
   var item=currentItems.find(function(it){return it.id===itemId});
   var state=roomData[currentRoom.id].items[itemId];
+  state.notApplicable=false;
+  state.clean=null;
+  state.undamaged=null;
+  state.working=(item && item.working) ? null : 'na';
+  persistRoomData();
+  renderItems();
+}
+
+function markNotApplicable(itemId){
+  var item=currentItems.find(function(it){return it.id===itemId});
+  var state=roomData[currentRoom.id].items[itemId];
+  state.notApplicable=true;
+  state.clean=null;
+  state.undamaged=null;
+  state.working=(item && item.working) ? null : 'na';
+  // Preserve photos and comments — if the user reverts, their work is intact.
+  // Reports and comparisons filter N/A items out anyway, so nothing leaks.
+  persistRoomData();
+  renderItems();
+}
+
+function clearNotApplicable(itemId){
+  var item=currentItems.find(function(it){return it.id===itemId});
+  var state=roomData[currentRoom.id].items[itemId];
+  state.notApplicable=false;
   state.clean=null;
   state.undamaged=null;
   state.working=(item && item.working) ? null : 'na';
@@ -1446,10 +1531,7 @@ function countUnreviewedItems(roomId){
   var data=roomData[roomId];
   if(!data||!data.items)return currentItems ? currentItems.length : 0;
   return currentItems.filter(function(item){
-    var s=data.items[item.id];
-    if(!s)return true;
-    var workingPending=item.working ? s.working===null : false;
-    return s.clean===null || s.undamaged===null || workingPending;
+    return !isItemReviewed(item, data.items[item.id]);
   }).length;
 }
 
@@ -1728,31 +1810,38 @@ function generateEntryReportCore(){
     reportData.completedRooms++;
 
     var itemDefs=getItemsForRoom(room);
-    var items=itemDefs.map(function(def){
-      var s=(rd.items&&rd.items[def.id])||{};
-      var photos=(s.photos||[]).map(function(p){
-        if(p&&(p.data||p.url))reportData.totalPhotos++;
+    var items=itemDefs
+      .filter(function(def){
+        var s=(rd.items&&rd.items[def.id])||{};
+        // Items the renter marked as not in this room don't belong in the
+        // formal report — exclude them from PDFs, exports and cloud copies.
+        return s.notApplicable!==true;
+      })
+      .map(function(def){
+        var s=(rd.items&&rd.items[def.id])||{};
+        var photos=(s.photos||[]).map(function(p){
+          if(p&&(p.data||p.url))reportData.totalPhotos++;
+          return {
+            photoId:p.photoId||'',
+            dataUrl:p.data||'',
+            url:p.url||'',
+            path:p.path||'',
+            time:p.time||'',
+            timestamp:p.timestamp||'',
+            roomId:room.id,
+            itemId:def.id
+          };
+        });
         return {
-          photoId:p.photoId||'',
-          dataUrl:p.data||'',
-          url:p.url||'',
-          path:p.path||'',
-          time:p.time||'',
-          timestamp:p.timestamp||'',
-          roomId:room.id,
-          itemId:def.id
+          id:def.id,
+          label:def.label,
+          clean:s.clean===true?true:(s.clean===false?false:null),
+          undamaged:s.undamaged===true?true:(s.undamaged===false?false:null),
+          working:def.working?(s.working===true?true:(s.working===false?false:null)):'na',
+          comment:s.comment||'',
+          photos:photos
         };
       });
-      return {
-        id:def.id,
-        label:def.label,
-        clean:s.clean===true?true:(s.clean===false?false:null),
-        undamaged:s.undamaged===true?true:(s.undamaged===false?false:null),
-        working:def.working?(s.working===true?true:(s.working===false?false:null)):'na',
-        comment:s.comment||'',
-        photos:photos
-      };
-    });
 
     reportData.rooms.push({
       id:room.id,
@@ -1958,6 +2047,14 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 function extractAgencyReport(dataUrl, mimeType, fileName, type){
+  var disclaim=(window.RIQDisclaimer&&window.RIQDisclaimer.gate)?window.RIQDisclaimer.gate():Promise.resolve(true);
+  disclaim.then(function(ok){
+    if(!ok) return;
+    runExtractAgencyReport(dataUrl, mimeType, fileName, type);
+  });
+}
+
+function runExtractAgencyReport(dataUrl, mimeType, fileName, type){
   var card=document.getElementById('agencyEntryCard');
   var sub=document.getElementById('agencyEntrySub');
   if(sub) sub.textContent='Extracting rooms and items from '+fileName+'…';
@@ -2019,6 +2116,7 @@ function runEntryComparison(agentExtracted){
         var items = [];
         Object.keys(r.items).forEach(function(itemId){
           var it = r.items[itemId];
+          if(it && it.notApplicable===true) return;
           items.push({ label: it.label || itemId, clean: it.clean, undamaged: it.undamaged, working: it.working, comment: it.comment || '' });
         });
         renterRooms.push({ name: r.name || roomId, emoji: r.emoji || '🏠', items: items });
