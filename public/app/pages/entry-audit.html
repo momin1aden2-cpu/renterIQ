@@ -188,6 +188,19 @@
     <button class="pb-change" onclick="showPropertyPicker()">Change</button>
   </div>
 
+  <div id="stateFormRef" style="display:none;margin:0 16px 12px;background:rgba(27,80,200,.04);border:1px solid rgba(27,80,200,.15);border-radius:12px;padding:11px 14px;gap:10px;align-items:flex-start"></div>
+
+  <div id="howThisWorksCard" style="display:none;margin:0 16px 14px;background:#fff;border:1px solid var(--border-lt);border-radius:14px;overflow:hidden">
+    <button id="howThisWorksToggle" type="button" style="width:100%;background:transparent;border:none;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:left">
+      <span style="font-size:20px;flex-shrink:0">💡</span>
+      <span style="flex:1;font-family:'Sora',sans-serif;font-weight:800;font-size:13.5px;color:var(--text);letter-spacing:-.1px">How this works alongside your agent's form</span>
+      <span id="howThisWorksChev" style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:var(--muted);transition:transform .2s">⌄</span>
+    </button>
+    <div id="howThisWorksBody" style="display:none;padding:0 16px 16px">
+      <div id="howThisWorksCopy" style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.7"></div>
+    </div>
+  </div>
+
   <div id="entryBody" style="flex:1;overflow-y:auto;padding-bottom:180px;display:none">
     <div style="padding:0 16px 8px">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase;margin-bottom:10px">Agent's Copy</div>
@@ -943,6 +956,147 @@ function loadPropertySetup(){
       buildRoomGrid();
       loadRoomData();
     }
+  }
+  renderStateFormRef();
+}
+
+// State-specific reference data shared between the form-ref card and the
+// "How this works" expander. The agent or landlord is always who hands the
+// form over (legally identical across states) — only the form name, return
+// deadline and statute differ. Used by renderStateFormRef and the
+// how-this-works copy below.
+function getStateConditionReportRef(){
+  var state = '';
+  try {
+    state = (localStorage.getItem('renteriq_user_state')
+      || localStorage.getItem('riq-user-state')
+      || '').toUpperCase();
+  } catch(e){}
+  var refs = {
+    NSW: {
+      formName: 'Residential Tenancy Condition Report (Schedule 2)',
+      authority: 'NSW Fair Trading',
+      href: 'https://www.nsw.gov.au/housing-and-construction/rental-forms-surveys-and-data/resources/residential-tenancy-condition-report',
+      linkText: 'View the NSW template →',
+      deadline: '7 days',
+      act: 'Residential Tenancies Act 2010 (NSW)'
+    },
+    QLD: {
+      formName: 'Form 1a (Entry Condition Report)',
+      authority: 'RTA Queensland',
+      href: 'https://www.rta.qld.gov.au/forms-resources/forms/forms-for-general-tenancies/entry-condition-report-general-tenancies-form-1a',
+      linkText: 'View Form 1a on RTA →',
+      deadline: '7 days',
+      act: 'Residential Tenancies and Rooming Accommodation Act 2008 (QLD)'
+    },
+    VIC: {
+      formName: 'Condition Report',
+      authority: 'Consumer Affairs Victoria',
+      href: 'https://www.consumer.vic.gov.au/housing/renting/rent-bond-bills-and-condition-reports/condition-reports',
+      linkText: 'View the official template →',
+      deadline: '5 business days',
+      act: 'Residential Tenancies Act 1997 (VIC)'
+    },
+    SA: {
+      formName: 'Inspection Sheet',
+      authority: 'Consumer and Business Services',
+      href: 'https://www.cbs.sa.gov.au/documents/tenancy/forms/Inspection_sheet.pdf',
+      linkText: 'Download the Inspection Sheet →',
+      deadline: '5 days',
+      act: 'Residential Tenancies Act 1995 (SA)'
+    },
+    WA: {
+      formName: 'Property Condition Report (Form 1)',
+      authority: 'WA Consumer Protection',
+      href: 'https://www.consumerprotection.wa.gov.au/publications/property-condition-report-form-1',
+      linkText: 'View Form 1 on Consumer Protection →',
+      deadline: '7 days',
+      act: 'Residential Tenancies Act 1987 (WA)'
+    },
+    TAS: {
+      formName: 'Residential Tenancy Condition Report',
+      authority: 'Consumer, Building and Occupational Services (CBOS)',
+      href: 'https://www.cbos.tas.gov.au/topics/housing/renting/beginning-tenancy/condition-reports',
+      linkText: 'View the CBOS condition report guide →',
+      deadline: '',
+      act: 'Residential Tenancy Act 1997 (TAS)'
+    },
+    ACT: {
+      formName: 'Condition Report',
+      authority: 'ACT Revenue Office',
+      href: 'https://www.revenue.act.gov.au/__data/assets/pdf_file/0020/1093043/Condition-Report.pdf',
+      linkText: 'Download the ACT Condition Report →',
+      deadline: '2 weeks',
+      act: 'Residential Tenancies Act 1997 (ACT)'
+    },
+    NT: {
+      formName: 'Condition Report',
+      authority: 'NT Consumer Affairs',
+      href: 'https://consumeraffairs.nt.gov.au/for-consumers/residential-tenancies',
+      linkText: 'View NT residential tenancy resources →',
+      deadline: '',
+      act: 'Residential Tenancies Act 1999 (NT)'
+    }
+  };
+  return { state: state, ref: refs[state] || null };
+}
+
+function renderStateFormRef(){
+  var box = document.getElementById('stateFormRef');
+  if(!box) return;
+  var info = getStateConditionReportRef();
+  var ref = info.ref;
+  if(!ref){ box.style.display = 'none'; return; }
+  box.innerHTML = '<span style="font-size:18px;flex-shrink:0;margin-top:1px">📋</span>' +
+    '<div>' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12.5px;color:var(--text);letter-spacing:-.1px">Equivalent to the ' + ref.formName + ' (' + ref.authority + ')</div>' +
+      '<a href="' + ref.href + '" target="_blank" rel="noopener" style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11.5px;color:var(--blue);display:inline-block;margin-top:4px;text-decoration:none">' + ref.linkText + '</a>' +
+    '</div>';
+  box.style.display = 'flex';
+  renderHowThisWorks(info);
+}
+
+// Renders the collapsible "How this works alongside your agent's form" copy.
+// State-aware deadline + form name; identical agent/landlord wording for all
+// states because the legal duty is the same regardless.
+function renderHowThisWorks(info){
+  var card = document.getElementById('howThisWorksCard');
+  var copy = document.getElementById('howThisWorksCopy');
+  var toggle = document.getElementById('howThisWorksToggle');
+  var body = document.getElementById('howThisWorksBody');
+  var chev = document.getElementById('howThisWorksChev');
+  if(!card || !copy) return;
+  var ref = info && info.ref;
+  if(!ref){ card.style.display = 'none'; return; }
+
+  var step3Deadline = ref.deadline
+    ? ('return it within ' + ref.deadline)
+    : 'return it as soon as practical after move-in';
+  copy.innerHTML =
+    '<div style="margin-bottom:10px"><strong style="color:var(--text)">1. Your agent or landlord gives you the official ' + ref.formName + '.</strong> They\'re legally required to complete and sign it before you move in.</div>' +
+    '<div style="margin-bottom:10px"><strong style="color:var(--text)">2. Walk through every room in this RenterIQ audit — the room grid below.</strong> Mark each item, snap photos, add notes. You build a far more detailed record than the agent\'s tickbox form, all timestamped on this device.</div>' +
+    '<div style="margin-bottom:10px"><strong style="color:var(--text)">3. Transfer any disagreements to the agent\'s ' + ref.formName + ' and ' + step3Deadline + '.</strong> Sign their copy with your additions. That\'s the version they keep on file.</div>' +
+    '<div><strong style="color:var(--text)">4. Keep both copies for exit.</strong> Your RenterIQ record and the signed official form are what you reach for at bond return time if anything is disputed.</div>';
+
+  card.style.display = 'block';
+
+  if(toggle && !toggle.dataset.bound){
+    toggle.dataset.bound = '1';
+    toggle.addEventListener('click', function(){
+      var open = body.style.display === 'block';
+      body.style.display = open ? 'none' : 'block';
+      if(chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+      // On expand, align the card's top with the top of the visible area
+      // so the renter reads steps 1 → 4 naturally. Aligning the bottom
+      // (the previous attempt) pushed steps 1 and 2 above the fold on
+      // shorter screens.
+      if(!open){
+        setTimeout(function(){
+          try { card.scrollIntoView({ behavior:'smooth', block:'start' }); }
+          catch(e){ card.scrollIntoView(true); }
+        }, 60);
+      }
+    });
   }
 }
 
@@ -1906,6 +2060,30 @@ function generateEntryReportCore(){
 // After the move-in record is saved, nudge the renter to file the other
 // two bits that matter most: bond receipt + a copy of the lease. Keeps
 // everything together before they unpack and forget.
+// "Don't forget the agent's form" — state-aware reminder card injected
+// into the filing sheet so the renter knows the official return deadline
+// while their move-in record is fresh.
+function buildOfficialFormReminderCard(){
+  var info = getStateConditionReportRef();
+  var ref = info && info.ref;
+  if(!ref) return '';
+  var safeForm = String(ref.formName).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var safeDeadline = String(ref.deadline);
+  var safeHref = String(ref.href);
+  var safeLink = String(ref.linkText);
+  var deadlineSentence = safeDeadline
+    ? ('Sign and return within ' + safeDeadline + '. ')
+    : 'Sign and return as soon as practical after move-in. ';
+  return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 14px;background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.28);border-radius:14px">'+
+    '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#F5A623,#F7C04A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📋</div>'+
+    '<div style="flex:1;min-width:0">'+
+      '<div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Return your agent\'s ' + safeForm + '</div>'+
+      '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:11.5px;color:#7A5500;margin-top:3px;line-height:1.55">' + deadlineSentence + 'Note any disagreements before sending. Keep your signed copy with this RenterIQ record for exit.</div>'+
+      '<a href="' + safeHref + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-family:Sora,sans-serif;font-weight:700;font-size:11.5px;color:var(--blue);text-decoration:none">' + safeLink + '</a>'+
+    '</div>'+
+  '</div>';
+}
+
 function openFilingSheet(reportData){
   var overlay=document.createElement('div');
   overlay.id='filingSheet';
@@ -1923,6 +2101,7 @@ function openFilingSheet(reportData){
           '<div style="width:40px;height:40px;border-radius:10px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0">✓</div>'+
           '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Move-in record</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--teal-dk);margin-top:2px">Just saved — you\'re set</div></div>'+
         '</div>'+
+        buildOfficialFormReminderCard()+
         '<div style="display:flex;align-items:center;gap:12px;padding:14px 14px;background:var(--blue-xl);border:1.5px solid var(--border);border-radius:14px;cursor:pointer" onclick="filingGoBondReceipt()">'+
           '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🛡️</div>'+
           '<div style="flex:1;min-width:0"><div style="font-family:Sora,sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Got your bond receipt?</div><div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:2px">Lodge it in your Bond Tracker now</div></div>'+
@@ -2297,6 +2476,7 @@ function openEntryResponseEmail(draft){
 
 function exportEntryReportPDF(data){
   if(!window.RIQExport||!RIQExport.generateConditionReport)return;
+  var stateInfo = getStateConditionReportRef();
   RIQExport.generateConditionReport({
     reportId:data.auditId,
     propertyAddress:data.propertyAddress,
@@ -2306,6 +2486,8 @@ function exportEntryReportPDF(data){
     date:new Date(data.generatedDate||Date.now()),
     rooms:data.rooms,
     totalPhotos:data.totalPhotos,
+    state:stateInfo.state || '',
+    stateRef:stateInfo.ref || null,
     filename:'RenterIQ-Entry-Condition-Report-'+new Date().toISOString().split('T')[0]+'.pdf'
   });
 }

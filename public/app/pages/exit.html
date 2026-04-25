@@ -421,6 +421,8 @@
       <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--blue);margin-top:8px;display:block;cursor:pointer" onclick="navigate('/app/pages/rights.html')">Know your bond rights →</span>
     </div>
 
+    <div id="bondRefundRefCard" style="display:none;background:#fff;border:1.5px solid var(--blue);border-radius:16px;padding:14px 16px;margin-bottom:14px;gap:12px;align-items:flex-start"></div>
+
     <div data-ai-disclaimer style="margin-bottom:10px"></div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px" onclick="draftBondReturnEmail()">✉️ Draft my bond return email</button>
@@ -2020,6 +2022,98 @@ function exitDataURLToBlob(dataUrl){
   }catch(e){return null}
 }
 
+// State-aware pointer to the official bond refund path. Surfaces on the
+// exit-complete view so the renter knows where to lodge after we generate
+// their evidence pack — RenterIQ stays out of the submission chain.
+function renderBondRefundRef(){
+  var box = document.getElementById('bondRefundRefCard');
+  if(!box) return;
+  var state = '';
+  try {
+    state = (localStorage.getItem('renteriq_user_state')
+      || localStorage.getItem('riq-user-state')
+      || '').toUpperCase();
+  } catch(e){}
+  var refs = {
+    NSW: {
+      title: 'Lodge your bond refund — NSW',
+      sub: 'Submit through Rental Bonds Online (RBO). If accepted by your landlord or agent, refunds typically land in your account within 2 business days.',
+      links: [
+        { text: 'Rental Bonds Online — claim refund →', href: 'https://www.service.nsw.gov.au/referral/lodge-a-residential-rental-bond-tenants' },
+        { text: 'Getting your bond back (Fair Trading guide) →', href: 'https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live/getting-your-bond-back' },
+        { text: 'Paper refund form (if no RBO account) →', href: 'https://www.nsw.gov.au/housing-and-construction/rental-forms-surveys-and-data/resources/claim-for-refund-of-bond-money-form' }
+      ]
+    },
+    QLD: {
+      title: 'Lodge your bond refund — QLD',
+      sub: 'Submit Form 4 (Refund of rental bond) through RTA Web Services. Online lodgement is fastest; the paper form is also accepted by post.',
+      links: [
+        { text: 'Online bond refund (RTA Web Services) →', href: 'https://www.rta.qld.gov.au/rta-web-services/online-bond-refund' },
+        { text: 'Form 4 PDF →', href: 'https://www.rta.qld.gov.au/forms-resources/forms/forms-for-general-tenancies/refund-of-rental-bond-form-4' }
+      ]
+    },
+    VIC: {
+      title: 'Lodge your bond refund — VIC',
+      sub: 'Bond claims and refunds are handled through RTBA Online. Sign in with the email registered on your bond.',
+      links: [
+        { text: 'RTBA Online — bond claims & refunds →', href: 'https://www.consumer.vic.gov.au/housing/renting/rent-bond-bills-and-condition-reports/bond/bond-claims-and-refunds' }
+      ]
+    },
+    SA: {
+      title: 'Lodge your bond refund — SA',
+      sub: 'Submit through Residential Bonds Online (RBO). Refunds without a dispute typically process within 5 working days.',
+      links: [
+        { text: 'Residential Bonds Online (RBO) →', href: 'https://tenancies.applyonline.sa.gov.au/rbo/bond/' },
+        { text: 'CBS bond refunds info →', href: 'https://www.sa.gov.au/topics/housing/renting-and-letting/residential-bonds/bond-refunds' }
+      ]
+    },
+    WA: {
+      title: 'Lodge your bond refund — WA',
+      sub: 'Use the BondsOnline portal, or download the Joint Application for Disposal of Security Bond if you can\'t access the portal. The application must be physically signed.',
+      links: [
+        { text: 'BondsOnline disposal portal →', href: 'https://bonds.commerce.wa.gov.au/bonds/pages/external/public/disposal/index.xhtml' },
+        { text: 'Releasing or claiming a bond (Consumer Protection) →', href: 'https://www.consumerprotection.wa.gov.au/releasing-or-claiming-bond-bond-disposal' }
+      ]
+    },
+    TAS: {
+      title: 'Lodge your bond refund — TAS',
+      sub: 'Bond claims are managed through MyBond. Tenants can start a claim three days after returning the keys (or sooner if the owner has finalised theirs).',
+      links: [
+        { text: 'Claiming a rental bond (CBOS) →', href: 'https://cbos.tas.gov.au/topics/housing/renting/bonds/claiming-a-bond' },
+        { text: 'MyBond for tenants →', href: 'https://www.cbos.tas.gov.au/topics/housing/mybond/what-is-mybond/mybond-for-existing-tenants' }
+      ]
+    },
+    ACT: {
+      title: 'Lodge your bond refund — ACT',
+      sub: 'Submit the Bond Refund Form to the ACT Revenue Office by emailing rb@act.gov.au with the property address in the subject line. Refunds typically deposit within 48 hours of processing.',
+      links: [
+        { text: 'How to lodge a bond refund (tenants) →', href: 'https://www.revenue.act.gov.au/rental-bonds/how-to-lodge-a-bond-refund/tenants' },
+        { text: 'Bond Refund Form (PDF) →', href: 'https://www.revenue.act.gov.au/__data/assets/pdf_file/0011/1193582/Bond-Refund-Form.pdf' }
+      ]
+    },
+    NT: {
+      title: 'Lodge your bond refund — NT',
+      sub: 'Bond refunds are handled by NT Consumer Affairs under the Residential Tenancies Act 1999. Check the Renting Guide and the forms list on the Consumer Affairs site for the current process.',
+      links: [
+        { text: 'Residential tenancies (NT Consumer Affairs) →', href: 'https://consumeraffairs.nt.gov.au/for-consumers/residential-tenancies' },
+        { text: 'A Guide to Renting in the NT (PDF) →', href: 'https://consumeraffairs.nt.gov.au/__data/assets/pdf_file/0011/668189/guide-to-renting-in-the-nt.pdf' }
+      ]
+    }
+  };
+  var ref = refs[state];
+  if(!ref){ box.style.display = 'none'; return; }
+  var linksHtml = ref.links.map(function(l){
+    return '<a href="' + l.href + '" target="_blank" rel="noopener" style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:12px;color:var(--blue);display:block;margin-top:6px;text-decoration:none">' + l.text + '</a>';
+  }).join('');
+  box.innerHTML = '<span style="font-size:22px;flex-shrink:0;margin-top:1px">🏛️</span>' +
+    '<div style="flex:1">' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:14px;color:var(--blue-dk);letter-spacing:-.1px">' + ref.title + '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.55">' + ref.sub + '</div>' +
+      linksHtml +
+    '</div>';
+  box.style.display = 'flex';
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   allViews.forEach(function(v){var el=document.getElementById('view'+v);if(el)el.style.display=v==='A'?'flex':'none'});
   var addr=loadEntryAuditData();
@@ -2028,6 +2122,7 @@ document.addEventListener('DOMContentLoaded',function(){
   updateExitProgress();
   if(addr){var sub=document.getElementById('sh-sub-c');if(sub)sub.textContent=addr}
   renderExitEvidence();
+  renderBondRefundRef();
 
   var aeInput=document.getElementById('agencyEntryInputOnExit');
   if(aeInput){

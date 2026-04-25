@@ -231,6 +231,7 @@
       <button class="btn-outline" style="flex:1;min-height:44px" onclick="copyDraft()">📋 Copy</button>
       <button class="btn-outline" style="flex:1;min-height:44px" onclick="saveWithoutSending()">💾 Save only</button>
     </div>
+    <div id="remedyEscalationCard" style="display:none;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.22);border-radius:12px;padding:13px 14px;margin-top:14px;gap:10px;align-items:flex-start"></div>
   </div>
 </div>
 
@@ -612,10 +613,99 @@ function runDraft(){
     });
 }
 
+// State-aware escalation pointer for when the landlord doesn't fix the issue
+// after the polite first email. Linked to the official notice-to-remedy form
+// for the renter's state. RenterIQ stays out of the submission chain.
+function renderRemedyEscalation(){
+  var box = document.getElementById('remedyEscalationCard');
+  if(!box) return;
+  var state = '';
+  try {
+    state = (localStorage.getItem('renteriq_user_state')
+      || localStorage.getItem('riq-user-state')
+      || '').toUpperCase();
+  } catch(e){}
+  var refs = {
+    NSW: {
+      title: 'If they don\'t fix it — NSW',
+      sub: 'NSW doesn\'t have a single tenant "Form 11" for repairs. The escalation path is: written request first, then Fair Trading\'s tenancy complaint service if that doesn\'t work, then NCAT.',
+      links: [
+        { text: 'Resolving rental problems (Fair Trading) →', href: 'https://www.fairtrading.nsw.gov.au/housing-and-property/renting/resolving-rental-problems' },
+        { text: 'Lodge a tenancy complaint →', href: 'https://www.service.nsw.gov.au/transaction/lodge-a-residential-tenancy-complaint-with-nsw-fair-trading' }
+      ]
+    },
+    QLD: {
+      title: 'If they don\'t fix it — QLD',
+      sub: 'Form 11 (Notice to remedy breach) is the formal next step under the RTA. Most issues require at least 7 days to remedy.',
+      links: [
+        { text: 'View Form 11 on RTA →', href: 'https://www.rta.qld.gov.au/forms-resources/forms/forms-for-general-tenancies/notice-to-remedy-breach-form-11' }
+      ]
+    },
+    VIC: {
+      title: 'If they don\'t fix it — VIC',
+      sub: 'CAV provides a Notice of breach of duty for the renter to give the rental provider. Most duty breaches give at least 14 days to remedy.',
+      links: [
+        { text: 'Notice of breach of duty (Word) →', href: 'https://www.consumer.vic.gov.au/library/forms/housing-and-accommodation/renting/notice-of-breach-of-duty-to-rental-provider-of-rented-premises.docx' },
+        { text: 'CAV — when a rental provider breaks the law →', href: 'https://www.consumer.vic.gov.au/housing/renting/legal-and-dispute-support/when-a-renter-or-rental-provider-breaks-the-law' }
+      ]
+    },
+    SA: {
+      title: 'If they don\'t fix it — SA',
+      sub: 'Form 11 is the tenant\'s notice to landlord to remedy a breach. The remedy period is at least 7 days.',
+      links: [
+        { text: 'Form 11 PDF (CBS) →', href: 'https://www.cbs.sa.gov.au/documents/tenancy/forms/Form-11_Notice-to-landlord-to-remedy-breach-Termination-notice.pdf' }
+      ]
+    },
+    WA: {
+      title: 'If they don\'t fix it — WA',
+      sub: 'Form 23 is the tenant\'s notice to landlord of breach of agreement. If the breach isn\'t remedied, lodge a complaint with Consumer Protection or apply to the Magistrates Court.',
+      links: [
+        { text: 'Rental forms and notices (Consumer Protection) →', href: 'https://www.consumerprotection.wa.gov.au/rental-forms-and-notices' }
+      ]
+    },
+    TAS: {
+      title: 'If they don\'t fix it — TAS',
+      sub: 'Notify the owner of the issue in writing first. If repairs aren\'t done in time, you can apply to the Residential Tenancy Commissioner for an Order for Repairs.',
+      links: [
+        { text: 'Request repairs to a rental property (CBOS) →', href: 'https://www.cbos.tas.gov.au/topics/housing/renting/rental-maintenance-repairs-changes/requesting-repairs' },
+        { text: 'Owner repair obligations →', href: 'https://cbos.tas.gov.au/topics/housing/renting/rental-maintenance-repairs-changes/owner-obligations' }
+      ]
+    },
+    ACT: {
+      title: 'If they don\'t fix it — ACT',
+      sub: 'Use the Notice to Remedy (clause 91) to give the lessor 14 days to fix the breach. If not remedied, you can apply to ACAT for an order or notice of intention to vacate.',
+      links: [
+        { text: 'Notice to Remedy — to lessor (Word) →', href: 'https://www.acat.act.gov.au/__data/assets/word_doc/0018/1404072/Notice-to-remedy-to-lessor-from-tenant-for-breach-clause-91-3.docx' },
+        { text: 'Termination of a lease (ACAT) →', href: 'https://www.acat.act.gov.au/case-types/rental-disputes/termination-of-a-lease' }
+      ]
+    },
+    NT: {
+      title: 'If they don\'t fix it — NT',
+      sub: 'Form RT04a is the tenant\'s Notice to remedy breach by landlord. If the breach isn\'t remedied within the period set in the notice, you can apply to NTCAT.',
+      links: [
+        { text: 'Residential tenancy forms (NT Consumer Affairs) →', href: 'https://consumeraffairs.nt.gov.au/for-consumers/residential-tenancies' }
+      ]
+    }
+  };
+  var ref = refs[state];
+  if(!ref){ box.style.display = 'none'; return; }
+  var linksHtml = ref.links.map(function(l){
+    return '<a href="' + l.href + '" target="_blank" rel="noopener" style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11.5px;color:#7A5500;display:block;margin-top:5px;text-decoration:underline">' + l.text + '</a>';
+  }).join('');
+  box.innerHTML = '<span style="font-size:18px;flex-shrink:0;margin-top:1px">📋</span>' +
+    '<div style="flex:1">' +
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:13px;color:#7A5500;letter-spacing:-.1px">' + ref.title + '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:12px;color:#8A6500;margin-top:4px;line-height:1.55">' + ref.sub + '</div>' +
+      linksHtml +
+    '</div>';
+  box.style.display = 'flex';
+}
+
 function renderDraft(d){
   document.getElementById('aiStatusBox').style.display='none';
   document.getElementById('draftBlock').style.display='block';
   document.getElementById('draftActions').style.display='block';
+  renderRemedyEscalation();
 
   var sev=(d.severity||'routine').toLowerCase();
   var sevLabel={emergency:'🚨 Emergency',urgent:'⚠️ Urgent',routine:'📝 Routine'}[sev]||sev;

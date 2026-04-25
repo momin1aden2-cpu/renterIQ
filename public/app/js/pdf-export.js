@@ -239,9 +239,22 @@
     html += '</table>';
     html += '</div>';
 
-    // Statutory note
+    // Statutory note — state-aware when the renter's profile state is known.
+    // Falls back to the generic 3–7 day reminder for unsupported states.
+    var stateRef = opts.stateRef;
     html += '<div style="background:#FEF9E7;border:1px solid #F5D57A;border-radius:8px;padding:12px 14px;margin-top:18px;font-size:10.5px;color:#7A5A00;line-height:1.6">';
-    html += '<strong>Important.</strong> Return the signed report to your agent or landlord within the statutory period for your state (typically 3–7 days from the start of your tenancy). Keep a copy for your records — you will need it at exit to compare against the outgoing condition report.';
+    if (stateRef && stateRef.formName && stateRef.act) {
+      html += '<strong>Important.</strong> This record supplements the official ' + esc(stateRef.formName);
+      if (stateRef.deadline) {
+        html += ' return required within ' + esc(stateRef.deadline) + ' under the ' + esc(stateRef.act) + '. ';
+        html += 'Sign and return the agent\'s form within that window and keep both copies for exit.';
+      } else {
+        html += ' under the ' + esc(stateRef.act) + '. ';
+        html += 'Sign and return the agent\'s form as soon as practical after move-in and keep both copies for exit.';
+      }
+    } else {
+      html += '<strong>Important.</strong> Return the signed report to your agent or landlord within the statutory period for your state (typically 3–7 days from the start of your tenancy). Keep a copy for your records — you will need it at exit to compare against the outgoing condition report.';
+    }
     html += '</div>';
 
     // Footer
