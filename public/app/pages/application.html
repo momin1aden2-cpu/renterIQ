@@ -27,6 +27,8 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"></noscript>
 <title>Renter Resume — RenterIQ</title>
 <script src="/app/js/pwa-init.js" defer></script>
+<script src="/app/js/ai-disclaimer.js" defer></script>
+<script src="/app/js/pdf-export.js" defer></script>
 <style>
 .sh{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--blue) 0%,#1545B0 100%);padding:14px 20px 20px;box-shadow:0 2px 16px rgba(10,36,96,.18)}
 .sh-row{display:flex;align-items:center;justify-content:space-between}
@@ -230,7 +232,7 @@
         </div>
         <div class="check-item" id="check-docs" onclick="switchView('C')">
           <div class="check-icon" style="background:var(--blue-xl);color:var(--blue)">2</div>
-          <div class="check-body"><div class="check-name">ID &amp; Documents</div><div class="check-status" id="status-docs">100-point ID check + income verification</div></div>
+          <div class="check-body"><div class="check-name">Identification</div><div class="check-status" id="status-docs">Privacy by design — IDs never touch RenterIQ</div></div>
           <span class="check-right">›</span>
         </div>
         <div class="check-item" id="check-cover" onclick="switchView('D')">
@@ -264,6 +266,8 @@
 
     <div style="padding:0 16px 24px">
       <button class="btn-blue-c btn-full" style="border-radius:14px;padding:14px;font-size:15px" onclick="switchView('B')">Start Your Resume →</button>
+      <button id="dlAppPdfBtn" class="btn-outline-c btn-full" style="border-radius:14px;padding:13px;font-size:14px;margin-top:10px" onclick="downloadTenancyApplicationPdf()">⬇ Download Tenancy Application PDF</button>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5">A clean one-pager you can attach to any agency portal or email. Identity documents go straight from your phone to the agency — never through RenterIQ.</div>
     </div>
   </div>
 </div>
@@ -407,6 +411,27 @@
         <div class="form-field"><label class="form-label">Occupant 3 — Name</label><input id="r-occ3Name" class="form-input" placeholder="If applicable" oninput="autosave()"></div>
       </div>
 
+      <div class="sec-label" style="margin-top:20px">Emergency contact</div>
+      <div class="form-card">
+        <div class="form-field"><label class="form-label">Name</label><input id="r-emergencyName" class="form-input" placeholder="Someone the agent can reach if needed" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Phone</label><input id="r-emergencyPhone" type="tel" class="form-input" placeholder="04XX XXX XXX" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Relationship</label><input id="r-emergencyRelation" class="form-input" placeholder="e.g. Parent, Sibling, Friend" oninput="autosave()"></div>
+      </div>
+
+      <div class="sec-label" style="margin-top:20px">Move-in preferences</div>
+      <div class="form-card">
+        <div class="form-field"><label class="form-label">Earliest move-in date</label><input id="r-moveInFrom" type="date" class="form-input" oninput="autosave()"></div>
+        <div class="form-field"><label class="form-label">Lease length you'd take</label>
+          <select id="r-leaseLengthPref" class="form-input" style="cursor:pointer" onchange="autosave()">
+            <option value="">Select…</option>
+            <option>Flexible</option>
+            <option>6 months</option>
+            <option>12 months</option>
+            <option>24 months</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Confirmation only on the final step -->
       <div style="margin:18px 0 0;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:14px 16px">
         <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent">
@@ -426,209 +451,77 @@
   </div>
 </div>
 
-<!-- VIEW C — DOCUMENTS & 100-POINT ID -->
+<!-- VIEW C — IDENTIFICATION (privacy-by-design) -->
 <div class="view" id="viewC" style="display:none;flex-direction:column;min-height:100vh">
   <header class="sh">
     <div class="sh-row">
       <button class="sh-back" onclick="switchView('B')"><span class="sh-back-arrow">‹</span><span class="sh-label">Details</span></button>
       <span class="sh-right-text">2 of 4</span>
     </div>
-    <div class="sh-title" style="font-size:22px">ID &amp; Documents</div>
-    <div class="sh-sub">100-point ID check + income verification</div>
+    <div class="sh-title" style="font-size:22px">Identification</div>
+    <div class="sh-sub">Your licence stays on your phone — never on RenterIQ</div>
     <div class="mini-progress"><div class="mini-progress-fill" style="width:50%;background:#fff"></div></div>
   </header>
 
-  <!-- 100-Point Score Banner -->
-  <div class="id-score-banner">
-    <div>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">ID Points</div>
-      <div style="display:flex;align-items:baseline;gap:4px">
-        <span class="id-score-num" id="idScoreLabel">0</span>
-        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:rgba(255,255,255,.4)">/ 100</span>
-      </div>
-    </div>
-    <div class="id-score-meta">
-      <div class="id-score-bar-wrap"><div class="id-score-bar" id="idScoreBar" style="width:0%"></div></div>
-      <div class="id-score-status" id="idScoreStatus">100 points needed to meet agency requirements</div>
-    </div>
-  </div>
-
   <div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:120px">
 
-    <!-- Privacy reassurance — sits between the ID score and the first doc
-         card so renters see the commitment the moment they enter this view. -->
-    <div style="background:linear-gradient(135deg,rgba(0,200,150,.08),rgba(27,80,200,.05));border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:13px 15px;margin-bottom:14px;display:flex;gap:11px;align-items:flex-start">
-      <span style="font-size:20px;line-height:1;flex-shrink:0;margin-top:1px">🔒</span>
-      <div>
-        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:13px;color:var(--teal-dk);letter-spacing:-.1px">Your IDs stay on this device</div>
-        <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.55">Every file you add is AES-encrypted and stored in your browser only. RenterIQ servers never receive your passport, licence, Medicare or payslips. You copy them into agency portals yourself.</div>
-      </div>
-    </div>
-
-    <!-- Primary ID -->
-    <div class="sec-label">Primary ID <span style="font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600">— 70 pts each (add at least one)</span></div>
-
-    <div class="doc-card" id="doc-passport">
-      <div class="doc-top">
-        <div class="doc-icon">🛂</div>
-        <div class="doc-body">
-          <div class="doc-name">Passport <span class="pts-badge pts-primary">70 pts</span></div>
-          <div class="doc-desc">Australian or valid foreign passport</div>
-          <div class="doc-status" id="doc-passport-status">Not added</div>
+    <div style="background:linear-gradient(135deg,rgba(0,200,150,.08),rgba(27,80,200,.05));border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:18px 18px 16px;margin-bottom:16px">
+      <div style="display:flex;gap:11px;align-items:flex-start;margin-bottom:12px">
+        <span style="font-size:24px;line-height:1;flex-shrink:0;margin-top:1px">🔒</span>
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--teal-dk);letter-spacing:-.1px">Privacy by design</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.6">RenterIQ has no place to upload your driver licence, passport, Medicare card or payslips. We don't collect them, encrypt them, or pass them through our servers — full stop.</div>
         </div>
-        <input type="file" id="file-passport" accept=".pdf,.jpg,.jpeg,.png,.heic,.docx" style="display:none" onchange="handleFileUpload('doc-passport',70,'passport')">
-        <button class="upload-btn" onclick="document.getElementById('file-passport').click()">📎 Add</button>
       </div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.65;background:#fff;border:1px solid rgba(0,200,150,.18);border-radius:10px;padding:12px 14px">When the agency asks for ID, you attach it directly from your phone or device — to their portal, their email, or in person. Your documents only ever touch you and the agency you choose.</div>
     </div>
 
-    <div class="doc-card" id="doc-birthcert">
-      <div class="doc-top">
-        <div class="doc-icon">📜</div>
-        <div class="doc-body">
-          <div class="doc-name">Birth Certificate <span class="pts-badge pts-primary">70 pts</span></div>
-          <div class="doc-desc">Australian birth certificate (full extract)</div>
-          <div class="doc-status" id="doc-birthcert-status">Not added</div>
+    <div class="sec-label">How it works</div>
+    <div style="background:#fff;border:1px solid var(--border-lt);border-radius:14px;padding:0;overflow:hidden;margin-bottom:14px">
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--border-lt)">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Keep your IDs in your own storage</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.55">iCloud, OneDrive, Google Drive, Files app, photos — wherever you already keep important documents.</div>
         </div>
-        <input type="file" id="file-birthcert" accept=".pdf,.jpg,.jpeg,.png,.heic" style="display:none" onchange="handleFileUpload('doc-birthcert',70,'birthcert')">
-        <button class="upload-btn" onclick="document.getElementById('file-birthcert').click()">📎 Add</button>
       </div>
-    </div>
-
-    <!-- Secondary ID -->
-    <div class="sec-label" style="margin-top:16px">Secondary ID <span style="font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600">— counts toward 100 pts</span></div>
-
-    <div class="doc-card" id="doc-licence">
-      <div class="doc-top">
-        <div class="doc-icon">🪪</div>
-        <div class="doc-body">
-          <div class="doc-name">Driver Licence <span class="pts-badge pts-secondary">40 pts</span></div>
-          <div class="doc-desc">Australian driver licence or learner permit</div>
-          <div class="doc-status" id="doc-licence-status">Not added</div>
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--border-lt)">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Use RenterIQ to prepare everything else</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.55">Profile, employment, references, cover letter, the application one-pager — that's the part RenterIQ helps with.</div>
         </div>
-        <input type="file" id="file-licence" accept=".pdf,.jpg,.jpeg,.png,.heic" style="display:none" onchange="handleFileUpload('doc-licence',40,'licence')">
-        <button class="upload-btn" onclick="document.getElementById('file-licence').click()">📎 Add</button>
       </div>
-    </div>
-
-    <div class="doc-card" id="doc-medicare">
-      <div class="doc-top">
-        <div class="doc-icon">💳</div>
-        <div class="doc-body">
-          <div class="doc-name">Medicare Card <span class="pts-badge pts-secondary">25 pts</span></div>
-          <div class="doc-desc">Current Australian Medicare card</div>
-          <div class="doc-status" id="doc-medicare-status">Not added</div>
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--blue-xl);color:var(--blue);font-family:'Sora',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--text)">Attach IDs straight to the agency</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.55">When you submit through the portal or email, attach your licence, Medicare and payslips at that moment — RenterIQ is never in between.</div>
         </div>
-        <input type="file" id="file-medicare" accept=".pdf,.jpg,.jpeg,.png,.heic" style="display:none" onchange="handleFileUpload('doc-medicare',25,'medicare')">
-        <button class="upload-btn" onclick="document.getElementById('file-medicare').click()">📎 Add</button>
       </div>
     </div>
 
-    <div class="doc-card" id="doc-centrelink">
-      <div class="doc-top">
-        <div class="doc-icon">🏛️</div>
-        <div class="doc-body">
-          <div class="doc-name">Centrelink Card <span class="pts-badge pts-secondary">25 pts</span></div>
-          <div class="doc-desc">Current Centrelink health care or concession card</div>
-          <div class="doc-status" id="doc-centrelink-status">Not added</div>
-        </div>
-        <input type="file" id="file-centrelink" accept=".pdf,.jpg,.jpeg,.png,.heic" style="display:none" onchange="handleFileUpload('doc-centrelink',25,'centrelink')">
-        <button class="upload-btn" onclick="document.getElementById('file-centrelink').click()">📎 Add</button>
+    <div class="sec-label" style="margin-top:18px">What agencies typically ask for</div>
+    <div style="background:#fff;border:1px solid var(--border-lt);border-radius:14px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--text);line-height:1.85">
+        · Photo identification (driver licence or passport)<br>
+        · Medicare or another secondary ID<br>
+        · Recent payslips or proof of income<br>
+        · Bank statement (most recent month)<br>
+        · Rental ledger from your previous tenancy, if available
       </div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-lt)">Each agency has their own list. Check the listing or the portal before you submit so you have everything ready in your own storage.</div>
     </div>
 
-    <!-- Income Verification -->
-    <div class="sec-label" style="margin-top:16px">Income Verification <span style="font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600">— required by all agencies</span></div>
-
-    <div class="doc-card" id="doc-payslip1">
-      <div class="doc-top">
-        <div class="doc-icon">💰</div>
-        <div class="doc-body">
-          <div class="doc-name">Payslip 1 <span class="pts-badge pts-support">Required</span></div>
-          <div class="doc-desc">Most recent payslip</div>
-          <div class="doc-status" id="doc-payslip1-status">Not added</div>
-        </div>
-        <input type="file" id="file-payslip1" accept=".pdf,.jpg,.jpeg,.png,.heic,.docx" style="display:none" onchange="handleFileUpload('doc-payslip1',0,'payslip1')">
-        <button class="upload-btn" onclick="document.getElementById('file-payslip1').click()">📎 Add</button>
-      </div>
-    </div>
-
-    <div class="doc-card" id="doc-payslip2">
-      <div class="doc-top">
-        <div class="doc-icon">💰</div>
-        <div class="doc-body">
-          <div class="doc-name">Payslip 2 <span class="pts-badge pts-support">Required</span></div>
-          <div class="doc-desc">Second most recent payslip</div>
-          <div class="doc-status" id="doc-payslip2-status">Not added</div>
-        </div>
-        <input type="file" id="file-payslip2" accept=".pdf,.jpg,.jpeg,.png,.heic,.docx" style="display:none" onchange="handleFileUpload('doc-payslip2',0,'payslip2')">
-        <button class="upload-btn" onclick="document.getElementById('file-payslip2').click()">📎 Add</button>
-      </div>
-    </div>
-
-    <div class="doc-card" id="doc-employmentletter" style="border-style:dashed">
-      <div class="doc-top">
-        <div class="doc-icon">💼</div>
-        <div class="doc-body">
-          <div class="doc-name">Employment Letter <span class="pts-badge pts-support">Recommended</span></div>
-          <div class="doc-desc">Letter confirming your role and salary</div>
-          <div class="doc-status" id="doc-employmentletter-status">Not added</div>
-        </div>
-        <input type="file" id="file-employmentletter" accept=".pdf,.jpg,.jpeg,.png,.heic,.docx" style="display:none" onchange="handleFileUpload('doc-employmentletter',0,'employmentletter')">
-        <button class="upload-btn" onclick="document.getElementById('file-employmentletter').click()">📎 Add</button>
-      </div>
-    </div>
-
-    <div class="doc-card" id="doc-bankstatements" style="border-style:dashed">
-      <div class="doc-top">
-        <div class="doc-icon">🏦</div>
-        <div class="doc-body">
-          <div class="doc-name">Bank Statements <span class="pts-badge pts-support">Recommended</span></div>
-          <div class="doc-desc">3 months — for self-employed or casual workers</div>
-          <div class="doc-status" id="doc-bankstatements-status">Not added</div>
-        </div>
-        <input type="file" id="file-bankstatements" accept=".pdf,.jpg,.jpeg,.png,.heic" style="display:none" onchange="handleFileUpload('doc-bankstatements',0,'bankstatements')">
-        <button class="upload-btn" onclick="document.getElementById('file-bankstatements').click()">📎 Add</button>
-      </div>
-    </div>
-
-    <!-- Rental History Docs -->
-    <div class="sec-label" style="margin-top:16px">Rental History Docs <span style="font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600">— highly recommended</span></div>
-
-    <div class="doc-card" id="doc-ledger" style="border-style:dashed">
-      <div class="doc-top">
-        <div class="doc-icon">🏠</div>
-        <div class="doc-body">
-          <div class="doc-name">Rental Ledger <span class="pts-badge pts-support">Recommended</span></div>
-          <div class="doc-desc">Proof of on-time payments from previous tenancy</div>
-          <div class="doc-status" id="doc-ledger-status">Not added</div>
-        </div>
-        <input type="file" id="file-ledger" accept=".pdf,.jpg,.jpeg,.png,.heic" style="display:none" onchange="handleFileUpload('doc-ledger',0,'ledger')">
-        <button class="upload-btn" onclick="document.getElementById('file-ledger').click()">📎 Add</button>
-      </div>
-    </div>
-
-    <div class="doc-card" id="doc-writtenref" style="border-style:dashed">
-      <div class="doc-top">
-        <div class="doc-icon">👤</div>
-        <div class="doc-body">
-          <div class="doc-name">Written Reference <span class="pts-badge pts-support">Recommended</span></div>
-          <div class="doc-desc">Character or landlord reference letter</div>
-          <div class="doc-status" id="doc-writtenref-status">Not added</div>
-        </div>
-        <input type="file" id="file-writtenref" accept=".pdf,.jpg,.jpeg,.png,.heic,.docx" style="display:none" onchange="handleFileUpload('doc-writtenref',0,'writtenref')">
-        <button class="upload-btn" onclick="document.getElementById('file-writtenref').click()">📎 Add</button>
-      </div>
-    </div>
-
-    <div style="margin-top:14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:14px 16px">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7A5500;margin-bottom:10px">Accepted file types</div>
-      <div style="font-weight:600;font-size:12.5px;color:#8A6500;line-height:1.65">PDF · JPG · PNG · HEIC · DOCX — all accepted by Australian rental portals.</div>
+    <div style="background:rgba(27,80,200,.04);border:1px solid rgba(27,80,200,.15);border-radius:14px;padding:14px 16px;display:flex;gap:11px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0;margin-top:1px">💡</span>
+      <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.6">Why this matters: in 2024 Australia's privacy commissioner ruled that the rental application platform 2Apply over-collected ID data from renters. Building RenterIQ without an upload path means we structurally can't make that mistake.</div>
     </div>
   </div>
 
   <div class="sticky-footer">
     <button class="btn-outline-c" onclick="switchView('B')">← Back</button>
-    <button class="btn-blue-c flex-1" style="border-radius:12px" onclick="saveAndNext('check-docs','status-docs','Documents ready ✓','D')">Save & Next →</button>
+    <button class="btn-blue-c flex-1" style="border-radius:12px" onclick="saveAndNext('check-docs','status-docs','Got it ✓','D')">Got it — continue →</button>
   </div>
 </div>
 
@@ -665,7 +558,8 @@
         <label class="form-label">Your Situation</label>
         <input id="cl-situation" class="form-input" placeholder="Non-smoker, no pets, long-term, etc." oninput="autosave()">
       </div>
-      <button id="generateBtn" style="width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;transition:all .18s" onclick="generateCoverLetter()">✦ Generate Cover Letter</button>
+      <div data-ai-disclaimer style="margin-top:14px;margin-bottom:0"></div>
+      <button id="generateBtn" style="width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-md));color:#fff;border-radius:12px;padding:14px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;transition:all .18s" onclick="generateCoverLetter()">✦ Generate Cover Letter</button>
     </div>
 
     <!-- Generated Letter -->
@@ -684,6 +578,7 @@
           <button class="btn-blue-c flex-1" style="border-radius:11px;padding:12px;font-size:13px" onclick="copyLetter()">📋 Copy Letter</button>
           <button class="btn-muted-c" style="border-radius:11px;padding:12px;font-size:13px;flex-shrink:0" onclick="generateCoverLetter()">↺ Redo</button>
         </div>
+        <button class="btn-outline-c btn-full" style="border-radius:11px;padding:11px;font-size:13px;margin-top:8px" onclick="downloadCoverLetterPdf()">⬇ Save Cover Letter as PDF</button>
         <div id="copyConfirm" style="display:none;background:var(--teal-lt);border-radius:10px;padding:10px 14px;margin-top:10px;text-align:center">
           <span style="font-weight:700;font-size:13px;color:var(--teal-dk)">✓ Copied — paste into the cover letter field in the portal</span>
         </div>
@@ -813,6 +708,7 @@
         </div>
       </div>
       <input type="file" id="agentFormInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.heic,image/*" style="display:none">
+      <div data-ai-disclaimer style="margin-bottom:12px"></div>
       <div id="agentFormZone" style="border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;background:var(--blue-xl);cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="document.getElementById('agentFormInput').click()">
         <div style="font-size:28px;margin-bottom:8px">📎</div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text)">Upload Agent's Form</div>
@@ -876,6 +772,19 @@
       </button>
     </div>
 
+    <!-- Submit-ready bundle — one PDF with the Tenancy Application, the
+         Cover Letter (if drafted), and an ID-attach instruction sheet. -->
+    <div style="margin:10px 16px 0">
+      <button onclick="downloadSubmitBundle()" style="width:100%;background:#fff;color:var(--blue-dk);border:1.5px solid var(--blue);border-radius:16px;padding:16px 18px;font-family:'Sora',sans-serif;font-weight:800;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:12px">
+        <span style="font-size:22px">📄</span>
+        <span style="flex:1;text-align:left">
+          <span style="display:block">Submit-Ready Bundle</span>
+          <span style="display:block;font-family:'Nunito',sans-serif;font-weight:600;font-size:11px;color:var(--muted);margin-top:2px;letter-spacing:0">Application + cover letter + how-to-attach-IDs in one PDF</span>
+        </span>
+        <span style="font-size:20px;color:var(--blue)">›</span>
+      </button>
+    </div>
+
     <!-- Quick Reference — populated from saved data -->
     <div style="margin:14px 16px 0;background:var(--blue-xl);border-radius:16px;padding:16px;border:1px solid var(--border-lt)">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:12px">Quick Reference — tap to copy</div>
@@ -923,8 +832,10 @@
 <script>
 var RESUME_KEY = 'riq-resume';
 var checkedItems = {};
-var uploadedDocs = {};   // { docId: pointsValue }
-var docMeta = {};        // { docId: { name, size } }
+// Legacy holders kept as empty objects so any stray reference returns
+// gracefully. RenterIQ no longer stores identity documents.
+var uploadedDocs = {};
+var docMeta = {};
 var portalChecked = {};
 var currentView = 'A';
 var allViews = ['A','B','C','D','E','F'];
@@ -996,6 +907,8 @@ function collectAndSave(){
     'petType','petBreed','petAge','petRego','petNotes',
     'vehicleCount','vehicle1','vehicle1Rego','vehicle2',
     'occupantCount','occ2Name','occ2Rel','occ3Name',
+    'emergencyName','emergencyPhone','emergencyRelation',
+    'moveInFrom','leaseLengthPref',
     'ref1Name','ref1Agency','ref1Phone','ref1Email','ref1Rel','ref1Period',
     'ref2Name','ref2Company','ref2Phone','ref2Email','ref2Rel',
     'ref3Name','ref3Company','ref3Title','ref3Phone','ref3Email','ref3Duration'
@@ -1012,7 +925,6 @@ function collectAndSave(){
     if(el)r[f]=el.value;
   });
   if(letterText)r.coverLetter=letterText;
-  r.docs=docMeta;
   saveResume(r);
   updateQuickRef(r);
 
@@ -1082,6 +994,8 @@ function loadResume(){
     'petType','petBreed','petAge','petRego','petNotes',
     'vehicleCount','vehicle1','vehicle1Rego','vehicle2',
     'occupantCount','occ2Name','occ2Rel','occ3Name',
+    'emergencyName','emergencyPhone','emergencyRelation',
+    'moveInFrom','leaseLengthPref',
     'ref1Name','ref1Agency','ref1Phone','ref1Email','ref1Rel','ref1Period',
     'ref2Name','ref2Company','ref2Phone','ref2Email','ref2Rel',
     'ref3Name','ref3Company','ref3Title','ref3Phone','ref3Email','ref3Duration'
@@ -1117,60 +1031,19 @@ function loadResume(){
   updateQuickRef(r);
 }
 
-// Rehydrate the doc cards from RIQSecureDocs (encrypted IndexedDB). Images
-// get a preview thumbnail decrypted to an object URL on demand.
-function restoreSecureDocs(){
-  if(!window.RIQSecureDocs)return;
-  RIQSecureDocs.list().then(function(rows){
-    docMeta={};
-    rows.forEach(function(meta){
-      var docId=meta.id;
-      docMeta[docId]={name:meta.name,size:meta.size,pts:meta.pts,ts:meta.ts,mimeType:meta.mimeType,secure:true};
-      if(meta.pts)uploadedDocs[docId]=meta.pts;
-      var card=document.getElementById(docId);
-      if(!card)return;
-      var icon=card.querySelector('.doc-icon');
-      var statusEl=card.querySelector('[id$="-status"]');
-      var btn=card.querySelector('.upload-btn');
-      if(icon){icon.style.background='var(--teal-lt)';icon.textContent='🔒';icon.style.color='var(--teal-dk)';icon.style.fontSize='16px';}
-      if(statusEl){statusEl.textContent='🔒 '+meta.name+' — encrypted on this device';statusEl.style.color='var(--teal-dk)';}
-      if(btn){btn.textContent='Replace';btn.style.background='var(--border-lt)';btn.style.color='var(--muted)';}
-      if(meta.mimeType&&meta.mimeType.indexOf('image/')===0){
-        var bar=card.querySelector('.upload-bar');
-        if(bar&&!card.querySelector('.doc-preview-thumb')){
-          RIQSecureDocs.getObjectURL(docId).then(function(objUrl){
-            if(!objUrl)return;
-            bar.style.display='block';
-            var thumb=document.createElement('div');
-            thumb.className='doc-preview-thumb';
-            thumb.style.cssText='margin-top:8px;border-radius:8px;overflow:hidden;height:72px;cursor:pointer;position:relative;';
-            var img=document.createElement('img');
-            img.src=objUrl;
-            img.style.cssText='width:100%;height:100%;object-fit:cover;';
-            img.onclick=function(){window.open(objUrl,'_blank');};
-            var viewLbl=document.createElement('span');
-            viewLbl.style.cssText='position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-family:Sora,sans-serif;font-weight:700;border-radius:4px;padding:2px 6px;';
-            viewLbl.textContent='View';
-            thumb.appendChild(img);
-            thumb.appendChild(viewLbl);
-            bar.parentNode.insertBefore(thumb,bar.nextSibling);
-          });
-        }
-      }
-    });
-    updateIdScore();
-    updateScore();
-  }).catch(function(e){console.warn('restoreSecureDocs:',e);});
-}
+// Privacy by design: RenterIQ no longer accepts ID uploads. The renter keeps
+// their licence / passport / Medicare / payslips in their own storage and
+// attaches them directly to the agency at submission time. These stubs stay
+// in place so any legacy call sites resolve cleanly.
+function restoreSecureDocs(){ /* no-op — IDs are never stored on RenterIQ */ }
 
 function updateScore(){
   var r=getResume();
-  var fields=['fullName','dob','email','mobile','currentAddress','employmentStatus','employer','jobTitle','income','prevAddress','ref1Name','ref1Phone','ref2Name'];
+  var fields=['fullName','dob','email','mobile','currentAddress','employmentStatus','employer','jobTitle','income','prevAddress','ref1Name','ref1Phone','ref2Name','emergencyName','emergencyPhone','moveInFrom'];
   var filled=fields.filter(function(f){return r[f]&&r[f].trim()}).length;
   var hasLetter=letterText?1:0;
-  var hasDocs=Object.keys(docMeta).length>0?1:0;
-  var total=fields.length+2;
-  var pct=Math.round(((filled+hasLetter+hasDocs)/total)*100);
+  var total=fields.length+1;
+  var pct=Math.round(((filled+hasLetter)/total)*100);
   var bar=document.getElementById('resumeScoreBar');
   var label=document.getElementById('resumeScoreLabel');
   if(bar)bar.style.width=pct+'%';
@@ -1231,91 +1104,13 @@ function markChecked(checkId,statusId){
   }
 }
 
-/* ── Document Upload ──────────────────────────────────────────────────
-   Sensitive ID, payslips, bank statements are AES-GCM encrypted and stored
-   inside IndexedDB via RIQSecureDocs. Bytes never leave this device. Cloud
-   sync only sees metadata (name, size, type, upload time, points value). */
-function handleFileUpload(docId, pts, fileKey){
-  var input=document.getElementById('file-'+fileKey);
-  if(!input||!input.files||!input.files[0])return;
-  var file=input.files[0];
-  var ext=file.name.split('.').pop().toLowerCase();
-  if(ACCEPTED_EXTS.indexOf(ext)===-1){
-    showToast('File type not supported','Please use PDF, JPG, PNG, HEIC or DOCX','⚠️');
-    return;
-  }
-  if(file.size>10*1024*1024){
-    showToast('File too large','Maximum 10MB per document — try compressing it first','⚠️');
-    return;
-  }
-  if(!window.RIQSecureDocs || !RIQSecureDocs.supported){
-    showToast('Secure storage not supported','Your browser doesn\'t support encrypted storage — try Chrome or Safari','⚠️');
-    return;
-  }
-  var card=document.getElementById(docId);
-  var btn=card?card.querySelector('.upload-btn'):null;
-  if(btn){btn.textContent='Encrypting…';btn.style.opacity='.6';btn.style.pointerEvents='none';}
-
-  RIQSecureDocs.put(docId,file,pts).then(function(meta){
-    docMeta[docId]={name:meta.name,size:meta.size,pts:pts,ts:meta.ts,mimeType:meta.mimeType,secure:true};
-    if(pts>0)uploadedDocs[docId]=pts;
-    if(card){
-      var icon=card.querySelector('.doc-icon');
-      var statusEl=card.querySelector('[id$="-status"]');
-      var uploadBtn=card.querySelector('.upload-btn');
-      if(icon){icon.style.background='var(--teal-lt)';icon.textContent='🔒';icon.style.color='var(--teal-dk)';icon.style.fontSize='16px';}
-      if(statusEl){statusEl.textContent='🔒 '+file.name+' — encrypted on this device';statusEl.style.color='var(--teal-dk)';}
-      if(file.type.indexOf('image/')===0){
-        var bar=card.querySelector('.upload-bar');
-        if(bar){
-          bar.style.display='block';
-          var existingImg=card.querySelector('.doc-preview-thumb');
-          if(!existingImg){
-            RIQSecureDocs.getObjectURL(docId).then(function(objUrl){
-              if(!objUrl)return;
-              var thumb=document.createElement('div');
-              thumb.className='doc-preview-thumb';
-              thumb.style.cssText='margin-top:8px;border-radius:8px;overflow:hidden;height:72px;cursor:pointer;position:relative;';
-              var img=document.createElement('img');
-              img.src=objUrl;
-              img.style.cssText='width:100%;height:100%;object-fit:cover;';
-              img.onclick=function(){window.open(objUrl,'_blank');};
-              var viewLbl=document.createElement('span');
-              viewLbl.style.cssText='position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-family:Sora,sans-serif;font-weight:700;border-radius:4px;padding:2px 6px;';
-              viewLbl.textContent='View';
-              thumb.appendChild(img);
-              thumb.appendChild(viewLbl);
-              bar.parentNode.insertBefore(thumb,bar.nextSibling);
-            });
-          }
-        }
-      }
-      if(uploadBtn){uploadBtn.textContent='Replace';uploadBtn.style.background='var(--border-lt)';uploadBtn.style.color='var(--muted)';uploadBtn.style.opacity='1';uploadBtn.style.pointerEvents='auto';}
-    }
-    updateIdScore();
-    updateScore();
-    try{collectAndSave();}catch(e){}
-    showToast('Saved securely 🔒',file.name+' · encrypted on this device','📎');
-  }).catch(function(err){
-    console.warn('Secure doc upload failed:',err);
-    if(btn){btn.textContent='📎 Add';btn.style.opacity='1';btn.style.pointerEvents='auto';}
-    showToast('Could not save','Please try a different file','⚠️');
-  });
-}
-
-function updateIdScore(){
-  var total=Object.values(uploadedDocs).reduce(function(s,v){return s+(typeof v==='number'?v:0)},0);
-  var capped=Math.min(100,total);
-  var label=document.getElementById('idScoreLabel');
-  var bar=document.getElementById('idScoreBar');
-  var status=document.getElementById('idScoreStatus');
-  if(label)label.textContent=total+(total>100?'+':'');
-  if(bar)bar.style.width=capped+'%';
-  if(status){
-    if(capped>=100){status.textContent='✓ 100+ points — ID requirements met';status.style.color='var(--teal)'}
-    else{status.textContent=(100-capped)+' more points needed to meet requirements';status.style.color='rgba(255,255,255,.6)'}
-  }
-}
+/* ── ID Upload (deprecated) ──────────────────────────────────────────
+   The product no longer accepts identity documents. The renter keeps their
+   licence / passport / Medicare / payslips in their own device storage and
+   attaches them directly to the agency at submission. These stubs exist so
+   any stray reference resolves cleanly — calling them is a no-op. */
+function handleFileUpload(){ /* no-op — RenterIQ does not accept IDs */ }
+function updateIdScore(){ /* no-op — ID points removed */ }
 
 function togglePets(){
   var cb=document.getElementById('r-hasPets');
@@ -1332,8 +1127,141 @@ function togglePets(){
   autosaveTimer=setTimeout(function(){collectAndSave();updateScore()},600);
 }
 
+/* ── Submit-Ready Bundle ─────────────────────────────────────
+   Produces a single PDF containing the Tenancy Application,
+   the Cover Letter (if drafted), and an ID-attach instruction
+   sheet. Pulls property + agency context from saved data so
+   the renter doesn't have to retype anything. */
+function downloadSubmitBundle(){
+  collectAndSave();
+  var r = getResume();
+  var coreFilled = ['fullName','email','mobile','currentAddress','employer'].filter(function(k){
+    return r[k] && String(r[k]).trim();
+  }).length;
+  if (coreFilled < 3) {
+    showToast('Add a few details first', 'Fill in your name, contact and current address before generating', '💡');
+    switchView('B');
+    return;
+  }
+
+  var applyingFor = '', agencyName = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record') || 'null');
+    if (lease){
+      if (lease.address) applyingFor = lease.address;
+      if (lease.agencyName) agencyName = lease.agencyName;
+    }
+  } catch(e){}
+  if (!applyingFor) {
+    try {
+      var active = JSON.parse(localStorage.getItem('riq-active-property') || 'null');
+      if (active && (active.address || active.label)) applyingFor = active.address || active.label;
+    } catch(e){}
+  }
+  var letter = letterText || r.coverLetter || '';
+
+  if (!window.RIQExport || typeof RIQExport.generateSubmitBundle !== 'function') {
+    showToast('Bundle unavailable', 'Refresh the page — the export library is loading', '⚠️');
+    return;
+  }
+
+  RIQExport.generateSubmitBundle({
+    resume: r,
+    letter: letter,
+    propertyAddress: applyingFor,
+    agencyName: agencyName,
+    date: new Date()
+  });
+}
+
+/* ── Cover Letter PDF ────────────────────────────────────────
+   Saves the generated cover letter as its own clean one-page
+   PDF using the browser's native print dialog. */
+function downloadCoverLetterPdf(){
+  var letter = letterText || (getResume().coverLetter || '');
+  if (!letter || !String(letter).trim()) {
+    showToast('No letter yet', 'Generate the cover letter first, then save as PDF', '💡');
+    return;
+  }
+  var r = getResume();
+  var applyingFor = '', agencyName = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record') || 'null');
+    if (lease){
+      if (lease.address) applyingFor = lease.address;
+      if (lease.agencyName) agencyName = lease.agencyName;
+    }
+  } catch(e){}
+  if (!applyingFor) {
+    try {
+      var active = JSON.parse(localStorage.getItem('riq-active-property') || 'null');
+      if (active && (active.address || active.label)) applyingFor = active.address || active.label;
+    } catch(e){}
+  }
+  if (!window.RIQExport || typeof RIQExport.generateCoverLetter !== 'function') {
+    showToast('PDF unavailable', 'Refresh the page — the export library is loading', '⚠️');
+    return;
+  }
+  RIQExport.generateCoverLetter({
+    resume: r,
+    letter: letter,
+    propertyAddress: applyingFor,
+    agencyName: agencyName,
+    date: new Date()
+  });
+}
+
+/* ── Universal Tenancy Application PDF ───────────────────────
+   Generates a clean one-pager from the saved resume. No ID
+   documents — the renter attaches those directly with the
+   agency, per the privacy-by-design rule. */
+function downloadTenancyApplicationPdf(){
+  var r = getResume();
+  collectAndSave();
+  r = getResume();
+
+  // Soft-block when the resume is essentially empty so the PDF isn't a sea
+  // of em-dashes. Fewer than three core fields = nudge them to fill in.
+  var coreFilled = ['fullName','email','mobile','currentAddress','employer'].filter(function(k){
+    return r[k] && String(r[k]).trim();
+  }).length;
+  if (coreFilled < 3) {
+    showToast('Add a few details first', 'Fill in your name, contact and current address before generating', '💡');
+    switchView('B');
+    return;
+  }
+
+  // Best-effort applying-for address: an active inspection or saved lease
+  var applyingFor = '';
+  try {
+    var active = JSON.parse(localStorage.getItem('riq-active-property') || 'null');
+    if (active && (active.address || active.label)) applyingFor = active.address || active.label;
+  } catch(e){}
+  if (!applyingFor) {
+    try {
+      var lease = JSON.parse(localStorage.getItem('riq-lease-record') || 'null');
+      if (lease && lease.address) applyingFor = lease.address;
+    } catch(e){}
+  }
+
+  if (!window.RIQExport || typeof RIQExport.generateTenancyApplication !== 'function') {
+    showToast('PDF unavailable', 'Try refreshing the page — the export library is loading', '⚠️');
+    return;
+  }
+
+  RIQExport.generateTenancyApplication({
+    resume: r,
+    propertyAddress: applyingFor,
+    date: new Date()
+  });
+}
+
 /* ── Cover Letter ─────────────────────────────────────────── */
 async function generateCoverLetter(){
+  if(window.RIQDisclaimer && window.RIQDisclaimer.gate){
+    var ok = await window.RIQDisclaimer.gate();
+    if(!ok) return;
+  }
   var btn=document.getElementById('generateBtn');
   var whoYouAre=document.getElementById('cl-whoYouAre').value.trim();
   var whyProperty=document.getElementById('cl-whyProperty').value.trim();
@@ -1411,7 +1339,6 @@ function saveResumeToVault(opts){
   opts = opts || {};
   try{
     var r=getResume();
-    var idScore=Math.min(100,Object.values(uploadedDocs).reduce(function(s,v){return s+(typeof v==='number'?v:0)},0));
     var resumeSnapshot={};
     ['fullName','dob','email','mobile','currentAddress','timeAtAddress','reasonMoving',
      'employmentStatus','employer','jobTitle','empDuration','income',
@@ -1420,28 +1347,21 @@ function saveResumeToVault(opts){
      'hasPets','petType','petBreed','petAge','petRego','petNotes',
      'vehicleCount','vehicle1','vehicle1Rego','vehicle2',
      'occupantCount','occ2Name','occ2Rel','occ3Name',
+     'emergencyName','emergencyPhone','emergencyRelation',
+     'moveInFrom','leaseLengthPref',
      'ref1Name','ref1Agency','ref1Phone','ref1Email','ref1Rel','ref1Period',
      'ref2Name','ref2Company','ref2Phone','ref2Email','ref2Rel',
      'ref3Name','ref3Company','ref3Title','ref3Phone','ref3Email','ref3Duration'
     ].forEach(function(k){if(r[k])resumeSnapshot[k]=r[k];});
 
-    // Metadata-only copy of uploaded docs — never carries bytes.
-    var metaOnly={};
-    Object.keys(docMeta||{}).forEach(function(k){
-      var d=docMeta[k]||{};
-      metaOnly[k]={name:d.name,size:d.size,pts:d.pts,ts:d.ts,mimeType:d.mimeType,secure:true};
-    });
-
     var record={
       resume:resumeSnapshot,
       coverLetter:letterText||r.coverLetter||'',
-      idScore:idScore,
-      uploadedDocs:metaOnly,
       updatedAt:Date.now()
     };
     localStorage.setItem('riq_personal_docs',JSON.stringify(record));
-    localStorage.setItem('riq_renter_resume_vault',JSON.stringify(Object.assign({},resumeSnapshot,{_savedToVault:Date.now(),_coverLetter:record.coverLetter,_idScore:idScore,_docCount:Object.keys(metaOnly).length,docs:metaOnly})));
-    if(!opts.silent) showToast('Resume saved 🔒','Your IDs stay encrypted on this device','🗂️');
+    localStorage.setItem('riq_renter_resume_vault',JSON.stringify(Object.assign({},resumeSnapshot,{_savedToVault:Date.now(),_coverLetter:record.coverLetter})));
+    if(!opts.silent) showToast('Resume saved ✓','Your details synced to your account','🗂️');
     syncPersonalDocsToCloud(record);
   }catch(e){console.warn('saveResumeToVault:',e);}
 }
@@ -1539,8 +1459,6 @@ function buildExportPackText(){
     if(!rows.length)return '';
     return heading+'\n'+rows.join('\n');
   }
-  var idScore=Math.min(100,Object.values(uploadedDocs).reduce(function(s,v){return s+(typeof v==='number'?v:0)},0));
-  var docList=Object.keys(docMeta||{}).map(function(k){var d=docMeta[k]||{};return '• '+(d.name||k)+(d.pts?(' ('+d.pts+' pts)'):'')}).join('\n');
   var out=[
     section('PERSONAL',[
       line('Full Name',r.fullName),line('Date of Birth',r.dob),line('Email',r.email),
@@ -1586,9 +1504,14 @@ function buildExportPackText(){
       line('Title',r.ref3Title),line('Phone',r.ref3Phone),
       line('Email',r.ref3Email),line('Known for',r.ref3Duration)
     ]),
-    section('ID & SUPPORTING DOCUMENTS',[
-      line('100-point ID check',idScore+'/100 points'),
-      docList?('Files ready to upload:\n'+docList):''
+    section('IDENTIFICATION',[
+      'RenterIQ does not store identity documents.',
+      'Attach the following directly to the agency at submission:',
+      '• Photo identification (driver licence or passport)',
+      '• Medicare or another secondary ID',
+      '• Recent payslips or proof of income',
+      '• Bank statement (most recent month)',
+      '• Rental ledger from your previous tenancy, if available'
     ]),
     (letterText||r.coverLetter)?('COVER LETTER\n'+(letterText||r.coverLetter)):''
   ].filter(Boolean).join('\n\n');
@@ -1867,7 +1790,18 @@ var agentFormResultText = '';
 document.getElementById('agentFormInput').addEventListener('change', function(e) {
   var file = e.target.files[0];
   if (!file) return;
+  var input = e.target;
 
+  var disclaim = (window.RIQDisclaimer && window.RIQDisclaimer.gate)
+    ? window.RIQDisclaimer.gate()
+    : Promise.resolve(true);
+  disclaim.then(function(ok){
+    if (!ok) { input.value = ''; return; }
+    runPrefillForm(file);
+  });
+});
+
+function runPrefillForm(file){
   var zone = document.getElementById('agentFormZone');
   var processing = document.getElementById('agentFormProcessing');
   var result = document.getElementById('agentFormResult');
@@ -1923,7 +1857,7 @@ document.getElementById('agentFormInput').addEventListener('change', function(e)
     });
   };
   reader.readAsDataURL(file);
-});
+}
 
 var agentFormEditMode = false;
 

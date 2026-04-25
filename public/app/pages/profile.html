@@ -339,7 +339,7 @@
     <span class="settings-chevron">›</span>
   </div>
 </div>
-<div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55">Your resume is saved securely on this device. IDs and payslips are encrypted and never uploaded to RenterIQ servers.</div>
+<div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55">Your details stay on this device and sync to your own account. RenterIQ never asks for or stores your licence, passport or Medicare — those go straight from your phone to the agency.</div>
 
 <!-- SECURITY -->
 <div class="sec-label" style="margin-top:20px">Security</div>
@@ -1538,7 +1538,6 @@ function renderResumeHero(){
   var pctEl=document.getElementById('resumeHeroPct');
   var subEl=document.getElementById('resumeHeroSub');
   var metaEl=document.getElementById('resumeHeroMeta');
-  var lockEl=document.getElementById('resumeHeroLock');
   if(!bar||!pctEl)return;
 
   var resume={};
@@ -1547,17 +1546,16 @@ function renderResumeHero(){
   var coreFields=['fullName','dob','email','mobile','currentAddress',
     'employmentStatus','employer','jobTitle','income',
     'prevAddress','prevAgency','prevContact',
-    'ref1Name','ref1Phone','ref2Name'];
+    'ref1Name','ref1Phone','ref2Name',
+    'emergencyName','emergencyPhone','moveInFrom'];
   var filled=coreFields.filter(function(k){return resume[k]&&String(resume[k]).trim();}).length;
 
   var vault={};
   try{vault=JSON.parse(localStorage.getItem('riq_personal_docs')||'{}')||{};}catch(e){}
   var hasLetter=(vault.coverLetter&&vault.coverLetter.length>40)||(resume.coverLetter&&resume.coverLetter.length>40)?1:0;
-  var idScore=Math.min(100,Number(vault.idScore)||0);
-  var hasDocs=idScore>0?1:0;
 
-  var total=coreFields.length+2; // +letter +docs
-  var pct=Math.round(((filled+hasLetter+hasDocs)/total)*100);
+  var total=coreFields.length+1; // +letter
+  var pct=Math.round(((filled+hasLetter)/total)*100);
 
   pctEl.textContent=pct+'% ready';
   bar.style.width=pct+'%';
@@ -1567,16 +1565,14 @@ function renderResumeHero(){
     metaEl.textContent='Tap to start →';
   }else if(pct<60){
     subEl.textContent='Keep going — a complete resume wins properties faster.';
-    metaEl.textContent=filled+'/'+coreFields.length+' core fields · '+idScore+'/100 ID pts · tap to continue →';
+    metaEl.textContent=filled+'/'+coreFields.length+' core fields · '+(hasLetter?'cover letter ✓':'cover letter missing')+' · tap to continue →';
   }else if(pct<100){
     subEl.textContent='Almost there. Finish the last bits so you\'re ready the moment you see a property.';
-    metaEl.textContent=idScore+'/100 ID pts · '+(hasLetter?'cover letter ✓':'cover letter missing')+' · tap to finish →';
+    metaEl.textContent=filled+'/'+coreFields.length+' fields · '+(hasLetter?'cover letter ✓':'cover letter missing')+' · tap to finish →';
   }else{
     subEl.textContent='Your resume is fully prepared. Hit any portal and apply in minutes.';
-    metaEl.textContent='100/100 ID pts · cover letter ✓ · tap to review →';
+    metaEl.textContent='All set · cover letter ✓ · tap to review →';
   }
-
-  if(idScore>0&&lockEl)lockEl.style.display='inline';
 }
 
 // Refresh the three stat tiles (days left on lease · vault docs · reports)

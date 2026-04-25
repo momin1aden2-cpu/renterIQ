@@ -253,6 +253,295 @@
     return html;
   }
 
+  // ── Universal Tenancy Application One-Pager ───────────────────────────
+  //
+  // A clean, agency-friendly summary of the renter's profile that works in
+  // any state. Generic "Tenancy Application" label — no statutory form
+  // numbers (Form 22, 3A, A1 etc) until those are verified. Includes an ID
+  // attachment placeholder block with the privacy line so the renter knows
+  // to attach licence / Medicare themselves at submission, not via RenterIQ.
+  function buildTenancyApplicationHTML(opts) {
+    var now = opts.date || new Date();
+    var dateStr = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+    var r = opts.resume || {};
+
+    function row(label, value) {
+      var v = value && String(value).trim();
+      return '<tr><td style="padding:5px 0;color:#6B7B99;font-weight:700;width:40%;font-size:11px;letter-spacing:.3px">' + esc(label) + '</td>' +
+             '<td style="padding:5px 0;color:#1A2B4A;font-size:11.5px">' + (v ? esc(v) : '<span style="color:#B7C0D0">—</span>') + '</td></tr>';
+    }
+    function section(title, body) {
+      if (!body) return '';
+      return '<div style="page-break-inside:avoid;margin-bottom:14px">' +
+        '<div style="font-size:10px;font-weight:800;color:#0A2460;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1.5px solid #0A2460;padding-bottom:4px;margin-bottom:8px">' + esc(title) + '</div>' +
+        '<table style="width:100%;border-collapse:collapse"><tbody>' + body + '</tbody></table>' +
+        '</div>';
+    }
+
+    var html = '';
+    html += '<div style="font-family:Arial,Helvetica,sans-serif;color:#1A2B4A;padding:0;max-width:720px;margin:0 auto">';
+
+    // Header
+    html += '<div style="border:2px solid #0A2460;border-radius:10px;padding:20px 22px 16px;margin-bottom:16px">';
+    html += '<div style="font-size:11px;font-weight:700;color:#6B7B99;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:4px">Tenancy Application</div>';
+    html += '<div style="font-size:22px;font-weight:800;color:#0A2460;letter-spacing:-.3px;margin-bottom:4px">' + esc(r.fullName || 'Applicant') + '</div>';
+    html += '<div style="font-size:12.5px;font-weight:600;color:#1A2B4A;line-height:1.55">';
+    var contactBits = [];
+    if (r.mobile) contactBits.push(esc(r.mobile));
+    if (r.email) contactBits.push(esc(r.email));
+    html += contactBits.length ? contactBits.join(' &nbsp;·&nbsp; ') : '<span style="color:#B7C0D0">Contact details not provided</span>';
+    html += '</div>';
+    if (opts.propertyAddress) {
+      html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #E8EFF8;font-size:11px;color:#6B7B99;font-weight:700;letter-spacing:.4px;text-transform:uppercase">Applying for</div>';
+      html += '<div style="font-size:13px;font-weight:700;color:#1A2B4A;margin-top:2px">' + esc(opts.propertyAddress) + '</div>';
+    }
+    html += '<div style="margin-top:10px;font-size:10.5px;color:#6B7B99;font-weight:600">Prepared ' + dateStr + '</div>';
+    html += '</div>';
+
+    // ── About you
+    html += section('About you',
+      row('Full name', r.fullName) +
+      row('Date of birth', r.dob) +
+      row('Mobile', r.mobile) +
+      row('Email', r.email) +
+      row('Current address', r.currentAddress) +
+      row('Time at address', r.timeAtAddress) +
+      row('Reason for moving', r.reasonMoving)
+    );
+
+    // ── Employment & income
+    html += section('Employment & income',
+      row('Status', r.employmentStatus) +
+      row('Employer', r.employer) +
+      row('Role', r.jobTitle) +
+      row('Time in role', r.empDuration) +
+      row('Income', r.income)
+    );
+
+    // ── Rental history
+    var rentalBody = '';
+    if (r.prevAddress || r.prevAgency || r.prevContact) {
+      rentalBody += row('Previous address', r.prevAddress);
+      rentalBody += row('Weekly rent', r.prevRent);
+      rentalBody += row('Agency / landlord', r.prevAgency);
+      rentalBody += row('Contact', r.prevContact);
+      rentalBody += row('Duration', r.prevDuration);
+      rentalBody += row('Reason for leaving', r.prevReason);
+    }
+    if (r.prev2Address) {
+      rentalBody += '<tr><td colspan="2" style="padding-top:10px;font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:.5px;text-transform:uppercase">Earlier tenancy</td></tr>';
+      rentalBody += row('Address', r.prev2Address);
+      rentalBody += row('Weekly rent', r.prev2Rent);
+      rentalBody += row('Agency / landlord', r.prev2Agency);
+      rentalBody += row('Contact', r.prev2Contact);
+      rentalBody += row('Duration', r.prev2Duration);
+      rentalBody += row('Reason for leaving', r.prev2Reason);
+    }
+    if (!rentalBody) rentalBody = row('Rental history', '');
+    html += section('Rental history', rentalBody);
+
+    // ── References
+    var refsBody = '';
+    if (r.ref1Name || r.ref1Phone) {
+      refsBody += '<tr><td colspan="2" style="font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:.5px;text-transform:uppercase;padding-bottom:2px">Previous landlord / agent</td></tr>';
+      refsBody += row('Name', r.ref1Name);
+      refsBody += row('Agency', r.ref1Agency);
+      refsBody += row('Phone', r.ref1Phone);
+      refsBody += row('Email', r.ref1Email);
+      refsBody += row('Tenancy period', r.ref1Period);
+    }
+    if (r.ref2Name || r.ref2Phone) {
+      refsBody += '<tr><td colspan="2" style="padding-top:8px;font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:.5px;text-transform:uppercase">Employer reference</td></tr>';
+      refsBody += row('Name', r.ref2Name);
+      refsBody += row('Company', r.ref2Company);
+      refsBody += row('Phone', r.ref2Phone);
+      refsBody += row('Email', r.ref2Email);
+    }
+    if (r.ref3Name || r.ref3Phone) {
+      refsBody += '<tr><td colspan="2" style="padding-top:8px;font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:.5px;text-transform:uppercase">Personal reference</td></tr>';
+      refsBody += row('Name', r.ref3Name);
+      refsBody += row('Relationship', r.ref3Title);
+      refsBody += row('Phone', r.ref3Phone);
+      refsBody += row('Email', r.ref3Email);
+      refsBody += row('Years known', r.ref3Duration);
+    }
+    if (refsBody) html += section('References', refsBody);
+
+    // ── Household
+    var householdBody = '';
+    if (r.occupantCount || r.occ2Name || r.occ3Name) {
+      householdBody += row('Total moving in', r.occupantCount);
+      householdBody += row('Occupant 2', r.occ2Name ? r.occ2Name + (r.occ2Rel ? ' (' + r.occ2Rel + ')' : '') : '');
+      householdBody += row('Occupant 3', r.occ3Name);
+    }
+    if (r.petType || r.petBreed) {
+      householdBody += row('Pet', [r.petType, r.petBreed, r.petAge].filter(Boolean).join(' · '));
+      if (r.petRego) householdBody += row('Pet registration', r.petRego);
+      if (r.petNotes) householdBody += row('Pet notes', r.petNotes);
+    }
+    if (r.vehicle1) {
+      householdBody += row('Vehicle 1', r.vehicle1 + (r.vehicle1Rego ? ' · ' + r.vehicle1Rego : ''));
+      if (r.vehicle2) householdBody += row('Vehicle 2', r.vehicle2);
+    }
+    if (householdBody) html += section('Household', householdBody);
+
+    // ── Emergency contact
+    if (r.emergencyName || r.emergencyPhone) {
+      html += section('Emergency contact',
+        row('Name', r.emergencyName) +
+        row('Phone', r.emergencyPhone) +
+        row('Relationship', r.emergencyRelation)
+      );
+    }
+
+    // ── Move-in preferences
+    if (r.moveInFrom || r.leaseLengthPref) {
+      html += section('Move-in preferences',
+        row('Earliest move-in', r.moveInFrom) +
+        row('Lease length', r.leaseLengthPref)
+      );
+    }
+
+    // ── ID attachment placeholder + privacy line
+    html += '<div style="page-break-inside:avoid;margin-top:8px;margin-bottom:14px">';
+    html += '<div style="font-size:10px;font-weight:800;color:#0A2460;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1.5px solid #0A2460;padding-bottom:4px;margin-bottom:10px">Identification</div>';
+    html += '<div style="border:1.5px dashed #B7C0D0;border-radius:10px;padding:14px 16px;background:#FAFCFF">';
+    html += '<div style="font-size:11.5px;font-weight:700;color:#1A2B4A;margin-bottom:6px">Attach the following at submission</div>';
+    html += '<div style="font-size:11px;color:#1A2B4A;line-height:1.65;margin-bottom:10px">';
+    html += '· Photo identification (driver licence or passport)<br>';
+    html += '· Medicare card<br>';
+    html += '· Recent payslips or proof of income<br>';
+    html += '· Bank statement (most recent month)';
+    html += '</div>';
+    html += '<div style="background:#FEF9E7;border:1px solid #F5D57A;border-radius:8px;padding:9px 11px;font-size:10.5px;color:#7A5A00;line-height:1.55">';
+    html += '<strong>Attach these directly with your application.</strong> RenterIQ never asks for or stores your identity documents — they go from your phone or device straight to the agency.';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // ── Signature
+    html += '<div style="page-break-inside:avoid;border-top:2px solid #0A2460;margin-top:16px;padding-top:14px">';
+    html += '<div style="font-size:11px;font-weight:800;color:#0A2460;margin-bottom:8px">Applicant declaration</div>';
+    html += '<div style="font-size:11px;color:#1A2B4A;line-height:1.6;margin-bottom:14px">I confirm the information in this application is accurate to the best of my knowledge. I authorise the agent or landlord to verify these details with the references and parties listed.</div>';
+    html += '<table style="width:100%;border-collapse:collapse"><tbody>';
+    html += '<tr>';
+    html += '<td style="width:60%;padding:0 12px 0 0;vertical-align:top">';
+    html += '<div style="font-size:10px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Signature</div>';
+    html += '<div style="border-bottom:1.5px solid #1A2B4A;height:54px"></div>';
+    html += '<div style="font-size:11.5px;font-weight:700;color:#1A2B4A;margin-top:5px">' + esc(r.fullName || '') + '</div>';
+    html += '</td>';
+    html += '<td style="width:40%;padding:0 0 0 12px;vertical-align:top">';
+    html += '<div style="font-size:10px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Date</div>';
+    html += '<div style="border-bottom:1.5px solid #1A2B4A;height:54px;padding:0 0 4px;font-size:11.5px;color:#1A2B4A;text-align:left;vertical-align:bottom">' + dateStr + '</div>';
+    html += '</td>';
+    html += '</tr>';
+    html += '</tbody></table>';
+    html += '</div>';
+
+    // Footer
+    html += '<div style="text-align:center;padding:14px 0 4px;font-size:9.5px;color:#9AA4B8;border-top:1px solid #E8EFF8;margin-top:14px">';
+    html += 'Prepared with RenterIQ · renteriq.com.au · Privacy by design — no ID documents are uploaded or stored.';
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  // Cover letter rendered as a standalone block — used inside the bundle and
+  // by the cover-letter-only PDF. Date top-right, optional addressee block,
+  // body in business-letter line-height, sign-off with name + contact.
+  function buildCoverLetterHTML(opts) {
+    var r = (opts && opts.resume) || {};
+    var letter = (opts && opts.letter) || r.coverLetter || '';
+    if (!letter || !String(letter).trim()) return '';
+    var now = (opts && opts.date) || new Date();
+    var dateStr = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    var addresseeBits = [];
+    if (opts && opts.agencyName) addresseeBits.push(esc(opts.agencyName));
+    if (opts && opts.propertyAddress) addresseeBits.push('Re: ' + esc(opts.propertyAddress));
+    var addresseeBlock = addresseeBits.length
+      ? '<div style="font-size:13px;color:#1A2B4A;line-height:1.55;margin-bottom:18px">' + addresseeBits.join('<br>') + '</div>'
+      : '';
+
+    var contactBits = [];
+    if (r.email) contactBits.push(esc(r.email));
+    if (r.mobile) contactBits.push(esc(r.mobile));
+    var contactLine = contactBits.length
+      ? '<div style="font-size:11.5px;color:#6B7B99;font-weight:600;margin-top:4px">' + contactBits.join(' &nbsp;·&nbsp; ') + '</div>'
+      : '';
+
+    return '<div style="font-family:Arial,Helvetica,sans-serif;color:#1A2B4A;max-width:720px;margin:0 auto;padding:0 4px">' +
+      '<div style="text-align:right;font-size:12px;color:#6B7B99;font-weight:600;margin-bottom:22px">' + dateStr + '</div>' +
+      addresseeBlock +
+      '<div style="font-size:13.5px;color:#1A2B4A;line-height:1.75;white-space:pre-wrap">' + esc(letter) + '</div>' +
+      '<div style="margin-top:32px;font-size:13px;color:#1A2B4A;font-weight:700">' + esc(r.fullName || '') + '</div>' +
+      contactLine +
+    '</div>';
+  }
+
+  // ID-attach instruction sheet — the third page of the submit-ready bundle.
+  // Explains why RenterIQ doesn't store IDs and walks the renter through
+  // attaching them themselves at the agency portal / by email / in person.
+  function buildIdAttachInstructionsHTML(opts) {
+    var r = (opts && opts.resume) || {};
+    var nameLine = r.fullName ? esc(r.fullName) : '';
+
+    var html = '';
+    html += '<div style="font-family:Arial,Helvetica,sans-serif;color:#1A2B4A;max-width:720px;margin:0 auto;padding:0 4px">';
+
+    html += '<div style="border:2px solid #0A2460;border-radius:10px;padding:18px 22px 14px;margin-bottom:18px">';
+    html += '<div style="font-size:11px;font-weight:700;color:#6B7B99;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:4px">Identification — instruction sheet</div>';
+    html += '<div style="font-size:20px;font-weight:800;color:#0A2460;letter-spacing:-.3px;margin-bottom:6px">How to attach your IDs</div>';
+    if (nameLine) html += '<div style="font-size:12.5px;font-weight:600;color:#1A2B4A">For ' + nameLine + '</div>';
+    html += '<div style="margin-top:8px;font-size:11.5px;color:#6B7B99;font-weight:600;line-height:1.6">A short walkthrough so your driver licence, Medicare and payslips go directly to the agency without passing through RenterIQ.</div>';
+    html += '</div>';
+
+    html += '<div style="background:#F4FBF8;border:1px solid rgba(0,200,150,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px">';
+    html += '<div style="font-size:10px;font-weight:800;color:#005040;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Why this is on you, not us</div>';
+    html += '<div style="font-size:11.5px;color:#1A2B4A;line-height:1.65">RenterIQ has no upload path for identity documents. We don\'t collect, encrypt, or relay your licence, passport, Medicare or payslips. That\'s a structural choice — the absence of a feature is the privacy guarantee.</div>';
+    html += '</div>';
+
+    html += '<div style="font-size:11px;font-weight:800;color:#0A2460;letter-spacing:1.2px;text-transform:uppercase;border-bottom:1.5px solid #0A2460;padding-bottom:4px;margin-bottom:10px">What to attach</div>';
+    html += '<div style="font-size:11.5px;color:#1A2B4A;line-height:1.85;margin-bottom:18px">' +
+      '<div>· Photo identification — driver licence or passport</div>' +
+      '<div>· Medicare card or another secondary ID</div>' +
+      '<div>· Two recent payslips (or last three months of bank statements if self-employed)</div>' +
+      '<div>· Bank statement showing the past month of activity</div>' +
+      '<div>· Rental ledger from your previous tenancy, if available</div>' +
+      '<div>· Written reference from a previous landlord or character referee, if you have one</div>' +
+    '</div>';
+
+    html += '<div style="font-size:11px;font-weight:800;color:#0A2460;letter-spacing:1.2px;text-transform:uppercase;border-bottom:1.5px solid #0A2460;padding-bottom:4px;margin-bottom:10px">Step-by-step</div>';
+    html += '<div style="margin-bottom:18px">';
+    var steps = [
+      ['1', 'Find your IDs in your own storage', 'Driver licence and Medicare cards in your phone\'s photo library or wallet app. Payslips and bank statements in your email or your accountant\'s portal. Keep everything in one folder for the application.'],
+      ['2', 'Open the agency\'s portal or email', 'Most Australian agencies use 1Form, Snug, Domain Apply, Ignite or REA. Some accept email applications. Check the listing for the exact path.'],
+      ['3', 'Upload directly from your device', 'Use the portal\'s "Add document" button to attach each file from the folder you prepared. If applying by email, attach the same files to the email body.'],
+      ['4', 'Attach this application + cover letter', 'The Tenancy Application and Cover Letter pages from this bundle complete the picture. Attach them alongside your IDs.'],
+      ['5', 'Submit and save the confirmation', 'Once you submit, screenshot the confirmation page or save the receipt email. That\'s your proof of submission.']
+    ];
+    steps.forEach(function(s) {
+      html += '<div style="display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #E8EFF8">';
+      html += '<div style="width:28px;height:28px;border-radius:50%;background:#1B50C8;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + s[0] + '</div>';
+      html += '<div><div style="font-size:12.5px;font-weight:700;color:#1A2B4A">' + esc(s[1]) + '</div>';
+      html += '<div style="font-size:11.5px;color:#6B7B99;font-weight:600;margin-top:3px;line-height:1.55">' + esc(s[2]) + '</div></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    html += '<div style="background:#FEF9E7;border:1px solid #F5D57A;border-radius:8px;padding:12px 14px;font-size:11px;color:#7A5A00;line-height:1.6">';
+    html += '<strong>A few things to check before you submit.</strong> Each agency has a slightly different list — read the listing or the portal\'s document checklist. If something is asked for that you don\'t have, contact the agent directly rather than skipping it.';
+    html += '</div>';
+
+    html += '<div style="text-align:center;padding:14px 0 4px;font-size:9.5px;color:#9AA4B8;border-top:1px solid #E8EFF8;margin-top:18px">';
+    html += 'Prepared with RenterIQ · renteriq.com.au · Privacy by design — no ID documents are uploaded or stored.';
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
   function waitForImages(container) {
     var imgs = container.querySelectorAll('img');
     return Promise.all(Array.prototype.map.call(imgs, function(img) {
@@ -369,6 +658,166 @@
         var filename = opts.filename || 'renteriq-report.pdf';
         runPdf(container, filename);
       });
+    },
+    generateSubmitBundle: function(opts) {
+      // One PDF, three pages — application + cover letter + ID-attach
+      // instructions. Uses the browser's native print dialog for reliable
+      // rendering (same proven pattern as the other PDFs).
+      opts = opts || {};
+      var safeName = String((opts.resume && opts.resume.fullName) || 'applicant').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'applicant';
+      var pageTitle = 'RenterIQ-Submit-Bundle-' + safeName + '-' + new Date().toISOString().split('T')[0];
+
+      var w = window.open('', '_blank');
+      if (!w) {
+        if (typeof showToast === 'function') showToast('Pop-ups blocked', 'Allow pop-ups for renteriq to download the bundle', '⚠️');
+        return;
+      }
+
+      var appHtml = buildTenancyApplicationHTML(opts);
+      var letterHtml = buildCoverLetterHTML(opts);
+      var instrHtml = buildIdAttachInstructionsHTML(opts);
+
+      // Each section gets its own page-break wrapper so print preview shows
+      // them as distinct pages of the same PDF.
+      var sectionStyle = 'page-break-after:always;break-after:page';
+      var lastSectionStyle = '';
+      var sections = [];
+      sections.push({ html: appHtml, label: 'Tenancy Application' });
+      if (letterHtml) sections.push({ html: letterHtml, label: 'Cover Letter' });
+      sections.push({ html: instrHtml, label: 'How to attach your IDs' });
+
+      var bodyHTML = '';
+      sections.forEach(function(sec, i) {
+        var s = (i === sections.length - 1) ? lastSectionStyle : sectionStyle;
+        bodyHTML += '<section data-bundle-part="' + esc(sec.label) + '" style="' + s + '">' + sec.html + '</section>';
+      });
+
+      var doc = '<!doctype html><html lang="en-AU"><head><meta charset="utf-8">' +
+        '<title>' + esc(pageTitle) + '</title>' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<style>' +
+          'html,body{margin:0;padding:0;background:#fff;color:#1A2B4A;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+          'body{padding:24px}' +
+          'section{page-break-inside:auto}' +
+          '.riq-actions{position:sticky;top:0;display:flex;gap:10px;justify-content:flex-end;padding:10px 0 14px;background:#fff;border-bottom:1px solid #E8EFF8;margin-bottom:18px;z-index:10}' +
+          '.riq-actions button{background:#1B50C8;color:#fff;border:0;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}' +
+          '.riq-actions button.secondary{background:#fff;color:#1B50C8;border:1.5px solid #1B50C8}' +
+          '@media print{.riq-actions{display:none}body{padding:0}@page{size:A4;margin:14mm}}' +
+        '</style></head><body>' +
+        '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
+        bodyHTML +
+        '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},400)});<\/script>' +
+        '</body></html>';
+      w.document.open();
+      w.document.write(doc);
+      w.document.close();
+      try { w.document.title = pageTitle; } catch(e){}
+
+      if (typeof showToast === 'function') showToast('Submit-ready bundle ready', 'Use Save as PDF in the print dialog', '📦');
+    },
+    generateCoverLetter: function(opts) {
+      // Cover letter is rendered as a single clean page using the browser's
+      // native print dialog — same pattern as the tenancy application.
+      var safeName = String((opts && opts.resume && opts.resume.fullName) || 'applicant').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'applicant';
+      var pageTitle = 'RenterIQ-Cover-Letter-' + safeName + '-' + new Date().toISOString().split('T')[0];
+      var r = (opts && opts.resume) || {};
+      var letter = (opts && opts.letter) || r.coverLetter || '';
+      if (!letter || !String(letter).trim()) {
+        if (typeof showToast === 'function') showToast('No letter yet', 'Generate the cover letter first, then save as PDF', '⚠️');
+        return;
+      }
+      var now = (opts && opts.date) || new Date();
+      var dateStr = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      var w = window.open('', '_blank');
+      if (!w) {
+        if (typeof showToast === 'function') showToast('Pop-ups blocked', 'Allow pop-ups for renteriq to save the PDF', '⚠️');
+        return;
+      }
+
+      var addresseeBits = [];
+      if (opts && opts.agencyName) addresseeBits.push(esc(opts.agencyName));
+      if (opts && opts.propertyAddress) addresseeBits.push('Re: ' + esc(opts.propertyAddress));
+      var addresseeBlock = addresseeBits.length
+        ? '<div style="font-size:13px;color:#1A2B4A;line-height:1.55;margin-bottom:18px">' + addresseeBits.join('<br>') + '</div>'
+        : '';
+
+      var contactBits = [];
+      if (r.email) contactBits.push(esc(r.email));
+      if (r.mobile) contactBits.push(esc(r.mobile));
+      var contactLine = contactBits.length
+        ? '<div style="font-size:11.5px;color:#6B7B99;font-weight:600;margin-top:4px">' + contactBits.join(' &nbsp;·&nbsp; ') + '</div>'
+        : '';
+
+      var letterHtml =
+        '<div style="font-family:Arial,Helvetica,sans-serif;color:#1A2B4A;max-width:720px;margin:0 auto;padding:0 4px">' +
+          '<div style="text-align:right;font-size:12px;color:#6B7B99;font-weight:600;margin-bottom:22px">' + dateStr + '</div>' +
+          addresseeBlock +
+          '<div style="font-size:13.5px;color:#1A2B4A;line-height:1.75;white-space:pre-wrap">' + esc(letter) + '</div>' +
+          '<div style="margin-top:32px;font-size:13px;color:#1A2B4A;font-weight:700">' + esc(r.fullName || '') + '</div>' +
+          contactLine +
+          '<div style="margin-top:32px;font-size:9.5px;color:#9AA4B8;text-align:center;border-top:1px solid #E8EFF8;padding-top:14px">Prepared with RenterIQ · renteriq.com.au</div>' +
+        '</div>';
+
+      var doc = '<!doctype html><html lang="en-AU"><head><meta charset="utf-8">' +
+        '<title>' + esc(pageTitle) + '</title>' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<style>' +
+          'html,body{margin:0;padding:0;background:#fff;color:#1A2B4A;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+          'body{padding:32px 28px}' +
+          '.riq-actions{position:sticky;top:0;display:flex;gap:10px;justify-content:flex-end;padding:10px 0 14px;background:#fff;border-bottom:1px solid #E8EFF8;margin-bottom:24px;z-index:10}' +
+          '.riq-actions button{background:#1B50C8;color:#fff;border:0;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}' +
+          '.riq-actions button.secondary{background:#fff;color:#1B50C8;border:1.5px solid #1B50C8}' +
+          '@media print{.riq-actions{display:none}body{padding:0}@page{size:A4;margin:18mm}}' +
+        '</style></head><body>' +
+        '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
+        letterHtml +
+        '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},350)});<\/script>' +
+        '</body></html>';
+      w.document.open();
+      w.document.write(doc);
+      w.document.close();
+      try { w.document.title = pageTitle; } catch(e){}
+
+      if (typeof showToast === 'function') showToast('Cover letter ready', 'Use Save as PDF in the print dialog', '📄');
+    },
+    generateTenancyApplication: function(opts) {
+      // We bypass html2pdf for this one because the multi-section table
+      // layout doesn't render reliably inside an off-screen canvas clone on
+      // every device. Instead we open a print-ready page in a new window
+      // and trigger the browser's native print-to-PDF dialog — the renter
+      // saves it from there. Works in every browser without library quirks.
+      var safeName = String((opts && opts.resume && opts.resume.fullName) || 'applicant').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'applicant';
+      var pageTitle = 'RenterIQ-Tenancy-Application-' + safeName + '-' + new Date().toISOString().split('T')[0];
+
+      var w = window.open('', '_blank');
+      if (!w) {
+        if (typeof showToast === 'function') showToast('Pop-ups blocked', 'Allow pop-ups for renteriq to download the PDF', '⚠️');
+        return;
+      }
+
+      var bodyHTML = buildTenancyApplicationHTML(opts || {});
+      var doc = '<!doctype html><html lang="en-AU"><head><meta charset="utf-8">' +
+        '<title>' + esc(pageTitle) + '</title>' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<style>' +
+          'html,body{margin:0;padding:0;background:#fff;color:#1A2B4A;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+          'body{padding:24px}' +
+          '.riq-actions{position:sticky;top:0;display:flex;gap:10px;justify-content:flex-end;padding:10px 0 14px;background:#fff;border-bottom:1px solid #E8EFF8;margin-bottom:18px;z-index:10}' +
+          '.riq-actions button{background:#1B50C8;color:#fff;border:0;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}' +
+          '.riq-actions button.secondary{background:#fff;color:#1B50C8;border:1.5px solid #1B50C8}' +
+          '@media print{.riq-actions{display:none}body{padding:0}@page{size:A4;margin:14mm}}' +
+        '</style></head><body>' +
+        '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
+        bodyHTML +
+        '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},350)});<\/script>' +
+        '</body></html>';
+      w.document.open();
+      w.document.write(doc);
+      w.document.close();
+      try { w.document.title = pageTitle; } catch(e){}
+
+      if (typeof showToast === 'function') showToast('Tenancy application ready', 'Use Save as PDF in the print dialog', '📄');
     }
   };
 })();
