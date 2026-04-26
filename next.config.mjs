@@ -9,16 +9,16 @@ const nextConfig = {
     const csp = [
       "default-src 'self'",
       // Firebase JS SDK + reCAPTCHA Enterprise (App Check) + html2pdf
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.google.com https://www.googletagmanager.com https://www.recaptcha.net https://cdnjs.cloudflare.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.google.com https://apis.google.com https://www.googletagmanager.com https://www.recaptcha.net https://cdnjs.cloudflare.com",
       // reCAPTCHA Enterprise iframes are required for App Check + sign-in
-      "frame-src 'self' https://*.firebaseapp.com https://auth.renteriq.com.au https://www.google.com https://www.recaptcha.net https://accounts.google.com https://checkout.stripe.com",
+      "frame-src 'self' https://*.firebaseapp.com https://auth.renteriq.com.au https://www.google.com https://apis.google.com https://www.recaptcha.net https://accounts.google.com https://checkout.stripe.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' data: https://fonts.gstatic.com",
       "img-src 'self' data: blob: https: http:",
       "media-src 'self' blob:",
       // Outbound XHR/fetch — Firebase services + Stripe redirect target +
       // Gemini is server-only so not listed here. wss:// for Firestore live updates.
-      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net https://*.firebaseapp.com https://auth.renteriq.com.au https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseappcheck.googleapis.com https://content-firebaseappcheck.googleapis.com https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://api.stripe.com wss://*.firebaseio.com wss://s-usc1f-nss-2089.firebaseio.com",
+      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net https://*.firebaseapp.com https://auth.renteriq.com.au https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseappcheck.googleapis.com https://content-firebaseappcheck.googleapis.com https://www.gstatic.com https://www.google.com https://apis.google.com https://www.recaptcha.net https://api.stripe.com wss://*.firebaseio.com wss://s-usc1f-nss-2089.firebaseio.com",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
       "object-src 'none'",
