@@ -189,21 +189,54 @@
         });
         html += '</tbody></table>';
 
-        // Photos for this room — collected with per-item captions
+        // Photos for this room — collected with per-item captions. Each
+        // photo carries the inline thumb (dataUrl preferred, cloud URL
+        // fallback) plus a clickable wrapper pointing at the cloud URL
+        // when available, so digital readers can tap to view the original
+        // at full resolution. Caption format matches agency reports:
+        // "Room — Item · Full date, time".
         var photoBlocks = [];
         (room.items || []).forEach(function(it) {
           (it.photos || []).forEach(function(ph) {
-            if (ph && ph.dataUrl) photoBlocks.push({ src: ph.dataUrl, caption: it.label, time: ph.time || '' });
+            if (!ph) return;
+            var thumb = ph.dataUrl || ph.url || '';
+            if (!thumb) return;
+            var fullSrc = ph.url || ph.dataUrl || '';
+            var when = '';
+            if (ph.timestamp) {
+              try {
+                var t = new Date(ph.timestamp);
+                if (!isNaN(t.getTime())) {
+                  when = t.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + t.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+                }
+              } catch (e) {}
+            }
+            if (!when && ph.time) when = ph.time;
+            photoBlocks.push({
+              thumb: thumb,
+              full: fullSrc,
+              roomLabel: room.name || 'Room',
+              itemLabel: it.label || 'Item',
+              when: when
+            });
           });
         });
         if (photoBlocks.length) {
-          html += '<div style="margin-top:12px">';
+          html += '<div style="margin-top:14px">';
           html += '<div style="font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px">Supporting photographs</div>';
-          html += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+          html += '<div style="display:flex;flex-wrap:wrap;gap:10px">';
           photoBlocks.forEach(function(ph) {
-            html += '<div style="width:140px">';
-            html += '<img src="' + ph.src + '" style="width:140px;height:105px;object-fit:cover;border-radius:6px;border:1px solid #E8EFF8;display:block">';
-            html += '<div style="font-size:9.5px;font-weight:700;color:#6B7B99;margin-top:4px;line-height:1.3">' + esc(ph.caption) + (ph.time ? ' · ' + esc(ph.time) : '') + '</div>';
+            var caption = esc(ph.roomLabel) + ' — ' + esc(ph.itemLabel) + (ph.when ? ' · ' + esc(ph.when) : '');
+            // Wrap the image in an <a> when we have a cloud URL — the PDF
+            // print path preserves links, so digital readers can tap a
+            // photo to open the high-res original in a new tab.
+            var imgTag = '<img src="' + ph.thumb + '" style="width:180px;height:135px;object-fit:cover;border-radius:7px;border:1px solid #E8EFF8;display:block" alt="">';
+            var wrapped = ph.full
+              ? '<a href="' + ph.full + '" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">' + imgTag + '</a>'
+              : imgTag;
+            html += '<div style="width:180px">';
+            html += wrapped;
+            html += '<div style="font-size:9.5px;font-weight:700;color:#6B7B99;margin-top:5px;line-height:1.35">' + caption + '</div>';
             html += '</div>';
           });
           html += '</div></div>';
@@ -643,19 +676,41 @@
 
   window.RIQExport = {
     generateConditionReport: function(opts) {
-      if (typeof showToast === 'function') showToast('Generating report', 'Building your condition report…', '📄');
-      loadLib(function(err) {
-        if (err) {
-          if (typeof showToast === 'function') showToast('Error', 'Could not load PDF library', '⚠️');
-          return;
-        }
-        var container = document.createElement('div');
-        container.innerHTML = buildConditionHTML(opts);
-        container.style.cssText = 'position:fixed;left:-10000px;top:0;width:720px;background:#fff;pointer-events:none';
-        document.body.appendChild(container);
-        var filename = opts.filename || ('RenterIQ-Entry-Condition-Report-' + new Date().toISOString().split('T')[0] + '.pdf');
-        runPdf(container, filename);
-      });
+      // Same browser-print-to-PDF pattern we use for the tenancy application
+      // and submit bundle. The earlier html2pdf + iframe-viewer path produced
+      // blank previews on mobile Safari and some Chrome versions; native
+      // print-window is reliable everywhere.
+      var addressSlug = String((opts && opts.propertyAddress) || 'property').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'property';
+      var pageTitle = (opts && opts.filename ? String(opts.filename).replace(/\.pdf$/i, '') : 'RenterIQ-Entry-Condition-Report-' + addressSlug + '-' + new Date().toISOString().split('T')[0]);
+
+      var w = window.open('', '_blank');
+      if (!w) {
+        if (typeof showToast === 'function') showToast('Pop-ups blocked', 'Allow pop-ups for renteriq to download the report', '⚠️');
+        return;
+      }
+
+      var bodyHTML = buildConditionHTML(opts || {});
+      var doc = '<!doctype html><html lang="en-AU"><head><meta charset="utf-8">' +
+        '<title>' + esc(pageTitle) + '</title>' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<style>' +
+          'html,body{margin:0;padding:0;background:#fff;color:#1A2B4A;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+          'body{padding:24px}' +
+          '.riq-actions{position:sticky;top:0;display:flex;gap:10px;justify-content:flex-end;padding:10px 0 14px;background:#fff;border-bottom:1px solid #E8EFF8;margin-bottom:18px;z-index:10}' +
+          '.riq-actions button{background:#1B50C8;color:#fff;border:0;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}' +
+          '.riq-actions button.secondary{background:#fff;color:#1B50C8;border:1.5px solid #1B50C8}' +
+          '@media print{.riq-actions{display:none}body{padding:0}@page{size:A4;margin:14mm}}' +
+        '</style></head><body>' +
+        '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
+        bodyHTML +
+        '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},400)});<\/script>' +
+        '</body></html>';
+      w.document.open();
+      w.document.write(doc);
+      w.document.close();
+      try { w.document.title = pageTitle; } catch(e){}
+
+      if (typeof showToast === 'function') showToast('Move-in record ready', 'Use Save as PDF in the print dialog', '📄');
     },
     generate: function(opts) {
       if (typeof showToast === 'function') showToast('Generating PDF', 'Preparing your report…', '📄');

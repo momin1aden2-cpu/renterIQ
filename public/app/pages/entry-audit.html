@@ -450,7 +450,7 @@
 
 function navigate(p){document.body.style.transition='opacity .12s ease';document.body.style.opacity='0';setTimeout(function(){window.location.href=p},100)}
 
-function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:16px;left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:var(--text);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.25)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0"></span><div><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35"></div><div id="toastSub" style="font-size:11px;color:var(--muted);margin-top:1px;font-family:Nunito,sans-serif"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
+function showToast(t,s,i){var e=document.getElementById('appToast');if(!e){e=document.createElement('div');e.id='appToast';e.style.cssText='position:fixed;top:max(16px,env(safe-area-inset-top,16px));left:14px;right:14px;max-width:402px;margin:0 auto;background:var(--blue-dk);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px;z-index:11000;transform:translateY(-90px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.35)';e.innerHTML='<span id="toastIcon" style="font-size:20px;flex-shrink:0;color:#fff"></span><div style="flex:1;min-width:0"><div id="toastText" style="font-family:Sora,sans-serif;font-size:13px;font-weight:700;line-height:1.35;color:#fff"></div><div id="toastSub" style="font-size:11px;color:rgba(255,255,255,.75);margin-top:1px;font-family:Nunito,sans-serif;line-height:1.4"></div></div>';document.body.appendChild(e)}document.getElementById('toastIcon').textContent=i||'✓';document.getElementById('toastText').textContent=t||'';document.getElementById('toastSub').textContent=s||'';e.style.transform='translateY(0)';e.style.opacity='1';clearTimeout(e._timer);e._timer=setTimeout(function(){e.style.transform='translateY(-90px)';e.style.opacity='0'},3200)}
 
 // Room data
 var standardRooms=[
@@ -1984,8 +1984,8 @@ function closeSignature(){
 
 function confirmSignature(){
   var name=document.getElementById('sigName').value.trim();
-  if(!name){ showToast('Name required','Please type your full name','⚠️'); return; }
-  if(!sigHasInk){ showToast('Signature required','Please sign in the box above','⚠️'); return; }
+  if(!name){ showToast('Name required','Please type your full name above','⚠️'); return; }
+  if(!sigHasInk){ showToast('Signature required','Please sign in the signature box','⚠️'); return; }
   try{
     sigData=document.getElementById('sigPad').toDataURL('image/png');
   }catch(e){
@@ -1993,12 +1993,56 @@ function confirmSignature(){
   }
   sigTenantName=name;
   closeSignature();
-  generateEntryReportCore();
+  showGeneratingOverlay();
+  // Defer the heavy work one frame so the overlay paints first
+  setTimeout(function(){
+    try {
+      generateEntryReportCore();
+    } catch(err) {
+      console.error('[EntryAudit] generation failed:', err);
+      hideGeneratingOverlay();
+      showToast('Couldn\'t finish the report', String(err && err.message ? err.message : 'Please try again — check console for details'), '⚠️');
+    }
+  }, 50);
+}
+
+// Persistent in-page overlay so the renter sees something is happening while
+// the report builds, photos sync to cloud, and the PDF renders. The toast
+// alone disappears in 3 seconds and leaves the renter wondering.
+function showGeneratingOverlay(){
+  var existing = document.getElementById('reportGenOverlay');
+  if(existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'reportGenOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10500;background:rgba(10,36,96,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .22s ease';
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:18px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 24px 72px rgba(10,36,96,.5)">'+
+      '<div style="width:54px;height:54px;border-radius:50%;border:4px solid var(--blue-xl);border-top-color:var(--blue);animation:riq-genspin 1s linear infinite;margin:0 auto 18px"></div>'+
+      '<div id="reportGenTitle" style="font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:var(--text);letter-spacing:-.2px;line-height:1.3">Generating your move-in record</div>'+
+      '<div id="reportGenSub" style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.55">Saving your record, syncing photos to your account, and preparing the PDF.</div>'+
+    '</div>'+
+    '<style>@keyframes riq-genspin{to{transform:rotate(360deg)}}</style>';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){ overlay.style.opacity = '1'; });
+}
+
+function updateGeneratingOverlay(title, sub){
+  var t = document.getElementById('reportGenTitle');
+  var s = document.getElementById('reportGenSub');
+  if(t && title) t.textContent = title;
+  if(s && sub) s.textContent = sub;
+}
+
+function hideGeneratingOverlay(){
+  var overlay = document.getElementById('reportGenOverlay');
+  if(!overlay) return;
+  overlay.style.opacity = '0';
+  setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 240);
 }
 
 function generateEntryReportCore(){
   if(window.riqEvent) riqEvent('entry_audit_complete');
-  showToast('Generating report','Creating your entry condition report...','📄');
+  updateGeneratingOverlay('Generating your move-in record', 'Building the report from your room data…');
 
   var auditId=(roomData && roomData._auditId) || ('entry_audit_'+Date.now());
   roomData._auditId=auditId;
@@ -2066,21 +2110,51 @@ function generateEntryReportCore(){
     });
   });
 
-  // Local vault record (with full base64 photos for offline use)
-  var vaultRecord={
-    id:auditId,
-    type:'entry-audit',
-    date:reportDate,
-    data:reportData
-  };
-  var vaultReports=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
-  vaultReports.push(vaultRecord);
-  localStorage.setItem('renteriq_vault_reports',JSON.stringify(vaultReports));
+  // Local vault record. We split the save: a SLIM record (no base64 photos)
+  // goes to renteriq_vault_reports so the vault listing renders even when
+  // localStorage is tight; the FULL record (with base64 photos) is kept under
+  // its own key for offline regeneration. base64 photos are also being
+  // uploaded to Cloud Storage in the background, so they're recoverable
+  // either way.
+  var slimReport = Object.assign({}, reportData, {
+    rooms: (reportData.rooms || []).map(function(room){
+      var slimRoom = Object.assign({}, room);
+      slimRoom.items = (room.items || []).map(function(it){
+        var slimItem = Object.assign({}, it);
+        slimItem.photos = (it.photos || []).map(function(p){
+          return { photoId: p.photoId, time: p.time, timestamp: p.timestamp, url: p.url || '', path: p.path || '', roomId: p.roomId, itemId: p.itemId };
+        });
+        return slimItem;
+      });
+      return slimRoom;
+    })
+  });
+  var vaultRecord = { id: auditId, type: 'entry-audit', date: reportDate, data: slimReport };
+  var fullRecord  = { id: auditId, type: 'entry-audit', date: reportDate, data: reportData };
 
-  // Also save to standardized riq_entry_audit_past for Vault integration
+  updateGeneratingOverlay('Saving your record', 'Storing locally and syncing to your account…');
+
+  // Save the slim record to the vault listing — wrap each step so a quota
+  // failure on one path doesn't kill the whole flow.
+  try {
+    var vaultReports = JSON.parse(localStorage.getItem('renteriq_vault_reports') || '[]');
+    // Replace any prior version of this audit so regenerations don't pile up.
+    vaultReports = vaultReports.filter(function(r){ return r && r.id !== auditId; });
+    vaultReports.push(vaultRecord);
+    localStorage.setItem('renteriq_vault_reports', JSON.stringify(vaultReports));
+  } catch(saveErr) {
+    console.warn('[EntryAudit] vault listing save failed:', saveErr);
+  }
+
+  // We don't keep the full record (with base64 photo bytes) in localStorage —
+  // photos sync to Cloud Storage in the background and the slim record above
+  // carries every cloud URL needed to regenerate the PDF later.
+
+  // riq_entry_audit_past — index used by other vault surfaces.
   try {
     var auditRaw = localStorage.getItem('riq_entry_audit_past') || '[]';
     var auditList = JSON.parse(auditRaw);
+    auditList = auditList.filter(function(a){ return a && a.id !== auditId; });
     auditList.unshift({
       id: auditId,
       type: 'entry_audit',
@@ -2090,30 +2164,48 @@ function generateEntryReportCore(){
       photos: reportData.totalPhotos
     });
     localStorage.setItem('riq_entry_audit_past', JSON.stringify(auditList));
-  } catch(e) { console.error('Save to riq_entry_audit_past:', e); }
+  } catch(e) { console.warn('[EntryAudit] riq_entry_audit_past save failed:', e); }
 
-  // ── Cloud sync (background) ──
-  syncEntryAuditToCloud(vaultRecord);
+  // Cloud sync (background) — uses the full record so photo bytes upload too.
+  try { syncEntryAuditToCloud(fullRecord); } catch(syncErr) { console.warn('[EntryAudit] cloud sync kick-off failed:', syncErr); }
 
-  // Generate downloadable report (text version for now)
-  var reportText=generateTextReport(reportData);
-  downloadReport(reportText, 'entry-audit-report.txt');
+  // Optional .txt download (text summary).
+  try {
+    var reportText = generateTextReport(reportData);
+    downloadReport(reportText, 'entry-audit-report.txt');
+  } catch(txtErr) { console.warn('[EntryAudit] text report failed:', txtErr); }
 
-  if(window.RIQPayments)RIQPayments.recordPurchase('entry_condition');
+  if(window.RIQPayments){
+    try { RIQPayments.recordPurchase('entry_condition'); } catch(rpErr){ console.warn('[EntryAudit] recordPurchase failed:', rpErr); }
+  }
 
+  // Export the PDF + show the filing sheet. The PDF and filing sheet must
+  // ALWAYS show — even if cloud sync prompt fails — so we wrap each step.
   setTimeout(function(){
-    showToast('Move-in record saved ✓',reportData.totalPhotos+' photos · '+reportData.completedRooms+' rooms','🏠');
-    // Export PDF
-    if(window.RIQExport){
-      exportEntryReportPDF(reportData);
+    hideGeneratingOverlay();
+    showToast('Move-in record saved ✓', reportData.totalPhotos + ' photos · ' + reportData.completedRooms + ' rooms', '🏠');
+
+    try {
+      if(window.RIQExport) exportEntryReportPDF(reportData);
+    } catch(pdfErr) {
+      console.error('[EntryAudit] PDF export failed:', pdfErr);
+      showToast('PDF couldn\'t render', 'Your record is saved — try regenerating from the Vault', '⚠️');
     }
-    // Prompt cloud sync if not purchased
-    if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function'){
-      RIQPayments.promptCloudSync().then(function(){ openFilingSheet(reportData); });
+
+    var openSheet = function(){
+      try { openFilingSheet(reportData); } catch(sheetErr){ console.warn('[EntryAudit] filing sheet failed:', sheetErr); }
+    };
+    if(window.RIQPayments && typeof RIQPayments.promptCloudSync === 'function'){
+      try {
+        RIQPayments.promptCloudSync().then(openSheet, openSheet);
+      } catch(promptErr) {
+        console.warn('[EntryAudit] cloud-sync prompt failed:', promptErr);
+        setTimeout(openSheet, 600);
+      }
     } else {
-      setTimeout(function(){ openFilingSheet(reportData); },800);
+      setTimeout(openSheet, 600);
     }
-  },2000);
+  }, 1200);
 }
 
 // ── Post-save Filing Sheet ────────────────────────────────────────

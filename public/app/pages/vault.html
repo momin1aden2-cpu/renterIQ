@@ -2318,8 +2318,9 @@ function renderLeaseDetail(l){
   var sub = document.getElementById('reportDetailSub');
   var body = document.getElementById('reportDetailBody');
   var savedDate = l.savedAt ? new Date(l.savedAt).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}) : '';
-  if(title) title.textContent = l.address || l.fileName || 'Lease Agreement';
-  if(sub) sub.textContent = 'Reviewed '+savedDate;
+  // Restore in case a previous render hid these (entry audit detail does)
+  if(title){ title.style.display=''; title.textContent = l.address || l.fileName || 'Lease Agreement'; }
+  if(sub){ sub.style.display=''; sub.textContent = 'Reviewed '+savedDate; }
 
   var kt = l.keyTerms || {};
   var fmt = function(d){ if(!d) return '—'; var t = new Date(d); return isNaN(t.getTime()) ? d : t.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}); };
@@ -2466,20 +2467,78 @@ function renderEntryAuditDetail(record){
   var sub=document.getElementById('reportDetailSub');
   var body=document.getElementById('reportDetailBody');
   var dateStr=new Date(record.date).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
-  if(title)title.textContent=d.propertyAddress||'Move-In Report';
-  if(sub)sub.textContent='Move-in audit · '+dateStr;
+  // The hero card below owns the address + date — hide the sticky page
+  // title/sub entirely so the audit detail isn't repeating itself.
+  if(title){ title.textContent=''; title.style.display='none'; }
+  if(sub){ sub.textContent=''; sub.style.display='none'; }
+
+  // Stash the record so the inline "Download PDF" button can re-render
+  // without re-fetching from localStorage on every click.
+  window._currentEntryAuditRecord = record;
 
   var rooms=(d.rooms||[]).filter(function(r){return r&&r.completed!==false});
-  var totalPhotos=d.totalPhotos||rooms.reduce(function(a,r){return a+((r.photos||[]).length)},0);
+  var totalPhotos = d.totalPhotos || 0;
+  if(!totalPhotos){
+    rooms.forEach(function(r){
+      if(r.photos) totalPhotos += r.photos.length;
+      if(r.items) r.items.forEach(function(it){ if(it && it.photos) totalPhotos += it.photos.length; });
+    });
+  }
+
+  // Property spec — prefer the audit's saved propertyDetails (already
+  // formatted "3 bed · 2 bath · garage" from setup), then fall back to
+  // the live setup record, then the saved lease record. None of these
+  // generally have a postcode so the address stays as the renter typed it.
+  var propertySpec = (d.propertyDetails || '').trim();
+  if(!propertySpec){
+    try {
+      var setup = JSON.parse(localStorage.getItem('renteriq_entry_property_setup')||'null');
+      if(setup){
+        var parts = [];
+        if(setup.bedrooms) parts.push(setup.bedrooms + ' bed');
+        if(setup.bathrooms) parts.push(setup.bathrooms + ' bath');
+        if(setup.living > 1) parts.push(setup.living + ' living');
+        if(setup.garage) parts.push('garage');
+        if(setup.carport) parts.push('carport');
+        if(setup.garden) parts.push('garden');
+        if(setup.balcony) parts.push('balcony');
+        if(setup.study) parts.push('study');
+        if(setup.laundry) parts.push('laundry');
+        propertySpec = parts.join(' · ');
+      }
+    } catch(e){}
+  }
+  if(!propertySpec){
+    try {
+      var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'null');
+      if(lease){
+        var lp = [];
+        if(lease.bedrooms) lp.push(lease.bedrooms + ' bed');
+        if(lease.bathrooms) lp.push(lease.bathrooms + ' bath');
+        if(lease.weeklyRent) lp.push(lease.weeklyRent + '/wk');
+        if(lp.length) propertySpec = lp.join(' · ');
+      }
+    } catch(e){}
+  }
+  // Drop generic placeholder text that occasionally lands here from older
+  // setup flows.
+  if(/^(property|property details|—|-|n\/a)$/i.test(propertySpec)) propertySpec = '';
+
+  var specRow = propertySpec
+    ? '<div style="display:flex;align-items:center;gap:8px;margin-top:5px"><div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.85);line-height:1.45;flex:1;min-width:0">'+vaultEsc(propertySpec)+'</div><button onclick="openPropertyDetailsEditor()" style="background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:10.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;letter-spacing:.3px">Edit</button></div>'
+    : '<button onclick="openPropertyDetailsEditor()" style="background:rgba(255,255,255,.14);color:#fff;border:1px dashed rgba(255,255,255,.35);border-radius:8px;padding:8px 12px;font-family:\'Sora\',sans-serif;font-weight:700;font-size:11.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:8px;letter-spacing:.2px">+ Add property details</button>';
+
   var html=
-    '<div style="background:linear-gradient(135deg,var(--blue),var(--blue-md));border-radius:18px;padding:18px 20px;margin-bottom:14px;color:#fff">'
-      +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:6px">Move-In Inspection</div>'
-      +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;margin-bottom:14px">'+vaultEsc(d.propertyAddress||'Property')+'</div>'
-      +'<div style="display:flex;gap:14px">'
-        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+rooms.length+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Rooms</div></div>'
-        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+totalPhotos+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Photos</div></div>'
-        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+dateStr.split(' ').slice(0,2).join(' ')+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Date</div></div>'
+    '<div style="background:linear-gradient(135deg,var(--blue),var(--blue-md));border-radius:18px;padding:20px 20px 18px;margin-bottom:14px;color:#fff">'
+      +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:10px">Move-In Inspection</div>'
+      +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:21px;line-height:1.25;letter-spacing:-.2px">'+vaultEsc(d.propertyAddress||'Property')+'</div>'
+      +specRow
+      +'<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:rgba(255,255,255,.78)">'
+        +'<span style="display:inline-flex;align-items:center;gap:5px">📅 '+dateStr+'</span>'
+        +'<span style="display:inline-flex;align-items:center;gap:5px">🛏 '+rooms.length+' room'+(rooms.length!==1?'s':'')+'</span>'
+        +'<span style="display:inline-flex;align-items:center;gap:5px">📸 '+totalPhotos+' photo'+(totalPhotos!==1?'s':'')+'</span>'
       +'</div>'
+      +'<button onclick="vaultDownloadEntryAuditPdf()" style="width:100%;background:#fff;color:var(--blue-dk);border:none;border-radius:12px;padding:11px 14px;font-family:\'Sora\',sans-serif;font-weight:800;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:14px">⬇ Download PDF report</button>'
     +'</div>';
 
   if(rooms.length===0){
@@ -2489,7 +2548,14 @@ function renderEntryAuditDetail(record){
     rooms.forEach(function(room){
       var condColor={good:'var(--teal)',fair:'var(--amber)',poor:'var(--red)'}[room.condition]||'var(--muted)';
       var condLabel={good:'Good',fair:'Fair',poor:'Issues noted'}[room.condition]||'Documented';
-      var photos=room.photos||[];
+      // Photos live on each item in the saved report. Flatten them to the
+      // room level so the vault detail view shows real counts + thumbnails.
+      var photos = (room.photos || []).slice();
+      if(!photos.length && room.items){
+        room.items.forEach(function(it){
+          if(it && it.photos && it.photos.length) photos = photos.concat(it.photos);
+        });
+      }
       html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:14px 16px;margin-bottom:10px">'
         +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:'+(room.notes||photos.length?'10px':'0')+'">'
           +'<div style="width:38px;height:38px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px">'+(room.emoji||'🏠')+'</div>'
@@ -2503,10 +2569,21 @@ function renderEntryAuditDetail(record){
         html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">';
         photos.slice(0,8).forEach(function(p){
           // Prefer cloud URL when present, fall back to legacy base64 data
-          var src = typeof p === 'string' ? p : (p && (p.url || p.data)) || '';
+          var src = typeof p === 'string' ? p : (p && (p.url || p.dataUrl || p.data)) || '';
           var ts = (p && p.time) || '';
+          var captionParts = [room.name || 'Room'];
+          if(p && p.itemId) captionParts.push(String(p.itemId).replace(/_/g,' '));
+          if(p && p.timestamp){
+            try {
+              var t = new Date(p.timestamp);
+              if(!isNaN(t.getTime())) captionParts.push(t.toLocaleDateString('en-AU',{day:'numeric',month:'short'}) + ' ' + t.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}));
+            } catch(e){}
+          } else if(ts) {
+            captionParts.push(ts);
+          }
+          var caption = captionParts.join(' · ');
           if(src){
-            html+='<div style="aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--blue-xl);position:relative">'+
+            html+='<div class="vault-photo-cell" data-photo-src="'+vaultEsc(src)+'" data-photo-caption="'+vaultEsc(caption)+'" style="aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--blue-xl);position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent">'+
               '<img src="'+src+'" loading="lazy" style="width:100%;height:100%;object-fit:cover" alt="">'+
               (ts ? '<span style="position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.6);color:#fff;font-family:Sora,sans-serif;font-size:8.5px;font-weight:700;padding:1.5px 5px;border-radius:4px;letter-spacing:.3px">'+ts+'</span>' : '')+
             '</div>';
@@ -2527,8 +2604,9 @@ function renderExitAuditDetail(record){
   var sub=document.getElementById('reportDetailSub');
   var body=document.getElementById('reportDetailBody');
   var dateStr=new Date(record.date).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
-  if(title)title.textContent='Exit Inspection';
-  if(sub)sub.textContent=dateStr;
+  // Restore in case a previous render hid these (entry audit detail does)
+  if(title){ title.style.display=''; title.textContent='Exit Inspection'; }
+  if(sub){ sub.style.display=''; sub.textContent=dateStr; }
 
   var rooms=record.rooms||[];
   var areas=record.areas||rooms.length;
@@ -3122,6 +3200,226 @@ function vaultGetPropertyContext(){
     } catch(e){}
   }
   return { propertyAddress: applyingFor, agencyName: agencyName };
+}
+
+// Property details editor for the audit detail card. Lets the renter add
+// or correct the bed/bath/garage spec post-hoc — handy for older audits
+// or imports that landed without it. Saves to localStorage AND syncs the
+// updated audit record to Firestore so it's consistent across devices.
+function openPropertyDetailsEditor(){
+  var record = window._currentEntryAuditRecord;
+  if(!record || !record.data){
+    showToast('No audit loaded', 'Open the audit first', '⚠️');
+    return;
+  }
+  var existing = document.getElementById('propertyDetailsEditor');
+  if(existing) existing.remove();
+
+  // Parse current spec into structured values where possible (best-effort —
+  // covers the standard "N bed · N bath · garage · ..." format we generate).
+  var d = record.data || {};
+  var current = String(d.propertyDetails || '').toLowerCase();
+  var bedMatch = current.match(/(\d+)\s*bed/);
+  var bathMatch = current.match(/(\d+)\s*bath/);
+  var livMatch = current.match(/(\d+)\s*living/);
+  var initial = {
+    bedrooms: bedMatch ? parseInt(bedMatch[1], 10) : 0,
+    bathrooms: bathMatch ? parseInt(bathMatch[1], 10) : 0,
+    living: livMatch ? parseInt(livMatch[1], 10) : 1,
+    garage: /\bgarage\b/.test(current),
+    carport: /\bcarport\b/.test(current),
+    garden: /\bgarden\b/.test(current),
+    balcony: /\bbalcony\b/.test(current),
+    study: /\bstudy\b/.test(current),
+    laundry: /\blaundry\b/.test(current)
+  };
+
+  var overlay = document.createElement('div');
+  overlay.id = 'propertyDetailsEditor';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:11200;background:rgba(10,36,96,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .22s ease';
+  function selectOpts(max, current){
+    var out = '';
+    for(var i=0;i<=max;i++) out += '<option value="'+i+'"'+(i===current?' selected':'')+'>'+i+'</option>';
+    return out;
+  }
+  function checkRow(id, label, checked){
+    return '<label style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border-lt);cursor:pointer;-webkit-tap-highlight-color:transparent">'+
+      '<input type="checkbox" id="'+id+'"'+(checked?' checked':'')+' style="width:18px;height:18px;accent-color:var(--blue);cursor:pointer">'+
+      '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:13px;color:var(--text);flex:1">'+label+'</span>'+
+      '</label>';
+  }
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;transform:translateY(20px);transition:transform .26s cubic-bezier(.34,1.56,.64,1);overflow:hidden">'+
+      '<div style="padding:14px 20px 8px;flex-shrink:0">'+
+        '<div style="width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 14px"></div>'+
+        '<div style="display:flex;align-items:flex-start;gap:10px">'+
+          '<div style="flex:1;min-width:0">'+
+            '<div style="font-family:Sora,sans-serif;font-weight:800;font-size:17px;color:var(--text);letter-spacing:-.2px">Property details</div>'+
+            '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5">Bed/bath count and what else the property has. Shown on the report header and in your vault.</div>'+
+          '</div>'+
+          '<button id="propertyEditorClose" aria-label="Close" style="background:rgba(15,23,42,.06);color:var(--muted);border:none;width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;line-height:1;font-weight:700">✕</button>'+
+        '</div>'+
+      '</div>'+
+      '<div style="flex:1;overflow-y:auto;padding:14px 20px 20px">'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">'+
+          '<label style="display:flex;flex-direction:column;gap:5px">'+
+            '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Bedrooms</span>'+
+            '<select id="pdEditBedrooms" style="border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:Nunito,sans-serif;font-weight:700;font-size:14px;color:var(--text);background:#fff;cursor:pointer">'+selectOpts(8, initial.bedrooms)+'</select>'+
+          '</label>'+
+          '<label style="display:flex;flex-direction:column;gap:5px">'+
+            '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Bathrooms</span>'+
+            '<select id="pdEditBathrooms" style="border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:Nunito,sans-serif;font-weight:700;font-size:14px;color:var(--text);background:#fff;cursor:pointer">'+selectOpts(6, initial.bathrooms)+'</select>'+
+          '</label>'+
+          '<label style="display:flex;flex-direction:column;gap:5px">'+
+            '<span style="font-family:Sora,sans-serif;font-weight:700;font-size:10.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Living</span>'+
+            '<select id="pdEditLiving" style="border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:Nunito,sans-serif;font-weight:700;font-size:14px;color:var(--text);background:#fff;cursor:pointer">'+selectOpts(5, initial.living)+'</select>'+
+          '</label>'+
+        '</div>'+
+        '<div style="background:#fff;border:1px solid var(--border-lt);border-radius:12px;overflow:hidden;margin-bottom:14px">'+
+          checkRow('pdEditGarage', '🚗 Garage', initial.garage)+
+          checkRow('pdEditCarport', '🚙 Carport', initial.carport)+
+          checkRow('pdEditGarden', '🌿 Garden / outdoor', initial.garden)+
+          checkRow('pdEditBalcony', '🌺 Balcony', initial.balcony)+
+          checkRow('pdEditStudy', '📚 Study', initial.study)+
+          checkRow('pdEditLaundry', '🧺 Separate laundry', initial.laundry)+
+        '</div>'+
+      '</div>'+
+      '<div style="padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-lt);display:flex;gap:10px;flex-shrink:0">'+
+        '<button id="propertyEditorCancel" style="flex:1;background:#fff;color:var(--muted);border:1.5px solid var(--border);border-radius:12px;padding:12px;font-family:Sora,sans-serif;font-weight:700;font-size:13px;cursor:pointer">Cancel</button>'+
+        '<button id="propertyEditorSave" style="flex:1.4;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px;font-family:Sora,sans-serif;font-weight:800;font-size:13px;cursor:pointer">Save details</button>'+
+      '</div>'+
+    '</div>';
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    overlay.style.opacity = '1';
+    var card = overlay.firstElementChild;
+    if(card) card.style.transform = 'translateY(0)';
+  });
+
+  function close(){
+    overlay.style.opacity = '0';
+    setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 240);
+  }
+  document.getElementById('propertyEditorClose').addEventListener('click', close);
+  document.getElementById('propertyEditorCancel').addEventListener('click', close);
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+
+  document.getElementById('propertyEditorSave').addEventListener('click', function(){
+    var beds = parseInt(document.getElementById('pdEditBedrooms').value, 10) || 0;
+    var baths = parseInt(document.getElementById('pdEditBathrooms').value, 10) || 0;
+    var liv = parseInt(document.getElementById('pdEditLiving').value, 10) || 0;
+    var parts = [];
+    if(beds) parts.push(beds + ' bed');
+    if(baths) parts.push(baths + ' bath');
+    if(liv > 1) parts.push(liv + ' living');
+    if(document.getElementById('pdEditGarage').checked) parts.push('garage');
+    if(document.getElementById('pdEditCarport').checked) parts.push('carport');
+    if(document.getElementById('pdEditGarden').checked) parts.push('garden');
+    if(document.getElementById('pdEditBalcony').checked) parts.push('balcony');
+    if(document.getElementById('pdEditStudy').checked) parts.push('study');
+    if(document.getElementById('pdEditLaundry').checked) parts.push('laundry');
+    var newSpec = parts.join(' · ');
+
+    // Update the in-memory record
+    record.data.propertyDetails = newSpec;
+    window._currentEntryAuditRecord = record;
+
+    // Persist back to localStorage — same vault listing this audit came from
+    try {
+      var raw = localStorage.getItem('renteriq_vault_reports') || '[]';
+      var list = JSON.parse(raw);
+      list = list.map(function(r){ return r && r.id === record.id ? Object.assign({}, r, { data: record.data }) : r; });
+      localStorage.setItem('renteriq_vault_reports', JSON.stringify(list));
+    } catch(e){ console.warn('[Vault] property details save failed:', e); }
+
+    // Mirror to Firestore (silent — best-effort)
+    try {
+      if(window.RIQStore && record.id){
+        RIQStore.ready.then(function(){
+          if(RIQStore.isAuthed()) RIQStore.write('entry-audits', record.id, record).catch(function(){});
+        });
+      }
+    } catch(e){}
+
+    close();
+    showToast('Property details saved', newSpec || 'No details added', '✓');
+    // Re-render the audit detail to reflect the new spec
+    setTimeout(function(){ renderEntryAuditDetail(record); }, 280);
+  });
+}
+
+// Photo lightbox — opens any photo cell at full size with caption overlay.
+// Uses event delegation so we don't have to re-bind on every render of
+// the audit detail view. Cell markup uses [data-photo-src] + [data-photo-caption].
+document.addEventListener('click', function(ev){
+  var cell = ev.target.closest && ev.target.closest('.vault-photo-cell');
+  if(!cell) return;
+  var src = cell.getAttribute('data-photo-src');
+  var caption = cell.getAttribute('data-photo-caption') || '';
+  if(!src) return;
+  openVaultPhotoLightbox(src, caption);
+});
+
+function openVaultPhotoLightbox(src, caption){
+  var existing = document.getElementById('vaultPhotoLightbox');
+  if(existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'vaultPhotoLightbox';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:11500;background:rgba(8,16,40,.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:stretch;justify-content:center;padding:max(14px,env(safe-area-inset-top,14px)) 14px max(14px,env(safe-area-inset-bottom,14px));opacity:0;transition:opacity .2s ease';
+  overlay.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:flex-end;flex-shrink:0">'+
+      '<button id="vaultLightboxClose" aria-label="Close" style="background:rgba(255,255,255,.12);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1;font-weight:700">✕</button>'+
+    '</div>'+
+    '<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:14px 0">'+
+      '<img src="'+src+'" alt="" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;box-shadow:0 16px 48px rgba(0,0,0,.55)">'+
+    '</div>'+
+    (caption ? '<div style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:rgba(255,255,255,.85);text-align:center;line-height:1.5;flex-shrink:0;padding:6px 8px">'+caption+'</div>' : '');
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){ overlay.style.opacity = '1'; });
+  function close(){
+    overlay.style.opacity = '0';
+    setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 220);
+  }
+  overlay.querySelector('#vaultLightboxClose').addEventListener('click', close);
+  overlay.addEventListener('click', function(e){
+    // Close on tap of background OR the image itself (single tap dismiss)
+    if(e.target === overlay || e.target.tagName === 'IMG') close();
+  });
+}
+
+// Re-render the entry condition report PDF from the saved audit record.
+// Same generator the audit page uses, just driven from the vault detail
+// view so renters can grab the PDF later (or after a regeneration without
+// having to redo the whole audit).
+function vaultDownloadEntryAuditPdf(){
+  var record = window._currentEntryAuditRecord;
+  if(!record || !record.data){
+    showToast('No record loaded', 'Open a saved audit first', '⚠️');
+    return;
+  }
+  if(!window.RIQExport || typeof RIQExport.generateConditionReport !== 'function'){
+    showToast('PDF unavailable', 'Refresh the page — the export library is loading', '⚠️');
+    return;
+  }
+  var d = record.data;
+  var stateRef = null, stateCode = '';
+  try {
+    stateCode = (localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || '').toUpperCase();
+  } catch(e){}
+  RIQExport.generateConditionReport({
+    reportId: d.auditId,
+    propertyAddress: d.propertyAddress,
+    propertyDetails: d.propertyDetails,
+    tenantName: d.tenantName,
+    signature: d.signature,
+    date: new Date(d.generatedDate || record.date || Date.now()),
+    rooms: d.rooms,
+    totalPhotos: d.totalPhotos,
+    state: stateCode,
+    stateRef: stateRef,
+    filename: 'RenterIQ-Entry-Condition-Report-' + new Date(record.date || Date.now()).toISOString().split('T')[0] + '.pdf'
+  });
 }
 
 function vaultDownloadTenancyApplication(){
