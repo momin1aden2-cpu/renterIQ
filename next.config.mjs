@@ -18,7 +18,7 @@ const nextConfig = {
       "media-src 'self' blob:",
       // Outbound XHR/fetch — Firebase services + Stripe redirect target +
       // Gemini is server-only so not listed here. wss:// for Firestore live updates.
-      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net https://*.firebaseapp.com https://auth.renteriq.com.au https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseappcheck.googleapis.com https://content-firebaseappcheck.googleapis.com https://www.recaptcha.net https://api.stripe.com wss://*.firebaseio.com wss://s-usc1f-nss-2089.firebaseio.com",
+      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net https://*.firebaseapp.com https://auth.renteriq.com.au https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseappcheck.googleapis.com https://content-firebaseappcheck.googleapis.com https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://api.stripe.com wss://*.firebaseio.com wss://s-usc1f-nss-2089.firebaseio.com",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
       "object-src 'none'",
