@@ -6,42 +6,28 @@
 (function() {
   'use strict';
 
-  var APPCHECK_SDK_URL = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js';
-  var APPCHECK_SDK_SRI = 'sha384-iF93NE9DFYjJ/GJcb4h18LKfvMn3Ppl4GSSFZ8RFvwc7OtGGQSHQXbHEdO8Rknhj';
-  var appCheckLoadPromise = null;
   var appCheckReady = false;
 
-  function loadAppCheckSDK() {
-    if (typeof firebase !== 'undefined' && firebase.appCheck) return Promise.resolve();
-    if (appCheckLoadPromise) return appCheckLoadPromise;
-    appCheckLoadPromise = new Promise(function(resolve, reject) {
-      var s = document.createElement('script');
-      s.src = APPCHECK_SDK_URL;
-      s.integrity = APPCHECK_SDK_SRI;
-      s.crossOrigin = 'anonymous';
-      s.async = true;
-      s.onload = function() { resolve(); };
-      s.onerror = function() { reject(new Error('Failed to load App Check SDK')); };
-      document.head.appendChild(s);
-    });
-    return appCheckLoadPromise;
-  }
-
+  // Activate App Check synchronously, immediately after initializeApp and
+  // BEFORE any Firestore/Auth/Storage call. The compat SDK is preloaded by
+  // a static <script> tag in every HTML page, so firebase.appCheck is
+  // available by the time this runs. If we activated lazily/async, the
+  // first Firestore listen channel would already be open without a token.
   function initializeAppCheck() {
-    if (appCheckReady) return Promise.resolve();
+    if (appCheckReady) return;
     var siteKey = window.__FIREBASE_CONFIG__ && window.__FIREBASE_CONFIG__.appCheckSiteKey;
-    if (!siteKey) return Promise.resolve(); // App Check not configured yet — fall open
-    return loadAppCheckSDK().then(function() {
-      try {
-        var provider = new firebase.appCheck.ReCaptchaEnterpriseProvider(siteKey);
-        firebase.appCheck().activate(provider, /* isTokenAutoRefreshEnabled */ true);
-        appCheckReady = true;
-      } catch (e) {
-        console.warn('[RenterIQ] App Check activation failed:', e);
-      }
-    }).catch(function(e) {
-      console.warn('[RenterIQ] App Check SDK load failed:', e);
-    });
+    if (!siteKey) return; // not configured yet — fall open
+    if (typeof firebase === 'undefined' || !firebase.appCheck) {
+      console.warn('[RenterIQ] App Check SDK not loaded — site key set but the script tag is missing on this page.');
+      return;
+    }
+    try {
+      var provider = new firebase.appCheck.ReCaptchaEnterpriseProvider(siteKey);
+      firebase.appCheck().activate(provider, /* isTokenAutoRefreshEnabled */ true);
+      appCheckReady = true;
+    } catch (e) {
+      console.warn('[RenterIQ] App Check activation failed:', e);
+    }
   }
 
   function initializeFirebase() {
