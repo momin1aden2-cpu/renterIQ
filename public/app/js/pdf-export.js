@@ -112,6 +112,28 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  // Small status pill used in the item-card layout. Three states map to
+  // three colours: green tick (positive), red cross (issue), grey N/A
+  // (not assessed or not applicable). Designed to print well in B&W too —
+  // background colour conveys the state even without colour rendering.
+  function pill(label, state) {
+    var bg, fg, mark;
+    if (state === true) { bg = '#E6F8F0'; fg = '#047857'; mark = '✓ ' + label; }
+    else if (state === false) { bg = '#FEECEC'; fg = '#B91C1C'; mark = '✗ ' + label; }
+    else { bg = '#F1F4F9'; fg = '#6B7B99'; mark = label + ' N/A'; }
+    return '<span style="display:inline-block;background:' + bg + ';color:' + fg + ';font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:100px;letter-spacing:.2px;white-space:nowrap">' + mark + '</span>';
+  }
+
+  // Small print-style disclaimer rendered at the bottom of every PDF we
+  // generate. Phrased to obey the project's no-legal-framing rule —
+  // describes RenterIQ as a documentation tool, never a legal service.
+  function disclaimerFooter() {
+    return '<div style="margin-top:24px;padding-top:14px;border-top:1px solid #E8EFF8;font-size:9px;color:#9AA4B8;line-height:1.55;text-align:center">' +
+      'Prepared by the tenant as a personal record. RenterIQ is a documentation tool, not a legal service. ' +
+      'This record is the tenant\'s own evidence and is intended to support — not replace — any official condition reports required under the relevant state tenancy framework.' +
+    '</div>';
+  }
+
   // ── Agency-style Condition Report ─────────────────────────────────────
   //
   // Produces a residential tenancy condition report in the format used by
@@ -152,95 +174,70 @@
     html += '<strong style="color:#0A2460">How to read this report.</strong> Each area is listed item-by-item with three columns: <strong>Clean</strong>, <strong>Undamaged</strong>, and <strong>Working</strong> (where applicable). A tick ✓ means the tenant agrees the item meets that standard at move-in. A cross ✗ means an issue was noted at move-in, with the comment and photo forming the supporting record.';
     html += '</div>';
 
-    // Per-room tables
+    // Per-room blocks. Item-card layout — each item is its own card with
+    // status badges, comment, and photos directly underneath. Photos under
+    // their item is far more readable than a clustered "supporting
+    // photographs" panel at the bottom of the room.
     if (opts.rooms && opts.rooms.length) {
       opts.rooms.forEach(function(room) {
-        html += '<div style="page-break-inside:avoid;margin-bottom:22px">';
-        html += '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0A2460;padding-bottom:6px;margin-bottom:10px">';
+        html += '<div style="margin-bottom:22px">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0A2460;padding-bottom:6px;margin-bottom:12px;page-break-after:avoid">';
         html += '<div style="font-size:15px;font-weight:800;color:#0A2460">' + esc(room.emoji || '') + ' ' + esc(room.name || 'Room') + '</div>';
         var bandColor = room.condition === 'issues' ? '#F59E0B' : '#10B981';
         var bandLabel = room.condition === 'issues' ? 'Issues noted' : 'All clean & undamaged';
         html += '<span style="background:' + bandColor + ';color:#fff;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700">' + bandLabel + '</span>';
         html += '</div>';
 
-        // Item table
-        html += '<table style="width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed">';
-        html += '<colgroup><col style="width:26%"><col style="width:10%"><col style="width:12%"><col style="width:10%"><col style="width:42%"></colgroup>';
-        html += '<thead><tr style="background:#0A2460;color:#fff">';
-        html += '<th style="padding:7px 8px;text-align:left;font-weight:700;font-size:10.5px;letter-spacing:.3px">Item</th>';
-        html += '<th style="padding:7px 4px;font-weight:700;font-size:10.5px">Clean</th>';
-        html += '<th style="padding:7px 4px;font-weight:700;font-size:10.5px">Undamaged</th>';
-        html += '<th style="padding:7px 4px;font-weight:700;font-size:10.5px">Working</th>';
-        html += '<th style="padding:7px 8px;text-align:left;font-weight:700;font-size:10.5px">Tenant Comments</th>';
-        html += '</tr></thead><tbody>';
-
-        (room.items || []).forEach(function(it, idx) {
-          var bg = idx % 2 === 0 ? '#FAFCFF' : '#FFFFFF';
-          var c = it.clean === true ? '<span style="color:#10B981;font-weight:800">✓</span>' : it.clean === false ? '<span style="color:#EF4444;font-weight:800">✗</span>' : '—';
-          var u = it.undamaged === true ? '<span style="color:#10B981;font-weight:800">✓</span>' : it.undamaged === false ? '<span style="color:#EF4444;font-weight:800">✗</span>' : '—';
-          var w = it.working === 'na' || it.working === null ? '<span style="color:#9AA4B8">N/A</span>' : it.working === true ? '<span style="color:#10B981;font-weight:800">✓</span>' : '<span style="color:#EF4444;font-weight:800">✗</span>';
-          html += '<tr style="background:' + bg + ';border-bottom:1px solid #E8EFF8">';
-          html += '<td style="padding:7px 8px;color:#1A2B4A;font-weight:700">' + esc(it.label) + '</td>';
-          html += '<td style="padding:7px 4px;text-align:center;font-size:14px">' + c + '</td>';
-          html += '<td style="padding:7px 4px;text-align:center;font-size:14px">' + u + '</td>';
-          html += '<td style="padding:7px 4px;text-align:center;font-size:14px">' + w + '</td>';
-          html += '<td style="padding:7px 8px;color:#1A2B4A;font-size:11px;line-height:1.45">' + (it.comment ? esc(it.comment) : '<span style="color:#9AA4B8">—</span>') + '</td>';
-          html += '</tr>';
-        });
-        html += '</tbody></table>';
-
-        // Photos for this room — collected with per-item captions. Each
-        // photo carries the inline thumb (dataUrl preferred, cloud URL
-        // fallback) plus a clickable wrapper pointing at the cloud URL
-        // when available, so digital readers can tap to view the original
-        // at full resolution. Caption format matches agency reports:
-        // "Room — Item · Full date, time".
-        var photoBlocks = [];
         (room.items || []).forEach(function(it) {
-          (it.photos || []).forEach(function(ph) {
-            if (!ph) return;
-            var thumb = ph.dataUrl || ph.url || '';
-            if (!thumb) return;
-            var fullSrc = ph.url || ph.dataUrl || '';
-            var when = '';
-            if (ph.timestamp) {
-              try {
-                var t = new Date(ph.timestamp);
-                if (!isNaN(t.getTime())) {
-                  when = t.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + t.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
-                }
-              } catch (e) {}
-            }
-            if (!when && ph.time) when = ph.time;
-            photoBlocks.push({
-              thumb: thumb,
-              full: fullSrc,
-              roomLabel: room.name || 'Room',
-              itemLabel: it.label || 'Item',
-              when: when
+          html += '<div style="page-break-inside:avoid;background:#FAFCFF;border:1px solid #E8EFF8;border-radius:10px;padding:11px 14px;margin-bottom:9px">';
+
+          // Item header row: name + status pills
+          html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:' + (it.comment ? '6px' : '0') + '">';
+          html += '<div style="font-size:13px;font-weight:800;color:#0A2460;flex:1;min-width:0">' + esc(it.label) + '</div>';
+          html += '<div style="display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0">';
+          html += pill('Clean', it.clean);
+          html += pill('Undamaged', it.undamaged);
+          if (it.working !== 'na' && it.working !== undefined) html += pill('Working', it.working);
+          html += '</div>';
+          html += '</div>';
+
+          // Comment
+          if (it.comment) {
+            html += '<div style="font-size:11.5px;color:#1A2B4A;line-height:1.5;background:#fff;border:1px solid #E8EFF8;border-radius:7px;padding:8px 11px;margin-bottom:' + ((it.photos && it.photos.length) ? '8px' : '0') + '">' + esc(it.comment) + '</div>';
+          }
+
+          // Photos directly under THIS item
+          if (it.photos && it.photos.length) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:' + (it.comment ? '0' : '8px') + '">';
+            it.photos.forEach(function(ph) {
+              if (!ph) return;
+              var thumb = ph.dataUrl || ph.url || '';
+              if (!thumb) return;
+              var fullSrc = ph.url || ph.dataUrl || '';
+              var when = '';
+              if (ph.timestamp) {
+                try {
+                  var t = new Date(ph.timestamp);
+                  if (!isNaN(t.getTime())) {
+                    when = t.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) + ' ' + t.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+                  }
+                } catch (e) {}
+              }
+              if (!when && ph.time) when = ph.time;
+              var imgTag = '<img src="' + thumb + '" style="width:118px;height:88px;object-fit:cover;border-radius:6px;border:1px solid #E8EFF8;display:block" alt="">';
+              var wrapped = fullSrc
+                ? '<a href="' + fullSrc + '" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">' + imgTag + '</a>'
+                : imgTag;
+              html += '<div style="width:118px">';
+              html += wrapped;
+              if (when) html += '<div style="font-size:8.5px;font-weight:700;color:#6B7B99;margin-top:3px;line-height:1.25;text-align:center">' + esc(when) + '</div>';
+              html += '</div>';
             });
-          });
-        });
-        if (photoBlocks.length) {
-          html += '<div style="margin-top:14px">';
-          html += '<div style="font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px">Supporting photographs</div>';
-          html += '<div style="display:flex;flex-wrap:wrap;gap:10px">';
-          photoBlocks.forEach(function(ph) {
-            var caption = esc(ph.roomLabel) + ' — ' + esc(ph.itemLabel) + (ph.when ? ' · ' + esc(ph.when) : '');
-            // Wrap the image in an <a> when we have a cloud URL — the PDF
-            // print path preserves links, so digital readers can tap a
-            // photo to open the high-res original in a new tab.
-            var imgTag = '<img src="' + ph.thumb + '" style="width:180px;height:135px;object-fit:cover;border-radius:7px;border:1px solid #E8EFF8;display:block" alt="">';
-            var wrapped = ph.full
-              ? '<a href="' + ph.full + '" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">' + imgTag + '</a>'
-              : imgTag;
-            html += '<div style="width:180px">';
-            html += wrapped;
-            html += '<div style="font-size:9.5px;font-weight:700;color:#6B7B99;margin-top:5px;line-height:1.35">' + caption + '</div>';
             html += '</div>';
-          });
-          html += '</div></div>';
-        }
+          }
+
+          html += '</div>';
+        });
 
         html += '</div>';
       });
@@ -290,13 +287,266 @@
     }
     html += '</div>';
 
-    // Footer
-    html += '<div style="text-align:center;padding:18px 0 4px;font-size:9.5px;color:#9AA4B8;border-top:1px solid #E8EFF8;margin-top:18px">';
+    // Disclaimer footer
+    html += disclaimerFooter();
+
+    // Brand footer / report ID
+    html += '<div style="text-align:center;padding:10px 0 4px;font-size:9px;color:#B7C0D0">';
     html += 'Generated by RenterIQ · renteriq.com.au · Report ID ' + esc(opts.reportId || ('RIQ-' + Date.now()));
     html += '</div>';
 
     html += '</div>';
     return html;
+  }
+
+  // ── Exit Condition / Bond Shield Report ───────────────────────────────
+  //
+  // Same agency-friendly per-item card layout as the entry condition
+  // report, with exit-specific sections grafted in: comparison overview
+  // (matches / items to review / chargeable counts), per-room item cards
+  // showing what changed since move-in with photos, AI-flagged
+  // discrepancies block, bond recovery suggestions, signed declaration.
+  function buildExitReportHTML(opts) {
+    var now = opts.date || new Date();
+    var dateStr = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+    var timeStr = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+    var summary = opts.summary || {};
+    var rooms = opts.rooms || [];
+    var discrepancies = opts.discrepancies || [];
+    var recovery = opts.bondRecovery || [];
+    var tenantName = opts.tenantName || '';
+
+    var html = '';
+    html += '<div style="font-family:Arial,Helvetica,sans-serif;color:#1A2B4A;padding:0;max-width:720px;margin:0 auto">';
+
+    // Header card
+    html += '<div style="border:2px solid #0A2460;border-radius:10px;padding:22px 22px 18px;margin-bottom:18px">';
+    html += '<div style="font-size:11px;font-weight:700;color:#6B7B99;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:6px">Residential Tenancy</div>';
+    html += '<div style="font-size:22px;font-weight:800;color:#0A2460;letter-spacing:-.3px;margin-bottom:4px">Exit Condition Report</div>';
+    html += '<div style="font-size:13px;font-weight:600;color:#1A2B4A;margin-bottom:16px">Comparison of property condition between move-in and move-out</div>';
+
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px"><tbody>';
+    html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700;width:130px">Property</td><td style="padding:6px 0;color:#1A2B4A;font-weight:700">' + esc(opts.propertyAddress || '—') + '</td></tr>';
+    if (opts.propertyDetails) {
+      html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Details</td><td style="padding:6px 0;color:#1A2B4A">' + esc(opts.propertyDetails) + '</td></tr>';
+    }
+    html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Report date</td><td style="padding:6px 0;color:#1A2B4A">' + dateStr + ' at ' + timeStr + '</td></tr>';
+    if (tenantName) {
+      html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Tenant</td><td style="padding:6px 0;color:#1A2B4A;font-weight:700">' + esc(tenantName) + '</td></tr>';
+    }
+    if (summary.areasChecked != null) {
+      html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Areas reviewed</td><td style="padding:6px 0;color:#1A2B4A">' + (summary.areasChecked || rooms.length) + '</td></tr>';
+    }
+    html += '<tr><td style="padding:6px 0;color:#6B7B99;font-weight:700">Photos attached</td><td style="padding:6px 0;color:#1A2B4A">' + (opts.totalPhotos || 0) + '</td></tr>';
+    html += '</tbody></table>';
+    html += '</div>';
+
+    // Comparison overview chips
+    if (summary && (summary.matches != null || summary.reviewItems != null || summary.chargeableItems != null)) {
+      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">';
+      if (summary.matches != null) html += chipBlock('Matched', summary.matches, '#10B981');
+      if (summary.reviewItems != null) html += chipBlock('To review', summary.reviewItems, '#F5A623');
+      if (summary.chargeableItems != null) html += chipBlock('Chargeable', summary.chargeableItems, '#EF4444');
+      if (summary.contradictions) html += chipBlock('Agent contradictions', summary.contradictions, '#7C3AED');
+      html += '</div>';
+    }
+
+    // Instructions / legend
+    html += '<div style="background:#F4F8FE;border:1px solid #E1ECFB;border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:11.5px;color:#1A2B4A;line-height:1.6">';
+    html += '<strong style="color:#0A2460">How to read this report.</strong> Each area is shown item-by-item with the move-out condition the tenant noted at exit. A green pill means the item matches the move-in record; an amber pill flags an item for review; a red pill flags an item the tenant believes is chargeable to the prior tenant or pre-existing.';
+    html += '</div>';
+
+    // Per-room blocks — item-card layout, same as the entry condition
+    // report. Photos for THIS exit walk-through go inline under each item.
+    rooms.forEach(function(room) {
+      html += '<div style="margin-bottom:22px">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0A2460;padding-bottom:6px;margin-bottom:12px;page-break-after:avoid">';
+      html += '<div style="font-size:15px;font-weight:800;color:#0A2460">' + esc(room.emoji || '') + ' ' + esc(room.name || 'Room') + '</div>';
+      var bandColor = '#10B981', bandLabel = 'Match';
+      if (room.condition === 'changed' || room.condition === 'review') { bandColor = '#F5A623'; bandLabel = 'Changes noted'; }
+      else if (room.condition === 'chargeable' || room.condition === 'issues') { bandColor = '#EF4444'; bandLabel = 'Issues to flag'; }
+      html += '<span style="background:' + bandColor + ';color:#fff;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700">' + bandLabel + '</span>';
+      html += '</div>';
+
+      (room.items || []).forEach(function(it) {
+        html += '<div style="page-break-inside:avoid;background:#FAFCFF;border:1px solid #E8EFF8;border-radius:10px;padding:11px 14px;margin-bottom:9px">';
+
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:' + (it.comment || it.changeNote ? '6px' : '0') + '">';
+        html += '<div style="font-size:13px;font-weight:800;color:#0A2460;flex:1;min-width:0">' + esc(it.label || it.id || 'Item') + '</div>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0">';
+        if (it.status === 'match') html += '<span style="display:inline-block;background:#E6F8F0;color:#047857;font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:100px">✓ Matches move-in</span>';
+        else if (it.status === 'review') html += '<span style="display:inline-block;background:#FEF3D6;color:#92400E;font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:100px">⚠ Review</span>';
+        else if (it.status === 'chargeable') html += '<span style="display:inline-block;background:#FEECEC;color:#B91C1C;font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:100px">⚠ Chargeable</span>';
+        else if (it.clean !== undefined || it.undamaged !== undefined) {
+          html += pill('Clean', it.clean);
+          html += pill('Undamaged', it.undamaged);
+          if (it.working !== 'na' && it.working !== undefined) html += pill('Working', it.working);
+        }
+        html += '</div>';
+        html += '</div>';
+
+        var noteText = it.changeNote || it.comment || '';
+        if (noteText) {
+          html += '<div style="font-size:11.5px;color:#1A2B4A;line-height:1.5;background:#fff;border:1px solid #E8EFF8;border-radius:7px;padding:8px 11px;margin-bottom:' + ((it.photos && it.photos.length) ? '8px' : '0') + '">' + esc(noteText) + '</div>';
+        }
+
+        if (it.photos && it.photos.length) {
+          html += '<div style="display:flex;flex-wrap:wrap;gap:7px">';
+          it.photos.forEach(function(ph) {
+            if (!ph) return;
+            var thumb = ph.dataUrl || ph.url || '';
+            if (!thumb) return;
+            var fullSrc = ph.url || ph.dataUrl || '';
+            var when = '';
+            if (ph.timestamp) {
+              try {
+                var t = new Date(ph.timestamp);
+                if (!isNaN(t.getTime())) when = t.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) + ' ' + t.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+              } catch (e) {}
+            }
+            if (!when && ph.time) when = ph.time;
+            var imgTag = '<img src="' + thumb + '" style="width:118px;height:88px;object-fit:cover;border-radius:6px;border:1px solid #E8EFF8;display:block" alt="">';
+            var wrapped = fullSrc
+              ? '<a href="' + fullSrc + '" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">' + imgTag + '</a>'
+              : imgTag;
+            html += '<div style="width:118px">';
+            html += wrapped;
+            if (when) html += '<div style="font-size:8.5px;font-weight:700;color:#6B7B99;margin-top:3px;line-height:1.25;text-align:center">' + esc(when) + '</div>';
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+
+        html += '</div>';
+      });
+
+      html += '</div>';
+    });
+
+    // AI-flagged discrepancies (when present and not already absorbed into
+    // the per-item cards above). Useful for renters who want a single
+    // summary list to point the agent at.
+    if (discrepancies.length) {
+      html += '<div style="page-break-inside:avoid;margin-bottom:18px">';
+      html += '<div style="font-size:13px;font-weight:800;color:#0A2460;border-bottom:2px solid #0A2460;padding-bottom:6px;margin-bottom:10px">Items flagged for review</div>';
+      discrepancies.forEach(function(d) {
+        var sevColor = d.severity === 'chargeable' ? '#FEECEC' : d.severity === 'review' ? '#FEF3D6' : '#F4F8FE';
+        var sevText = d.severity === 'chargeable' ? '#B91C1C' : d.severity === 'review' ? '#92400E' : '#1F3A6E';
+        var sevLabel = d.severity === 'chargeable' ? 'Chargeable' : d.severity === 'review' ? 'Review' : 'Note';
+        html += '<div style="page-break-inside:avoid;background:' + sevColor + ';border:1px solid ' + (d.severity === 'chargeable' ? '#FCA5A5' : d.severity === 'review' ? '#FCD34D' : '#E1ECFB') + ';border-radius:10px;padding:11px 14px;margin-bottom:8px">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
+        html += '<div style="font-size:12px;font-weight:800;color:#0A2460;flex:1">' + esc(d.emoji || '') + ' ' + esc(d.room || '') + (d.itemLabel ? ' · ' + esc(d.itemLabel) : '') + '</div>';
+        html += '<span style="font-size:9px;font-weight:800;color:' + sevText + ';background:#fff;padding:2px 8px;border-radius:100px;letter-spacing:.4px;text-transform:uppercase">' + sevLabel + '</span>';
+        html += '</div>';
+        if (d.description) html += '<div style="font-size:11.5px;color:#1A2B4A;line-height:1.5;margin-bottom:6px">' + esc(d.description) + '</div>';
+        if (d.evidenceNote) html += '<div style="font-size:11px;color:#1A2B4A;line-height:1.5;margin-bottom:4px"><strong>Evidence:</strong> ' + esc(d.evidenceNote) + '</div>';
+        if (d.contradictionNote) html += '<div style="font-size:11px;color:#7C3AED;line-height:1.5;margin-top:4px"><strong>Agent contradiction:</strong> ' + esc(d.contradictionNote) + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Bond recovery / pre-handover fixes
+    if (recovery.length) {
+      html += '<div style="page-break-inside:avoid;margin-bottom:18px">';
+      html += '<div style="font-size:13px;font-weight:800;color:#0A2460;border-bottom:2px solid #0A2460;padding-bottom:6px;margin-bottom:10px">Suggested fixes before handover</div>';
+      recovery.forEach(function(r) {
+        html += '<div style="page-break-inside:avoid;background:#FAFCFF;border:1px solid #E8EFF8;border-radius:10px;padding:11px 14px;margin-bottom:8px">';
+        html += '<div style="font-size:12px;font-weight:800;color:#0A2460;margin-bottom:4px">' + esc(r.emoji || '') + ' ' + esc(r.room || '') + ' · ' + esc(r.issue || '') + '</div>';
+        if (r.suggestion) html += '<div style="font-size:11.5px;color:#1A2B4A;line-height:1.5;margin-bottom:5px">' + esc(r.suggestion) + '</div>';
+        var meta = [];
+        if (r.timeEst) meta.push('⏱ ' + r.timeEst);
+        if (r.costEst) meta.push('💰 ' + r.costEst);
+        if (r.difficulty) meta.push('🔧 ' + r.difficulty);
+        if (meta.length) html += '<div style="font-size:10.5px;color:#6B7B99;font-weight:600">' + meta.join(' · ') + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Declaration + signature
+    html += '<div style="page-break-inside:avoid;border-top:2px solid #0A2460;margin-top:22px;padding-top:16px">';
+    html += '<div style="font-size:13px;font-weight:800;color:#0A2460;margin-bottom:8px">Tenant Declaration</div>';
+    html += '<div style="font-size:11.5px;color:#1A2B4A;line-height:1.65;margin-bottom:16px">I confirm the above record reflects the property condition at the end of my tenancy. Items flagged as chargeable or for review represent issues I dispute or wish raised at bond return. Photos attached are evidence I captured myself, with the timestamps shown.</div>';
+
+    html += '<table style="width:100%;border-collapse:collapse;margin-top:8px"><tbody>';
+    html += '<tr>';
+    html += '<td style="width:60%;padding:0 12px 0 0;vertical-align:top">';
+    html += '<div style="font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Tenant Signature</div>';
+    if (opts.signature) {
+      html += '<div style="border-bottom:1.5px solid #1A2B4A;padding-bottom:4px;height:70px;display:flex;align-items:flex-end"><img src="' + opts.signature + '" style="max-height:66px;max-width:100%;object-fit:contain"></div>';
+    } else {
+      html += '<div style="border-bottom:1.5px solid #1A2B4A;height:70px"></div>';
+    }
+    html += '<div style="font-size:12px;font-weight:700;color:#1A2B4A;margin-top:6px">' + esc(tenantName) + '</div>';
+    html += '<div style="font-size:10.5px;color:#6B7B99;margin-top:2px">' + dateStr + '</div>';
+    html += '</td>';
+    html += '<td style="width:40%;padding:0 0 0 12px;vertical-align:top">';
+    html += '<div style="font-size:10.5px;font-weight:700;color:#6B7B99;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Agent / Landlord</div>';
+    html += '<div style="border-bottom:1.5px solid #1A2B4A;height:70px"></div>';
+    html += '<div style="font-size:10.5px;color:#6B7B99;margin-top:8px">For agency records</div>';
+    html += '</td>';
+    html += '</tr></tbody></table>';
+    html += '</div>';
+
+    // Statutory note (state-aware)
+    var stateRef = opts.stateRef;
+    html += '<div style="background:#FEF9E7;border:1px solid #F5D57A;border-radius:8px;padding:12px 14px;margin-top:18px;font-size:10.5px;color:#7A5A00;line-height:1.6">';
+    html += '<strong>Important.</strong> Submit your bond refund claim through your state\'s rental bond authority';
+    if (stateRef && stateRef.act) html += ' under the ' + esc(stateRef.act);
+    html += '. Keep this record together with your move-in record and any communications with the agent or landlord — they\'re your evidence at bond return time.';
+    html += '</div>';
+
+    // Disclaimer footer
+    html += disclaimerFooter();
+
+    // Brand footer / report ID
+    html += '<div style="text-align:center;padding:10px 0 4px;font-size:9px;color:#B7C0D0">';
+    html += 'Generated by RenterIQ · renteriq.com.au · Report ID ' + esc(opts.reportId || ('RIQ-EXIT-' + Date.now()));
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  // Shared print-window opener for the report PDFs. Renders the supplied
+  // HTML in a new tab with a sticky "Save as PDF" / "Close" toolbar at the
+  // top — the renter reviews the rendered page first, then taps Save when
+  // they're ready. No auto-print: lets them double-check the content
+  // before the print dialog appears.
+  function openPrintReport(pageTitle, bodyHTML, readyToastTitle) {
+    var w = window.open('', '_blank');
+    if (!w) {
+      if (typeof showToast === 'function') showToast('Pop-ups blocked', 'Allow pop-ups for renteriq to download the report', '⚠️');
+      return;
+    }
+    var doc = '<!doctype html><html lang="en-AU"><head><meta charset="utf-8">' +
+      '<title>' + esc(pageTitle) + '</title>' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<style>' +
+        'html,body{margin:0;padding:0;background:#fff;color:#1A2B4A;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        'body{padding:24px}' +
+        '.riq-actions{position:sticky;top:0;display:flex;gap:10px;justify-content:flex-end;padding:10px 0 14px;background:#fff;border-bottom:1px solid #E8EFF8;margin-bottom:18px;z-index:10}' +
+        '.riq-actions button{background:#1B50C8;color:#fff;border:0;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}' +
+        '.riq-actions button.secondary{background:#fff;color:#1B50C8;border:1.5px solid #1B50C8}' +
+        '@media print{.riq-actions{display:none}body{padding:0}@page{size:A4;margin:14mm}}' +
+      '</style></head><body>' +
+      '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
+      bodyHTML +
+      '</body></html>';
+    w.document.open();
+    w.document.write(doc);
+    w.document.close();
+    try { w.document.title = pageTitle; } catch(e){}
+    if (typeof showToast === 'function') showToast(readyToastTitle || 'Report ready', 'Use Save as PDF in the print dialog', '📄');
+  }
+
+  // Small coloured chip used in the exit overview row.
+  function chipBlock(label, count, colour) {
+    return '<div style="background:#fff;border:1.5px solid ' + colour + ';border-radius:10px;padding:8px 12px;display:inline-flex;align-items:baseline;gap:6px">' +
+      '<span style="font-size:18px;font-weight:800;color:' + colour + ';line-height:1">' + count + '</span>' +
+      '<span style="font-size:10.5px;font-weight:700;color:#1A2B4A;letter-spacing:.3px;text-transform:uppercase">' + esc(label) + '</span>' +
+    '</div>';
   }
 
   // ── Universal Tenancy Application One-Pager ───────────────────────────
@@ -682,35 +932,12 @@
       // print-window is reliable everywhere.
       var addressSlug = String((opts && opts.propertyAddress) || 'property').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'property';
       var pageTitle = (opts && opts.filename ? String(opts.filename).replace(/\.pdf$/i, '') : 'RenterIQ-Entry-Condition-Report-' + addressSlug + '-' + new Date().toISOString().split('T')[0]);
-
-      var w = window.open('', '_blank');
-      if (!w) {
-        if (typeof showToast === 'function') showToast('Pop-ups blocked', 'Allow pop-ups for renteriq to download the report', '⚠️');
-        return;
-      }
-
-      var bodyHTML = buildConditionHTML(opts || {});
-      var doc = '<!doctype html><html lang="en-AU"><head><meta charset="utf-8">' +
-        '<title>' + esc(pageTitle) + '</title>' +
-        '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-        '<style>' +
-          'html,body{margin:0;padding:0;background:#fff;color:#1A2B4A;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
-          'body{padding:24px}' +
-          '.riq-actions{position:sticky;top:0;display:flex;gap:10px;justify-content:flex-end;padding:10px 0 14px;background:#fff;border-bottom:1px solid #E8EFF8;margin-bottom:18px;z-index:10}' +
-          '.riq-actions button{background:#1B50C8;color:#fff;border:0;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}' +
-          '.riq-actions button.secondary{background:#fff;color:#1B50C8;border:1.5px solid #1B50C8}' +
-          '@media print{.riq-actions{display:none}body{padding:0}@page{size:A4;margin:14mm}}' +
-        '</style></head><body>' +
-        '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
-        bodyHTML +
-        '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},400)});<\/script>' +
-        '</body></html>';
-      w.document.open();
-      w.document.write(doc);
-      w.document.close();
-      try { w.document.title = pageTitle; } catch(e){}
-
-      if (typeof showToast === 'function') showToast('Move-in record ready', 'Use Save as PDF in the print dialog', '📄');
+      openPrintReport(pageTitle, buildConditionHTML(opts || {}), 'Move-in record ready');
+    },
+    generateExitReport: function(opts) {
+      var addressSlug = String((opts && opts.propertyAddress) || 'property').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'property';
+      var pageTitle = (opts && opts.filename ? String(opts.filename).replace(/\.pdf$/i, '') : 'RenterIQ-Exit-Report-' + addressSlug + '-' + new Date().toISOString().split('T')[0]);
+      openPrintReport(pageTitle, buildExitReportHTML(opts || {}), 'Exit record ready');
     },
     generate: function(opts) {
       if (typeof showToast === 'function') showToast('Generating PDF', 'Preparing your report…', '📄');
@@ -774,8 +1001,7 @@
         '</style></head><body>' +
         '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
         bodyHTML +
-        '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},400)});<\/script>' +
-        '</body></html>';
+                '</body></html>';
       w.document.open();
       w.document.write(doc);
       w.document.close();
@@ -840,8 +1066,7 @@
         '</style></head><body>' +
         '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
         letterHtml +
-        '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},350)});<\/script>' +
-        '</body></html>';
+                '</body></html>';
       w.document.open();
       w.document.write(doc);
       w.document.close();
@@ -878,8 +1103,7 @@
         '</style></head><body>' +
         '<div class="riq-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">⬇ Save as PDF</button></div>' +
         bodyHTML +
-        '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},350)});<\/script>' +
-        '</body></html>';
+                '</body></html>';
       w.document.open();
       w.document.write(doc);
       w.document.close();

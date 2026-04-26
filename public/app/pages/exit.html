@@ -435,6 +435,30 @@
 
 </div>
 
+<!-- Exit signature modal — required step before save + PDF generation. -->
+<div id="exitSignatureModal" style="display:none;position:fixed;inset:0;z-index:10010;background:rgba(10,36,96,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:18px;box-sizing:border-box;opacity:0;transition:opacity .22s ease">
+  <div style="background:#fff;border-radius:18px;padding:22px;max-width:440px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 24px 72px rgba(10,36,96,.45);transform:translateY(12px);transition:transform .26s cubic-bezier(.34,1.56,.64,1)">
+    <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--text);letter-spacing:-.2px;margin-bottom:6px">Sign &amp; Finalise Exit Report</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.55">Your signature confirms this exit record reflects the property condition at handover. Keep it with your bond return correspondence.</div>
+    <div style="margin-bottom:12px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px">Full Name (tenant)</div>
+      <input type="text" id="exitSigName" placeholder="e.g. Alex Taylor" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;color:var(--text);background:#fff;box-sizing:border-box">
+    </div>
+    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px">Signature</div>
+    <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:4px;margin-bottom:8px">
+      <canvas id="exitSigPad" style="width:100%;height:160px;display:block;background:#fff;border-radius:10px;touch-action:none;cursor:crosshair"></canvas>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <button onclick="clearExitSignature()" style="background:transparent;border:none;color:var(--muted);font-family:'Sora',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-decoration:underline">Clear signature</button>
+      <span id="exitSigDate" style="font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:600;color:var(--muted)"></span>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeExitSignature()" style="flex:1;background:var(--glass-surface-1,#F4F7FF);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer">Cancel</button>
+      <button onclick="confirmExitSignature()" style="flex:1.2;background:var(--blue);color:#fff;border:none;border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Confirm &amp; Generate →</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /app-shell -->
 
 <script>
@@ -1256,107 +1280,104 @@ async function runExitGenerationCore(){
     renderComparisonResults(aiComparisonData);
     switchView('F');
     if(window.RIQPayments && typeof RIQPayments.promptCloudSync==='function') RIQPayments.promptCloudSync();
-    if(window.RIQExport) exportExitReportPDF(aiComparisonData);
+    // PDF fires only when the renter explicitly hits "Generate Final Exit
+    // Report" later — that flow goes through the signature step + save +
+    // overlay, then renders the PDF. No auto-fire here.
   },6200);
 }
 
 function exportExitReportPDF(data){
-  if(!window.RIQExport||!data)return;
-  var sections=[];
-  var summary=data.summary||{};
-  var hasFourWay=summary.hasAgencyEntry||summary.hasAgencyExit;
+  if(!window.RIQExport || typeof RIQExport.generateExitReport !== 'function'){
+    showToast('PDF unavailable','Refresh the page — the export library is loading','⚠️');
+    return;
+  }
+  var summary = data.summary || {};
+  var address = '', propertyDetails = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}');
+    if(lease.address) address = lease.address;
+  } catch(e){}
+  if(!address){
+    try {
+      var setup = JSON.parse(localStorage.getItem('renteriq_entry_property_setup')||'null');
+      if(setup && setup.address) address = setup.address;
+    } catch(e){}
+  }
+  try {
+    var setup2 = JSON.parse(localStorage.getItem('renteriq_entry_property_setup')||'null');
+    if(setup2){
+      var parts = [];
+      if(setup2.bedrooms) parts.push(setup2.bedrooms + ' bed');
+      if(setup2.bathrooms) parts.push(setup2.bathrooms + ' bath');
+      if(setup2.living > 1) parts.push(setup2.living + ' living');
+      if(setup2.garage) parts.push('garage');
+      if(setup2.carport) parts.push('carport');
+      propertyDetails = parts.join(' · ');
+    }
+  } catch(e){}
 
-  // Property + comparison mode header
-  var address='';
-  try{var lease=JSON.parse(localStorage.getItem('riq-lease-record')||'{}');address=lease.address||'';}catch(e){}
-  var modeLabel=hasFourWay?(summary.hasAgencyEntry&&summary.hasAgencyExit?'Four-way comparison':'Three-way comparison'):'Renter entry vs exit';
-  sections.push({
-    heading:'Comparison Overview',
-    content:'Property: '+(address||'—')+'\n'+
-      'Mode: '+modeLabel+'\n'+
-      'Areas checked: '+(summary.areasChecked||0)+'\n'+
-      'Matching: '+(summary.matches||0)+'\n'+
-      'Items to review: '+(summary.reviewItems||0)+'\n'+
-      'Chargeable items: '+(summary.chargeableItems||0)+
-      (summary.contradictions?('\nAgent contradictions: '+summary.contradictions):'')+
-      (summary.bondAtRiskEstimate?('\nBond at risk estimate: '+summary.bondAtRiskEstimate):'')
+  // Build per-room data from exitRoomData + exitRoomNotes — items with
+  // photos that the renter recorded during the exit walk-through. The
+  // PDF builder handles the per-item card layout including inline photos.
+  var rooms = (exitRoomData || []).map(function(r, i){
+    var notes = (exitRoomNotes && exitRoomNotes[i]) || {};
+    var roomItems = [];
+    if(notes.items && typeof notes.items === 'object'){
+      Object.keys(notes.items).forEach(function(itId){
+        var s = notes.items[itId] || {};
+        if(s._baseline){
+          var b = s._baseline;
+          var changed = (b.clean !== s.clean) || (b.undamaged !== s.undamaged) || (b.working !== s.working);
+          var status = changed ? (s.disputed ? 'review' : 'review') : 'match';
+          roomItems.push({
+            id: itId,
+            label: itId.replace(/_/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }),
+            status: status,
+            clean: s.clean,
+            undamaged: s.undamaged,
+            working: s.working,
+            comment: s.comment || '',
+            photos: s.photos || []
+          });
+        }
+      });
+    }
+    return {
+      name: r.name,
+      emoji: r.emoji,
+      condition: notes.condition || (roomItems.some(function(it){ return it.status !== 'match'; }) ? 'review' : 'good'),
+      items: roomItems
+    };
   });
 
-  // Room overview
-  if(data.areas&&data.areas.length){
-    var roomLines=data.areas.map(function(a){
-      var st=a.status==='match'?'Match ✓':a.status==='contradiction'?'Contradiction (in your favour)':a.status==='chargeable'?'Chargeable':a.status==='review'?'Review':'—';
-      return(a.emoji||'')+' '+a.room+' — '+st;
-    });
-    sections.push({heading:'Room Overview',items:roomLines});
-  }
+  // Total photos across all room items
+  var totalPhotos = 0;
+  rooms.forEach(function(rm){ rm.items.forEach(function(it){ if(it.photos) totalPhotos += it.photos.length; }); });
 
-  // Discrepancies with four-way sources
-  var disc=data.discrepancies||[];
-  if(disc.length){
-    disc.forEach(function(d){
-      var lines=[];
-      lines.push(d.description||'');
-      if(d.sources){
-        lines.push('');
-        lines.push('Your move-in: '+(d.sources.renterEntry||'—'));
-        lines.push('Agent move-in: '+(d.sources.agentEntry||'Not uploaded'));
-        lines.push('Your exit: '+(d.sources.renterExit||'—'));
-        lines.push('Agent exit: '+(d.sources.agentExit||'Not uploaded'));
-      } else {
-        if(d.entryContext) lines.push('Move-in: '+d.entryContext);
-        if(d.exitContext) lines.push('Exit: '+d.exitContext);
-      }
-      if(d.contradictionNote){
-        lines.push('');
-        lines.push('AGENT CONTRADICTION: '+d.contradictionNote);
-      }
-      if(d.evidenceNote){
-        lines.push('');
-        lines.push('Evidence: '+d.evidenceNote);
-      }
-      if(d.evidenceRefs&&d.evidenceRefs.length){
-        lines.push('References: '+d.evidenceRefs.join(', '));
-      }
-      var sev=d.severity==='contradiction'?'Contradiction':d.severity==='chargeable'?'Concerns':d.severity==='review'?'Issues':'Good';
-      sections.push({
-        heading:(d.emoji||'')+' '+d.room+(d.itemLabel?(' · '+d.itemLabel):''),
-        badge:sev,
-        content:lines.join('\n')
-      });
-    });
-  }
+  var tenantName = '';
+  try { tenantName = localStorage.getItem('riq-user-name') || (JSON.parse(localStorage.getItem('riq-resume')||'{}').fullName) || ''; } catch(e){}
+  if(!tenantName && typeof exitSigTenantName !== 'undefined') tenantName = exitSigTenantName;
 
-  // Bond recovery suggestions
-  var recovery=data.bondRecovery||[];
-  if(recovery.length){
-    var recItems=recovery.map(function(r){
-      return(r.emoji||'')+' '+r.room+': '+r.issue+
-        '\n  Fix: '+r.suggestion+
-        '\n  Time: '+(r.timeEst||'—')+' · Cost: '+(r.costEst||'—')+' · Difficulty: '+(r.difficulty||'—');
-    });
-    sections.push({heading:'Fix Before Handover',items:recItems});
-  }
+  var stateRef = null, stateCode = '';
+  try {
+    stateCode = (localStorage.getItem('renteriq_user_state') || localStorage.getItem('riq-user-state') || '').toUpperCase();
+  } catch(e){}
 
-  // Tenant decisions
-  var confirmed=Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='confirmed'}).length;
-  var dismissed=Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='dismissed'}).length;
-  if(confirmed||dismissed){
-    sections.push({
-      heading:'Your Decisions',
-      content:'Items confirmed as happened during tenancy: '+confirmed+'\nItems dismissed as pre-existing / wear & tear: '+dismissed
-    });
-  }
-
-  var tenantName='';
-  try{tenantName=localStorage.getItem('riq-user-name')||(JSON.parse(localStorage.getItem('riq-resume')||'{}').fullName)||'';}catch(e){}
-
-  RIQExport.generate({
-    title:'Exit Condition Report',
-    subtitle:address||'Bond Protection Record',
-    date:new Date(),
-    sections:sections,
-    filename:'RenterIQ-Exit-Report-'+new Date().toISOString().split('T')[0]+'.pdf'
+  RIQExport.generateExitReport({
+    reportId: data.auditId || ('RIQ-EXIT-' + Date.now()),
+    propertyAddress: address,
+    propertyDetails: propertyDetails,
+    tenantName: tenantName,
+    signature: (typeof exitSigData !== 'undefined' ? exitSigData : null),
+    date: new Date(),
+    rooms: rooms,
+    summary: summary,
+    discrepancies: data.discrepancies || [],
+    bondRecovery: data.bondRecovery || [],
+    totalPhotos: totalPhotos,
+    state: stateCode,
+    stateRef: stateRef,
+    filename: 'RenterIQ-Exit-Report-' + new Date().toISOString().split('T')[0] + '.pdf'
   });
 }
 
@@ -1775,67 +1796,202 @@ function markFixed(n){
 
 function generateExitReport(){
   if(!guardExitPendingUploads(function(){ generateExitReport(); })) return;
+  openExitSignatureModal();
+}
 
-  if(window.riqEvent) riqEvent('exit_report_complete');
-  var disc=aiComparisonData?aiComparisonData.discrepancies||[]:[];
-  var confirmed=Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='confirmed'}).length;
-  var auditId = getOrCreateExitAuditId();
-  var fullRooms = exitRoomData.map(function(r,i){return Object.assign({},r,exitRoomNotes[i]||{})});
-  var report={
-    id:auditId,
-    type:'exit-audit',
-    date:new Date().toISOString(),
-    areas:exitRoomData.length,
-    discrepancies:disc.length,
-    confirmed:confirmed,
-    rooms:fullRooms,
-    aiComparison:aiComparisonData||null
+// ── Exit signature ─────────────────────────────────────────────
+var exitSigCtx=null, exitSigDrawing=false, exitSigHasInk=false, exitSigData=null, exitSigTenantName='';
+
+function openExitSignatureModal(){
+  var modal = document.getElementById('exitSignatureModal');
+  if(!modal) return;
+  // Pre-fill name from profile if we have it
+  try {
+    var profile = JSON.parse(localStorage.getItem('renteriq_user_profile')||'{}');
+    var existing = profile.fullName || localStorage.getItem('riq-user-name') || '';
+    if(existing) document.getElementById('exitSigName').value = existing;
+  } catch(e){}
+  document.getElementById('exitSigDate').textContent = new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+  modal.style.display = 'flex';
+  requestAnimationFrame(function(){
+    modal.style.opacity = '1';
+    var card = modal.firstElementChild;
+    if(card) card.style.transform = 'translateY(0)';
+  });
+  setTimeout(initExitSignaturePad, 60);
+}
+
+function initExitSignaturePad(){
+  var canvas = document.getElementById('exitSigPad');
+  if(!canvas) return;
+  var rect = canvas.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = 160 * dpr;
+  canvas.style.height = '160px';
+  exitSigCtx = canvas.getContext('2d');
+  exitSigCtx.scale(dpr, dpr);
+  exitSigCtx.lineWidth = 2.2;
+  exitSigCtx.lineCap = 'round';
+  exitSigCtx.lineJoin = 'round';
+  exitSigCtx.strokeStyle = '#1A2B4A';
+  exitSigHasInk = false;
+
+  var getPos = function(e){
+    var r = canvas.getBoundingClientRect();
+    var x = (e.touches?e.touches[0].clientX:e.clientX) - r.left;
+    var y = (e.touches?e.touches[0].clientY:e.clientY) - r.top;
+    return {x:x, y:y};
   };
-  try{
-    var vault=JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
-    vault.push(report);localStorage.setItem('renteriq_vault_reports',JSON.stringify(vault));
-  }catch(e){}
+  var start = function(e){ e.preventDefault(); exitSigDrawing=true; exitSigHasInk=true; var p=getPos(e); exitSigCtx.beginPath(); exitSigCtx.moveTo(p.x,p.y); };
+  var move = function(e){ if(!exitSigDrawing) return; e.preventDefault(); var p=getPos(e); exitSigCtx.lineTo(p.x,p.y); exitSigCtx.stroke(); };
+  var end = function(){ exitSigDrawing=false; };
 
-  // ── Cloud sync (background) ──
-  // Photos are already uploaded at capture time. Strip base64 from the Firestore
-  // write so the doc stays under the 1MB limit — keep only photo metadata + URL.
-  if(window.RIQStore){
-    RIQStore.ready.then(function(){
-      if(!RIQStore.isAuthed())return;
-      var slimRooms = fullRooms.map(function(room){
-        var slim = Object.assign({}, room);
-        if(slim.items){
-          var slimItems = {};
-          Object.keys(slim.items).forEach(function(ik){
-            var it = slim.items[ik];
-            if(!it) return;
-            var slimIt = Object.assign({}, it);
-            slimIt.photos = (it.photos||[]).map(function(p){
-              return {
-                photoId: p.photoId||'',
-                time: p.time||'',
-                timestamp: p.timestamp||'',
-                url: p.url||'',
-                path: p.path||''
-              };
-            });
-            slimItems[ik] = slimIt;
-          });
-          slim.items = slimItems;
-        }
-        return slim;
-      });
-      var slimReport = Object.assign({}, report, {rooms: slimRooms});
-      RIQStore.write('exit-audits',auditId,slimReport).then(function(){
-        showToast('Saved to cloud ✓','Exit record backed up across your devices','☁️');
-      }).catch(function(err){
-        console.warn('Exit audit cloud sync failed:',err);
-      });
-    });
-  }
+  canvas.onmousedown=start; canvas.onmousemove=move; canvas.onmouseup=end; canvas.onmouseleave=end;
+  canvas.ontouchstart=start; canvas.ontouchmove=move; canvas.ontouchend=end;
+}
 
-  showToast('Exit report saved to Vault','Your bond protection record is complete','📄');
-  setTimeout(function(){switchView('H')},1200);
+function clearExitSignature(){
+  var canvas = document.getElementById('exitSigPad');
+  if(canvas && exitSigCtx) exitSigCtx.clearRect(0,0,canvas.width,canvas.height);
+  exitSigHasInk = false;
+}
+
+function closeExitSignature(){
+  var modal = document.getElementById('exitSignatureModal');
+  if(!modal) return;
+  modal.style.opacity = '0';
+  var card = modal.firstElementChild;
+  if(card) card.style.transform = 'translateY(12px)';
+  setTimeout(function(){ modal.style.display = 'none'; }, 240);
+}
+
+function confirmExitSignature(){
+  var name = document.getElementById('exitSigName').value.trim();
+  if(!name){ showToast('Name required','Please type your full name above','⚠️'); return; }
+  if(!exitSigHasInk){ showToast('Signature required','Please sign in the signature box','⚠️'); return; }
+  try { exitSigData = document.getElementById('exitSigPad').toDataURL('image/png'); } catch(e){ exitSigData = null; }
+  exitSigTenantName = name;
+  closeExitSignature();
+  showExitGeneratingOverlay();
+  setTimeout(function(){
+    try {
+      generateExitReportCore();
+    } catch(err) {
+      console.error('[ExitReport] generation failed:', err);
+      hideExitGeneratingOverlay();
+      showToast('Couldn\'t finish the report', String(err && err.message ? err.message : 'Please try again'), '⚠️');
+    }
+  }, 50);
+}
+
+// Persistent fullscreen overlay so the renter sees something is happening
+// while the exit report saves locally, syncs to cloud, and renders the PDF.
+function showExitGeneratingOverlay(){
+  var existing = document.getElementById('exitReportGenOverlay');
+  if(existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'exitReportGenOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10500;background:rgba(10,36,96,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .22s ease';
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:18px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 24px 72px rgba(10,36,96,.5)">'+
+      '<div style="width:54px;height:54px;border-radius:50%;border:4px solid var(--blue-xl);border-top-color:var(--blue);animation:riq-genspin 1s linear infinite;margin:0 auto 18px"></div>'+
+      '<div id="exitReportGenTitle" style="font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:var(--text);letter-spacing:-.2px;line-height:1.3">Generating your exit report</div>'+
+      '<div id="exitReportGenSub" style="font-family:Nunito,sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.55">Saving your record, syncing photos to your account, and preparing the PDF.</div>'+
+    '</div>'+
+    '<style>@keyframes riq-genspin{to{transform:rotate(360deg)}}</style>';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){ overlay.style.opacity = '1'; });
+}
+function updateExitGeneratingOverlay(title, sub){
+  var t = document.getElementById('exitReportGenTitle');
+  var s = document.getElementById('exitReportGenSub');
+  if(t && title) t.textContent = title;
+  if(s && sub) s.textContent = sub;
+}
+function hideExitGeneratingOverlay(){
+  var overlay = document.getElementById('exitReportGenOverlay');
+  if(!overlay) return;
+  overlay.style.opacity = '0';
+  setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 240);
+}
+
+function generateExitReportCore(){
+  if(window.riqEvent) riqEvent('exit_report_complete');
+  updateExitGeneratingOverlay('Building your exit report', 'Compiling rooms, photos, and comparison data…');
+
+  var disc = aiComparisonData ? aiComparisonData.discrepancies || [] : [];
+  var confirmed = Object.keys(tenantDecisions).filter(function(k){return tenantDecisions[k]==='confirmed'}).length;
+  var auditId = getOrCreateExitAuditId();
+  var fullRooms = exitRoomData.map(function(r,i){ return Object.assign({}, r, exitRoomNotes[i] || {}); });
+
+  // Build a slim version of the rooms (no base64 photo bytes) — photos are
+  // already syncing to Cloud Storage with URLs, no need to also stuff them
+  // into localStorage and risk QuotaExceededError on regeneration.
+  var slimRooms = fullRooms.map(function(room){
+    var slim = Object.assign({}, room);
+    if(slim.items){
+      var slimItems = {};
+      Object.keys(slim.items).forEach(function(ik){
+        var it = slim.items[ik];
+        if(!it) return;
+        var slimIt = Object.assign({}, it);
+        slimIt.photos = (it.photos||[]).map(function(p){
+          return { photoId: p.photoId||'', time: p.time||'', timestamp: p.timestamp||'', url: p.url||'', path: p.path||'', roomId: p.roomId||'', itemId: p.itemId||'' };
+        });
+        slimItems[ik] = slimIt;
+      });
+      slim.items = slimItems;
+    }
+    return slim;
+  });
+
+  var slimReport = {
+    id: auditId,
+    type: 'exit-audit',
+    date: new Date().toISOString(),
+    areas: exitRoomData.length,
+    discrepancies: disc.length,
+    confirmed: confirmed,
+    rooms: slimRooms,
+    aiComparison: aiComparisonData || null,
+    tenantName: exitSigTenantName,
+    signature: exitSigData
+  };
+
+  updateExitGeneratingOverlay('Saving your record', 'Storing locally and syncing to your account…');
+
+  // Local vault save — slim record only, replaces any prior version of the
+  // same auditId so regenerations don't pile up.
+  try {
+    var vault = JSON.parse(localStorage.getItem('renteriq_vault_reports')||'[]');
+    vault = vault.filter(function(r){ return r && r.id !== auditId; });
+    vault.push(slimReport);
+    localStorage.setItem('renteriq_vault_reports', JSON.stringify(vault));
+  } catch(e) { console.warn('[ExitReport] vault save failed:', e); }
+
+  // Cloud sync (background) — same slim record.
+  try {
+    if(window.RIQStore){
+      RIQStore.ready.then(function(){
+        if(!RIQStore.isAuthed()) return;
+        RIQStore.write('exit-audits', auditId, slimReport).then(function(){
+          showToast('Saved to cloud ✓','Exit record backed up across your devices','☁️');
+        }).catch(function(err){ console.warn('[ExitReport] cloud sync failed:', err); });
+      });
+    }
+  } catch(syncErr) { console.warn('[ExitReport] cloud sync kick-off failed:', syncErr); }
+
+  setTimeout(function(){
+    hideExitGeneratingOverlay();
+    showToast('Exit report saved ✓','Your bond protection record is complete','📄');
+    try { if(window.RIQExport) exportExitReportPDF(aiComparisonData||{}); }
+    catch(pdfErr){
+      console.error('[ExitReport] PDF export failed:', pdfErr);
+      showToast('PDF couldn\'t render','Your record is saved — try regenerating from the Vault','⚠️');
+    }
+    setTimeout(function(){ try { switchView('H'); } catch(e){} }, 600);
+  }, 1000);
 }
 
 function guardExitPendingUploads(retryFn){

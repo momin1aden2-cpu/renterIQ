@@ -2604,50 +2604,209 @@ function renderExitAuditDetail(record){
   var sub=document.getElementById('reportDetailSub');
   var body=document.getElementById('reportDetailBody');
   var dateStr=new Date(record.date).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
-  // Restore in case a previous render hid these (entry audit detail does)
-  if(title){ title.style.display=''; title.textContent='Exit Inspection'; }
-  if(sub){ sub.style.display=''; sub.textContent=dateStr; }
+  // The hero card below owns the property identity — hide the page-level
+  // title/sub on this view, same pattern as the entry audit detail.
+  if(title){ title.textContent=''; title.style.display='none'; }
+  if(sub){ sub.textContent=''; sub.style.display='none'; }
 
-  var rooms=record.rooms||[];
-  var areas=record.areas||rooms.length;
-  var discrepancies=record.discrepancies||0;
-  var confirmed=record.confirmed||0;
+  // Stash the record so the inline "Download PDF" button + photo lightbox
+  // can read from it without re-fetching from localStorage every click.
+  window._currentExitAuditRecord = record;
 
-  var html=
-    '<div style="background:linear-gradient(135deg,var(--blue-dk),#4A2299);border-radius:18px;padding:18px 20px;margin-bottom:14px;color:#fff">'
-      +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:6px">Exit Inspection</div>'
-      +'<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:18px;margin-bottom:14px">Bond Protection Record</div>'
-      +'<div style="display:flex;gap:14px">'
-        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+areas+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Areas</div></div>'
-        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+discrepancies+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Flagged</div></div>'
-        +'<div><div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:22px">'+confirmed+'</div><div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700">Confirmed</div></div>'
-      +'</div>'
-    +'</div>';
+  var rooms = record.rooms || [];
+  var areas = record.areas || rooms.length;
 
-  if(confirmed===0){
-    html+='<div style="background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:16px;margin-bottom:14px"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:13px;color:var(--teal-dk);margin-bottom:4px">✓ All clear</div><div style="font-weight:600;font-size:12.5px;color:var(--muted);line-height:1.6">No items were confirmed as tenant liability. Strong position for full bond return.</div></div>';
+  // Property identity — pulls from saved lease + property setup since the
+  // exit record itself doesn't always carry the address.
+  var address = '', propertySpec = '';
+  try {
+    var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}');
+    if(lease && lease.address) address = lease.address;
+  } catch(e){}
+  if(!address){
+    try {
+      var setupAddr = JSON.parse(localStorage.getItem('renteriq_entry_property_setup')||'null');
+      if(setupAddr && setupAddr.address) address = setupAddr.address;
+    } catch(e){}
+  }
+  try {
+    var setup = JSON.parse(localStorage.getItem('renteriq_entry_property_setup')||'null');
+    if(setup){
+      var parts = [];
+      if(setup.bedrooms) parts.push(setup.bedrooms + ' bed');
+      if(setup.bathrooms) parts.push(setup.bathrooms + ' bath');
+      if(setup.living > 1) parts.push(setup.living + ' living');
+      if(setup.garage) parts.push('garage');
+      if(setup.carport) parts.push('carport');
+      if(setup.garden) parts.push('garden');
+      if(setup.balcony) parts.push('balcony');
+      if(setup.study) parts.push('study');
+      if(setup.laundry) parts.push('laundry');
+      propertySpec = parts.join(' · ');
+    }
+  } catch(e){}
+
+  // Counters
+  var totalPhotos = 0;
+  var matchCount = 0, reviewCount = 0, chargeableCount = 0;
+  rooms.forEach(function(rm){
+    if(rm.items && typeof rm.items === 'object'){
+      Object.keys(rm.items).forEach(function(ik){
+        var it = rm.items[ik]; if(!it) return;
+        if(it.photos) totalPhotos += it.photos.length;
+        if(it._baseline){
+          var b = it._baseline;
+          var changed = (b.clean !== it.clean) || (b.undamaged !== it.undamaged) || (b.working !== it.working);
+          if(!changed) matchCount++;
+          else if(it.disputed) reviewCount++;
+          else chargeableCount++;
+        }
+      });
+    }
+  });
+
+  var html =
+    '<div style="background:linear-gradient(135deg,var(--blue-dk),#4A2299);border-radius:18px;padding:20px 20px 18px;margin-bottom:14px;color:#fff">'+
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:10px">Exit Inspection</div>'+
+      '<div style="font-family:\'Sora\',sans-serif;font-weight:800;font-size:21px;line-height:1.25;letter-spacing:-.2px">'+vaultEsc(address || 'Bond Protection Record')+'</div>'+
+      (propertySpec ? '<div style="font-family:\'Nunito\',sans-serif;font-weight:600;font-size:13px;color:rgba(255,255,255,.85);margin-top:5px;line-height:1.45">'+vaultEsc(propertySpec)+'</div>' : '')+
+      '<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-family:\'Nunito\',sans-serif;font-weight:600;font-size:11.5px;color:rgba(255,255,255,.78)">'+
+        '<span style="display:inline-flex;align-items:center;gap:5px">📅 '+dateStr+'</span>'+
+        '<span style="display:inline-flex;align-items:center;gap:5px">🚪 '+areas+' area'+(areas!==1?'s':'')+'</span>'+
+        '<span style="display:inline-flex;align-items:center;gap:5px">📸 '+totalPhotos+' photo'+(totalPhotos!==1?'s':'')+'</span>'+
+      '</div>'+
+      '<button onclick="vaultDownloadExitAuditPdf()" style="width:100%;background:#fff;color:var(--blue-dk);border:none;border-radius:12px;padding:11px 14px;font-family:\'Sora\',sans-serif;font-weight:800;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:14px">⬇ Download PDF report</button>'+
+    '</div>';
+
+  // Status chip row
+  if(matchCount + reviewCount + chargeableCount > 0){
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">';
+    if(matchCount) html += '<div style="background:rgba(0,200,150,.08);border:1.5px solid var(--teal);border-radius:10px;padding:8px 12px;display:inline-flex;align-items:baseline;gap:6px"><span style="font-size:18px;font-weight:800;color:var(--teal-dk)">'+matchCount+'</span><span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.3px;text-transform:uppercase">Matched</span></div>';
+    if(reviewCount) html += '<div style="background:rgba(245,166,35,.08);border:1.5px solid var(--amber);border-radius:10px;padding:8px 12px;display:inline-flex;align-items:baseline;gap:6px"><span style="font-size:18px;font-weight:800;color:#92400E">'+reviewCount+'</span><span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.3px;text-transform:uppercase">To review</span></div>';
+    if(chargeableCount) html += '<div style="background:rgba(232,64,64,.06);border:1.5px solid var(--red);border-radius:10px;padding:8px 12px;display:inline-flex;align-items:baseline;gap:6px"><span style="font-size:18px;font-weight:800;color:var(--red)">'+chargeableCount+'</span><span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.3px;text-transform:uppercase">Chargeable</span></div>';
+    html += '</div>';
   }
 
-  if(rooms.length===0){
-    html+='<div style="background:#fff;border-radius:14px;padding:24px 18px;border:1px solid var(--border-lt);text-align:center;color:var(--muted);font-weight:600;font-size:13px">No room data was saved with this report.</div>';
-  }else{
-    html+='<div class="sec-label" style="padding:0 0 10px">Areas Walked Through</div>';
+  if(rooms.length === 0){
+    html += '<div style="background:#fff;border-radius:14px;padding:24px 18px;border:1px solid var(--border-lt);text-align:center;color:var(--muted);font-weight:600;font-size:13px">No room data was saved with this report.</div>';
+  } else {
+    html += '<div class="sec-label" style="padding:0 0 10px">Rooms walked through</div>';
     rooms.forEach(function(room){
-      var condColor={good:'var(--teal)',fair:'var(--amber)',poor:'var(--red)'}[room.condition]||'var(--muted)';
-      var condLabel={good:'Clean & good',fair:'Minor issues',poor:'Needs attention'}[room.condition]||'Documented';
-      html+='<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:14px 16px;margin-bottom:10px">'
-        +'<div style="display:flex;align-items:center;gap:12px;'+(room.notes?'margin-bottom:10px':'')+'">'
-          +'<div style="width:38px;height:38px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px">'+(room.emoji||'🏠')+'</div>'
-          +'<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+vaultEsc(room.name||'Room')+'</div></div>'
-          +'<span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:'+condColor+';background:rgba(27,80,200,.05);border-radius:8px;padding:5px 11px">'+condLabel+'</span>'
-        +'</div>';
-      if(room.notes){
-        html+='<div style="background:var(--blue-xl);border-radius:10px;padding:10px 12px;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.6">'+vaultEsc(room.notes)+'</div>';
+      var roomPhotos = [];
+      var roomItems = [];
+      if(room.items && typeof room.items === 'object'){
+        Object.keys(room.items).forEach(function(ik){
+          var it = room.items[ik]; if(!it) return;
+          (it.photos||[]).forEach(function(p){ roomPhotos.push(Object.assign({}, p, { itemId: ik })); });
+          roomItems.push(Object.assign({}, it, { id: ik, label: ik.replace(/_/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }) }));
+        });
       }
-      html+='</div>';
+      var condColor = {good:'var(--teal)',review:'var(--amber)',chargeable:'var(--red)'}[room.condition] || 'var(--muted)';
+      var condLabel = {good:'Clean & good',review:'To review',chargeable:'Chargeable'}[room.condition] || 'Documented';
+      html += '<div style="background:#fff;border-radius:16px;border:1px solid var(--border-lt);padding:14px 16px;margin-bottom:10px">'+
+        '<div style="display:flex;align-items:center;gap:12px;margin-bottom:'+(room.notes||roomPhotos.length?'10px':'0')+'">'+
+          '<div style="width:38px;height:38px;border-radius:11px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px">'+(room.emoji||'🏠')+'</div>'+
+          '<div style="flex:1"><div style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:14px;color:var(--text)">'+vaultEsc(room.name||'Room')+'</div><div style="font-weight:600;font-size:11px;color:var(--muted);margin-top:2px">'+roomPhotos.length+' photo'+(roomPhotos.length!==1?'s':'')+'</div></div>'+
+          '<span style="font-family:\'Sora\',sans-serif;font-weight:700;font-size:11px;color:'+condColor+';background:rgba(27,80,200,.05);border-radius:8px;padding:5px 11px">'+condLabel+'</span>'+
+        '</div>';
+      if(room.notes){
+        html += '<div style="background:var(--blue-xl);border-radius:10px;padding:10px 12px;font-weight:600;font-size:12.5px;color:var(--text);line-height:1.6;margin-bottom:'+(roomPhotos.length?'10px':'0')+'">'+vaultEsc(room.notes)+'</div>';
+      }
+      if(roomPhotos.length){
+        html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">';
+        roomPhotos.slice(0,8).forEach(function(p){
+          var src = p.url || p.dataUrl || p.data || '';
+          var ts = p.time || '';
+          var captionParts = [room.name || 'Room'];
+          if(p.itemId) captionParts.push(String(p.itemId).replace(/_/g,' '));
+          if(p.timestamp){
+            try { var t = new Date(p.timestamp); if(!isNaN(t.getTime())) captionParts.push(t.toLocaleDateString('en-AU',{day:'numeric',month:'short'}) + ' ' + t.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})); } catch(e){}
+          } else if(ts) captionParts.push(ts);
+          var caption = captionParts.join(' · ');
+          if(src){
+            html += '<div class="vault-photo-cell" data-photo-src="'+vaultEsc(src)+'" data-photo-caption="'+vaultEsc(caption)+'" style="aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--blue-xl);position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent">'+
+              '<img src="'+src+'" loading="lazy" style="width:100%;height:100%;object-fit:cover" alt="">'+
+              (ts ? '<span style="position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.6);color:#fff;font-family:Sora,sans-serif;font-size:8.5px;font-weight:700;padding:1.5px 5px;border-radius:4px;letter-spacing:.3px">'+ts+'</span>' : '')+
+              '</div>';
+          } else {
+            html += '<div style="aspect-ratio:1;border-radius:8px;background:var(--blue-xl);display:flex;align-items:center;justify-content:center;font-size:18px">📷</div>';
+          }
+        });
+        html += '</div>';
+      }
+      html += '</div>';
     });
   }
-  body.innerHTML=html;
+  body.innerHTML = html;
+}
+
+// Re-render the exit report PDF from the saved record. Same pattern as
+// vaultDownloadEntryAuditPdf — pulls the slim record from window state,
+// passes it through RIQExport.generateExitReport.
+function vaultDownloadExitAuditPdf(){
+  var record = window._currentExitAuditRecord;
+  if(!record){
+    showToast('No record loaded','Open a saved exit audit first','⚠️');
+    return;
+  }
+  if(!window.RIQExport || typeof RIQExport.generateExitReport !== 'function'){
+    showToast('PDF unavailable','Refresh the page — the export library is loading','⚠️');
+    return;
+  }
+  var rooms = (record.rooms||[]).map(function(r){
+    var items = [];
+    if(r.items && typeof r.items === 'object'){
+      Object.keys(r.items).forEach(function(ik){
+        var it = r.items[ik]; if(!it) return;
+        if(!it._baseline) return;
+        var b = it._baseline;
+        var changed = (b.clean !== it.clean) || (b.undamaged !== it.undamaged) || (b.working !== it.working);
+        items.push({
+          id: ik,
+          label: ik.replace(/_/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }),
+          status: changed ? 'review' : 'match',
+          clean: it.clean, undamaged: it.undamaged, working: it.working,
+          comment: it.comment || '', photos: it.photos || []
+        });
+      });
+    }
+    return { name: r.name, emoji: r.emoji, condition: r.condition || 'good', items: items };
+  });
+  var totalPhotos = 0;
+  rooms.forEach(function(rm){ rm.items.forEach(function(it){ if(it.photos) totalPhotos += it.photos.length; }); });
+  var address = '', propertyDetails = '';
+  try { var lease = JSON.parse(localStorage.getItem('riq-lease-record')||'{}'); if(lease.address) address = lease.address; } catch(e){}
+  try {
+    var setup = JSON.parse(localStorage.getItem('renteriq_entry_property_setup')||'null');
+    if(setup){
+      var parts = [];
+      if(setup.bedrooms) parts.push(setup.bedrooms + ' bed');
+      if(setup.bathrooms) parts.push(setup.bathrooms + ' bath');
+      if(setup.living > 1) parts.push(setup.living + ' living');
+      if(setup.garage) parts.push('garage');
+      propertyDetails = parts.join(' · ');
+      if(!address && setup.address) address = setup.address;
+    }
+  } catch(e){}
+
+  var summary = (record.aiComparison && record.aiComparison.summary) || {};
+  var discrepancies = (record.aiComparison && record.aiComparison.discrepancies) || [];
+  var bondRecovery = (record.aiComparison && record.aiComparison.bondRecovery) || [];
+
+  RIQExport.generateExitReport({
+    reportId: record.id,
+    propertyAddress: address,
+    propertyDetails: propertyDetails,
+    tenantName: record.tenantName || '',
+    signature: record.signature || null,
+    date: new Date(record.date || Date.now()),
+    rooms: rooms,
+    summary: summary,
+    discrepancies: discrepancies,
+    bondRecovery: bondRecovery,
+    totalPhotos: totalPhotos,
+    filename: 'RenterIQ-Exit-Report-' + new Date(record.date || Date.now()).toISOString().split('T')[0] + '.pdf'
+  });
 }
 
 function renderOpenHomeDetail(record){
