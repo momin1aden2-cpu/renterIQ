@@ -28,6 +28,7 @@
   'use strict';
 
   var STORAGE_SDK_URL = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js';
+  var STORAGE_SDK_SRI = 'sha384-oFrOL1TiREYNET0lsYF3LjQuyi2gL7vhjH1X8vFr+umcmzAdPELopeSgbcrv4uRm';
   var storageLoadPromise = null;
 
   // ── Auth-ready promise ─────────────────────────────────────────
@@ -160,6 +161,8 @@
     storageLoadPromise = new Promise(function(resolve, reject) {
       var s = document.createElement('script');
       s.src = STORAGE_SDK_URL;
+      s.integrity = STORAGE_SDK_SRI;
+      s.crossOrigin = 'anonymous';
       s.async = true;
       s.onload = function() { resolve(); };
       s.onerror = function() { reject(new Error('Failed to load Firebase Storage SDK')); };

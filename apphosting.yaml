@@ -5,7 +5,15 @@
 runConfig:
   # Node.js version for build and runtime
   nodeVersion: 20
-  
+
+  # Hard ceiling on parallel instances. Without this, a hostile loop on a
+  # paid endpoint (e.g. /api/analyze-lease) could spin up unlimited Cloud
+  # Run instances and run up the bill before the rate limiter catches up.
+  # Raise once steady-state traffic warrants it.
+  maxInstances: 5
+  minInstances: 0
+  concurrency: 80
+
   # Environment variables (must be set in Firebase Console or .env.local)
   # These are injected at build time and runtime
   environmentVariables:
@@ -15,6 +23,8 @@ runConfig:
     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
     NEXT_PUBLIC_FIREBASE_APP_ID: ${NEXT_PUBLIC_FIREBASE_APP_ID}
+    NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY: ${NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY}
+    REQUIRE_APP_CHECK: ${REQUIRE_APP_CHECK}
 
 # Hosting configuration
 hosting:

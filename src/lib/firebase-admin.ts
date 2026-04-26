@@ -1,5 +1,6 @@
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
+import { getAppCheck, type AppCheck } from 'firebase-admin/app-check';
 
 let cached: { app: App | null; auth: Auth | null } | null = null;
 
@@ -93,4 +94,14 @@ export function adminAuth(): Auth | null {
 
 export function isAdminConfigured(): boolean {
   return init().auth !== null;
+}
+
+export function adminAppCheck(): AppCheck | null {
+  const app = init().app;
+  if (!app) return null;
+  try {
+    return getAppCheck(app);
+  } catch {
+    return null;
+  }
 }

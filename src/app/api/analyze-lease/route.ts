@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { requireAuth, aiKillSwitch } from '@/lib/api-auth';
-import { requireFeature } from '@/lib/feature-gate';
+import { markFreebieUsed, requireFeature } from '@/lib/feature-gate';
 
 const STATE_CONTEXT: Record<string, { name: string; act: string; authority: string; bondWeeks: number; bondAuthority: string }> = {
   NSW: { name: 'New South Wales', act: 'Residential Tenancies Act 2010 (NSW)', authority: 'NSW Fair Trading', bondWeeks: 4, bondAuthority: 'Rental Bond Board' },
@@ -236,12 +236,20 @@ export async function POST(request: Request) {
 
     try {
       const analysis = JSON.parse(jsonStr);
+      // Successful analysis on a first-free grant — mark the freebie as
+      // spent server-side so it can't be replayed.
+      if (gate.ok && gate.reason === 'first_free' && auth.uid) {
+        await markFreebieUsed(auth.uid, 'lease_review');
+      }
       return NextResponse.json(analysis);
     } catch {
       // If the response was truncated mid-clause, try to salvage it by finding
       // the last complete clause and closing the JSON manually.
       const recovered = tryRecoverTruncatedJson(jsonStr);
       if (recovered) {
+        if (gate.ok && gate.reason === 'first_free' && auth.uid) {
+          await markFreebieUsed(auth.uid, 'lease_review');
+        }
         return NextResponse.json(recovered);
       }
       console.error('Failed to parse lease analysis JSON:', text.slice(0, 500));

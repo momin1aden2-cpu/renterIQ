@@ -20,12 +20,15 @@
   'use strict';
 
   var CDN_URL = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js';
+  var CDN_SRI = 'sha384-aBc0BOllaGWrQx51DYt978St/L7B+21jzNGc4N/jnGD0NxGwj8S/ftRgW0AkXIak';
   var loaded = false;
 
   function loadLib(cb) {
     if (loaded && window.html2pdf) { cb(); return; }
     var script = document.createElement('script');
     script.src = CDN_URL;
+    script.integrity = CDN_SRI;
+    script.crossOrigin = 'anonymous';
     script.onload = function() { loaded = true; cb(); };
     script.onerror = function() { cb(new Error('Failed to load PDF library')); };
     document.head.appendChild(script);

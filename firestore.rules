@@ -77,6 +77,16 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Server-tracked freebie state. The Lease Review first-free counter
+    // lives here because if it lived under users/{uid} the owner could
+    // reset it from the browser and farm unlimited free reviews. Only
+    // the AI route (Admin SDK) writes; owner reads so the UI knows
+    // whether the freebie has been spent.
+    match /free-grants/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

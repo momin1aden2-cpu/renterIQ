@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminAuth, isAdminConfigured } from './firebase-admin';
+import { adminAppCheck, adminAuth, isAdminConfigured } from './firebase-admin';
 import { checkRateLimit } from './rate-limit';
 
 export type AuthResult =
@@ -30,7 +30,35 @@ type Options = {
   /** If true, an unauthenticated caller falls back to IP-bucketed rate limiting
    *  instead of returning 401. Use for endpoints that must work before sign-in. */
   allowAnonymous?: boolean;
+  /** If true, skip App Check verification for this route. Use only for
+   *  endpoints that must work without a configured client (e.g. public
+   *  marketing-page metadata). Defaults to false. */
+  skipAppCheck?: boolean;
 };
+
+/**
+ * Verify the X-Firebase-AppCheck header on an incoming request. Returns:
+ *   - 'pass'   — header verified by Firebase
+ *   - 'absent' — header missing (caller decides whether to enforce)
+ *   - 'fail'   — header present but invalid (always reject)
+ *
+ * Enforcement is gated on REQUIRE_APP_CHECK=true so we can ship the wiring
+ * before the reCAPTCHA Enterprise site key is provisioned. Once the key is
+ * live in production, set REQUIRE_APP_CHECK=true to make missing/invalid
+ * tokens a hard 401.
+ */
+async function verifyAppCheck(req: Request): Promise<'pass' | 'absent' | 'fail'> {
+  const token = req.headers.get('x-firebase-appcheck') || '';
+  if (!token) return 'absent';
+  const checker = adminAppCheck();
+  if (!checker) return 'absent';
+  try {
+    await checker.verifyToken(token);
+    return 'pass';
+  } catch {
+    return 'fail';
+  }
+}
 
 /**
  * Gate an API route on a Firebase ID token + per-UID rate limit.
@@ -45,6 +73,21 @@ export async function requireAuth(
 ): Promise<AuthResult> {
   const limit = opts.limit ?? 30;
   const windowMs = opts.windowMs ?? 60 * 60 * 1000;
+
+  // App Check — verify the request came from our genuine client, not a
+  // scripted attacker hitting the API directly with a stolen ID token.
+  // Always reject a present-but-invalid token. Enforce missing tokens only
+  // when REQUIRE_APP_CHECK=true (so we can ship the wiring before the
+  // site key is provisioned).
+  if (!opts.skipAppCheck) {
+    const ac = await verifyAppCheck(req);
+    if (ac === 'fail') {
+      return { ok: false, response: NextResponse.json({ error: 'App Check verification failed' }, { status: 401 }) };
+    }
+    if (ac === 'absent' && process.env.REQUIRE_APP_CHECK === 'true') {
+      return { ok: false, response: NextResponse.json({ error: 'App Check token required' }, { status: 401 }) };
+    }
+  }
 
   const header = req.headers.get('authorization') || '';
   const match = header.match(/^Bearer\s+(.+)$/i);

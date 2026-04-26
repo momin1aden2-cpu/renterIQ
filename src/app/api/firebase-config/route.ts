@@ -8,7 +8,13 @@ export async function GET() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     // VAPID key for Web Push (FCM). Generate at:
     // Firebase Console → Project Settings → Cloud Messaging → Web Push certificates
-    vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || null
+    vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || null,
+    // reCAPTCHA Enterprise site key for App Check. When present, the client
+    // initialises App Check and attaches the token to Firestore/Storage/Auth
+    // SDK calls and to our own /api/ requests. Without it, App Check stays
+    // dormant — set NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY in App Hosting
+    // env, then enforce in Firebase Console.
+    appCheckSiteKey: process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY || null
   };
 
   return new Response(

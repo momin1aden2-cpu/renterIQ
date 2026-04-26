@@ -17,7 +17,7 @@ const PURCHASE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
  * still can't call the AI.
  *
  * Rules:
- *   - lease_review: first use free (leaseReviewCount === 0), then require a
+ *   - lease_review: first use free (no entry in free-grants), then require a
  *     lease_review purchase within the grace window.
  *   - entry_condition / exit_bond_shield: require a matching purchase within
  *     the grace window.
@@ -30,23 +30,31 @@ export async function requireFeature(uid: string, feature: FeatureKey): Promise<
     return { ok: true, reason: 'admin_not_configured' };
   }
 
-  let leaseReviewCount = 0;
   const db = getFirestore();
+  let freeUsed = false;
 
-  // Freebie counter lives under the user's own state doc. Users can write
-  // this, so an attacker could only get *one additional* free review per
-  // tampered reset — capped hard by the rate limiter on the AI route.
+  // Authoritative freebie tracker. Writes are server-only (firestore.rules
+  // denies client writes to /free-grants/*) so the user can't reset it.
   try {
-    const snap = await db.collection('users').doc(uid).collection('state').doc('payments').get();
-    if (snap.exists) {
-      const data = snap.data() as { leaseReviewCount?: number } | undefined;
-      leaseReviewCount = (data && data.leaseReviewCount) || 0;
+    const grant = await db.collection('free-grants').doc(uid).get();
+    if (grant.exists) {
+      const data = grant.data() as { leaseReviewUsed?: boolean } | undefined;
+      freeUsed = !!(data && data.leaseReviewUsed);
+    } else {
+      // Honour the legacy client-tracked counter so users who already spent
+      // their freebie pre-migration don't get a second one. Read-only — we
+      // only use it to decide; we don't carry the value forward.
+      const legacy = await db.collection('users').doc(uid).collection('state').doc('payments').get();
+      if (legacy.exists) {
+        const data = legacy.data() as { leaseReviewCount?: number } | undefined;
+        if (data && (data.leaseReviewCount || 0) > 0) freeUsed = true;
+      }
     }
   } catch (err) {
     console.warn('[feature-gate] freebie read failed:', err);
   }
 
-  if (feature === 'lease_review' && leaseReviewCount === 0) {
+  if (feature === 'lease_review' && !freeUsed) {
     return { ok: true, reason: 'first_free' };
   }
 
@@ -86,4 +94,24 @@ export async function requireFeature(uid: string, feature: FeatureKey): Promise<
       { status: 402 }
     )
   };
+}
+
+/**
+ * Mark the lease-review freebie as spent. Called from the analyze-lease route
+ * AFTER a successful first-free analysis so a user can't farm unlimited free
+ * reviews by resetting their browser state. Idempotent — if already set, the
+ * second write just refreshes the timestamp.
+ */
+export async function markFreebieUsed(uid: string, feature: FeatureKey): Promise<void> {
+  if (feature !== 'lease_review') return;
+  if (!isAdminConfigured()) return;
+  try {
+    const db = getFirestore();
+    await db.collection('free-grants').doc(uid).set(
+      { leaseReviewUsed: true, leaseReviewUsedAt: Date.now() },
+      { merge: true }
+    );
+  } catch (err) {
+    console.warn('[feature-gate] markFreebieUsed failed:', err);
+  }
 }

@@ -6,6 +6,44 @@
 (function() {
   'use strict';
 
+  var APPCHECK_SDK_URL = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js';
+  var APPCHECK_SDK_SRI = 'sha384-iF93NE9DFYjJ/GJcb4h18LKfvMn3Ppl4GSSFZ8RFvwc7OtGGQSHQXbHEdO8Rknhj';
+  var appCheckLoadPromise = null;
+  var appCheckReady = false;
+
+  function loadAppCheckSDK() {
+    if (typeof firebase !== 'undefined' && firebase.appCheck) return Promise.resolve();
+    if (appCheckLoadPromise) return appCheckLoadPromise;
+    appCheckLoadPromise = new Promise(function(resolve, reject) {
+      var s = document.createElement('script');
+      s.src = APPCHECK_SDK_URL;
+      s.integrity = APPCHECK_SDK_SRI;
+      s.crossOrigin = 'anonymous';
+      s.async = true;
+      s.onload = function() { resolve(); };
+      s.onerror = function() { reject(new Error('Failed to load App Check SDK')); };
+      document.head.appendChild(s);
+    });
+    return appCheckLoadPromise;
+  }
+
+  function initializeAppCheck() {
+    if (appCheckReady) return Promise.resolve();
+    var siteKey = window.__FIREBASE_CONFIG__ && window.__FIREBASE_CONFIG__.appCheckSiteKey;
+    if (!siteKey) return Promise.resolve(); // App Check not configured yet — fall open
+    return loadAppCheckSDK().then(function() {
+      try {
+        var provider = new firebase.appCheck.ReCaptchaEnterpriseProvider(siteKey);
+        firebase.appCheck().activate(provider, /* isTokenAutoRefreshEnabled */ true);
+        appCheckReady = true;
+      } catch (e) {
+        console.warn('[RenterIQ] App Check activation failed:', e);
+      }
+    }).catch(function(e) {
+      console.warn('[RenterIQ] App Check SDK load failed:', e);
+    });
+  }
+
   function initializeFirebase() {
     // Check if Firebase SDK is loaded
     if (typeof firebase === 'undefined') {
@@ -28,6 +66,11 @@
         return false;
       }
     }
+
+    // App Check must activate immediately after initializeApp so subsequent
+    // Firestore/Auth/Storage calls get a token attached. No-op when site key
+    // isn't configured yet.
+    initializeAppCheck();
 
     // Enable Firestore offline persistence so writes queue while offline and
     // sync when back online. Must be called before any other Firestore use.
@@ -70,11 +113,26 @@
 
   window.initializeFirebase = initializeFirebase;
 
-  // Attach a Firebase ID token to outbound /api/ requests so server routes
-  // can verify the caller's uid and apply per-user rate limits.
+  // Attach a Firebase ID token + App Check token to outbound /api/ requests so
+  // server routes can verify the caller's uid and origin, and apply per-user
+  // rate limits. App Check token is attached only when the SDK has been
+  // activated (i.e. APPCHECK_SITE_KEY is set) — otherwise the header is
+  // omitted and the server-side gate falls open per its own env flag.
   if (!window.__RIQ_FETCH_PATCHED__) {
     window.__RIQ_FETCH_PATCHED__ = true;
     var nativeFetch = window.fetch.bind(window);
+
+    function getAppCheckToken() {
+      try {
+        if (typeof firebase === 'undefined' || !firebase.appCheck) return Promise.resolve(null);
+        return firebase.appCheck().getToken(/* forceRefresh */ false)
+          .then(function(res) { return (res && res.token) || null; })
+          .catch(function() { return null; });
+      } catch (e) {
+        return Promise.resolve(null);
+      }
+    }
+
     window.fetch = function(input, init) {
       try {
         var url = typeof input === 'string' ? input : (input && input.url) || '';
@@ -85,11 +143,12 @@
           return nativeFetch(input, init);
         }
         var user = firebase.auth().currentUser;
-        if (!user) return nativeFetch(input, init);
-        return user.getIdToken().then(function(token) {
+        var idTokenPromise = user ? user.getIdToken().catch(function(){ return null; }) : Promise.resolve(null);
+        return Promise.all([idTokenPromise, getAppCheckToken()]).then(function(toks) {
           init = init || {};
           var headers = new Headers(init.headers || (typeof input !== 'string' && input.headers) || {});
-          if (!headers.has('Authorization')) headers.set('Authorization', 'Bearer ' + token);
+          if (toks[0] && !headers.has('Authorization')) headers.set('Authorization', 'Bearer ' + toks[0]);
+          if (toks[1] && !headers.has('X-Firebase-AppCheck')) headers.set('X-Firebase-AppCheck', toks[1]);
           init.headers = headers;
           return nativeFetch(input, init);
         }).catch(function() {

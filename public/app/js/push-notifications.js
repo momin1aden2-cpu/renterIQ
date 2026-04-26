@@ -28,6 +28,7 @@
   // or fall back to a placeholder that logs a clear error message.
 
   var MESSAGING_SDK_URL = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js';
+  var MESSAGING_SDK_SRI = 'sha384-G+YlsltNcQL59QCo5N1zoQkhGqujKRb2RBu6JuFYNU/ZjoPfdw1Ckm7M6wgDW3eR';
   var messagingLoadPromise = null;
   var currentToken = null;
 
@@ -37,6 +38,8 @@
     messagingLoadPromise = new Promise(function(resolve, reject) {
       var s = document.createElement('script');
       s.src = MESSAGING_SDK_URL;
+      s.integrity = MESSAGING_SDK_SRI;
+      s.crossOrigin = 'anonymous';
       s.async = true;
       s.onload = function() { resolve(); };
       s.onerror = function() { reject(new Error('Failed to load Firebase Messaging SDK')); };
