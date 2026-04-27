@@ -176,10 +176,19 @@ function showPreview(prop) {
   else descEl.style.display = 'none';
 
   var imgWrap = document.getElementById('previewImageWrap');
+  while (imgWrap.firstChild) imgWrap.removeChild(imgWrap.firstChild);
   if (prop.image) {
-    imgWrap.innerHTML = '<img src="' + prop.image + '" alt="" class="share-card-img" loading="eager">';
+    var img = document.createElement('img');
+    img.src = prop.image;
+    img.alt = '';
+    img.className = 'share-card-img';
+    img.loading = 'eager';
+    imgWrap.appendChild(img);
   } else {
-    imgWrap.innerHTML = '<div class="share-card-img">' + src.icon + '</div>';
+    var fallback = document.createElement('div');
+    fallback.className = 'share-card-img';
+    fallback.textContent = src.icon;
+    imgWrap.appendChild(fallback);
   }
 }
 

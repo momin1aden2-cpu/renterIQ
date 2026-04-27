@@ -747,7 +747,7 @@ function appendPhotoLinksToEmail(body){
   return (body || '').replace(/\s+$/, '') + block;
 }
 
-function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 function copyDraft(){
   var body=document.getElementById('emailBody').value;

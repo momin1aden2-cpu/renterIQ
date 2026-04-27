@@ -99,6 +99,21 @@
 
   window.initializeFirebase = initializeFirebase;
 
+  // Single source of truth for HTML escaping. Several pages had their own
+  // partial copies (some missing " and ', which left attribute contexts
+  // open). New code should always reach for window.escHtml; the local copies
+  // are being phased out.
+  if (!window.escHtml) {
+    window.escHtml = function(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    };
+  }
+
   // Attach a Firebase ID token + App Check token to outbound /api/ requests so
   // server routes can verify the caller's uid and origin, and apply per-user
   // rate limits. App Check token is attached only when the SDK has been
