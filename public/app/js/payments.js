@@ -34,6 +34,32 @@
 (function() {
   'use strict';
 
+  // DEV-ONLY: payments bypass — remove when Pin Payments lands.
+  // Magic-URL toggle for demo devices. Visiting any /app/... URL with
+  //   ?riqdemo=on   → enables the bypass on this device (sets localStorage)
+  //   ?riqdemo=off  → revokes it
+  // Either way the param is stripped from the URL so the link stays clean.
+  // Use case: bookmark renteriq.com.au/app/?riqdemo=on, hand it to a demo
+  // phone, tap once. The server still has to be opted in via the
+  // DEV_PAYMENTS_BYPASS env var or this flag does nothing on its own.
+  (function applyDemoUrlToggle() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var demo = params.get('riqdemo');
+      if (demo !== 'on' && demo !== 'off') return;
+      if (demo === 'on') {
+        localStorage.setItem('riq_dev_bypass', '1');
+      } else {
+        localStorage.removeItem('riq_dev_bypass');
+      }
+      params.delete('riqdemo');
+      var qs = params.toString();
+      var clean = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+      window.history.replaceState({}, '', clean);
+      try { console.warn('[RIQPayments] Demo mode ' + (demo === 'on' ? 'activated' : 'deactivated') + ' on this device'); } catch (e) {}
+    } catch (e) {}
+  })();
+
   var FEATURES = {
     lease_review:      { name: 'Lease Review',            price: '$4.99',  priceCents: 499,  freeFirst: true, freeField: 'leaseReviewCount', heroIcon: '📑', heroLine: 'Get a plain-English breakdown of every clause in your lease.' },
     entry_condition:   { name: 'Bond-Shield Move-In',     price: '$24.99', priceCents: 2499, freeFirst: false, heroIcon: '🏠', heroLine: 'Document the property at move-in with timestamped photos — protects your bond from day one.' },

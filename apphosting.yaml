@@ -25,6 +25,8 @@ runConfig:
     NEXT_PUBLIC_FIREBASE_APP_ID: ${NEXT_PUBLIC_FIREBASE_APP_ID}
     NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY: ${NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY}
     REQUIRE_APP_CHECK: ${REQUIRE_APP_CHECK}
+    # DEV-ONLY: payments bypass — remove when Pin Payments lands.
+    DEV_PAYMENTS_BYPASS: "true"
 
 # Hosting configuration
 hosting:
