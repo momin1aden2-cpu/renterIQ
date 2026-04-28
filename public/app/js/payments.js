@@ -49,6 +49,21 @@
   var readyPromise = new Promise(function(res) { readyResolve = res; });
   var payState = null;
 
+  // DEV-ONLY: payments bypass — remove when Pin Payments lands.
+  // Auto-on when running on localhost. On the live domain, set
+  //   localStorage.setItem('riq_dev_bypass','1')
+  // in the device's DevTools to enable testing without paying. The server gate
+  // also has to be opted in via DEV_PAYMENTS_BYPASS=true; the client flag alone
+  // will not unlock paid AI calls.
+  function isDevBypassActive() {
+    try {
+      var host = (window.location && window.location.hostname) || '';
+      if (host === 'localhost' || host === '127.0.0.1' || host === '::1') return true;
+      if (localStorage.getItem('riq_dev_bypass') === '1') return true;
+    } catch (e) {}
+    return false;
+  }
+
   function loadState() {
     try {
       var raw = localStorage.getItem(LOCAL_KEY);
@@ -343,6 +358,12 @@
     gate: function(featureKey) {
       var feat = FEATURES[featureKey];
       if (!feat) return Promise.resolve(true);
+
+      // DEV-ONLY: payments bypass — remove when Pin Payments lands.
+      if (isDevBypassActive()) {
+        try { console.warn('[RIQPayments] DEV bypass — gate auto-passed for', featureKey); } catch (e) {}
+        return Promise.resolve(true);
+      }
 
       return readyPromise.then(function() {
         // Freebie check (1st lease review)

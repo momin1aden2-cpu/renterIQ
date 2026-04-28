@@ -5,7 +5,7 @@ import { adminAuth, isAdminConfigured } from './firebase-admin';
 export type FeatureKey = 'lease_review' | 'entry_condition' | 'exit_bond_shield';
 
 type GateResult =
-  | { ok: true; reason: 'first_free' | 'paid' | 'admin_not_configured' }
+  | { ok: true; reason: 'first_free' | 'paid' | 'admin_not_configured' | 'dev_bypass' }
   | { ok: false; response: NextResponse };
 
 /** How long after purchase the server will honour it. */
@@ -26,6 +26,14 @@ const PURCHASE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
  * credentials). In production, admin is always configured so the check runs.
  */
 export async function requireFeature(uid: string, feature: FeatureKey): Promise<GateResult> {
+  // DEV-ONLY: payments bypass — remove when Pin Payments lands.
+  // Toggled by the DEV_PAYMENTS_BYPASS env var so it can never be flipped from
+  // a request body. Production hosting simply doesn't set this var.
+  if (process.env.DEV_PAYMENTS_BYPASS === 'true') {
+    console.warn('[feature-gate] DEV bypass active for', feature, 'uid', uid);
+    return { ok: true, reason: 'dev_bypass' };
+  }
+
   if (!isAdminConfigured() || !adminAuth()) {
     return { ok: true, reason: 'admin_not_configured' };
   }
